@@ -7,11 +7,12 @@
 \title{Claire PhD Research Outline}
 \begin{document}
 \maketitle
-\section{Timeline}
+
+\section{(Time)line}
 \begin{enumerate}
 \item Dynamic topography (key parameters---$M_p$, $q_{\rm stellar}$, $H_0$, $t_{\rm age}$, core radius fraction) 
 	\begin{enumerate}
-	\item Steady state heat flux calculation as function of $a$, $H_0$, $X_{\rm K, U, Th}$
+	\item Steady state heat flux calculation as function of $a$, $M_p$, $X_{\rm K, U, Th}$
 	\item Thermal model
 	
 		\begin{enumerate}
@@ -36,8 +37,44 @@
 	
 \end{enumerate}
 	
-		
+\section{Some simple calculations}
 
+\subsection{Steady state heat flux}
+
+We model a planet as a uniform sphere with mass $M_p$ and density $\rho$, and write energy balance equations for the surface and interior with fluxes in W. 
+
+At the surface, $Q_{\rm sfc}^{\uparrow} = Q_*^{\downarrow} + Q^{\uparrow}_{\rm bl}$, where $Q_{\rm sfc}^{\uparrow}$ is the blackbody radiation lost to space, $Q_*^{\downarrow}$ is the incident stellar flux, and $Q_{bl}$ is the flux from the interior from conduction across the boundary layer. The left hand side comprises outgoing fluxes, and the right hand side comprises incoming fluxes. 
+
+In the interior, the outgoing conductive flux across the boundary layer is balanced by internal radiogenic heating, $Q^{\uparrow}_{\rm bl} = Q_{\rm rad}$. If we don't know the boundary layer flux, which would depend on interior temperature, then
+\begin{equation}
+Q_{\rm sfc}^{\uparrow} = Q_*^{\downarrow} + Q_{\rm rad}.
+\end{equation}
+
+We can make order-of-magnitude estimations. First, the stellar contribution is parameterized as
+\begin{equation}
+Q_*^{\downarrow} = \frac{L_*(1-A)}{4a^2} \; \pi R_p^2,
+\end{equation}
+where $L_*$ is the stellar luminosity in W, $A$ is the planetary albedo, $a$ is the orbital semi-major axis in m, and $R_p = \left(\frac{3M_p}{4 \pi \rho}\right)^{1/3}$ is the radius of the planet. For a blackbody with 0 albedo, 
+\begin{equation}
+Q_*^{\downarrow} = \frac{10^{26} \; {\rm W}}{\left(10^{11}\right)^2 \; \rm{m}^2} \cdot \left(\frac{10^{24}\;{\rm kg}}{10^3 \; {\rm kg}\;{\rm m}^3}\right)^{2/3} = 10^{17} \; {\rm W}.
+\end{equation}
+
+
+Next,
+\begin{equation}
+Q_{\rm rad} = \sum^{\rm K, U, Th}_n [ H_{0, n} \; X_n \; n_0 \; e^{\ln 2 \frac{\tau}{\tau_{1/2 ,n}}} ] \; M_p,
+\end{equation}
+where we are summing over the heat-producing elements K, U, and Th, $H_{0, n}$ is the heat production of the $n^{th}$ isotope in W kg$^{-1}$, $X_n$ is the natural abundance of the $n^{th}$ isotope in terms of mass (compared to all isotopes of that element), $n_0$ is the concentration by mass of that element in the planet, $\tau$ is the age of the planet in seconds,  $\tau_{1/2 ,n}$ is the half-life of the $n^{th}$ isotope in seconds, and $M_p$ is the mass of the planet in kg. Using Earth values, and taking only the isotope with highest-order heat flux (40-K), we have
+\begin{equation}
+Q_{\rm rad} = \frac{10^{-5}\;{\rm W}}{{\rm kg}\;^{40}{\rm K}} \cdot \frac{10^{-3}\;\rm{kg\;K}}{\rm kg} \cdot \frac{10^{-4}\;{\rm kg}\;^{40}{\rm K}}{\rm{kg\;K}} \cdot 10^{24} \; {\rm kg} = 10^{12} \; {\rm W}.
+\end{equation}
+
+Therefore, $Q_{\rm sfc}^{\uparrow} = 10^{17} \; {\rm W} + 10^{12} \; {\rm W} = 10^{17} \; {\rm W}$.
+
+In terms of flux densities, we assume an isotropically-emitting sphere, so we have $q_{\rm sfc}^{\uparrow} = Q_{\rm sfc}^{\uparrow}/\rm{SA}_p$ where $\rm{SA}_p = 4\pi\;R_p^2$ is the of the planet's surface area, giving 
+\begin{equation}
+q_{\rm sfc}^{\uparrow} = \frac{10^{17} \; {\rm W}}{10^1 \cdot \left(10^{24}\;{\rm kg}/10^3 \; {\rm kg}\;{\rm m}^3\right)^{2/3}} = 10^2 \; \rm{W\;m}^{-2}.
+\end{equation}
 
 
 \end{document}
