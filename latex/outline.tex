@@ -85,11 +85,11 @@ The thermal state of a planetary mantle is controlled by the balance of heat los
 
 The change in temperature due to this balance is governed by the O.D.E.,
 \begin{equation}
-M_m c_v \frac{{\rm d}T_m}{{\rm d}t} = -Q_{\rm lid} + Q_{\rm rad},
+M_m c_v \frac{{\rm d}T_m}{{\rm d}t} = -Q_{\rm lid} + Q_{\rm rad} + Q_{\rm CMB},
 \end{equation}
 where $M_m$ is the mantle mass, $c_v$ is the mantle specific heat capacity at constant volume, $Q$ is the integral of the heat flux over surface area or volume, respectively, and the sign of $Q$ indicates cooling or heating. We use {\tt scipy.integrate} to integrate this O.D.E. from $\tau_0$, taken to be the time of magma ocean cooling, until the age of the planet, $\tau_f$.  
 
-Table \ref{tab:params} lists the free parameters in this model, being the planetary mass, $M_p$, semi-major axis, $a$, and core mass fraction, CMF; as well as the stellar luminosity, $L_*$, planetary albedo, Alb, mantle thermal conductivity, $k_m$, mantle thermal expansivity, $\alpha_m$, mantle density, $\rho_m$, mantle heat capacity at constant volume, $c_v$, critical Rayleigh number for convection, Ra$_{\rm crit}$, and mantle dynamic viscosity, $\eta_m$.
+Table \ref{tab:params} lists the free parameters in this model, being the planetary mass, $M_p$, semi-major axis, $a$, and core mass fraction, CMF; as well as the stellar luminosity, $L_*$, planetary albedo, Alb, mantle thermal conductivity, $k_m$, mantle thermal expansivity, $\alpha_m$, mantle density, $\rho_m$, mantle heat capacity at constant volume, $c_v$, critical Rayleigh number for convection, Ra$_{\rm crit}$, and mantle dynamic viscosity, $\eta_m$, along with the radioisotope parameters described above.
 
 From this we also calculate a number of derived parameters:
 
@@ -120,7 +120,7 @@ A vigorously-convecting medium is said to be isothermal except in its upper and 
 Q_{\rm lid} &= \int_{\rm A} q_{\rm lid} \; {\rm d}A = q_{\rm lid} \; {\rm SA}_p,\\
 q_{\rm lid} &= \frac{k_m \Delta T}{d_{\rm lid}}.
 \end{align}
-Here, $d_{\rm lid}$ is calculated by setting the Rayleigh number to its critical value for initiating convection:
+$d_{\rm lid}$ is calculated by setting the Rayleigh number to its critical value for initiating convection:
 \begin{equation}
 d_{\rm lid} = \left(\frac{{\rm Ra}_c \eta_m \kappa_m}{\alpha_m \rho_m g_{\rm sfc} \Delta T}\right)^{\frac{1}{3}}
 \end{equation}
