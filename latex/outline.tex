@@ -65,7 +65,7 @@ Q_*^{\downarrow} = \frac{10^{26} \; {\rm W}}{\left(10^{11}\right)^2 \; \rm{m}^2}
 
 Next,
 \begin{equation}
-Q_{\rm rad} = \sum^{\rm K, U, Th}_n [ H_{0, n} \; X_n \; n_0 \; e^{\ln 2 \frac{\tau}{\tau_{1/2 ,n}}} ] \; M_p,
+Q_{\rm rad} = \sum^{\rm K, U, Th}_n [ H_{0, n} \; X_n \; n_0 \; e^{-\ln 2 \frac{\tau}{\tau_{1/2 ,n}}} ] \; M_p,
 \end{equation}
 where we are summing over the heat-producing elements K, U, and Th, $H_{0, n}$ is the heat production of the $n^{th}$ isotope in W kg$^{-1}$, $X_n$ is the natural abundance of the $n^{th}$ isotope in terms of mass (compared to all isotopes of that element), $n_0$ is the concentration by mass of that element in the planet, $\tau$ is the age of the planet in seconds,  $\tau_{1/2 ,n}$ is the half-life of the $n^{th}$ isotope in seconds, and $M_p$ is the mass of the planet in kg. Using Earth values, and taking only the isotope with highest-order heat flux (40-K), we have
 \begin{equation}
@@ -127,8 +127,8 @@ d_{\rm lid} = \left(\frac{{\rm Ra}_c \eta_m \kappa_m}{\alpha_m \rho_m g_{\rm sfc
 
 Meanwhile, radiogenic heating is the same as in the previous section:
 \begin{align}
-Q_{\rm rad} &= \int_{\rm A} q_{\rm rad} \; {\rm d}M = q_{\rm rad} M_p,\\
-q_{\rm rad} &= \sum^{\rm K, U, Th}_n \left[ H_{0, n} \; X_n \; n_0 \; e^{\ln 2 \frac{\tau}{\tau_{1/2 ,n}}} \right],
+Q_{\rm rad} &= \int_{\rm M_p} q_{\rm rad} \; {\rm d}M = q_{\rm rad} M_p,\\
+q_{\rm rad} &= \sum^{\rm K, U, Th}_n \left[ H_{0, n} \; X_n \; n_0 \; e^{-\ln 2 \frac{\tau}{\tau_{1/2 ,n}}} \right],
 \end{align}
 
 If CMF \textgreater\; 0, then the heat flux across the core-mantle boundary is obtained by analogy to Earth, assuming the same flux density, $q_{\rm CMB}$:
