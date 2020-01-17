@@ -1,9 +1,26 @@
-\begin{thebibliography}{2}
+\begin{thebibliography}{4}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Davaille and Jaupart(1993)]{DavailleJaupart1993}
+Anne Davaille and Claude Jaupart.
+\newblock Transient high-rayleigh-number thermal convection with large
+  viscosity variations.
+\newblock \emph{Journal of Fluid Mechanics}, 253:\penalty0 141–166, 1993.
+\newblock \doi{10.1017/S0022112093001740}.
+
+\bibitem[{Thiriet} et~al.(2019){Thiriet}, {Breuer}, {Michaut}, and
+  {Plesa}]{Thiriet2019}
+M{\'e}lanie {Thiriet}, Doris {Breuer}, Chlo{\'e} {Michaut}, and Ana-Catalina
+  {Plesa}.
+\newblock {Scaling laws of convection for cooling planets in a stagnant lid
+  regime}.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 286:\penalty0
+  138--153, Jan 2019.
+\newblock \doi{10.1016/j.pepi.2018.11.003}.
 
 \bibitem[Zeng and Jacobsen()]{Zeng2017}
 Li~Zeng and Stein~B. Jacobsen.

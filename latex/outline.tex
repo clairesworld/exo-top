@@ -5,15 +5,20 @@
 \usepackage{amssymb}
 \usepackage{natbib}
 \bibliographystyle{plainnat}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{subcaption}
 
 \author{Claire Marie Guimond, Oliver Shorttle, John Rudge}
 \title{Claire PhD Research Outline}
+
 \begin{document}
+
 \maketitle
 
 \section{Steps}
 \begin{enumerate}
-\item Dynamic topography (key parameters---$M_p$, $q_{\rm stellar}$, $H_0$, $t_{\rm age}$, core radius fraction) 
+\item Dynamic topography (key parameters---$a$, $M_p$, $q_{\rm stellar}$, $H_0$, $t_{\rm age}$, core mass fraction) 
 	\begin{enumerate}
 	\item Steady state heat flux calculation as function of $a$, $M_p$, $X_{\rm K, U, Th}$
 	\item Thermal model
@@ -22,7 +27,8 @@
 		
 		\item Steady-state isoviscous mantle
 		\item Temperature-dependent viscosity
-		\item Age dependence
+		\item Evolution with age
+		\item Realistic stagnant lid coupling
 		\end{enumerate}
 	\item Mapping temperatures to topography
 	\end{enumerate}
@@ -81,13 +87,17 @@ q_{\rm sfc}^{\uparrow} = \frac{10^{17} \; {\rm W}}{10^1 \cdot \left(10^{24}\;{\r
 
 \subsection{Thermal evolution of mantle with uniform viscosity and temperature}
 
-The thermal state of a planetary mantle is controlled by the balance of heat loss (by conduction through the lid), $Q_{\rm lid}$, with (radiogenic) heating, $Q_{\rm rad}$. Secular core cooling represents an additional source of heat to the mantle, here represented by an optional parameter. In this section we make the preliminary simplifying assumption that viscosity does not change with temperature.
+The thermal state of a planetary mantle is controlled by the balance of heat loss (by conduction through the upper thermal boundary layer), $Q_{\rm ubl}$, with radiogenic heating, $Q_{\rm rad}$. Secular core cooling represents an additional source of heat to the mantle, here represented by an optional parameter. In this section we make the preliminary simplifying assumption that viscosity does not change with temperature.
 
 The change in temperature due to this balance is governed by the O.D.E.,
 \begin{equation}
-M_m c_v \frac{{\rm d}T_m}{{\rm d}t} = -Q_{\rm lid} + Q_{\rm rad} + Q_{\rm CMB},
+M_m c_v \frac{{\rm d}T_m}{{\rm d}t} = -Q_{\rm ubl} + Q_{\rm rad} + Q_{\rm CMB},
 \end{equation}
 where $M_m$ is the mantle mass, $c_v$ is the mantle specific heat capacity at constant volume, $Q$ is the integral of the heat flux over surface area or volume, respectively, and the sign of $Q$ indicates cooling or heating. We use {\tt scipy.integrate} to integrate this O.D.E. from $\tau_0$, taken to be the time of magma ocean cooling, until the age of the planet, $\tau_f$.  
+
+\begin{table}
+\label{tab:params}
+\end{table}
 
 Table \ref{tab:params} lists the free parameters in this model, being the planetary mass, $M_p$, semi-major axis, $a$, and core mass fraction, CMF; as well as the stellar luminosity, $L_*$, planetary albedo, Alb, mantle thermal conductivity, $k_m$, mantle thermal expansivity, $\alpha_m$, mantle density, $\rho_m$, mantle heat capacity at constant volume, $c_v$, critical Rayleigh number for convection, Ra$_{\rm crit}$, and mantle dynamic viscosity, $\eta_m$, along with the radioisotope parameters described above.
 
@@ -117,28 +127,123 @@ the thermal diffusivity of the mantle,
 
 A vigorously-convecting medium is said to be isothermal except in its upper and lower boundary layers, which have steep temperature gradients.  Heat escapes the system via conduction through the boundary layers. For mantle thermal evolution, we only consider heat transport through the upper boundary layer. Hence mantle cooling depends on the boundary layer thickness, $d_{\rm lid}$, as well as the temperature difference between the mantle and surface, $\Delta T = T_m - T_s$, and the thermal conductivity of the mantle, $k_m$:
 \begin{align}
-Q_{\rm lid} &= \int_{\rm A} q_{\rm lid} \; {\rm d}A = q_{\rm lid} \; {\rm SA}_p,\\
-q_{\rm lid} &= \frac{k_m \Delta T}{d_{\rm lid}}.
+Q_{ubl} &= \int_{\rm A} q_{ubl} \; {\rm d}A = q_{ubl} \; {\rm SA}_p,\\
+q_{ubl} &= \frac{k_m \Delta T}{\delta_{ubl}}.
+\label{eq:q_ubl}
 \end{align}
-$d_{\rm lid}$ is calculated by setting the Rayleigh number to its critical value for initiating convection:
+$\delta_{ubl}$ is calculated by setting the Rayleigh number to its critical value for initiating convection:
 \begin{equation}
-d_{\rm lid} = \left(\frac{{\rm Ra}_c \eta_m \kappa_m}{\alpha_m \rho_m g_{\rm sfc} \Delta T}\right)^{\frac{1}{3}}
+\delta_{ubl} = \left(\frac{{\rm Ra}_c \eta_m \kappa_m}{\alpha_m \rho_m g_{\rm sfc} \Delta T}\right)^{\frac{1}{3}}
+\label{eq:d_ubl}
 \end{equation}
 
 Meanwhile, radiogenic heating is the same as in the previous section:
 \begin{align}
-Q_{\rm rad} &= \int_{\rm M_p} q_{\rm rad} \; {\rm d}M = q_{\rm rad} M_p,\\
+Q_{\rm rad} &= \int_{M_p} q_{\rm rad} \; {\rm d}M = q_{\rm rad} M_p,\\
 q_{\rm rad} &= \sum^{\rm K, U, Th}_n \left[ H_{0, n} \; X_n \; n_0 \; e^{-\ln 2 \frac{\tau}{\tau_{1/2 ,n}}} \right],
 \end{align}
 
-If CMF \textgreater\; 0, then the heat flux across the core-mantle boundary is obtained by analogy to Earth, assuming the same flux density, $q_{\rm CMB}$:
-\begin{equation}
-Q_{\rm CMB} = q_{\rm CMB}\;{\rm SA}_c
-\end{equation}
+If CMF \textgreater \; 0, then the heat flux across and thickness of the lower thermal boundary layer of the mantle is obtained by analogy to equations \ref{eq:q_ubl} and \ref{eq:d_ubl}, where $\Delta T = T_c - T_m$, $\delta_{ubl}$ is replaced by lower boundary layer thickness $\delta_{lbl}$ with gravity evaluated at $R_c$.
 
 %\begin{equation}
 %{\frac{{\rm d}T_m}{{\rm d}t}}_{\rm rad} = \frac{h [{\rm W} \; {\rm kg}^{-1}] \times M_m [{\rm kg}]}{M_m [{\rm kg}] \times c_v [{\rm J}\;{\rm kg}^{-1}\;{\rm K}^{-1}]} = \frac{{\rm K}}{{\rm s}}
 %\end{equation}
+
+\subsection{Thermal evolution of a stagnant lid planet}
+
+So far, we have not distinguished between the upper thermal boundary layer of the mantle and the stagnant lid. This is important because the stagnant lid may have a different temperature profile than the convecting mantle, with different internal heating rates. In reality the temperature at the top of the mantle thermal boundary layer, $T_l$, would not be set at the planetary surface temperature. To find the radius $R_l$ at which we find $T_l$, we use continuity of temperature.
+
+Fluid dynamics experiments show that the temperature jump, $\Delta T_{ubl}$, between the isothermal core at $T_m$ and the top of the thermal boundary layer at $T_l$ is proportional to the ``viscous temperature scale" $\Delta T_\eta$, the rate of viscosity change with temperature \citep{DavailleJaupart1993}. Following the method of \citet{Thiriet2019}, $\Delta T_{ubl}$ is a function of only the isothermal core temperature:
+\begin{align}
+\label{eq:Tl}
+\Delta T_{ubl} &= -a_{rh} \Delta T_{\eta} \\
+\Delta T_{\eta} &= \frac{\eta(T_m)}{{\rm d}\eta/{\rm d}T_m\vert_{Tm}} = \frac{R_b T_m^2}{E_a},
+\end{align}
+Here, $R_b$ is the universal gas constant, and $a_{rh} = 2.54$ based on fits to 3D convection models \citep{Thiriet2019}. $E_a$ is the activation energy in the Arrhenius law for viscosity as a function of temperature:
+
+\begin{equation}
+\eta(T_m) = \eta_0 \; {\rm exp}\left[\frac{E_a}{R_b}\left(\frac{1}{T_m} - \frac{1}{T_0}\right)\right],
+\end{equation} 
+where $\eta_0$ and $T_0$ are the reference viscosity and temperature.
+
+In the stagnant lid of thickness $d_l$ above this layer, the temperature decreases from $T_l = T_m + \Delta T_{ubl}$ to $T_s$ by conductive heat transport. As on Earth, there may be different internal heating rates in this layer than in the mantle; the temperature profile in figure \ref{fig:T_z} is:
+\begin{equation}
+T_{\rm lid}(z) = \frac{-H_l}{2k}z^2 - \frac{q_{ubl} +d_l H_l}{k}z + T_s,
+\end{equation}
+where the $z$-axis points perpendicularly upwards from the surface, $z=0$. $H_l$ is the lithospheric heat production in W m$^{-3}$, assumed to be constant with $z$ at a given time step for simplicity. This is the standard solution for steady-state heat conduction with internal heating, where $q(z=0) = q(z=-\Delta z) + H \Delta z$.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{../T_z.png} 
+ \caption{Thermal profile in the lithosphere for different mantle temperatures $T_m$ (coloured lines). Dashed lines show the temperature at the lid base from equation \ref{eq:Tl} for that mantle temperature. \label{fig:T_z}}
+\end{figure}
+
+Our coupled 1D model necessitates that temperature is continuous where the upper thermal boundary layer meets the stagnant lid:
+\begin{align}
+\label{eq:t-continuity}
+&T_{\rm lid}(z=-d_l) = T_m + \Delta T_\eta \\
+&\frac{H_l}{2k}d_l^2 + \frac{q_{ubl}\left(T_m\right)}{k}d_l + \left(T_m - T_s - \frac{R_b}{E_a}T_m^2\right)  = 0
+\end{align}
+%\frac{-H_l}{2k}\left(-d_l\right)^2 - \frac{q_{\rm ubl} + \left(H_l\right)\left(-d_l\right)}{k\left(-d\right)} + T_s = T_m - a_{rh} \frac{R_b T_m^2}{E_a}.
+where $q_{ubl}$ is a function of only $T_m$ if $\beta=1/3$ ($\delta_{ubl}$ independent of mantle depth). The roots of this equation give $d_l$ as a function of $T_m(t)$ and $H_l(t)$, which allows $d_l$ to be calculated at each time-step. It can be shown that there is one positive root for our range of parameters. 
+
+We can use {\tt sympy} to write an analytic expression for $d_l$ in terms of $T_m$, although it's quite long. Figure \ref{fig:d_fT} plots this for different values of $H_l$, showing that for our choice of parameters, $d_l$ peaks around $T_m = 1400$~K. 
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{../d_T.png} 
+ \caption{Lid thickness as a function of mantle temperature for different radiogenic heating rates in the lithosphere: either equal to the mantle value (red line), or $10\times$ the mantle value (orange line). \label{fig:d_fT}}
+\end{figure}
+
+Results for the thermal evolution of a 1-Mars mass planet using this stagnant lid parameterization are shown in figure \ref{fig:evol-lid}.
+
+\begin{figure}
+\includegraphics[width=\textwidth]{../figs/evol.png} 
+\caption{Thermal evolution of a 1-Mars mass planet, using the input values of \citet{Thiriet2019}, and assuming that the radiogenic element abundance in the lithosphere is equal to that of the mantle. Results for the lid thickness may be compared to figure \ref{fig:thiriet-lid}. \label{fig:evol-lid}}
+\end{figure}
+
+\begin{figure}
+        \includegraphics[width=\textwidth]{../figs/thiriet.png} 
+        \caption{Stagnant lid evolution from \citet{Thiriet2019}. From their paper: {\footnotesize ``The stagnant lid thickness evolution obtained for Mars’s 3-D model is shown in blue: in (a) if the base of the lid is defined by the intersection between the tangent to the velocity profile at the depth corresponding to the maximum velocity gradient and the radius axis (method 1, Reese et al., 2005), in (b) if it corresponds to the depth where 1\% of the maximum velocity is reached (method 2). We obtain best fits when considering in 1-D models $u$ = 0.345 $a_{rh}$ = 2.16 for method 1 and $u$ = 0.338 $a_{rh}$ = 2.32 for method 2 (red dotted dashed lines). Stagnant lid thickness evolution for 1-D models are also shown for some of our best scaling parameter combinations $u$ = 1/3 and $a_{rh}$ = 2.44 (green
+dashed lines), $u$ = 1/4 and $a_{rh}$ = 5.3 (black dashed lines) and $u$ = 0.335 and $a_{rh}$ = 2.54 (our best combination for the three planets, red solid lines)."} \label{fig:thiriet-lid}}
+\end{figure}
+
+\subsubsection{Some reasons this is wrong}
+
+Firstly, I should be using spherical coordinates to calculate $T_{\rm lid}(z)$, but I got stuck on the maths.
+
+Secondly, this method for calculating the lid thickness seems to pretend d$T$/d$t = 0$, but this can't be true for two reasons: 
+\begin{enumerate}
+\item If $T_{\rm lid}(z)$ is recalculated at each time step, then obviously $T$ is changing for fixed $z$ (might be able to get around this with a change of variables, normalizing between $R_l$ and $R_p$).
+\item If the heat flux in W at radius $r$ is $Q(r)$, then it can be derived\footnote{\url{https://www.eoas.ubc.ca/courses/eosc250/content/Lecture_04_11/ch1.pdf}} that $Q(r + \Delta r) = Q(r) + 4\pi r^2 H_l(r) \Delta r$. Thus $Q(R_l) = Q(R_l + d_l)$ only if $4\pi R_l^2 H_l(r) d_l = 0$.
+\item \citet{Thiriet2019} (and references therein) argue that the time to thermal equilibrium in thick lids is too long to use a steady-state thermal profile.
+\end{enumerate}
+
+Also, I think it is more reasonable to calculate the rate of change ${\rm d}(d_l)/{\rm d}t$ in the governing ODE, instead of calculating $d_l$ directly. 
+
+
+%Plotting $T_{\rm lid}(z = -d)$ as a function of $T_m$ shows an approximately linear relationship:
+
+%\begin{equation}
+%d_l = \left[ \frac{- R_{b} T_m^{2} a_{rh} k + \sqrt{k \left(2.0 E_a^{2} H_l T_m \left(\frac{E_a Ra_{crit} \eta_{0} \kappa e^{\frac{E_a}{R_{b} T_m} - \frac{E_a}{R_{b} T_{0}}}}{R_{b} T_m^{2} a_{rh} \alpha g_{sfc} \rho}\right)^{0.666666666666667} - 2.0 E_a^{2} H_l Ts \left(\frac{E_a Ra_{crit} \eta_{0} \kappa e^{\frac{E_a}{R_{b} T_m} - \frac{E_a}{R_{b} T_{0}}}}{R_{b} T_m^{2} a_{rh} \alpha g_{sfc} \rho}\right)^{0.666666666666667} - 2.0 E_a H_l R_{b} T_m^{2} a_{rh} \left(\frac{E_a Ra_{crit} \eta_{0} \kappa e^{\frac{E_a}{R_{b} T_m} - \frac{E_a}{R_{b} T_{0}}}}{R_{b} T_m^{2} a_{rh} \alpha g_{sfc} \rho}\right)^{0.666666666666667} + R_{b}^{2} T_m^{4} a_{rh}^{2} k\right)}}{E_a H_l \sqrt[3]{\frac{E_a Ra_{crit} \eta_{0} \kappa e^{\frac{E_a}{R_{b} T_m} - \frac{E_a}{R_{b} T_{0}}}}{R_{b} T_m^{2} a_{rh} \alpha g_{sfc} \rho}}}, \  - \frac{R_{b} T_m^{2} a_{rh} k + \sqrt{k \left(2.0 E_a^{2} H_l T_m \left(\frac{E_a Ra_{crit} \eta_{0} \kappa e^{\frac{E_a}{R_{b} T_m} - \frac{E_a}{R_{b} T_{0}}}}{R_{b} T_m^{2} a_{rh} \alpha g_{sfc} \rho}\right)^{0.666666666666667} - 2.0 E_a^{2} H_l Ts \left(\frac{E_a Ra_{crit} \eta_{0} \kappa e^{\frac{E_a}{R_{b} T_m} - \frac{E_a}{R_{b} T_{0}}}}{R_{b} T_m^{2} a_{rh} \alpha g_{sfc} \rho}\right)^{0.666666666666667} - 2.0 E_a H_l R_{b} T_m^{2} a_{rh} \left(\frac{E_a Ra_{crit} \eta_{0} \kappa e^{\frac{E_a}{R_{b} T_m} - \frac{E_a}{R_{b} T_{0}}}}{R_{b} T_m^{2} a_{rh} \alpha g_{sfc} \rho}\right)^{0.666666666666667} + R_{b}^{2} T_m^{4} a_{rh}^{2} k\right)}}{E_a H_l \sqrt[3]{\frac{E_a Ra_{crit} \eta_{0} \kappa e^{\frac{E_a}{R_{b} T_m} - \frac{E_a}{R_{b} T_{0}}}}{R_{b} T_m^{2} a_{rh} \alpha g_{sfc} \rho}}}\right]
+%\end{equation}
+
+%Using the initial values of \citet{Thiriet2019}, both conditions are only satisfied self-consistently if we turn off heat production in the lid, $H_l=0$. In fact, their equation for flux continuity, which I think they 
+%\begin{equation}
+%\frac{T_m - T_l}{\delta{\rm ubl}} = \frac{T_l - T_s}{d_l},
+%\end{equation}
+%assumes (I think) that heat flux is constant with $z$ across the stagnant lid. With radiogenic heating, we should have:
+%\begin{align}
+%\frac{{\rm d}q_{\rm lid}}{{\rm d} z} &= H(t) \\
+%q_{\rm lid}(z) &= Hz + c \\
+%q_{\rm lid}(z = -d) &= q_{\rm ubl} = H(-d) + c\\
+%c &= q_{\rm ubl} + Hd
+%\end{align}
+%This method of finding the heat flux implicitly requires that flux is continuous at $z = -d_{\rm lid}$. We would therefore need to rely on equation (\ref{eq:t-continuity}) to find $d_{\rm lid}$.
+
+
+
+
 
 \bibliography{planetary-interiors}
 
