@@ -1,31 +1,10 @@
 import numpy as np
+from scipy import integrate
 import six
 import math
-import astroenv as astro
-import structure 
-
-###### PHYSICAL CONSTANTS #####~
-M_E = 5.972e24 # earth mass in kg
-R_E = 6371e3 # earth radius in m
-years2sec = 31557600
-sec2Gyr = 1e-9/years2sec
-AU2m = 1.5e11
-R_b = 8.3144598 # universal gas constant in J mol −1 K −1
-
-# Decay constant in 1/sec from Dye (2012) in Treatise on Geophys
-lambda_n = np.array([0.15541417, 0.98458406, 0.04951051, 0.55011681])*1e-9/years2sec  # [238U, 235U, 232Th, 40K]
-
-# Heating rates of radioisotopes per mass of isotope in W kg^-1 from Dye (2012) in Treatise on Geophys
-p_n = [95.13e-6, 568.47e-6, 26.3e-6, 28.47e-6] # [238U, 235U, 232Th, 40K]
-
-# radioisotope abundances
-# TODO: are the below values in moles or mass? 
-K_0 = 0.0117e-2 # ratio of 40-K to total K at time 0 (in Treatise on Geophysics)
-U_0_235 = 0.0072 # ratio of 235-U to total U at time 0 (in Treatise on Geophysics)
-U_0_238 = 0.9927 # ratio of 238-U to total U at time 0 (in Treatise on Geophysics)
-Th_0 = 1 # ratio of 232-Th to total Th at time 0 (in Treatise on Geophysics)
-
-
+import astroenv as ast
+import structure as st 
+import terrestrialplanet as tp
 
 
 ###### SOME THERMODYNAMICS ######
@@ -90,49 +69,11 @@ def rect_flux(r, a0=None, q0=None, r0=None, **kwargs):
     c0 = q0 - a0*r0
     return a0*r + c0
 
-
-
-
-
-
-
-
-
-###### THERMAL MODEL for stagnant lid adapted from Thiriet+ 2019 ######
-
-def init(k_m=None, rho_m=None, rho_c=None, c_m=None, CMF=None, M_p=None, R_p0=None, R_c0=None, 
-         T_s=None, **kwargs):
-    if R_p0 is None:
-        R_p = radius_zeng(M_p, CMF)*R_E # in m
-    else:
-        R_p = R_p0
-    if R_c0 is None:
-        M_m = M_p*(1 - CMF) # mass of mantle
-        CRF = CMF**0.5 # Zeng & Jacobsen 2017
-        M_c = M_p*CMF # M_p - M_m
-        R_c = R_p*CRF
-        #R_c = radius_seager(M_p*CMF, CMF=0, m1=4.34*M_E, r1=2.23*R_E) # EoS for iron... is this consistent?
-    else:
-        R_c = R_c0
-        CRF = R_c0/R_p0
-        M_c = 4/3*np.pi*R_c**3 * rho_c
-        CMF = M_c/M_p
-        M_m = 4/3*np.pi*(R_p**3 - R_c**3)*rho_m  #M_p - M_c
-    SA_p = SA(R=R_p)
-    SA_c = SA(R=R_c) # core surface area 
-    h = R_p - R_c # mantle thickness
-    g_sfc = grav(M_p, R_p)
-    if CMF>0:
-        g_cmb = grav(M_c, R_c)
-    else:
-        g_cmb = 0
-    kappa_m = thermal_diffusivity(k_m, rho_m, c_m)
-    
-    if T_s is None:
-        q_out = q_sfc_outgoing(R_p=R_p, SA_p=SA_p, **kwargs)
-        T_s = T_sfc(q_out)
-    return dict(kappa_m=kappa_m, SA_p=SA_p, SA_c=SA_c, M_m=M_m, g_sfc=g_sfc, R_p=R_p, R_c=R_c,
-                CRF=CRF, g_cmb=g_cmb, h=h, M_c=M_c, T_s=T_s)
+def T_mean(T_m=None, T_l=None, R_p=None, R_l=None, R_c=None, T_s=None, k_m=None, a0=None, **kwargs):
+    '''average temperature across convecting region and lid'''
+    c1 = k_m*(T_l - T_s - a0/(6*k_m)*(R_p**2 - R_l**2))/(R_l**-1 - R_p**-1)
+    c2 = T_s + a0/(6*k_m)*R_p**2 - c1/(k_m*R_p)
+    return 3/(R_p**3 - R_c**3)*((T_m/3)*(R_l**3 - R_c**3) - a0/(30*k_m)*(R_p**5 - R_l**5) + c1/(2*k_m)*(R_p**2 - R_l**2)  + c2/3*(R_p**3 - R_l**3))
 
 def dyn_visc(T=None, nu_0=None, visc_type=None, rho_m=None, **kwargs):
     if visc_type=='constant':
@@ -146,25 +87,27 @@ def dyn_visc(T=None, nu_0=None, visc_type=None, rho_m=None, **kwargs):
     elif visc_type=='Thi':
         return eta_Thi(T, **kwargs)
 
+ #####################################################################
+#
+#   
+#    
+ ##### THERMAL MODEL for stagnant lid adapted from Thiriet+ 2019 ######
+    
+    
 def bdy_thickness_beta(dT=None, R_l=None, R_c=None, Ra_crit=None, beta=None, g=None,
-                       kappa_m=None, eta_m=None, Ea=None, alpha_m=None, rho_m=None, a_rh=None,**kwargs):
+                       kappa_m=None, eta_m=None, alpha_m=None, rho_m=None, **kwargs):
     """Thickness of thermal boundary layer """
     if beta is None:
         beta = 1/3
     Ra_rh = alpha_m*rho_m*g*dT*(R_l - R_c)**3 / (kappa_m*eta_m)
     return (R_l - R_c) * (Ra_crit/Ra_rh)**beta
-    
-def bdy_thickness(dT=None, Ra_crit=None, g=None, kappa_m=None, eta_m=None, alpha_m=None, rho_m=None, 
-                  **kwargs):
-    """Thickness of thermal boundary layer """
-    return (Ra_crit*kappa_m*eta_m/(alpha_m*rho_m*g*dT))**(1/3)
 
 def inv_bdy_thickness(dT=None, Ra_crit=None, g=None, kappa_m=None, eta_m=None, alpha_m=None, rho_m=None, 
                   **kwargs):
     """Thickness of thermal boundary layer """
     return ((alpha_m*rho_m*g*np.absolute(dT))/(Ra_crit*kappa_m*eta_m))**(1/3)
     
-def h_rad(t, tf=None, H_0=None, c_n=None, p_n=None, lambda_n=None, t_vect=False, **kwargs):
+def h_rad(t, tf=None, H_0=None, c_n=None, p_n=None, lambda_n=None, **kwargs):
     """Calculate radiogenic heating in W kg^-1 from Korenaga (2006)"""
     x_n = np.array(c_n)*np.array(p_n)
     x_tot = sum(x_n)
@@ -179,9 +122,8 @@ def h_rad(t, tf=None, H_0=None, c_n=None, p_n=None, lambda_n=None, t_vect=False,
             h[ii] = H_0*sum(h_n*np.exp(lambda_n*(tf-t_val)))
     return h
         
-def H_rad(t=None, M=None, **kwargs):
+def H_rad(h=None, M=None, **kwargs):
     """Calculate energy flux radioisotope decay in W"""
-    h = h_rad(t, **kwargs)
     return h*M 
 
 def q_bl(deltaT, k=None, d_bl=None, beta=None, d_bl_inv=None, **kwargs):
@@ -190,9 +132,9 @@ def q_bl(deltaT, k=None, d_bl=None, beta=None, d_bl_inv=None, **kwargs):
     else:
         return k*deltaT*d_bl_inv
 
-def Q_bl(q=None, deltaT=None, SA=None, h=None, d_bl=None,
-         adiabatic=False, beta=None, Ra_rh=None, **kwargs):
+def Q_bl(q=None, deltaT=None, d_bl=None, beta=None, R=None, **kwargs):
     """Calculate energy flux from conduction across thermal bdy layer in W""" 
+    SA = 4*np.pi*R**2
     if q is None:
         return SA*q_bl(deltaT, k=k, d_bl=d_bl, beta=beta, **kwargs)
     else:
@@ -216,20 +158,18 @@ def dTdt(Q, M, C, **kwargs):
     """
     return Q/(M*C)
 
-def LHS(t, y, M_c=None, c_m=None, c_c=None, SA_c=None, adiabats=0, complexity=3, **kwargs):
-    T_m = y[0]
-    T_c = y[1]
-    D_l = y[2]
-    [R_l, T_l, eta_m, eta_cmb, nu_m, nu_cmb, TBL_u, h_rad_m, q_ubl, Q_ubl, Ra_i, Ra_crit_c, TBL_c, 
-     q_core, Q_core, M_mi, M_lid, H_rad_m, a0, 
-     H_rad_lid, q_sfc, Q_sfc, D_l, T_avg, T_c] = outputs(t, T_m=T_m, T_c=T_c, D_l=D_l, M_c=M_c, c_m=c_m, 
-                                                         SA_c=SA_c, complexity=complexity, **kwargs)
+def LHS(t, y, pl=None, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
+    pl.T_m = y[0]
+    pl.T_c = y[1]
+    pl.D_l = y[2]
+    pl = update_outputs(t, pl, adiabats=adiabats, complexity=complexity, Tlid_ini=Tlid_ini, **kwargs)
     if SA_c>0:
-        dTdt_c = dTdt(-Q_core, M_c, c_c)
+        dTdt_c = dTdt(-pl.Q_core, pl.M_c, pl.c_c)
     else:
         dTdt_c = 0
-    dTdt_m =  dTdt(-Q_ubl + H_rad_m + Q_core, M_mi, c_m)
-    dDdt = lid_growth(T_m=T_m, q_ubl=q_ubl, h0=h_rad_m, R_l=R_l, T_l=T_l, c_m=c_m, **kwargs)
+    dTdt_m =  dTdt(-pl.Q_ubl + pl.H_rad_m + pl.Q_core, pl.M_conv, pl.c_m)
+    dDdt = lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l, rho_m=pl.rho_m, T_s=pl.T_s,
+                      c_m=pl.c_m, k_m=pl.k_m, *kwargs)
     if complexity==3:
         return [dTdt_m, dTdt_c, dDdt]
     elif complexity==2:
@@ -237,69 +177,68 @@ def LHS(t, y, M_c=None, c_m=None, c_c=None, SA_c=None, adiabats=0, complexity=3,
     elif complexity==1:
         return [dTdt_m, dTdt_c, 0]
 
-def solve(t0=0, tf=None, T_m0=None, T_c0=None, D_l0=None, complexity=3, **kwargs):
-    kwargs = {**kwargs, **init(complexity=complexity, **kwargs)} # get derived parameters
+def solve(pl, t0=0, tf=None, T_m0=None, T_c0=None, D_l0=None, complexity=3, **kwargs):
     if complexity==1:
         T_c0 = T_m0
-    f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(tf=tf*1e9*years2sec, complexity=complexity, **kwargs)), 
+    f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(pl=pl, tf=tf*1e9*years2sec, complexity=complexity, **kwargs)), 
                             t_span=(t0*1e9*years2sec,tf*1e9*years2sec), y0=[T_m0, T_c0, D_l0], max_step=100e6*years2sec,
                             method='RK45', dense_output=False)
-    return f
+    
+    # return planet object with iteratives for evolving variables
+    pl.T_m = f.y[0] 
+    pl.T_c = f.y[1]
+    pl.D_l = f.y[2]
+    pl.t = f.t
+    pl = update_outputs(f.t, pl, **kwargs)
+    return pl
 
-def outputs(t=None, T_m=None, T_c=None, D_l=None, T_s=None, M_m=None, M_c=None, c_m=None, c_c=None, 
-            SA_p=None, SA_c=None, g_sfc=None, g_cmb=None, R_p=None, R_c=None, k_m=None, k_lm=None, 
-            Ra_crit_u=None, beta_u=None, beta_c=None, rho_lith=None, adiabats=0, complexity=3, Tlid_ini=None,
-            **kwargs):
+def update_outputs(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     if complexity == 1:
-        T_c = T_m
-    h_rad_m = h_rad(t, **kwargs) # W kg^-1
-    a0 = h_rad_m*rho_m # radiogenic heating in W m^-3
+        pl.T_c = pl.T_m
+    pl.h_rad_m = h_rad(t, H_0=pl.H_0, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, **kwargs) # W kg^-1
+    pl.a0 = pl.h_rad_m*pl.rho_m # radiogenic heating in W m^-3
     if complexity<3: # lid adjusts instantaneously
-        D_l = d_lid_ss(T_m, k=k_m, H0=a0, Ra_crit=Ra_crit_u, g_sfc=g_sfc, Ts=T_s, **kwargs)
+        pl.D_l = d_lid_ss(Tm=pl.T_m, a_rh=pl.a_rh, k=pl.k_m, Ea=pl.Ea, H0=pl.H0, Ra_crit=pl.Ra_crit_u, eta_0=pl.eta_0,
+                          T_ref=pl.T_ref, kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, g_sfc=pl.g_sfc, rho_m=pl.rho_m, Ts=pl.Ts)
     
-    R_l = R_p - D_l
-    T_l = T_lid(T_m, **kwargs)
-    V_lid = 4/3*np.pi*(R_p**3 - R_l**3)
-    M_lid = V_lid*rho_m # should use another density?
-    M_mi = M_m - M_lid
-    if (beta_u is None) or (beta_c is None):
-        h = None
-    else:
-        pass
-    eta_m = dyn_visc(T=T_m, **kwargs)
-    eta_cmb = dyn_visc(T=(T_c+T_m)/2, **kwargs)
-    nu_m = eta_m/rho_m
-    nu_cmb = eta_cmb/rho_m
-    TBL_u = bdy_thickness_beta(dT=T_c-T_l, eta_m=eta_m, g=g_sfc, Ra_crit=Ra_crit_u, 
-                               R_l=R_l, R_c=R_c, beta=beta_u, **kwargs)
-    #TBL_u = bdy_thickness(dT=T_c-T_l, eta_m=eta_m, g=g_sfc, Ra_crit=Ra_crit_u, **kwargs)
-    q_ubl = q_bl(deltaT=T_m-T_l, k=k_m, d_bl=TBL_u, beta=beta_u, **kwargs)
-    Q_ubl = Q_bl(q_ubl, SA=4*np.pi*R_l**2) 
-    Ra_i = Ra(eta=eta_m, kappa=kwargs['kappa_m'], alpha=kwargs['alpha_m'], rho=rho_m, 
-              g=g_sfc, deltaT=T_m-T_l, l=R_l-R_c)
-    Ra_crit_c = 0.28*Ra_i**0.21  
+    pl.R_l = pl.R_p - pl.D_l
+    pl.T_l = T_lid(T_m=pl.T_m, a_rh=pl.a_rh, Ea=pl.Ea)
+    V_lid = 4/3*np.pi*(pl.R_p**3 - pl.R_l**3)
+    pl.M_lid = V_lid*pl.rho_m # should use another density?
+    pl.M_conv = pl.M_m - M_lid
+    pl.eta_m = dyn_visc(T=pl.T_m, rho_m=pl.rho_m, **kwargs)
+    pl.eta_cmb = dyn_visc(T=(pl.T_c+pl.T_m)/2, rho_m=pl.rho_m, **kwargs)
+    pl.nu_m = pl.eta_m/pl.rho_m
+    pl.nu_cmb = pl.eta_cmb/pl.rho_m
+    pl.TBL_u = bdy_thickness_beta(dT=pl.T_c-pl.T_l, R_l=pl.R_l, R_c=pl.R_c, g=pl.g_sfc, Ra_crit=pl.Ra_crit_u, rho_m=pl.rho_m, 
+                                  beta=pl.beta_u, kappa_m=pl.kappa_m, eta_m=pl.eta_m, alpha_m=pl.alpha_m, **kwargs)
+    pl.q_ubl = q_bl(deltaT=pl.T_m-pl.T_l, k=pl.k_m, d_bl=pl.TBL_u, beta=pl.beta_u, **kwargs)
+    pl.Q_ubl = Q_bl(q=pl.q_ubl, R=pl.R_l) 
+    pl.Ra_i = Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, deltaT=pl.T_m-pl.T_l, l=pl.R_l-pl.R_c, kappa=pl.kappa_m, 
+                 alpha=pl.alpha_m)
+    pl.Ra_crit_c = 0.28*pl.Ra_i**0.21  
     
-    if SA_c>0:
-        TBL_c_inv = inv_bdy_thickness(dT=T_c-T_m, eta_m=eta_cmb, g=g_cmb, Ra_crit=Ra_crit_c, **kwargs)  
-        q_core = q_bl(deltaT=T_c-T_m, k=k_lm, d_bl_inv=TBL_c_inv, beta=beta_c, **kwargs)
-        Q_core = Q_bl(q_core, SA=SA_c) 
-        TBL_c = TBL_c_inv**-1
+    if SA_c>0: 
+        TBL_c_inv = inv_bdy_thickness(dT=pl.T_c-pl.T_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c, 
+                                      kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, rho_m=pl.rho_m, **kwargs)  
+        pl.q_core = q_bl(deltaT=pl.T_c-pl.T_m, k=pl.k_lm, d_bl_inv=TBL_c_inv, beta=pl.beta_c, **kwargs)
+        pl.Q_core = Q_bl(q=pl.q_core, R=pl.R_c) 
+        pl.TBL_c = TBL_c_inv**-1
     else:
-        TBL_c=None
-        Q_core = 0
+        pl.TBL_c = None
+        pl.Q_core = 0
         
-    H_rad_m = H_rad(t, M=M_mi, **kwargs) # mantle radiogenic heating in W
-    H_rad_lid = H_rad(t, M=M_lid, **kwargs) # lid radiogenic heating in W
+    pl.H_rad_m = H_rad(h=h_rad_m, M=pl.M_conv, **kwargs) # mantle radiogenic heating in W
+    pl.H_rad_lid = H_rad(h=h_rad_m, M=pl.M_lid, **kwargs) # lid radiogenic heating in W
     
-    #q_sfc = sfc_flux(q_bl=q_ubl, R_p=R_p, R_l=R_l, m=2, **kwargs)
-    q_sfc = sph_flux(R_p, a0=a0, T_l=T_l, R_l=R_l, k_m=k_m, T_s=T_s, R_p=R_p, **kwargs) # surface heat flux in W m^-2
+    pl.q_sfc = sph_flux(pl.R_p, a0=pl.a0, T_l=pl.T_l, R_l=pl.R_l, k_m=pl.k_m, T_s=pl.T_s, R_p=pl.R_p, **kwargs) # W m^-2
     if Tlid_ini=='linear':
-        q_sfc = sph_flux(R_p, a0=0, T_l=T_l, R_l=R_l, k_m=k_m, T_s=T_s, R_p=R_p, **kwargs)
+        pl.q_sfc = sph_flux(pl.R_p, a0=0, T_l=pl.T_l, R_l=pl.R_l, k_m=pl.k_m, T_s=pl.T_s, R_p=pl.R_p, **kwargs)
     
-    Q_sfc = q_sfc*4*np.pi*R_p**2
+    pl.Q_sfc = pl.Q_bl(q=pl.q_sfc, R=pl.R_p)
+    pl.urey = (pl.H_rad_m + pl.H_rad_lid)/pl.Q_sfc
     
-    T_avg = T_mean(T_m=T_m, T_l=T_l, R_p=R_p, R_l=R_l, R_c=R_c, T_s=T_s, k_m=k_m, a0=a0, **kwargs)
+    pl.T_avg = T_mean(T_m=pl.T_m, T_l=pl.T_l, R_p=pl.R_p, R_l=pl.R_l, R_c=pl.R_c, T_s=pl.T_s, k_m=pl.k_m, a0=pl.a0, **kwargs)
     if Tlid_ini=='linear':
-        T_avg = T_mean(T_m=T_m, T_l=T_l, R_p=R_p, R_l=R_l, R_c=R_c, T_s=T_s, k_m=k_m, a0=0, **kwargs)
-    
-    return R_l, T_l, eta_m, eta_cmb, nu_m, nu_cmb, TBL_u, h_rad_m, q_ubl, Q_ubl, Ra_i, Ra_crit_c, TBL_c, q_core, Q_core, M_mi, M_lid, H_rad_m, a0, H_rad_lid, q_sfc, Q_sfc, D_l, T_avg, T_c 
+        pl.T_avg = T_mean(T_m=pl.T_m, T_l=pl.T_l, R_p=pl.R_p, R_l=pl.R_l, R_c=pl.R_c, T_s=pl.T_s, k_m=pl.k_m, a0=0, **kwargs)
+    return pl
