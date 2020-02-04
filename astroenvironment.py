@@ -1,12 +1,11 @@
 import numpy as np
-import six
-import math
+import parameters as p
 
 
 ###### ASTRONOMY ######
 
 def luminosity(tau, L=None, **kwargs):
-    return L*L_sun
+    return L*p.L_sun
     
 def q_star(t=None, Alb=None, sma=None, **kwargs):
     """Calculate incident stellar flux density (over entire heliocentric sphere with radius a) in W m^-2"""
@@ -17,4 +16,4 @@ def q_sfc_outgoing(R_p=None, SA_p=None, **kwargs):
 
 def T_sfc(q_out=None, **kwargs):
     """Calculate equilibrium surface temperature given outgoing radiation in W m^-2"""
-    return (q_out/sb)**(1/4)
+    return (q_out/p.sb)**(1/4)
