@@ -6,7 +6,7 @@ import astroenvironment as ast
 import structure as struct 
 import parameters as p
 
-
+# todo: update attributes function
 
 ######      CLASS DEF     ######
 class TerrestrialPlanet():
@@ -29,8 +29,7 @@ class TerrestrialPlanet():
                             sma = 1, # semimajor axis in au
                             Ra_crit = 660, # critical Rayleigh number (in Driscoll & Bercovici 2014)
                             rho_c = 8000, # Density of iron core in kg m^-3 
-                            rho_m = 3300, # Density of silicate mantle in kg m^-3 
-                            rho_lith = 2800,
+                            rho_m = 3300, # Density of silicate mantle in kg m^-3 rho_lith = 2800,
                             # what pressure should you take these densities at?
                             c_m = 1200, # specific heat capacity from Dorn, Noack & Rozal 2018 in J kg−1 K−1 
                             c_c = 530, # speific heat capacity iron core Nimmo+ 1997

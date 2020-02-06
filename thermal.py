@@ -114,25 +114,15 @@ def h_rad(t, tf=None, H_0=None, c_n=None, p_n=None, lambda_n=None, **kwargs):
     """Calculate radiogenic heating in W kg^-1 from Korenaga (2006)"""
     c_n = np.array(c_n)
     p_n = np.array(p_n)
-#     print('p_n', p_n)
     lambda_n = np.array(lambda_n)
     x_n = c_n*p_n
-#     x_n = np.array(c_n)*np.array(p_n)
 #     x_n = [x*y for x, y in zip(c_n, p_n)]
-#     print('x_n', x_n)
     x_tot = np.sum(x_n)
     h_n = x_n/x_tot
     
     try:
-#         print('H_0', H_0)
-#         print('h_n', h_n)
-#         print('lambda_n', lambda_n)
-#         print('tf-t', tf-t)
 #         h = H_0*sum([x*np.exp(y*(tf-t)) for x, y in zip(h_n, lambda_n)])
         h = H_0*sum(h_n*np.exp(lambda_n*(tf-t)))
-#         print('inside sum', h_n*np.exp(lambda_n*(tf-t)))
-#         print('sum', sum(h_n*np.exp(lambda_n*(tf-t))))
-#         print('h', h)
     except ValueError:
         # for a list of ages
         h = np.zeros(len(t))
