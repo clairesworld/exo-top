@@ -27,7 +27,7 @@ class TerrestrialPlanet():
                             L = 1, # stellar luminosity in solar units
                             Alb = 0, # planetary albedo
                             sma = 1, # semimajor axis in au
-                            Ra_crit = 660, # critical Rayleigh number (in Driscoll & Bercovici 2014)
+                            Ra_crit_u = 660, # critical Rayleigh number (in Driscoll & Bercovici 2014)
                             rho_c = 8000, # Density of iron core in kg m^-3 
                             rho_m = 3300, # Density of silicate mantle in kg m^-3 rho_lith = 2800,
                             # what pressure should you take these densities at?
@@ -39,18 +39,19 @@ class TerrestrialPlanet():
                             X_K = 250, # initial abundance of K in wt ppm in Treatise on Geophysics
                             X_U = 2e-2, # initial abundane of U in wt ppm ""
                             X_Th = 7e-2, # initial abundance of Th in wt ppm ""
-                            ident = '%.2f'%(kwargs['M_p']/p.M_E)+' M$_E$, CMF='+'%.1f'%(kwargs['CMF']) # run id
                            )  
         
         # add input parameters, use default if not given
         default_attr.update(kwargs) 
         self.__dict__.update((k,v) for k,v in default_attr.items())
         # add derived parameters
-        self.init_derived() 
+        self.init_derived(**kwargs) 
 
             
     def init_derived(self, **kwargs):
         """ Parameters derived from input parameters """
+        if kwargs['ident'] is None:
+            self.ident = '%.2f'%(kwargs['M_p']/p.M_E)+' M$_E$, CMF='+'%.1f'%(kwargs['CMF']) # run id
         if self.R_p0 is None:
             self.R_p = struct.radius_zeng(self.M_p, self.CMF)*p.R_E # in m
         else:
