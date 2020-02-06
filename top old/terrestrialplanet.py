@@ -42,7 +42,6 @@ class TerrestrialPlanet():
                             X_Th = 7e-2, # initial abundance of Th in wt ppm ""
                             ident = '%.2f'%(kwargs['M_p']/p.M_E)+' M$_E$, CMF='+'%.1f'%(kwargs['CMF']) # run id
                            )  
-        
         # add input parameters, use default if not given
         default_attr.update(kwargs) 
         self.__dict__.update((k,v) for k,v in default_attr.items())
@@ -82,8 +81,6 @@ class TerrestrialPlanet():
             self.T_s = ast.T_sfc(self.q_out)
 
         # radiogenic element abundance rel. to U
-        self.c_n = [a*b for a,b in zip([self.U_0_238, self.U_0_235, self.Th_0, self.K_0],[1, 1, self.X_Th/self.X_U, 
-                                                                                         self.X_K/self.X_U])]
-#         self.c_n = np.array([self.U_0_238, self.U_0_235, self.Th_0, self.K_0])*np.array([1, 1, self.X_Th/self.X_U, 
-#                                                                                          self.X_K/self.X_U])
+        self.c_n = np.array([self.U_0_238, self.U_0_235, self.Th_0, self.K_0])*np.array([1, 1, self.X_Th/self.X_U, 
+                                                                                         self.X_K/self.X_U])
 
