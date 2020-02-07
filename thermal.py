@@ -78,7 +78,7 @@ def T_mean(T_m=None, T_l=None, R_p=None, R_l=None, R_c=None, T_s=None, k_m=None,
     c2 = T_s + a0/(6*k_m)*R_p**2 - c1/(k_m*R_p)
     return 3/(R_p**3 - R_c**3)*((T_m/3)*(R_l**3 - R_c**3) - a0/(30*k_m)*(R_p**5 - R_l**5) + c1/(2*k_m)*(R_p**2 - R_l**2)  + c2/3*(R_p**3 - R_l**3))
 
-def dyn_visc(T=None, nu_0=None, visc_type=None, rho_m=None, **kwargs):
+def dyn_visc(T=None, visc_type=None, rho_m=None, nu_0=None, eta_0=None, T_ref=None, Ea=None, **kwargs):
     if visc_type=='constant':
         return nu_0*rho_m
     elif visc_type=='Dorn':
@@ -88,7 +88,7 @@ def dyn_visc(T=None, nu_0=None, visc_type=None, rho_m=None, **kwargs):
     elif visc_type=='Driscoll':
         return nu_Driscoll(T, **kwargs)*rho_m
     elif visc_type=='Thi':
-        return eta_Thi(T, **kwargs)
+        return eta_Thi(T, eta_0=eta_0, T_ref=T_ref, Ea=Ea, **kwargs)
 
  #####################################################################
 #
@@ -171,7 +171,7 @@ def LHS(t, y, pl=None, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     pl.T_m = y[0]
     pl.T_c = y[1]
     pl.D_l = y[2]
-    pl = update_outputs(t, pl, adiabats=adiabats, complexity=complexity, Tlid_ini=Tlid_ini, **kwargs)
+    pl = recalculate(t, pl, adiabats=adiabats, complexity=complexity, Tlid_ini=Tlid_ini, **kwargs)
     if pl.SA_c>0:
         dTdt_c = dTdt(-pl.Q_core, pl.M_c, pl.c_c)
     else:
@@ -201,10 +201,10 @@ def solve(pl, t0=0, tf=None, T_m0=None, T_c0=None, D_l0=None, complexity=3, **kw
     pl.T_c = f.y[1]
     pl.D_l = f.y[2]
     pl.t = f.t
-    pl = update_outputs(f.t, pl, tf=tf, **kwargs)
+    pl = recalculate(f.t, pl, tf=tf, **kwargs)
     return pl
 
-def update_outputs(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
+def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     if complexity == 1:
         pl.T_c = pl.T_m
     pl.h_rad_m = h_rad(t, H_0=pl.H_0, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, **kwargs) # W kg^-1
@@ -218,8 +218,8 @@ def update_outputs(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     V_lid = 4/3*np.pi*(pl.R_p**3 - pl.R_l**3)
     pl.M_lid = V_lid*pl.rho_m # should use another density?
     pl.M_conv = pl.M_m - pl.M_lid
-    pl.eta_m = dyn_visc(T=pl.T_m, rho_m=pl.rho_m, **kwargs)
-    pl.eta_cmb = dyn_visc(T=(pl.T_c+pl.T_m)/2, rho_m=pl.rho_m, **kwargs)
+    pl.eta_m = dyn_visc(T=pl.T_m, rho_m=pl.rho_m, eta_0=pl.eta_0, T_ref=pl.T_ref, Ea=pl.Ea, **kwargs)
+    pl.eta_cmb = dyn_visc(T=(pl.T_c+pl.T_m)/2, rho_m=pl.rho_m, eta_0=pl.eta_0, T_ref=pl.T_ref, Ea=pl.Ea, **kwargs)
     pl.nu_m = pl.eta_m/pl.rho_m
     pl.nu_cmb = pl.eta_cmb/pl.rho_m
     pl.TBL_u = bdy_thickness_beta(dT=pl.T_c-pl.T_l, R_l=pl.R_l, R_c=pl.R_c, g=pl.g_sfc, Ra_crit=pl.Ra_crit_u, rho_m=pl.rho_m, 
