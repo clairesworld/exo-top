@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyshtools
 from pyshtools import constant
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 def do(filename='NGS-2015-07-01303-s13.csv', fig_path='figs/', save=False, file_path='models/'):
     """ run John F. Rudge's script to plot dynamic topography from Hoggard (2016)
@@ -29,26 +31,26 @@ def do(filename='NGS-2015-07-01303-s13.csv', fig_path='figs/', save=False, file_
     # Hoggard uses "fully normalized" coefficients with the Condon-Shortley phase convention (like seismologists)
     clm= pyshtools.SHCoeffs.from_array(cilm,lmax=30,normalization="ortho",csphase=-1)
 
-    # Mimic Figure 5 -- plot of l2 norm spectrum (not really power, out by 4pi)
-    fig1, ax1 = clm.plot_spectrum(unit="per_l",xscale='lin',yscale='log',convention="l2norm")
-    plt.xlim([0,30])
-    plt.ylabel("L2 norm (km$^2$)")
-    plt.xlabel("Degree, $l$")
-    plt.ylim(np.array([1e-2, 1e1]))
-    if save:
-        plt.savefig(fig_path+'hoggard_l2norm.pdf',bbox_inches="tight")
+#     # Mimic Figure 5 -- plot of l2 norm spectrum (not really power, out by 4pi)
+#     fig1, ax1 = clm.plot_spectrum(unit="per_l",xscale='lin',yscale='log',convention="l2norm")
+#     plt.xlim([0,30])
+#     plt.ylabel("L2 norm (km$^2$)")
+#     plt.xlabel("Degree, $l$")
+#     plt.ylim(np.array([1e-2, 1e1]))
+#     if save:
+#         plt.savefig(fig_path+'hoggard_l2norm.pdf',bbox_inches="tight")
 
-    plt.figure()
-    spectrum = clm.spectrum(unit='per_lm')
-    R = 6371.0 # km
-    l = clm.degrees()
-    plt.loglog(l, 4.0*np.pi*R*R*spectrum)
-    plt.xlim(-0.5+2.0*np.pi*R/5000.0, -0.5+2.0*np.pi*R/200.0)
-    plt.ylim(1e1,1e6)
-    plt.xlabel("Degree, $l$")
-    plt.ylabel("Power spectral density (km$^2$ km$^2$)")
-    if save:
-        plt.savefig(fig_path+'hoggard_2d_PSD.pdf',bbox_inches="tight")
+#     plt.figure()
+#     spectrum = clm.spectrum(unit='per_lm')
+#     R = 6371.0 # km
+#     l = clm.degrees()
+#     plt.loglog(l, 4.0*np.pi*R*R*spectrum)
+#     plt.xlim(-0.5+2.0*np.pi*R/5000.0, -0.5+2.0*np.pi*R/200.0)
+#     plt.ylim(1e1,1e6)
+#     plt.xlabel("Degree, $l$")
+#     plt.ylabel("Power spectral density (km$^2$ km$^2$)")
+#     if save:
+#         plt.savefig(fig_path+'hoggard_2d_PSD.pdf',bbox_inches="tight")
 
     # Expand onto a regular lat/lon grid for plotting
     topo = clm.expand(lmax=lmax_plot)
@@ -83,9 +85,11 @@ def do(filename='NGS-2015-07-01303-s13.csv', fig_path='figs/', save=False, file_
     
     # histogram of lat/lon data
     fig=plt.figure()
-    plt.hist(proj_crs.flatten(), bins=20, histtype='step', color='k')
+    xv, yv = np.meshgrid(lons, lats, sparse=False, indexing='ij')
+    proj_points = proj_crs.transform_points(x=xv, y=yv, z=data.T, src_crs=data_crs)
+    plt.hist(proj_points[:,:,2].flatten(), bins=20, histtype='step', color='k')
     plt.xlabel('Dynamic topography (km)')
-    plt.title('RMS = %.2f km'%np.sqrt(np.mean(data**2)))
+    plt.title('RMS = %.2f km'%np.sqrt(np.mean(proj_points[:,:,2].flatten()**2)))
     if save:
         plt.savefig(fig_path+'hoggard_dyntop_hist.pdf',bbox_inches="tight")
 
@@ -99,9 +103,11 @@ def do(filename='NGS-2015-07-01303-s13.csv', fig_path='figs/', save=False, file_
     
     # histogram of lat/lon data
     fig=plt.figure()
-    plt.hist(data.flatten(), bins=20, histtype='step', color='k')
-    plt.xlabel('Dynamic topography, degrees 0-3 (km)')
-    plt.title('RMS = %.2f km'%np.sqrt(np.mean(data**2)))
+    xv, yv = np.meshgrid(lons, lats, sparse=False, indexing='ij')
+    proj_points = proj_crs.transform_points(x=xv, y=yv, z=data.T, src_crs=data_crs)
+    plt.hist(proj_points[:,:,2].flatten(), bins=20, histtype='step', color='k')
+    plt.xlabel('Dynamic topography (km)')
+    plt.title('RMS = %.2f km'%np.sqrt(np.mean(proj_points[:,:,2].flatten()**2)))
     if save:
         plt.savefig(fig_path+'hoggard_dyntop_low_degree_hist.pdf',bbox_inches="tight")
 
