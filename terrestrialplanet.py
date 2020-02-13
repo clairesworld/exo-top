@@ -50,10 +50,11 @@ class TerrestrialPlanet():
             
     def init_derived(self, **kwargs):
         """ Parameters derived from input parameters """
-        try:
-            self.ident = '%.2f'%(kwargs['M_p']/p.M_E)+' M$_E$, CMF='+'%.1f'%(kwargs['CMF']) # run id
-        except KeyError:
-            self.ident = '%.2f'%(kwargs['M_p']/p.M_E)+' M$_E$' # run id
+        if 'ident' not in kwargs.keys():
+            try:
+                self.ident = '%.2f'%(kwargs['M_p']/p.M_E)+' M$_E$, CMF='+'%.1f'%(kwargs['CMF']) # run id
+            except KeyError:
+                self.ident = '%.2f'%(kwargs['M_p']/p.M_E)+' M$_E$' # run id
         if self.R_p0 is None:
             self.R_p = struct.radius_zeng(self.M_p, self.CMF)*p.R_E # in m
         else:
