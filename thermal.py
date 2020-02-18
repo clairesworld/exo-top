@@ -36,6 +36,18 @@ def nu_KW(T, p=0, **kwargs): # Karato & Wu 1993, diffusion law for dry olivine
 def eta_Thi(T, eta_0=1e21, T_ref=1600, Ea=300e3, **kwargs): # diffusion creep, dry rheology (Thiriet+ 2019)
     return eta_0*np.exp(Ea/p.R_b*(T**-1 - T_ref**-1))
 
+def dyn_visc(T=None, visc_type=None, rho_m=None, nu_0=None, eta_0=None, T_ref=None, Ea=None, **kwargs):
+    if visc_type=='constant':
+        return nu_0*rho_m
+    elif visc_type=='Dorn':
+        return nu_Dorn(T, **kwargs)*rho_m
+    elif visc_type=='KW':
+        return nu_KW(T, **kwargs)*rho_m
+    elif visc_type=='Driscoll':
+        return nu_Driscoll(T, **kwargs)*rho_m
+    elif visc_type=='Thi':
+        return eta_Thi(T, eta_0=eta_0, T_ref=T_ref, Ea=Ea, **kwargs)
+
 def adiabat(T_0, R=None, g=None, R_p=None, h=None, c_v=None, alpha_m=None, adiabatic=True, **kwargs):
     if adiabatic:
         R_0 = R_p - 0.5*h # depth to avg mantle temp (taken to be midpoint between surface and cmb)
@@ -78,17 +90,6 @@ def T_mean(T_m=None, T_l=None, R_p=None, R_l=None, R_c=None, T_s=None, k_m=None,
     c2 = T_s + a0/(6*k_m)*R_p**2 - c1/(k_m*R_p)
     return 3/(R_p**3 - R_c**3)*((T_m/3)*(R_l**3 - R_c**3) - a0/(30*k_m)*(R_p**5 - R_l**5) + c1/(2*k_m)*(R_p**2 - R_l**2)  + c2/3*(R_p**3 - R_l**3))
 
-def dyn_visc(T=None, visc_type=None, rho_m=None, nu_0=None, eta_0=None, T_ref=None, Ea=None, **kwargs):
-    if visc_type=='constant':
-        return nu_0*rho_m
-    elif visc_type=='Dorn':
-        return nu_Dorn(T, **kwargs)*rho_m
-    elif visc_type=='KW':
-        return nu_KW(T, **kwargs)*rho_m
-    elif visc_type=='Driscoll':
-        return nu_Driscoll(T, **kwargs)*rho_m
-    elif visc_type=='Thi':
-        return eta_Thi(T, eta_0=eta_0, T_ref=T_ref, Ea=Ea, **kwargs)
 
  #####################################################################
 #

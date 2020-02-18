@@ -20,25 +20,36 @@ class TerrestrialPlanet():
                             U_0_235 = p.U_0_235,
                             U_0_238 = p.U_0_238, 
                             Th_0 = p.Th_0, 
-                            R_p0 = None, # fixed R_p input value
-                            R_c0 = None, # fixed R_c input value
-                            T_s = None,
-                            CMF = 0, # needs a value to avoid errors
+                            R_p0 = None, # fixed R_p input value, if none then comes from mass
+                            R_c0 = None, # fixed R_c input value " "
+                            T_s = None, # if none then calculated from energy balance
                             L = 1, # stellar luminosity in solar units
                             Alb = 0, # planetary albedo
                             sma = 1, # semimajor axis in au
-                            Ra_crit_u = 660, # critical Rayleigh number (in Driscoll & Bercovici 2014)
+                            # bulk property defaults
+                            CMF = 0, # needs a value to avoid errors
                             rho_c = 8000, # Density of iron core in kg m^-3 
                             rho_m = 3300, # Density of silicate mantle in kg m^-3 rho_lith = 2800,
+                            Ra_crit_u = 660, # critical Rayleigh number (in Driscoll & Bercovici 2014)
+                            beta_u = 0.335, # defaults to 1/3
+                            beta_c = None, # defaults to 1/3
                             # what pressure should you take these densities at?
+                            # thermodynamic defaults
                             c_m = 1200, # specific heat capacity from Dorn, Noack & Rozal 2018 in J kg−1 K−1 
                             c_c = 530, # speific heat capacity iron core Nimmo+ 1997
                             alpha_m = 2e-5, # thermal expansivity of silicate mantle in K^-1
                             k_m = 4, # thermal conductivity of silicate mantle in W m^−1 K^−1
                             k_lm = 10, # thermal conductivity lower mantle in W m^−1 K^−1 from Driscoll & Bercovici
+                            # radioisotope defaults
                             X_K = 250, # initial abundance of K in wt ppm in Treatise on Geophysics
                             X_U = 2e-2, # initial abundane of U in wt ppm ""
                             X_Th = 7e-2, # initial abundance of Th in wt ppm ""
+                            H_0 = 4.6e-12, # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999), CI chondrites
+                            # viscosity defaults
+                            a_rh=2.44, # for beta=1/3 from Thiriet+ (2019)
+                            Ea=300e3, # activation energy in J for viscosity law
+                            eta_0 = 1e21,
+                            T_ref = 1600,
                            )  
         
         # add input parameters, use default if not given
@@ -81,7 +92,7 @@ class TerrestrialPlanet():
         self.kappa_m = therm.thermal_diffusivity(self.k_m, self.rho_m, self.c_m)
 
         if self.T_s is None:
-            self.q_out = ast.q_sfc_outgoing(R_p=self.R_p, SA_p=self.SA_p, **kwargs)
+            self.q_out = ast.q_sfc_outgoing(R_p=self.R_p, SA_p=self.SA_p, L=self.L, Alb=self.Alb, sma=self.sma, **kwargs)
             self.T_s = ast.T_sfc(self.q_out)
 
         # radiogenic element abundance rel. to U
