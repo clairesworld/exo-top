@@ -3,7 +3,7 @@ from scipy import interpolate
 import thermal as therm
 import topography as top
 import astroenvironment as ast
-import structure as struct 
+import geometry as geom
 import parameters as p
 
 # todo: update attributes function
@@ -14,7 +14,8 @@ class TerrestrialPlanet():
     def __init__(self, **kwargs):
         """ Initialize with kwargs, TODO: defaults? """
         # define default attributes
-        default_attr = dict(lambda_n = p.lambda_n, 
+        default_attr = dict(M_p = p.M_E,
+                            lambda_n = p.lambda_n, 
                             p_n = p.p_n,
                             K_0 = p.K_0,
                             U_0_235 = p.U_0_235,
@@ -27,16 +28,16 @@ class TerrestrialPlanet():
                             Alb = 0, # planetary albedo
                             sma = 1, # semimajor axis in au
                             # bulk property defaults
-                            CMF = 0, # needs a value to avoid errors
-                            rho_c = 8000, # Density of iron core in kg m^-3 
-                            rho_m = 3300, # Density of silicate mantle in kg m^-3 rho_lith = 2800,
+                            CMF = 0.3, # needs a value to avoid errors
+                            rho_c = 7200, # Density of iron core in kg m^-3 
+                            rho_m = 3500, # Density of silicate mantle in kg m^-3 rho_lith = 2800,
                             Ra_crit_u = 660, # critical Rayleigh number (in Driscoll & Bercovici 2014)
                             beta_u = 0.335, # defaults to 1/3
                             beta_c = None, # defaults to 1/3
                             # what pressure should you take these densities at?
                             # thermodynamic defaults
                             c_m = 1200, # specific heat capacity from Dorn, Noack & Rozal 2018 in J kg−1 K−1 
-                            c_c = 530, # speific heat capacity iron core Nimmo+ 1997
+                            c_c = 840, # speific heat capacity iron core Thiriet+ 2019
                             alpha_m = 2e-5, # thermal expansivity of silicate mantle in K^-1
                             k_m = 4, # thermal conductivity of silicate mantle in W m^−1 K^−1
                             k_lm = 10, # thermal conductivity lower mantle in W m^−1 K^−1 from Driscoll & Bercovici
@@ -52,6 +53,7 @@ class TerrestrialPlanet():
                             T_ref = 1600,
                            )  
         
+        
         # add input parameters, use default if not given
         default_attr.update(kwargs) 
         self.__dict__.update((k,v) for k,v in default_attr.items())
@@ -63,11 +65,11 @@ class TerrestrialPlanet():
         """ Parameters derived from input parameters """
         if 'ident' not in kwargs.keys():
             try:
-                self.ident = '%.2f'%(kwargs['M_p']/p.M_E)+' M$_E$, CMF='+'%.1f'%(kwargs['CMF']) # run id
+                self.ident = '%.2f'%(self.M_p/p.M_E)+' M$_E$, CMF='+'%.1f'%(self.CMF) # run id
             except KeyError:
-                self.ident = '%.2f'%(kwargs['M_p']/p.M_E)+' M$_E$' # run id
+                self.ident = '%.2f'%(self.M_p/p.M_E)+' M$_E$' # run id
         if self.R_p0 is None:
-            self.R_p = struct.radius_zeng(self.M_p, self.CMF)*p.R_E # in m
+            self.R_p = ast.radius_zeng(self.M_p, self.CMF)*p.R_E # in m
         else:
             self.R_p = self.R_p0
         if self.R_c0 is None:
@@ -82,17 +84,17 @@ class TerrestrialPlanet():
             self.M_c = 4/3*np.pi*self.R_c**3 * self.rho_c
             self.CMF = self.M_c/self.M_p
             self.M_m = 4/3*np.pi*(self.R_p**3 - self.R_c**3)*self.rho_m  #M_p - M_c
-        self.SA_p = struct.SA(R=self.R_p)
-        self.SA_c = struct.SA(R=self.R_c) # core surface area 
-        self.g_sfc = struct.grav(self.M_p, self.R_p)
+        self.SA_p = geom.SA(R=self.R_p)
+        self.SA_c = geom.SA(R=self.R_c) # core surface area 
+        self.g_sfc = ast.grav(self.M_p, self.R_p)
         if self.CMF>0:
-            self.g_cmb = struct.grav(self.M_c, self.R_c)
+            self.g_cmb = ast.grav(self.M_c, self.R_c)
         else:
             self.g_cmb = 0
         self.kappa_m = therm.thermal_diffusivity(self.k_m, self.rho_m, self.c_m)
 
         if self.T_s is None:
-            self.q_out = ast.q_sfc_outgoing(R_p=self.R_p, SA_p=self.SA_p, L=self.L, Alb=self.Alb, sma=self.sma, **kwargs)
+            self.q_out = ast.q_sfc_outgoing(R_p=self.R_p, SA_p=self.SA_p, L=self.L, Alb=self.Alb, sma=self.sma)
             self.T_s = ast.T_sfc(self.q_out)
 
         # radiogenic element abundance rel. to U

@@ -4,7 +4,7 @@ import six
 import math
 import parameters as p
 import astroenvironment as ast
-import structure as struct 
+import geometry as geom
 import terrestrialplanet as tp
 
 
