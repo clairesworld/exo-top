@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.10.12)  22 JAN 2020 17:37
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.10.12)  2 MAR 2020 14:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -744,9 +744,6 @@ Package rerunfilecheck Info: File `outline.out' has not changed.
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 251.
  ) 
 Here is how much of TeX's memory you used:
@@ -776,7 +773,7 @@ f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist
 type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
 public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
 /amsfonts/cm/cmtt8.pfb>
-Output written on outline.pdf (9 pages, 246769 bytes).
+Output written on outline.pdf (9 pages, 246677 bytes).
 PDF statistics:
  253 PDF objects out of 1000 (max. 8388607)
  213 compressed objects within 3 object streams
