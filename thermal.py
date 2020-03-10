@@ -5,6 +5,7 @@ import math
 import parameters as p
 import astroenvironment as ast
 import geometry as geom
+import rheology as rh
 import terrestrialplanet as tp
 
 
@@ -21,32 +22,6 @@ def thermal_diffusivity(k, rho, C_p):
     rho : density in kg m^-3
     """
     return k/(rho*C_p)
-
-def nu_Driscoll(T, nu_0=7e7, Ea=3e5, **kwargs):
-    """kinematic viscosity (upper mantle) from eqn 6 in Driscoll & Bercovici"""
-    return nu_0*np.exp(Ea/(p.R_b*T))/10
-
-def nu_Dorn(T, nu_0=1.6e20, Ea=300e3, T_0=1800, **kwargs):
-    # viscosity (below lithosphere) from Dorn, Noack & Rozal 2018
-    return nu_0*np.exp(Ea/p.R_b*(T**-1-T_0**-1))
-
-def nu_KW(T, p=0, **kwargs): # Karato & Wu 1993, diffusion law for dry olivine
-    return 2.6e10*np.exp((3e5 + (6e3*p))/(p.R_b*T))   
-
-def eta_Thi(T, eta_0=1e21, T_ref=1600, Ea=300e3, **kwargs): # diffusion creep, dry rheology (Thiriet+ 2019)
-    return eta_0*np.exp(Ea/p.R_b*(T**-1 - T_ref**-1))
-
-def dyn_visc(T=None, visc_type=None, rho_m=None, nu_0=None, eta_0=None, T_ref=None, Ea=None, **kwargs):
-    if visc_type=='constant':
-        return nu_0*rho_m
-    elif visc_type=='Dorn':
-        return nu_Dorn(T, **kwargs)*rho_m
-    elif visc_type=='KW':
-        return nu_KW(T, **kwargs)*rho_m
-    elif visc_type=='Driscoll':
-        return nu_Driscoll(T, **kwargs)*rho_m
-    elif visc_type=='Thi':
-        return eta_Thi(T, eta_0=eta_0, T_ref=T_ref, Ea=Ea, **kwargs)
 
 def adiabat(T_0, R=None, g=None, R_p=None, h=None, c_v=None, alpha_m=None, adiabatic=True, **kwargs):
     if adiabatic:
@@ -212,18 +187,21 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     pl.a0 = pl.h_rad_m*pl.rho_m # radiogenic heating in W m^-3
     if complexity<3: # lid adjusts instantaneously
         pl.D_l = d_lid_ss(Tm=pl.T_m, a_rh=pl.a_rh, k=pl.k_m, Ea=pl.Ea, H0=pl.H_0, Ra_crit=pl.Ra_crit_u, eta_0=pl.eta_0,
-                          T_ref=pl.T_ref, kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, g_sfc=pl.g_sfc, rho_m=pl.rho_m, Ts=pl.T_s)
+                          T_ref=pl.T_ref, kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, g_sfc=pl.g_sfc, rho_m=pl.rho_m, 
+                          Ts=pl.T_s)
     
     pl.R_l = pl.R_p - pl.D_l
     pl.T_l = T_lid(T_m=pl.T_m, a_rh=pl.a_rh, Ea=pl.Ea)
     V_lid = 4/3*np.pi*(pl.R_p**3 - pl.R_l**3)
     pl.M_lid = V_lid*pl.rho_m # should use another density?
     pl.M_conv = pl.M_m - pl.M_lid
-    pl.eta_m = dyn_visc(T=pl.T_m, rho_m=pl.rho_m, eta_0=pl.eta_0, T_ref=pl.T_ref, Ea=pl.Ea, **kwargs)
-    pl.eta_cmb = dyn_visc(T=(pl.T_c+pl.T_m)/2, rho_m=pl.rho_m, eta_0=pl.eta_0, T_ref=pl.T_ref, Ea=pl.Ea, **kwargs)
+    pl.eta_m = rh.dynamic_viscosity(T=pl.T_m, rho_m=pl.rho_m, eta_0=pl.eta_0, T_ref=pl.T_ref, Ea=pl.Ea, **kwargs)
+    pl.eta_cmb = rh.dynamic_viscosity(T=(pl.T_c+pl.T_m)/2, rho_m=pl.rho_m, eta_0=pl.eta_0, T_ref=pl.T_ref, Ea=pl.Ea,
+                                      **kwargs)
     pl.nu_m = pl.eta_m/pl.rho_m
     pl.nu_cmb = pl.eta_cmb/pl.rho_m
-    pl.TBL_u = bdy_thickness_beta(dT=pl.T_c-pl.T_l, R_l=pl.R_l, R_c=pl.R_c, g=pl.g_sfc, Ra_crit=pl.Ra_crit_u, rho_m=pl.rho_m, 
+    pl.TBL_u = bdy_thickness_beta(dT=pl.T_c-pl.T_l, R_l=pl.R_l, R_c=pl.R_c, g=pl.g_sfc, Ra_crit=pl.Ra_crit_u, 
+                                  rho_m=pl.rho_m, 
                                   beta=pl.beta_u, kappa_m=pl.kappa_m, eta_m=pl.eta_m, alpha_m=pl.alpha_m, **kwargs)
     pl.q_ubl = q_bl(deltaT=pl.T_m-pl.T_l, k=pl.k_m, d_bl=pl.TBL_u, beta=pl.beta_u, **kwargs)
     pl.Q_ubl = Q_bl(q=pl.q_ubl, R=pl.R_l) 
@@ -251,7 +229,9 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     pl.Q_sfc = Q_bl(q=pl.q_sfc, R=pl.R_p)
     pl.urey = (pl.H_rad_m + pl.H_rad_lid)/pl.Q_sfc
     
-    pl.T_avg = T_mean(T_m=pl.T_m, T_l=pl.T_l, R_p=pl.R_p, R_l=pl.R_l, R_c=pl.R_c, T_s=pl.T_s, k_m=pl.k_m, a0=pl.a0, **kwargs)
+    pl.T_avg = T_mean(T_m=pl.T_m, T_l=pl.T_l, R_p=pl.R_p, R_l=pl.R_l, R_c=pl.R_c, T_s=pl.T_s, k_m=pl.k_m, a0=pl.a0, 
+                      **kwargs)
     if Tlid_ini=='linear':
-        pl.T_avg = T_mean(T_m=pl.T_m, T_l=pl.T_l, R_p=pl.R_p, R_l=pl.R_l, R_c=pl.R_c, T_s=pl.T_s, k_m=pl.k_m, a0=0, **kwargs)
+        pl.T_avg = T_mean(T_m=pl.T_m, T_l=pl.T_l, R_p=pl.R_p, R_l=pl.R_l, R_c=pl.R_c, T_s=pl.T_s, k_m=pl.k_m, a0=0, 
+                          **kwargs)
     return pl
