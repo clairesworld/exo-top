@@ -70,7 +70,11 @@ def T_mean(T_m=None, T_l=None, R_p=None, R_l=None, R_c=None, T_s=None, k_m=None,
 #
 #   
 #    
- ##### THERMAL MODEL for stagnant lid adapted from Thiriet+ 2019 ######
+#    THERMAL MODEL for stagnant lid adapted from Thiriet+ 2019 
+#
+#
+#
+ #####################################################################
     
     
 def bdy_thickness_beta(dT=None, R_l=None, R_c=None, Ra_crit=None, beta=None, g=None,

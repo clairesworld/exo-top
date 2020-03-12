@@ -1,43 +1,90 @@
-\begin{thebibliography}{4}
+\begin{thebibliography}{9}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[Davaille and Jaupart(1993)]{DavailleJaupart1993}
-Anne Davaille and Claude Jaupart.
-\newblock Transient high-rayleigh-number thermal convection with large
-  viscosity variations.
-\newblock \emph{Journal of Fluid Mechanics}, 253:\penalty0 141–166, 1993.
-\newblock \doi{10.1017/S0022112093001740}.
+\bibitem[Arnould et~al.(2018)Arnould, Coltice, Flament, Seigneur, and
+  M{\"u}ller]{Arnould2018}
+M.~Arnould, N.~Coltice, N.~Flament, V.~Seigneur, and R.~D. M{\"u}ller.
+\newblock On the {{Scales}} of {{Dynamic Topography}} in {{Whole}}-{{Mantle
+  Convection Models}}.
+\newblock \emph{Geochemistry, Geophysics, Geosystems}, 19\penalty0
+  (9):\penalty0 3140--3163, 2018.
+\newblock ISSN 1525-2027.
+\newblock \doi{10.1029/2018GC007516}.
 
-\bibitem[{Thiriet} et~al.(2019){Thiriet}, {Breuer}, {Michaut}, and
-  {Plesa}]{Thiriet2019}
-M{\'e}lanie {Thiriet}, Doris {Breuer}, Chlo{\'e} {Michaut}, and Ana-Catalina
-  {Plesa}.
-\newblock {Scaling laws of convection for cooling planets in a stagnant lid
-  regime}.
+\bibitem[Golle et~al.(2012)Golle, Dumoulin, Choblet, and Cadek]{Golle2012}
+O.~Golle, C.~Dumoulin, G.~Choblet, and O.~Cadek.
+\newblock Topography and geoid induced by a convecting mantle beneath an
+  elastic lithosphere.
+\newblock \emph{Geophysical Journal International}, 189\penalty0 (1):\penalty0
+  55--72, April 2012.
+\newblock ISSN 0956-540X.
+\newblock \doi{10.1111/j.1365-246X.2012.05364.x}.
+
+\bibitem[Huang et~al.(2013)Huang, Yang, and Zhong]{Huang2013}
+Jinshui Huang, An~Yang, and Shijie Zhong.
+\newblock Constraints of the topography, gravity and volcanism on {{Venusian}}
+  mantle dynamics and generation of plate tectonics.
+\newblock \emph{Earth and Planetary Science Letters}, 362:\penalty0 207--214,
+  January 2013.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/j.epsl.2012.11.051}.
+
+\bibitem[Pari(2001)]{Pari2001}
+Giovanni Pari.
+\newblock Crust 5.1-based inference of the {{Earth}}'s dynamic surface
+  topography: Geodynamic implications.
+\newblock \emph{Geophysical Journal International}, 144\penalty0 (3):\penalty0
+  501--516, March 2001.
+\newblock ISSN 0956-540X.
+\newblock \doi{10.1046/j.1365-246x.2001.01328.x}.
+
+\bibitem[Reese et~al.(2005)Reese, Solomatov, and Baumgardner]{Reese2005}
+C.~C. Reese, V.~S. Solomatov, and J.~R. Baumgardner.
+\newblock Scaling laws for time-dependent stagnant lid convection in a
+  spherical shell.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 149:\penalty0
+  361--370, April 2005.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/j.pepi.2004.11.004}.
+
+\bibitem[Thiriet et~al.(2019)Thiriet, Breuer, Michaut, and Plesa]{Thiriet2019}
+M{\'e}lanie Thiriet, Doris Breuer, Chlo{\'e} Michaut, and Ana-Catalina Plesa.
+\newblock Scaling laws of convection for cooling planets in a stagnant lid
+  regime.
 \newblock \emph{Physics of the Earth and Planetary Interiors}, 286:\penalty0
-  138--153, Jan 2019.
+  138--153, January 2019.
+\newblock ISSN 0031-9201.
 \newblock \doi{10.1016/j.pepi.2018.11.003}.
 
-\bibitem[Zeng and Jacobsen()]{Zeng2017}
+\bibitem[Yang et~al.(2016)Yang, Huang, and Wei]{Yang2016}
+An~Yang, Jinshui Huang, and Daiyun Wei.
+\newblock Separation of dynamic and isostatic components of the {{Venusian}}
+  gravity and topography and determination of the crustal thickness of
+  {{Venus}}.
+\newblock \emph{Planetary and Space Science}, 129:\penalty0 24--31, September
+  2016.
+\newblock ISSN 0032-0633.
+\newblock \doi{10.1016/j.pss.2016.06.001}.
+
+\bibitem[Zeng and Jacobsen(2017)]{Zeng2017}
 Li~Zeng and Stein~B. Jacobsen.
 \newblock A {{Simple Analytical Model}} for {{Rocky Planet Interiors}}.
-\newblock 837\penalty0 (2):\penalty0 164.
+\newblock \emph{The Astrophysical Journal}, 837\penalty0 (2):\penalty0 164,
+  March 2017.
 \newblock ISSN 1538-4357.
 \newblock \doi{10.3847/1538-4357/aa6218}.
-\newblock URL
-  \url{http://stacks.iop.org/0004-637X/837/i=2/a=164?key=crossref.84cd7e40008714d641fb95626d9222c2}.
 
-\bibitem[Zeng et~al.()Zeng, Sasselov, and Jacobsen]{Zeng2016}
+\bibitem[Zeng et~al.(2016)Zeng, Sasselov, and Jacobsen]{Zeng2016}
 Li~Zeng, Dimitar~D. Sasselov, and Stein~B. Jacobsen.
-\newblock Mass–radius relation for rocky planets based on {{PREM}}.
-\newblock 819\penalty0 (2):\penalty0 127.
-\newblock ISSN 1538-4357.
+\newblock {{MASS}}\textendash{{RADIUS RELATION FOR ROCKY PLANETS BASED ON
+  PREM}}.
+\newblock \emph{The Astrophysical Journal}, 819\penalty0 (2):\penalty0 127,
+  March 2016.
+\newblock ISSN 0004-637X.
 \newblock \doi{10.3847/0004-637X/819/2/127}.
-\newblock URL
-  \url{http://stacks.iop.org/0004-637X/819/i=2/a=127?key=crossref.3ec1d23e04dfaf9f75dcd6226623abf0}.
 
 \end{thebibliography}
