@@ -14,43 +14,53 @@ class TerrestrialPlanet():
     def __init__(self, **kwargs):
         """ Initialize with kwargs, TODO: defaults? """
         # define default attributes
-        default_attr = dict(M_p = p.M_E,
-                            lambda_n = p.lambda_n, 
-                            p_n = p.p_n,
-                            K_0 = p.K_0,
-                            U_0_235 = p.U_0_235,
-                            U_0_238 = p.U_0_238, 
+        default_attr = dict(
+                            # bulk property defaults
+                            M_p = p.M_E,
+                            sma = 1, # semimajor axis in au
+                            L = 1, # stellar luminosity in solar units
+                            Alb = 0, # planetary albedo 
                             Th_0 = p.Th_0, 
                             R_p0 = None, # fixed R_p input value, if none then comes from mass
                             R_c0 = None, # fixed R_c input value " "
                             T_s = None, # if none then calculated from energy balance
-                            L = 1, # stellar luminosity in solar units
-                            Alb = 0, # planetary albedo
-                            sma = 1, # semimajor axis in au
-                            # bulk property defaults
                             CMF = 0.3, # needs a value to avoid errors
                             rho_c = 7200, # Density of iron core in kg m^-3 
                             rho_m = 3500, # Density of silicate mantle in kg m^-3 rho_lith = 2800,
                             Ra_crit_u = 660, # critical Rayleigh number (in Driscoll & Bercovici 2014)
                             beta_u = 0.335, # defaults to 1/3
                             beta_c = None, # defaults to 1/3
-                            # what pressure should you take these densities at?
+                            # what pressure should you take densities at?
+                            
                             # thermodynamic defaults
                             c_m = 1200, # specific heat capacity from Dorn, Noack & Rozal 2018 in J kg−1 K−1 
                             c_c = 840, # speific heat capacity iron core Thiriet+ 2019
                             alpha_m = 2e-5, # thermal expansivity of silicate mantle in K^-1
                             k_m = 4, # thermal conductivity of silicate mantle in W m^−1 K^−1
                             k_lm = 10, # thermal conductivity lower mantle in W m^−1 K^−1 from Driscoll & Bercovici
+                            
                             # radioisotope defaults
+                            lambda_n = p.lambda_n, # astrophysically constant
+                            p_n = p.p_n,
+                            K_0 = p.K_0,
+                            U_0_235 = p.U_0_235,
+                            U_0_238 = p.U_0_238,
                             X_K = 250, # initial abundance of K in wt ppm in Treatise on Geophysics
                             X_U = 2e-2, # initial abundane of U in wt ppm ""
                             X_Th = 7e-2, # initial abundance of Th in wt ppm ""
                             H_0 = 4.6e-12, # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999), CI chondrites
+                            
                             # viscosity defaults
                             a_rh=2.44, # for beta=1/3 from Thiriet+ (2019)
-                            Ea=300e3, # activation energy in J for viscosity law
-                            eta_0 = 1e21,
-                            T_ref = 1600,
+                            eta_0 = 1e21, # reference eta from Thiriet+ (2019)
+                            T_ref = 1600, # reference T from Thiriet+ (2019)
+                            Ea=300e3, # activation energy in J, K&W (1993) dry olivine
+                            V_rh=6e-6, # activation volume in m^3, K&W (1993)  dry olivine
+                            mu=80e9, # shear modulus in Pa, K&W (1993)  dry olivine
+                            A_rh=8.7e15, # pre-exponential factor in s^-1, K&W (1993)  dry olivine
+                            h_rh=10**-2, # grain size in m, K&W (1993)  dry olivine
+                            B_rh=0.5e-9, # Burgers vector, K&W (1993)  dry olivine
+                            m_rh=2.5, # grain size exponent, K&W (1993)  dry olivine
                            )  
         
         

@@ -25,6 +25,7 @@ def eta_KW(T, pl=None, P=0, Ea=300e3, V_rh=6e-6, mu=80e9, A_rh=8.7e15, h_rh=10**
         A_rh = pl.A_rh
         B_rh = pl.B_rh
         m_rh = pl.m_rh
+        h_rh = pl.h_rh
     Q = Ea + P*V_rh # activation enthalpy
     b = mu/(2*A_rh) * (h_rh/B_rh)**m_rh
     return b*np.exp(Q/(p.R_b*T))
@@ -46,7 +47,7 @@ def eta_FK(T, pl=None, T_s=None, eta_s=None, T_i=None, Ea=300e3, P=0, V_rh=6e-6,
     gamma = Q/(p.R_b*T_i**2)
     return eta_s*np.exp(-gamma*(T - T_s))
 
-def dynamic_viscosity(T=None, visc_type=None, **kwargs):
+def dynamic_viscosity(T=None, visc_type=None, **kwargs): # note kwargs can contain planet object
     if visc_type=='constant':
         return nu_0*rho_m
     elif visc_type=='Dorn':

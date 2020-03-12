@@ -195,9 +195,8 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     V_lid = 4/3*np.pi*(pl.R_p**3 - pl.R_l**3)
     pl.M_lid = V_lid*pl.rho_m # should use another density?
     pl.M_conv = pl.M_m - pl.M_lid
-    pl.eta_m = rh.dynamic_viscosity(T=pl.T_m, rho_m=pl.rho_m, eta_0=pl.eta_0, T_ref=pl.T_ref, Ea=pl.Ea, **kwargs)
-    pl.eta_cmb = rh.dynamic_viscosity(T=(pl.T_c+pl.T_m)/2, rho_m=pl.rho_m, eta_0=pl.eta_0, T_ref=pl.T_ref, Ea=pl.Ea,
-                                      **kwargs)
+    pl.eta_m = rh.dynamic_viscosity(T=pl.T_m, pl=pl, **kwargs)
+    pl.eta_cmb = rh.dynamic_viscosity(T=(pl.T_c+pl.T_m)/2, pl=pl, **kwargs)
     pl.nu_m = pl.eta_m/pl.rho_m
     pl.nu_cmb = pl.eta_cmb/pl.rho_m
     pl.TBL_u = bdy_thickness_beta(dT=pl.T_c-pl.T_l, R_l=pl.R_l, R_c=pl.R_c, g=pl.g_sfc, Ra_crit=pl.Ra_crit_u, 

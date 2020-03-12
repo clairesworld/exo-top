@@ -36,7 +36,10 @@ def convective_stress(pl=None, where='lid', rho_m=None, alpha_m=None, g_sfc=None
 
 def max_topo(pl=None, s=None, rho_m=3500, rho_w=0, g_sfc=9.8, **kwargs):
     if pl is not None:
-        s = pl.sigma_interior
+        try:
+            s = pl.sigma_interior
+        except:
+            s = convective_stress(pl=pl, **kwargs)
         rho_m = pl.rho_m
         g_sfc = pl.g_sfc
     if s is None:
