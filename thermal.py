@@ -82,7 +82,12 @@ def bdy_thickness_beta(dT=None, R_l=None, R_c=None, Ra_crit=None, beta=None, g=N
     """Thickness of thermal boundary layer """
     if beta is None:
         beta = 1/3
+    print('rho_m', rho_m, 'g_sfc', g, 'alpha_m', alpha_m, 'kappa_m', kappa_m, 'Ra_crit', Ra_crit, 'beta', beta)
+        
+#     print('numerical: Ra_crit', Ra_crit, 'g_sfc', g,'kappa_m', kappa_m, 'alpha_m', alpha_m, 'rho_m', rho_m)
     Ra_rh = alpha_m*rho_m*g*dT*(R_l - R_c)**3 / (kappa_m*eta_m)
+    
+    print('Ra_rh', Ra_rh)
     return (R_l - R_c) * (Ra_crit/Ra_rh)**beta
 
 def inv_bdy_thickness(dT=None, Ra_crit=None, g=None, kappa_m=None, eta_m=None, alpha_m=None, rho_m=None, 
@@ -115,6 +120,7 @@ def H_rad(h=None, M=None, **kwargs):
     return h*M 
 
 def q_bl(deltaT, k=None, d_bl=None, beta=None, d_bl_inv=None, **kwargs):
+    print('k_m', k)
     if d_bl_inv is None:
         return k*deltaT/d_bl #a_BL*Ra_rh**beta_BL * k*deltaT/h
     else:
@@ -129,6 +135,7 @@ def Q_bl(q=None, deltaT=None, d_bl=None, beta=None, R=None, **kwargs):
         return SA*q
 
 def T_lid(T_m, a_rh=None, Ea=None, **kwargs):
+    print('a_rh', a_rh)
     return T_m - a_rh*(p.R_b*T_m**2/Ea) # temperature at base of stagnant lid, Thiriet+ eq. 15
 
 def lid_growth(T_m=None, q_ubl=None, h0=None, R_p=None, R_l=None, T_l=None, rho_m=None, T_s=None,
@@ -159,9 +166,10 @@ def LHS(t, y, pl=None, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     dTdt_m =  dTdt(-pl.Q_ubl + pl.H_rad_m + pl.Q_core, pl.M_conv, pl.c_m)
     dDdt = lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l, rho_m=pl.rho_m,T_s=pl.T_s,
                       c_m=pl.c_m, k_m=pl.k_m, **kwargs)
+
     if complexity==3:
         return [dTdt_m, dTdt_c, dDdt]
-    elif complexity==2:
+    elif (complexity==2) or hasattr(pl, 'D_l_const'):
         return [dTdt_m, dTdt_c, 0]
     elif complexity==1:
         return [dTdt_m, dTdt_c, 0]
@@ -186,23 +194,28 @@ def solve(pl, t0=0, tf=None, T_m0=None, T_c0=None, D_l0=None, complexity=3, **kw
 
 def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     if complexity == 1:
-        pl.T_c = pl.T_m
+        pl.T_c = pl.T_m # no distinction between core and mantle
     pl.h_rad_m = h_rad(t, H_0=pl.H_0, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, **kwargs) # W kg^-1
     pl.a0 = pl.h_rad_m*pl.rho_m # radiogenic heating in W m^-3
     if complexity<3: # lid adjusts instantaneously
         pl.D_l = d_lid_ss(Tm=pl.T_m, a_rh=pl.a_rh, k=pl.k_m, Ea=pl.Ea, H0=pl.H_0, Ra_crit=pl.Ra_crit_u, eta_0=pl.eta_0,
                           T_ref=pl.T_ref, kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, g_sfc=pl.g_sfc, rho_m=pl.rho_m, 
                           Ts=pl.T_s)
+    if hasattr(pl, 'D_l_const'):
+        pl.D_l = pl.D_l_const*np.ones_like(t) # keep lid constant for testing purposes
     
     pl.R_l = pl.R_p - pl.D_l
     pl.T_l = T_lid(T_m=pl.T_m, a_rh=pl.a_rh, Ea=pl.Ea)
     V_lid = 4/3*np.pi*(pl.R_p**3 - pl.R_l**3)
     pl.M_lid = V_lid*pl.rho_m # should use another density?
     pl.M_conv = pl.M_m - pl.M_lid
+    print('mantle eta')
     pl.eta_m = rh.dynamic_viscosity(T=pl.T_m, pl=pl, **kwargs)
+    print('cmb eta')
     pl.eta_cmb = rh.dynamic_viscosity(T=(pl.T_c+pl.T_m)/2, pl=pl, **kwargs)
     pl.nu_m = pl.eta_m/pl.rho_m
     pl.nu_cmb = pl.eta_cmb/pl.rho_m
+    print('upper bl')
     pl.TBL_u = bdy_thickness_beta(dT=pl.T_c-pl.T_l, R_l=pl.R_l, R_c=pl.R_c, g=pl.g_sfc, Ra_crit=pl.Ra_crit_u, 
                                   rho_m=pl.rho_m, 
                                   beta=pl.beta_u, kappa_m=pl.kappa_m, eta_m=pl.eta_m, alpha_m=pl.alpha_m, **kwargs)
@@ -237,4 +250,10 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     if Tlid_ini=='linear':
         pl.T_avg = T_mean(T_m=pl.T_m, T_l=pl.T_l, R_p=pl.R_p, R_l=pl.R_l, R_c=pl.R_c, T_s=pl.T_s, k_m=pl.k_m, a0=0, 
                           **kwargs)
+    
+    
+    print('dT convection', pl.T_c-pl.T_l)
+    print('dT bl flux', pl.T_m-pl.T_l)
+    print('eta_m', pl.eta_m)
+    print('delta_bl', pl.TBL_u)
     return pl

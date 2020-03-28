@@ -115,5 +115,10 @@ class TerrestrialPlanet():
 
 
     def set_attrs(self, **kwargs):
-        # todo??
-        pass
+        self.__dict__.update((k,v) for k,v in kwargs.items())
+    
+    def copy(self, **kwargs):
+        self_args = self.__dict__
+        self_args.update(kwargs)
+        new = TerrestrialPlanet(self_args)
+        return new

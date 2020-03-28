@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.12.26)  8 MAR 2020 13:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.12.26)  25 MAR 2020 21:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -705,4 +705,136 @@ LaTeX Info: Redefining \nameref on input line 18.
 ) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
 
-(/usr/share/texlive/texmf-dist/tex/latex/oberdie
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+)
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+38.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 456.
+
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
+LaTeX Font Info:    Try loading font information for U+msa on input line 21.
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 21.
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) [1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+
+Package caption Warning: \label without proper reference on input line 102.
+See the caption package documentation for explanation.
+
+
+LaTeX Warning: Reference `tab:params' on page 2 undefined on input line 105.
+
+
+Package natbib Warning: Citation `Zeng2016' on page 2 undefined on input line 1
+09.
+
+
+Package natbib Warning: Citation `Zeng2017' on page 2 undefined on input line 1
+13.
+
+[2]
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 149.
+
+ (/usr/share/texlive/texmf-dist/tex/latex/base/omlcmr.fd
+File: omlcmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 149.
+
+
+Package natbib Warning: Citation `DavailleJaupart1993' on page 3 undefined on i
+nput line 159.
+
+
+Package natbib Warning: Citation `Thiriet2019' on page 3 undefined on input lin
+e 159.
+
+
+Package natbib Warning: Citation `Thiriet2019' on page 3 undefined on input lin
+e 165.
+
+
+LaTeX Warning: Reference `fig:T_z' on page 3 undefined on input line 172.
+
+
+LaTeX Warning: Reference `fig:d_fT' on page 3 undefined on input line 192.
+
+
+LaTeX Warning: Reference `fig:evol-lid' on page 3 undefined on input line 200.
+
+[3]
+
+Package natbib Warning: Citation `Reese2005' on page 4 undefined on input line 
+225.
+
+
+LaTeX Warning: Reference `tab:dyn_topo_obvs' on page 4 undefined on input line 
+236.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 236--237
+
+ []
+
+! Misplaced \noalign.
+\toprule ->\noalign 
+                    {\ifnum 0=`}\fi \@aboverulesep =\abovetopsep \global \@b...
+l.239 \toprule
+              
+I expect to see \noalign only after the \cr of
+an alignment. Proceed, and I'll ignore this case.
+
+! Missing } inserted.
+<inserted text> 
+                }
+l.240 R
+       eference & RMS (km) & Amplitude (km) & $l=2$ power (km) & Heat flow (...
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing } inserted.
+<inserted text> 
+                }
+l.240 R
+       eference & RMS (km) & Amplitude (km) & $l=2$ power (km) & Heat flow (...
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing } inserted.
+<inserted text> 
+                }
+l.240 R
+       eference & RMS (km) & Amplitude (km) & $l=2$ power (km) & Heat flow (...
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing \cr inserted.
+<inserted text> 
+                \cr 
+l.240 R
+       eference & RMS (km) & 
