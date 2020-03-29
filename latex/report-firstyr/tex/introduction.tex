@@ -1,0 +1,152 @@
+\section{Background}
+
+\begin{itemize}
+\item Motivation... The interior of a planet is increasingly understood to be important for its overall habitability.... modern era of exoplanet characterization amazingly permits some level of examining and testing this...
+\end{itemize}
+
+\subsection{The interior structure of terrestrial planets through time}
+\begin{itemize}
+\item differences between petrologic and mechanical transitions, what we choose to put into our conceptual model
+\item Stagnant lids... \citet{Davaille1993, Reese2005, ORourke2012}, etc... we have no idea how/if plate tectonics could operate---avoid this unnecessary complexity. Experiments and models show that these develop in convecting cells with large viscosity contrasts.
+\item Urey ratio meaning... do ``evolved planets" have a Urey ratio of 1, why not...
+\item \citep{Seales2019, Seales2019a} etc. uncertainty on thermal history modelling 
+\end{itemize}
+
+\subsection{Parameterized convection models}
+
+\begin{itemize}
+\item box models 1980s-1990s McKenzie, Solomatov, etc. Most basic: isothermal mantle with upper and lower thermal boundary layers, core is a finite source of heating, maybe internal heating
+\item Use nondimensional parameters... the Rayleigh number quantifies the ``vigour" of convection and is analytically equal to the ratio of time scales for heat transport by conduction to heat transport by convection (will something diffuse away its heat before it can convect). 
+
+
+\begin{equation}\label{eq:Ra}
+\mathrm{Ra} = \frac{\alpha \rho g \Delta T h^3 }{ \kappa \eta(T)},
+\end{equation}
+where $\alpha$ is thermal expansivity, $\rho$ is density, $g$ is gravity, $\Delta T$ is the temperature contrast across the layer, $h$ is the thickness of the layer, $\kappa$ is the thermal diffusivity, and $\eta$ is the dynamic viscosity.
+
+\item Nusselt number
+\end{itemize}
+
+
+\subsection{Our understanding of mantle rheology}
+
+Despite good effort, the rheology of Earth's mantle is difficult to measure, and we would expect rheology to make up for a large amount of our model uncertainty \citep{Dumoulin2013}. 
+
+Experiments show that viscosity has an Arrhenius dependence on temperature,
+\begin{equation}\label{eq:eta_Arrhenius}
+\eta(T) = b \exp\left(\frac{Q}{R_b T}\right),
+\end{equation}
+where $R_b$ is the gas constant, $b$ is a prefactor, and $Q = E_a + pV$ is the activation enthalpy, with pressure $p$ and activation volume $V$ \citep{Karato1993, Korenaga2008, Karato2010, Mullet2015, Jain2019}. The pressure-dependence is often ignored, so $Q = E_a$. \citet{Karato1993}, for example, offer a physical meaning for the prefactor,
+\begin{equation}\label{eq:eta_b}
+b = \frac{\mu}{2 A} \left(\frac{h}{B}\right)^m,
+\end{equation}
+where $\mu$ is the shear modulus, $A$ is a preexponential factor (of order $10^{15}$ for diffusion creep), $B$ is the Burgers vector (quantifying the distortion in the crystal lattice due to dislocation), $h$ is the typical grain size of the rock, and $m$ is an exponent characteristic to the type of creep.
+
+In many applications this rheology law can be linearized, e.g., via the Frank-Kamenetskii parameterization,\footnote{Named for the Soviet scientist David A. Frank-Kamenetskii, who developed thermal combustion theory in the 1930s.}
+\begin{equation}
+\eta(T) = \eta_0 \, \exp{\left[-\gamma \left(T - T_0\right)\right]}
+\end{equation}
+where $\eta_0$ and $T_0$ are a reference viscosity and temperature, usually taken at the surface, and $\gamma = Q/(R_b T_i^2)$ with internal temperature $T_i$.
+
+\subsubsection{Diffusion creep or dislocation creep?}
+
+\begin{itemize}
+\item Can be accounted for by changing the parameter values in equations (\ref{eq:eta_Arrhenius}) and (\ref{eq:eta_b}).
+\item Diffusion creep depends on grain size while dislocation creep has higher $E_a$ and depends on \citep{Turcotte2014}.
+\end{itemize} 
+
+\subsubsection{Dry or wet?}
+
+\begin{itemize}
+\item The distinction between rheologic behaviour of wet versus dry materials is less pronounced than the mode of creep. This is represented by smaller changes of parameter values in equations (\ref{eq:eta_Arrhenius}) and (\ref{eq:eta_b}).
+\item Nevertheless, the fact that Earth's interior probably contains more water than Venus or Mars is thought to have played a major role in their divergent evolutions (REFS), e.g. water is probably necessary for the initiation of plate tectonics
+\end{itemize} 
+
+
+\subsubsection{Self-regulation of viscosity}
+
+\begin{itemize}
+\item Meanwhile, the anaytical form of viscosity's temperature dependence suggests a negative feedback. This would buffer the interior mantle viscosity at a near-constant value \citet{Solomatov1996a, Turcotte2014}.
+\item If true, this would limit the feasible ranges we could expect for the mantle viscosities of terrestrial exoplanets.
+\item However, \citep{Korenaga?} have shown that this might not work if realistic melting is considered...
+\end{itemize}
+
+
+\subsection{Stress, strength, and mountains}
+
+\begin{itemize}
+\item early papers - Scheuer 1981
+\item Time dependence - viscous relaxation
+\end{itemize}
+
+\subsubsection{Convective stress}
+
+Rising and sinking mantle plumes are associated with density contrasts, which induce shear stresses in the mantle. These can be estimated ``on average" using parameterized convection:
+\begin{align}
+\sigma_{rr} &\propto \rho g \alpha \Delta T_{rh} \delta_u \\
+&= C_\sigma \rho_m \alpha_m g \left(\frac{R_b T_m^2}{E_a}\right)^2 \frac{k_m}{q_{bl}},
+\end{align}
+which is the volume change due to a temperature change, where the expressions \ref{eq:Tl} and \ref{eq:d_ubl} are substituted for $\Delta T_{rh}$ and $\delta_{bl}$. \citet{Reese2005} give $C_\sigma = 0.1$ for interior stress and $C_\sigma = 2$ for lid stress.
+
+At equilibrium, this stress is balanced by the downwards gravitational force of a topographic load, $\sigma_{rr} = \rho g h$, where $h$ is the amplitude of topography. In this simple force balance, $h$ scales with $T_m$ and $q_{\rm ubl}$ as:
+\begin{equation}
+h_{\rm max} = C_\sigma \alpha \left(\frac{R_b T_m^2}{E_a}\right)^2 \frac{k_m}{q_{\rm ubl}}
+\end{equation}
+Confused - shear stress or normal stress in balace?
+
+This gives a theoretical upper limit for the height of a load supported by mantle convection. In reality, the actual topography would be much lower than this.
+
+
+
+\subsubsection{Dynamic topography in the solar system}
+
+\begin{itemize}
+\item Definition of dynamic topography
+\end{itemize}
+
+The dynamic component of topography can be tricky to parse from observed topographic heights because it requires an estimate of how much topography is isostatically compensated. This can be done, however, by measuring the geoid of the planet and comparing it to the observed topography... geoid-to-topography ratio...
+
+\begin{table}
+\footnotesize
+\caption{Surface heat flux and stress estimates are also given when provided. Note that Earth's dynamic topography is made more complex by, e.g., subducting plates, and is not focussed on here, although a sample of values is presented for comparison. \label{tab:dyn_topo_obvs}}
+\begin{tabular}{ @{} p{1.5cm} r r r r r p{3cm} @{} } 
+
+\toprule
+Ref. & RMS & Amplitude & $l=2$ power  & Surface heat flow  & Convecting stress & Notes \\
+\; & (km) & (km) & (km) & (mW m$^{-2}$) & (MPa) & \; \\
+\midrule
+\textbf{Mars} & & & & & & \\
+1 & 2 & 3 & 4 & 5 & 6 & 7 \\ 
+
+\midrule
+
+1 & 2 & 3 & 4 & 5 & 6 & 7 \\ 
+
+\midrule 
+
+\textbf{Venus} & 2& 3&4 &5 &6 &7 \\
+
+\citet{Solomatov1996} & ? & $\sim$3 & & & & Topography from ``thermal thinning" \\
+\citet{Huang2013} & \; & \; & $\sim$1 & \; & \; & \; \\
+\citet{Golle2012} &  \; &  \; & 3.3 &  \; &  \; & Result without elastic lid \\
+\citet{Yang2016} & ? & $\sim$3 &  \; &  \; &   \; & Separated dynamic and isostatic components \\  \midrule
+
+
+\textbf{Earth} & & & & \textbf{37\textendash 41 TW} & & \citet{Jaupart2007} \\
+\citet{Kiefer1998} & & & & & & Given non-dimensionalized, need to convert \\
+\citet{Amante2009} & 2.17 & & & & & \; \\
+\citet{Arnould2018} & 3.47\textendash 7.28 & & & 6.9\textendash 83 TW & & 2D numerical models \\
+\citet{Davies2019} & & & & & & \; \\
+
+
+\bottomrule
+
+
+\end{tabular}
+\end{table}
+
+
+\subsection{Statement of the problem}
+\begin{itemize}
+\item We propose to develop simple scaling relationships to examine the nature of how topography changes with planet mass...
+\end{itemize}

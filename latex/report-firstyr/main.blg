@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: main.aux
+The style file: plainnat.bst
+Database file #1: ../exogeodynamics.bib
+Warning--I didn't find a database entry for "Korenaga?"
+Warning--I didn't find a database entry for "Jaupart2007"
+Warning--I didn't find a database entry for "Kiefer1998"
+You've used 27 entries,
+            2773 wiz_defined-function locations,
+            841 strings with 10902 characters,
+and the built_in function-call counts, 13699 in all, are:
+= -- 1330
+> -- 752
+< -- 15
++ -- 252
+- -- 225
+* -- 1215
+:= -- 2140
+add.period$ -- 129
+call.type$ -- 27
+change.case$ -- 156
+chr.to.int$ -- 27
+cite$ -- 54
+duplicate$ -- 556
+empty$ -- 1055
+format.name$ -- 274
+if$ -- 2843
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 25
+newline$ -- 190
+num.names$ -- 108
+pop$ -- 227
+preamble$ -- 1
+purify$ -- 129
+quote$ -- 0
+skip$ -- 410
+stack$ -- 0
+substring$ -- 627
+swap$ -- 56
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 297
+warning$ -- 0
+while$ -- 125
+width$ -- 0
+write$ -- 450
+(There were 3 warnings)

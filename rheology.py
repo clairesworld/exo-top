@@ -28,7 +28,6 @@ def eta_KW(T, pl=None, P=0, Ea=300e3, V_rh=6e-6, mu=80e9, A_rh=8.7e15, h_rh=2.07
         h_rh = pl.h_rh
     Q = Ea + P*V_rh # activation enthalpy
     b = mu/(2*A_rh) * (h_rh/B_rh)**m_rh
-    print('T_m', T, 'Ea', Ea, 'mu', mu, 'A_rh', A_rh,  'h_rh', h_rh, 'B_rh', B_rh, 'm_rh', m_rh)
         
     return b*np.exp(Q/(p.R_b*T))
 
@@ -62,3 +61,7 @@ def dynamic_viscosity(T=None, visc_type=None, **kwargs): # note kwargs can conta
         return eta_Thi(T, **kwargs)
     elif visc_type=='FK':
         return eta_FK(T, T_i=T, **kwargs)
+    
+def grain_size(A_rh, eta_0, Ea, T_ref, m, B_rh, mu):
+    # calculate grain size to correspond to linearization
+    return B_rh * (2*A_rh*eta_0*np.exp(-Ea/(p.R_b*T_ref))/mu)**(1/m)

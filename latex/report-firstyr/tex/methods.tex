@@ -1,0 +1,180 @@
+\section{Model description}
+
+
+\begin{table}
+\centering
+\caption{Parameters used in this study. We later test the effects of tuning the parameters in the bottom section (these override the values given in the top section). \label{tab:params}}
+
+\begin{tabular}{@{} c l r l p{4cm} @{}}
+\multicolumn{5}{l}{\textbf{Constant values for all planets}} \\
+\toprule
+Symbol & Description & Value & Units & Ref. \\
+\midrule
+\multicolumn{5}{c}{\textbf{Bulk properties}} \\
+$\rho_m$ & Mantle density & 3500 & kg m$^{-3}$ & \citet{Thiriet2019} \\
+$\rho_c$ & Core density & 7200 & kg m$^{-3}$ &  \citet{Thiriet2019}  \\
+$X_{\rm K}$ & Initial K abundance &  305 & wt ppm  & \citet{Jaupart2015} \\
+$X_{\rm U}$ & Initial U abundance &  $16 \times 10^{-3}$ & wt ppm  & \citet{Jaupart2015} \\
+$X_{\rm Th}$ & Initial Th abundance &  $56 \times 10^{-3}$ & wt ppm  & \citet{Jaupart2015} \\
+$c_m$ & Mantle specific heat (p or v?) & 1142 & J kg$^{-1}$ K$^{-1}$  & \citet{Thiriet2019}  \\
+$c_c$ & Core specific heat (p or v?) & 840 & J kg$^{-1}$ K$^{-1}$  & \citet{Thiriet2019}  \\
+$\alpha_m$ & Thermal expansivity &  $2.5 \times 10^{-5}$ &   & \citet{Thiriet2019}  \\
+Ra$_{\rm crit}$ & Critical Rayleigh number &  &  & \citet{Thiriet2019}  \\
+$A_{rh}$ & Viscosity preexponential factor & & & \citet{Karato1993} \\
+$h$ & Grain size & 2.07 & mm & . \\
+$B_{rh}$ & Burgers vector &  & nm & \citet{Karato1993} \\
+$m$ & Grain size exponent &  & . & \citet{Karato1993} \\
+$\mu$ & Shear modulus & 80 & GPa & \citet{Karato1993} \\
+
+\multicolumn{5}{c}{\textbf{Astrophysical properties}} \\
+$L_*$ & Stellar luminosity & 1 & $L_{\rm Sun}$ &  \\
+Alb & Planetary geometric albedo & 0 & &  \\
+\bottomrule
+\end{tabular}
+
+
+
+\begin{tabular}{@{} c l r r r r l p{3cm} @{}}
+\multicolumn{8}{l}{\textbf{Solar system values}} \\
+\toprule
+Symbol & Description & Moon & Mercury & Mars & Venus & Units & Ref. \\
+\midrule
+$M_p$ & Planet mass & Moon & Mercury & Mars & Venus & kg & . \\
+CMF & Core mass fraction & Moon & Mercury & Mars & Venus & kg & . \\
+$T_s$ & Surface temperature & & & & & K & . \\
+\bottomrule
+\end{tabular}
+
+
+%
+%\begin{tabular}{@{} c l r l  @{}}
+%\multicolumn{4}{l}{\textbf{Exoplanet parameter study}} \\
+%\toprule
+%Symbol & Description & Range & Units \\
+%\midrule
+%$M_p$ & Planet mass & Range & kg \\
+%CMF & Core mass fraction & Range &  \\
+%$E_a$ & Viscosity activation energy & Range & kJ mol$^{-1}$ \\
+%$h$ & Grain size & Range & mm \\
+%\bottomrule
+%\end{tabular}
+
+\end{table}
+
+
+We have developed parameterized models of rocky planet interiors. The key free parameters we are interested in tuning are the planet mass, $M_p$, core mass fraction, CMF, and viscosity activation energy $E_a$ and prefactor. 
+
+From these we calculate derived bulk properties: the radius of the planet, $R_p$, based on \citet{Zeng2016} using PREM,
+\begin{equation}
+\frac{R_p}{R_E} = (1.07 - 0.21\; {\rm CMF})\left(\frac{M_p}{M_E}\right)^{1/3.7},
+\end{equation}
+which has surface area SA$_p$; the radius of the core, using the scaling relationship from \citet{Zeng2017},
+\begin{equation}
+R_c = R_p \; {\rm CMF}^{0.5},
+\end{equation}
+which has surface area SA$_c$; the surface gravity,
+\begin{equation}
+g_{\rm sfc} =\frac{6.674\times 10^{-11}M_p}{R_p^2};
+\end{equation}
+and the thermal diffusivity of the mantle,
+\begin{equation}
+\kappa_m = \frac{k_m}{\rho_m c_p}.
+\end{equation}
+We can also find the surface temperature, $T_s$, assuming the surface is in blackbody equilibrium,
+\begin{align}
+T_s &= \left(\frac{q_* \pi R_p^2}{\sigma_{\rm SB} \; {\rm SA}_p}\right)^{1/4},\\
+q_* &= \frac{L_*(1-{\rm Alb})}{4 \pi a^2};
+\end{align}
+where $q_*$ is the incident stellar radiation in W m$^{-2}$, Alb is the geometric albedo, $L_*$ is the stellar luminosity, and $\sigma_{\rm SB}$ is the Stefan–Boltzmann constant, but for solar system planets we take the measured $T_s$ (see Table \ref{tab:params}).
+
+
+
+
+\subsection{Temperature-dependent viscosity convection}\label{sec:viscosity-model}
+
+We focus on the rheology laws from \citet{Karato1993} as a first step, as this helps us understand the physical basis of tweaking rheological parameters.
+
+The temperatures of the mantle and core are governed by the ordinary differential equations
+\begin{align}
+M_m c_{v, m} \frac{{\rm d}T_m}{{\rm d}t} &= -Q_{\rm ubl} + Q_{\rm rad} + Q_c, \\
+M_c c_{v, c} \frac{{\rm d}T_c}{{\rm d}t} &= -Q_c,
+\end{align}
+where $M_m$ is the mantle mass, $c_{v, m}$ is the mantle specific heat capacity at constant volume, $Q_{\rm rad}$ is the mass-integrated radiogenic heat flux, $Q_{\rm ubl}$ and $Q_{c}$ are the surface-integrated upper and lower thermal boundary layer heat fluxes, and the sign of $Q$ indicates cooling or heating. The analagous notation with subscript $c$ applies to the core. We use {\tt scipy.integrate} to solve this O.D.E. from $\tau_0$, taken to be the time of magma ocean cooling, over the age of the planet, $\tau_f$.  
+
+\subsubsection{Heat fluxes}
+The next paragraphs describe these heat fluxes. Throughout, heat fluxes per unit volume or area are given by lowercase $q$. The radiogenic heat flux in W kg$^{-1}$ is:
+\begin{align}
+q_{\rm rad} &= \sum^{\rm K, U, Th}_n \left[ H_{0, n} \; X_n \; n_0 \; e^{-\ln 2 \frac{\tau}{\tau_{1/2 ,n}}} \right],
+\end{align}
+where we are summing over the heat-producing elements K, U, and Th, $H_{0, n}$ is the heat production of the $n^{th}$ isotope in W kg$^{-1}$, $X_n$ is the natural abundance of the $n^{th}$ isotope in terms of mass (compared to all isotopes of that element), $n_0$ is the concentration by mass of that element in the planet, $\tau$ is the age of the planet, and $\tau_{1/2 ,n}$ is the half-life of the $n^{th}$ isotope.
+
+Heat travels by conduction through the upper and lower thermal boundary layers, so these fluxes depend on thermal conductivity, $k_m$, and the boundary layer thickness, $\delta$, with subscripts $u$ and $c$ referring to the upper and lower layers respectively: 
+\begin{align}
+q_{u, c} &= k_m \frac{\Delta T_{u, c}}{\delta_{u, c}} \\
+\delta_{u, c} &= h \left(\frac{Ra_{{\rm crit}, u, c}}{Ra_{rh, u, c}}\right)^\beta,
+\end{align}
+where Ra$_{rh}$ is the interior Rayleigh number from equation \ref{eq:Ra}, taking $\Delta T = T_l - T_c$. We assume $\beta = 1/3$, so convecting layer depth $h$ cancels out.\footnote{Numerical studies give $\beta$ around 0.3 \citep{Thiriet2019}.} Note that in the flux expressions, $\Delta T$ changes slightly: for $\Delta T_u$ we use $T_m - T_l$, and $\Delta T_c = T_c - T_m$. $T_l$ is the temperature at the top of the convecting region, as explained in the next section. Viscosity is taken at the isothermal core for the upper boundary layer, and at $T_c + T_m/2$ for the lower, after \citet{Thiriet2019}. Gravity is evaluated at the surface for $\delta_u$ and at the core radius for $\delta_c$.
+
+
+
+
+\subsection{Thermal evolution in the stagnant lid regime}
+
+We distinguish between the upper thermal boundary layer of the convecting region and the stagnant lid.  The latter, conceptually, is like adding an insulating shell over the body, while allowing the boundary in between to contract and expand. Namely, the temperature at the top of the mantle thermal boundary layer, $T_l$, would not be set at the planetary surface temperature. 
+
+Fluid dynamics experiments show that the temperature jump, $\Delta T_{ubl}$, between the isothermal core of the convecting region at $T_m$ and the top of the thermal boundary layer at $T_l$ is proportional to the viscous temperature scale $\Delta T_\eta$: the rate of viscosity change with temperature \citep{Davaille1993}. $\Delta T_{ubl}$ is a function of only the isothermal core temperature and viscosity activation energy:
+\begin{align}
+\label{eq:Tl}
+\Delta T_{ubl} &= -a_{rh} \Delta T_{\eta} \\
+\Delta T_{\eta} &= \frac{\eta(T_m)}{{\rm d}\eta/{\rm d}T_m\vert_{Tm}} = \frac{R_b T_m^2}{E_a},
+\end{align}
+where $R_b$ is the universal gas constant, and $a_{rh} = 2.54$ based on fits to 3D convection models \citep{Thiriet2019}. (\ref{eq:Tl} has the same form regardless of which viscosity parameterization from section \ref{sec:viscosity-model} is chosen. We can then find $T_l = T_m + \Delta T_{ubl}$.
+
+\subsubsection{Temperatures and heat flow in the lid}
+
+In the stagnant lid of thickness $d_l$ above this layer, the temperature decreases from $T_l$ to $T_s$ by conductive heat transport, which in spherical coordinates is:
+\begin{align}
+T_{\rm lid}(r) &= \frac{-a_0}{6k_l} r^2 + \frac{c_1}{k_m r} + c_2 \\
+    c_1 &= k_m \frac{T_l - T_s - \frac{a_0}{6 k_m} \left(R_p^2 - R_l^2\right)}{\frac{1}{R_l} - \frac{1}{R_p}} \\
+    c_2 &= T_s + \frac{a_0}{6 k_m} R_p^2 - \frac{c_1}{k_m R_p}
+\end{align} 
+where $k_l = k_m$ is thermal conductivity, $a_0 = \rho_l H_0$ is the lithospheric heat production in W m$^{-3}$, assumed to be constant with $r$. For now we are assuming $H_l$ is equivalent to the mantle value; we might anticipate more radiogenic heating in the lid because the lid partly corresponds to the lithosphere in a real planet, and K, U, and Th are lithophilic.
+
+Evaluating the associated conductive heat flux, $q_{l} = -k_l \d T/\d r$, at $r = R_p$ gives the surface heat flux:
+\begin{equation}
+q_{\rm sfc} = -\frac{a_0}{3k_m}R_p - \frac{c_1}{k_m R_p^2}.
+\end{equation}
+
+
+
+\subsubsection{Lid thickness}
+
+%As a zeroth order case, we can assume a constant lid thickness over the planet's evolution.
+%
+%At intermediate complexity, we assume flux is continuous where the upper thermal boundary layer meets the stagnant lid:
+%\begin{align}
+%\label{eq:t-continuity}
+%&T_{\rm lid}(z=-d_l) = T_m + \Delta T_\eta \\
+%&\frac{H_l}{2k}d_l^2 + \frac{q_{ubl}\left(T_m\right)}{k}d_l + \left(T_m - T_s - \frac{R_b}{E_a}T_m^2\right)  = 0
+%\end{align}
+%where $q_{ubl}$ is a function of only $T_m$ if $\beta=1/3$ ($\delta_{ubl}$ independent of mantle depth). The roots of this equation give $d_l$ as a function of $T_m(t)$ and $H_l(t)$, which allows $d_l$ to be calculated at each time-step. It can be shown that there is one positive root for our range of parameters.
+
+
+We account for the fact that the lid does not instantly grow or shrink in response to a change in $q_{\rm ubl}$. There is some lag where $D_l$ adjusts such that the flux out of the top of the lid is moving towards equilibrium with the flux into the base of the lid \citep{Thiriet2019}:
+\begin{equation}\label{eq:D_l}
+\frac{\d D_l}{\d t} = k_l \left(\frac{-q_{\rm ubl} - q_{\rm sfc}}{\rho_m c_{p,m} (T_m - T_l)} \right). 
+\end{equation}
+From this we can calculate $R_l = R_p - D_l$; we also account for the mass of the convecting region $M_m$ changing with $R_l$.
+
+
+
+
+\subsection{Amplitude of dynamic topography}
+
+We use the scaling law provided by \citet{Parsons1983} equation (33) to estimate the root-mean-square (RMS) amplitude of dynamic topography based on viscosity and surface heat flow:
+\begin{equation}\label{eq:RMS}
+h_{\rm RMS} = C_{\rm top} \left(\frac{\alpha_m q_{\rm sfc} \eta_m(T) \kappa_m}{\rho_m g_{\rm sfc} k_m}\right)^\frac{1}{2},
+\end{equation}
+where $C_{\rm top} = 5.4$ to match the predictions of RMS dynamic topography in \citet{Lees2019}.
+
+

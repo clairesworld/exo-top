@@ -1,0 +1,239 @@
+\begin{thebibliography}{27}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Amante and Eakins(2009)]{Amante2009}
+C~Amante and B.~W. Eakins.
+\newblock {{ETOPO1}} 1 {{Arc}}-{{Minute Global Relief Model}}: {{Procedures}},
+  {{Data Sources}} and {{Analysis}}.
+\newblock Technical Report NESDIS NGDC-24, {National Geophysical Data Center,
+  NOAA}, 2009.
+
+\bibitem[Arnould et~al.(2018)Arnould, Coltice, Flament, Seigneur, and
+  M{\"u}ller]{Arnould2018}
+M.~Arnould, N.~Coltice, N.~Flament, V.~Seigneur, and R.~D. M{\"u}ller.
+\newblock On the {{Scales}} of {{Dynamic Topography}} in {{Whole}}-{{Mantle
+  Convection Models}}.
+\newblock \emph{Geochemistry, Geophysics, Geosystems}, 19\penalty0
+  (9):\penalty0 3140--3163, 2018.
+\newblock ISSN 1525-2027.
+\newblock \doi{10.1029/2018GC007516}.
+
+\bibitem[Davaille and Jaupart(1993)]{Davaille1993}
+Anne Davaille and Claude Jaupart.
+\newblock Transient high-{{Rayleigh}}-number thermal convection with large
+  viscosity variations.
+\newblock \emph{Journal of Fluid Mechanics}, 253:\penalty0 141--166, August
+  1993.
+\newblock ISSN 1469-7645, 0022-1120.
+\newblock \doi{10.1017/S0022112093001740}.
+
+\bibitem[Davies et~al.(2019)Davies, Valentine, Kramer, Rawlinson, Hoggard,
+  Eakin, and Wilson]{Davies2019}
+D.~R. Davies, A.~P. Valentine, S.~C. Kramer, N.~Rawlinson, M.~J. Hoggard, C.~M.
+  Eakin, and C.~R. Wilson.
+\newblock Earth's multi-scale topographic response to global mantle flow.
+\newblock \emph{Nature Geoscience}, 12\penalty0 (10):\penalty0 845--850,
+  October 2019.
+\newblock ISSN 1752-0908.
+\newblock \doi{10.1038/s41561-019-0441-4}.
+
+\bibitem[Dumoulin et~al.(2013)Dumoulin, {\v C}adek, and Choblet]{Dumoulin2013}
+C.~Dumoulin, O.~{\v C}adek, and G.~Choblet.
+\newblock Predicting surface dynamic topographies of stagnant lid planetary
+  bodies.
+\newblock \emph{Geophysical Journal International}, 195\penalty0 (3):\penalty0
+  1494--1508, December 2013.
+\newblock ISSN 0956-540X.
+\newblock \doi{10.1093/gji/ggt363}.
+
+\bibitem[Golle et~al.(2012)Golle, Dumoulin, Choblet, and Cadek]{Golle2012}
+O.~Golle, C.~Dumoulin, G.~Choblet, and O.~Cadek.
+\newblock Topography and geoid induced by a convecting mantle beneath an
+  elastic lithosphere.
+\newblock \emph{Geophysical Journal International}, 189\penalty0 (1):\penalty0
+  55--72, April 2012.
+\newblock ISSN 0956-540X.
+\newblock \doi{10.1111/j.1365-246X.2012.05364.x}.
+
+\bibitem[Huang et~al.(2013)Huang, Yang, and Zhong]{Huang2013}
+Jinshui Huang, An~Yang, and Shijie Zhong.
+\newblock Constraints of the topography, gravity and volcanism on {{Venusian}}
+  mantle dynamics and generation of plate tectonics.
+\newblock \emph{Earth and Planetary Science Letters}, 362:\penalty0 207--214,
+  January 2013.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/j.epsl.2012.11.051}.
+
+\bibitem[Jain et~al.(2019)Jain, Korenaga, and Karato]{Jain2019}
+Chhavi Jain, Jun Korenaga, and Shun-ichiro Karato.
+\newblock Global {{Analysis}} of {{Experimental Data}} on the {{Rheology}} of
+  {{Olivine Aggregates}}.
+\newblock \emph{Journal of Geophysical Research (Solid Earth)}, 124:\penalty0
+  310--334, January 2019.
+\newblock ISSN 0148-0227.
+\newblock \doi{10.1029/2018JB016558}.
+
+\bibitem[Jaupart et~al.(2015)Jaupart, Labrosse, Lucazeau, and
+  Mareschal]{Jaupart2015}
+C.~Jaupart, S.~Labrosse, F.~Lucazeau, and J.-C. Mareschal.
+\newblock Temperatures, {{Heat}}, and {{Energy}} in the {{Mantle}} of the
+  {{Earth}}.
+\newblock In \emph{Treatise on {{Geophysics}}}, pages 223--270. {Elsevier},
+  2015.
+\newblock ISBN 978-0-444-53803-1.
+\newblock \doi{10.1016/B978-0-444-53802-4.00126-3}.
+
+\bibitem[Karato(2010)]{Karato2010}
+Shun-ichiro Karato.
+\newblock Rheology of the deep upper mantle and its implications for the
+  preservation of the continental roots: {{A}} review.
+\newblock \emph{Tectonophysics}, 481\penalty0 (1-4):\penalty0 82--98, January
+  2010.
+\newblock ISSN 00401951.
+\newblock \doi{10.1016/j.tecto.2009.04.011}.
+
+\bibitem[Karato and Wu(1993)]{Karato1993}
+Shun-ichiro Karato and Patrick Wu.
+\newblock Rheology of the {{Upper Mantle}}: {{A Synthesis}}.
+\newblock \emph{Science}, 260\penalty0 (5109):\penalty0 771--778, May 1993.
+\newblock ISSN 0036-8075, 1095-9203.
+\newblock \doi{10.1126/science.260.5109.771}.
+
+\bibitem[Korenaga and Karato(2008)]{Korenaga2008}
+Jun Korenaga and Shun-Ichiro Karato.
+\newblock A new analysis of experimental data on olivine rheology.
+\newblock \emph{Journal of Geophysical Research (Solid Earth)}, 113:\penalty0
+  B02403, February 2008.
+\newblock ISSN 0148-0227.
+\newblock \doi{10.1029/2007JB005100}.
+
+\bibitem[Lees et~al.(2019)Lees, Rudge, and McKenzie]{Lees2019}
+Matthew~E. Lees, John~F. Rudge, and Dan McKenzie.
+\newblock Gravity, topography, and melt generation rates from simple {{3D}}
+  models of mantle convection.
+\newblock \emph{arXiv:1911.02927 [physics]}, November 2019.
+
+\bibitem[McTier and Kipping(2018)]{McTier2018}
+Moiya A.~S. McTier and David~M. Kipping.
+\newblock Finding mountains with molehills: The detectability of exotopography.
+\newblock \emph{Monthly Notices of the Royal Astronomical Society},
+  475\penalty0 (4):\penalty0 4978--4985, April 2018.
+\newblock ISSN 0035-8711.
+\newblock \doi{10.1093/mnras/sty143}.
+
+\bibitem[Mullet et~al.(2015)Mullet, Korenaga, and Karato]{Mullet2015}
+Benjamin~G. Mullet, Jun Korenaga, and Shun-Ichiro Karato.
+\newblock Markov chain {{Monte Carlo}} inversion for the rheology of olivine
+  single crystals.
+\newblock \emph{Journal of Geophysical Research (Solid Earth)}, 120:\penalty0
+  3142--3172, May 2015.
+\newblock ISSN 0148-0227.
+\newblock \doi{10.1002/2014JB011845}.
+
+\bibitem[O'Rourke and Korenaga(2012)]{ORourke2012}
+Joseph~G. O'Rourke and Jun Korenaga.
+\newblock Terrestrial {{Planet Evolution}} in the {{Stagnant}}-{{Lid Regime}}:
+  {{Size Effects}} and the {{Formation}} of {{Self}}-{{Destabilizing Crust}}.
+\newblock \emph{Icarus}, 221\penalty0 (2):\penalty0 1043--1060, November 2012.
+\newblock ISSN 00191035.
+\newblock \doi{10.1016/j.icarus.2012.10.015}.
+
+\bibitem[Parsons and Daly(1983)]{Parsons1983}
+Barry Parsons and Stephen Daly.
+\newblock The relationship between surface topography, gravity anomalies, and
+  temperature structure of convection.
+\newblock \emph{Journal of Geophysical Research: Solid Earth}, 88\penalty0
+  (B2):\penalty0 1129--1144, 1983.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/JB088iB02p01129}.
+
+\bibitem[Reese et~al.(2005)Reese, Solomatov, and Baumgardner]{Reese2005}
+C.~C. Reese, V.~S. Solomatov, and J.~R. Baumgardner.
+\newblock Scaling laws for time-dependent stagnant lid convection in a
+  spherical shell.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 149:\penalty0
+  361--370, April 2005.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/j.pepi.2004.11.004}.
+
+\bibitem[Seales and Lenardic(2019)]{Seales2019a}
+Johnny Seales and Adrian Lenardic.
+\newblock Layered {{Uncertainty}} in {{Planetary Thermal History Models}}:
+  {{Implications}} for {{Hypotheses Discrimination}} and {{Habitability
+  Modeling}}.
+\newblock \emph{arXiv:1910.13654 [astro-ph]}, October 2019.
+
+\bibitem[Seales et~al.(2019)Seales, Lenardic, and Moore]{Seales2019}
+Johnny Seales, Adrian Lenardic, and William~B. Moore.
+\newblock Assessing the {{Intrinsic Uncertainty}} and {{Structural Stability}}
+  of {{Planetary Models}}: 1. {{Parameterized Thermal}}-{{Tectonic History
+  Models}}.
+\newblock \emph{Journal of Geophysical Research: Planets}, 124\penalty0
+  (8):\penalty0 2213--2232, 2019.
+\newblock ISSN 2169-9100.
+\newblock \doi{10.1029/2019JE005918}.
+
+\bibitem[Solomatov(1996)]{Solomatov1996}
+V.~S. Solomatov.
+\newblock Can hotter mantle have a larger viscosity?
+\newblock \emph{Geophysical Research Letters}, 23:\penalty0 937--940, 1996.
+\newblock ISSN 0094-8276.
+\newblock \doi{10.1029/96GL00724}.
+
+\bibitem[Solomatov and Moresi(1996)]{Solomatov1996a}
+V.~S. Solomatov and L.-N. Moresi.
+\newblock Stagnant lid convection on {{Venus}}.
+\newblock \emph{Journal of Geophysical Research: Planets}, 101\penalty0
+  (E2):\penalty0 4737--4753, 1996.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/95JE03361}.
+
+\bibitem[Thiriet et~al.(2019)Thiriet, Breuer, Michaut, and Plesa]{Thiriet2019}
+M{\'e}lanie Thiriet, Doris Breuer, Chlo{\'e} Michaut, and Ana-Catalina Plesa.
+\newblock Scaling laws of convection for cooling planets in a stagnant lid
+  regime.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 286:\penalty0
+  138--153, January 2019.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/j.pepi.2018.11.003}.
+
+\bibitem[Turcotte and Schubert(2014)]{Turcotte2014}
+Donald Turcotte and Gerald Schubert.
+\newblock Rock {{Rheology}}.
+\newblock
+  /core/books/geodynamics/rock-rheology/18B40E89784F629FBAC2EFD53D34AC9D, April
+  2014.
+\newblock Library Catalog: www.cambridge.org Pages: 336-385.
+
+\bibitem[Yang et~al.(2016)Yang, Huang, and Wei]{Yang2016}
+An~Yang, Jinshui Huang, and Daiyun Wei.
+\newblock Separation of dynamic and isostatic components of the {{Venusian}}
+  gravity and topography and determination of the crustal thickness of
+  {{Venus}}.
+\newblock \emph{Planetary and Space Science}, 129:\penalty0 24--31, September
+  2016.
+\newblock ISSN 0032-0633.
+\newblock \doi{10.1016/j.pss.2016.06.001}.
+
+\bibitem[Zeng and Jacobsen(2017)]{Zeng2017}
+Li~Zeng and Stein~B. Jacobsen.
+\newblock A {{Simple Analytical Model}} for {{Rocky Planet Interiors}}.
+\newblock \emph{The Astrophysical Journal}, 837\penalty0 (2):\penalty0 164,
+  March 2017.
+\newblock ISSN 1538-4357.
+\newblock \doi{10.3847/1538-4357/aa6218}.
+
+\bibitem[Zeng et~al.(2016)Zeng, Sasselov, and Jacobsen]{Zeng2016}
+Li~Zeng, Dimitar~D. Sasselov, and Stein~B. Jacobsen.
+\newblock {{MASS}}\textendash{{RADIUS RELATION FOR ROCKY PLANETS BASED ON
+  PREM}}.
+\newblock \emph{The Astrophysical Journal}, 819\penalty0 (2):\penalty0 127,
+  March 2016.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.3847/0004-637X/819/2/127}.
+
+\end{thebibliography}
