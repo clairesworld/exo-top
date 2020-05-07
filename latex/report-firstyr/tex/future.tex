@@ -1,27 +1,46 @@
 \section{Future work}
 
-\subsection{Plate flexure and lithospheric strength models}
+\subsection{Importance of melting on thermal history}
 
-The dynamic topography a planet could support based on rock strength alone is unrealistically high. In reality, this topography is ``filtered" by the elastic properties of the lithosphere. 
+As we have mentioned, modelling melting processes is necessary to obtain realistic thermal histories \citep{Nakagawa2012}. \citet{Armann2012} argue that ``heat pipe" magmatism really is the dominant mode of heat loss for Venus. Because in this case heat loss is not controlled by the thermal boundary layer flux, one cannot really apply classical stagnant lid parameterized convection. While \citet{Kite2009} give a smaller ratio of magmatic to conductive heat loss of 0.1 for a Venus-like planet, the net effect on thermal evolution is still important, even more so for younger worlds. One-to-one comparisons of Venus thermal models with and without melting can be found in \citet{Driscoll2014}, for example, showing mantle temperatures up to 500 K lower if melting occurs, assuming 100\% of it reaches the surface extrusively. How much magmatism is extrusive further affects mantle cooling---whereas intrusive magmatism thins the lithosphere, extrusive magmatism thickens it, insulating the mantle and slowing its heat loss \citep{Lourenco2018}.
 
-\begin{itemize}
-\item Some preliminary equations, from e.g. \citet{Golle2012}
-\item How much (\%) do we expect this to matter for steady state Earth-sized planets?
-\end{itemize}
+Melt generation has cascading effects on planetary interior evolution, namely dehydration stiffening and compositional buoyancy \citep{Korenaga2009}. Melting extracts water, which raises viscosity, and in a hot mantle that melts deeper, this can eventually lead to viscosity stratifications that limit surface heat flux---in contrast to what we expect from the temperature-dependent viscosity feedback. Compositional buoyancy follows from the melt extraction of light elements, creating density stratifications that effectively act as temperature contrasts in the context of changing Ra. Overall, these effects combine such that mantle melting reduces surface heat flow by 5--10\%. \citeauthor{Korenaga2009}'s model \citeyear{Korenaga2009} implementing melting in parameterized convection, along with several others \citep{Kite2009, Driscoll2014, Tosi2017, Foley2018}, give a good basis for approaching this additional complexitiy. 
 
-\subsection{More exotic planets}
 
-\begin{itemize}
-\item Tidally locked planets - could we adapt our model for potentially large spatial contrasts in $T_m, T_s$?
-\item K/U/Th ratios vary depending on condensation history in protoplanetary disc; this introduces uncertainty... How much do we expect radiogenic isotope budgets to vary from looking at stellar catalogues?
-\end{itemize}
+\subsection{Plate flexure and lithospheric strength models} \label{sec:future-elastic}
+
+So far the dynamic topography models we use fall under the ``instantaneous viscous flow" approximation: pretending the planet reacts to stresses instantaneously and permanently. In reality, the planet has a non-instantaneous responses to stress via viscous relaxation and elastic filtering; any load on its surface is transient. Uplift can be filtered by the lithosphere, which behaves essentially like a thin elastic shell. The amount of filtering thus depends on the thickness of the lithosphere that behaves elastically, the primary control of which is temperature \citep{Watts2001}. The more-accurate planetary deformation model would couple flow in the viscous interior with an elastic shell of time-variable thickness (computed in multiple dimensions, e.g., using the local Maxwell time) \citep[e.g.,][]{Dumoulin2013}. 
+
+Although elastic flexure is usually thought of as only being relevant in the support topography at short wavelengths, several recent studies have pointed out that the elastic properties can indeed affect long-wavelength support, and the instantaneous viscous flow approximation will overestimate dynamic topography \citet{Zhong2002, Golle2012, Dumoulin2013}. Models show an elastically-filtered topography lower by up to 10\% for Venus-like (elastic thickness 46 km), and much larger for Mars with its thicker elastic lithosphere. It would take $\sim$10 Gyr (i.e., never) for the instantaneous case to be achieved \citep{Zhong2002, Dumoulin2013}. 
+
+These concerns will be investigated after the time of report writing. Modelling frameworks of coupling numerical mantle convection in spherical geometry with thin elastic shells (of variable thickness) for stagnant lid planets exist in e.g. \citet{Zhong2002, Beuthe2008, Golle2012, Dumoulin2013, Patocka2017}, although it remains to be seen how accurate these could be for parameterized convection.
+
+
+
+
+
+\subsection{More exotic planets} \label{sec:future-exoticplanets}
+
+So far we have assumed an Earth-like composition in our use of thermodynamic and rheological properties for (dry) olivine \citep{Karato1993}. In reality, we aren't even sure if this can apply to Venus. For planets around other stars, we expect variability in \textit{(i)} the composition of their protoplanetary disk between stars, and hence the composition of planets forming out of it \citep{Bitsch2020}; as well as \textit{(ii)} the radial distribution, for a given star, in the solidified minerals available to build planets (e.g., Fe, Mg, Si, Ca, Al, and Na minerals), for which modelling is improving \citep{Miyazaki2020}. Considering this last point, exoplanets present some extreme end-members: close-in massive rocky planets such as HD 219134 b, 55 Cancri e, and WASP-47 e may be coreless and rich in minerals containing the highest-temperature condensates Ca and Al, making them 10\textendash 20\% less dense than Earth---with yet-unknown consequences for interior dynamics \citep{Dorn2019}. %As for composition's effects on convection, the Mg/Si ratio influences the postperovskite phase transition deep in the mantles of massive rocky planets, for example \citep{Umemoto2017}. 
+We have not yet touched on the effects that a higher mantle water content would have on rheology and rock strength.
+
+Capturing this diversity clearly presents a huge gap in our ability to model exoplanet interiors. However, there may be some things we can account for more methodologically. Heat-producing elements K, U, and Th are among these planet building blocks whose abundances vary according to condensation history in the protoplanetary disk. We might expect all main sequence stars to produce the same isotope ratios for a given element if they obey the same rules of nucleosynthesis. Yet the absolute abundance of K, U, and Th could vary. Although the actual material accreted by a planet depends on its stochastic formation history, we can look to stellar catalogues to understand the inter-system variation. Th and U are refractory elements, unlike K, so we expect planetary abundances to follow stellar abundances somewhat. One study found a two-fold variation in the logarithm of Th/H abundances among solar-twin stars \citep{Unterborn2015}. \citet{Frank2014} use a galactic chemical evolution model to predict variations of heat-producing element abundances, specifically with respect to the date of star formation within the galaxy: the later a star forms, the hotter its planets are radiogenically. On the other hand, \citet{Wagner2012} argue that the more intense radiogenic heating in young planets does not play an important role in determining their interior structures. A better statistical treatment considering the prior distribution of radiogenic heating rates may be within reach.
+
+
+Tidal-locking is another interesting aspect of rocky exopolanets we do not see in the solar system---our observation biases mean that many currently-known small planets are probably tidally locked because they are so close to their star. Depending on the heat circulation efficiency in the atmosphere, such planets would have extreme hemispherical equilibrium temperature contrasts, possibly with strange convective patterns (e.g., a day-side magma ocean?) (ref). How might topography behave on these bodies? 
+
+
+
 
 
 \subsection{Observables}
 
-\citet{McTier2018} postulate a way to obseve ``topography", but for the smaller topographic amplitudes expected for super-Earth planets we wouldn't expect a detectable signal...  How to justify that the project can could say anything useful about real life
+The elephant in the room is the impossibility of using measurements to test our model. Interior properties of exoplanets will probably never be accessible to proper constraints. As just one example, \citet{Schaefer2017} use thermodynamic models to predict element partitioning between core and mantle, and the resulting interior structure signals in bulk density. They conclude that while these signals could not be detected from planet mass and radius alone, the different resulting mantle compositions would nevertheless alter properties such as mantle rheology that are so important in models. A priority is generalizing models as much as possible to get an accurate sense of change, rather than try to make deterministic predictions. A statistical answer is in line with the large sample size of planets in space. We would still like to figure out which tiny details do matter in order to know our enemy.
 
-\subsection{Implications for planetary climate}
+A handful of astrophysical methods have been studied to this end, although for now they are hypotheses. \citet{McTier2018} postulate a way to extract ``bumpiness" from the light-curves of planets that transit their star, but for the smaller topographic amplitudes expected for massive planets, the signal would probably be undetectable. Exo-cartography, or, solving the inverse problem of 2D albedo distributions from light-curves, could in theory discriminate between land and ocean surface coverage for even Earth-sized planets \citep{Cowan2018, Farr2018, Kawahara2020, Aizawa2020}. This would require next-generation space observatories\footnote{https://asd.gsfc.nasa.gov/luvoir/}\footnote{https://www.jpl.nasa.gov/habex/} equipped with coronagraphs or starshades to be funded, built, and launched.
 
-Briefly (although this is the most interesting part)
+\begin{itemize}
+\item How to justify that the project can could say anything useful about real life
+%\item cool final point
+\end{itemize} 
 

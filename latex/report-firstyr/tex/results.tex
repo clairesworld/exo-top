@@ -1,18 +1,74 @@
-\section{Preliminary results}
+\section{Preliminary results}\label{sec:results}
+
+We have used a simple parameterized convection model to produce thermal histories for stagnant lid planets, which are reasonable to the extent that a thermal history which ignores melting processes can be reasonable. From these results we have estimated dynamic topography as a function of various model parameters.
 
 \subsection{Thermal evolution}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\linewidth]{thermal_Mars1}
+\caption{Sample thermal evolution for a Mars-like planet. Solid blue lines are results from \citet{Thiriet2019}; solid black lines are from this work using identical parameters, and dashed blue lines are results from \citet{Breuer2010} with dashed black lines from this work using identical parameters, except $\beta = 1/3$ and $a_{rh} = 2.44$, and Arrhenius rheology with grain size tuned such that we get the same reference viscosity and temperature pair as their linear rheology, and no . $T_{avg}$ is the potential temperature averaged across the mantle and lid, $q_{\rm sfc}$ is the surface heat flux, $D_l$ is the stagnant lid thickness, $q_{B}$ is the flux into the bottom of the convecting region, Ur is the Urey ratio, and $T_l$ is the temperature at the base of the lid. TODO: calculate Thiriet Ur given their sfc flux and equation for $H(t)$. TODO: add Nimmo \& McKenzie (1997) for Mars to show no-lid thermal model?}
+\label{fig:thermal}
+\end{figure}
+
+Firstly, figure \ref{fig:thermal} compares our temperature evolution to results from the nearly-identical stagnant lid parameterized convection model of \citet{Thiriet2019}, as well as to a similar model from adjacent authors \citep{Breuer2010}. The latter considers an additional component of the core-mantle heat flux, the energy from inner core freezing. These models are chosen because we share the most assumptions. For example, some thermal models do not explicitly consider stagnant lid evolution, equivalent to assuming a fixed depth for the convecting region. The temperatures shown here are really potential temperatures. Because we have assumed viscosity is pressure-independent, it is constant along this adiabat.
+
+During the first 1.5 Gyr, the model is adjusting to having initialized well out of equilibrium. The core cools down to the mantle temperature during this relatively quick time frame. The mantle responds by shedding its extra heat quickly; some of this was also imparted by the early violence of its primordial radioisotope stock. The stagnant lid shrinks in response to the high flux of heat coming out of the upper thermal boundary layer; it can reach its mandated high basal temperature in less distance. The Urey ratio of the planet drops steadily: at first internal radiogenic heating dominates, and the fluxes still have a strong memory of their initial conditions. Once settled, the Urey ratio is in sync with the boundary layer heat flux, as seen through the surface heat flux ($q_{u}$ is adjusting to bring the whole planet towards thermal equilibrium). As the radioisotope decay rate gradually, naturally declines, the surface cooling lags, keeping Ur to a vaguely asymptotic value of 0.66. This is close to the classical numerically-modelled value of Ur $\sim$0.7 \citep{Schubert1980, McKenzie1981}.
+
+The discrepancy between our values and those of \citet{Thiriet2019} are explained by the main difference in our model, the assumption of a steady-state conductive temperature profile in the lid; otherwise a PDE is needed. The RMS error between our surface heat flow and \citet{Thiriet2019} is $\pm$2.69 mW m$^{-2}$, which is within the \textless~4 mW m$^{-2}$ they mention that will arise from assuming steady-state conduction in the lid. The steady-state lid shrinking and surface flux increase happen sooner than they should because the temperature profile is allowed to shift instantly. Note that this also affects the average temperature, which includes the lid temperature profile. We only show results for a Mars-like planet. We also produced the same Moon and Mercury scenarios as \citet{Thiriet2019}, and were able to match theirs more or less equally well.  
+
+However, especially if compared directly to ``more complete" models which include melting, it is clear that these mantle temperatures are several hundred Kelvin higher than desired. This points to a missing flux of heat out of the interior. Melting and its transport upwards may actually be the most effective way for Venus' mantle to shed heat \citep{Armann2012}. Without an additional heat loss mechanism such as this, the stabilizing feedback effect of temperature-dependent viscosity make it very hard to reduce the mantle temperature. 
+
 \begin{itemize}
-\item Figures comparing our thermal model to Thiriet and others in the literature for Venus/Mars parameters
+\item Useful to compare to Driscoll no melting case, which has no stagnant lid though? compare to e.g. 1 M$_E$ figure 6 in \citet{Kite2009} to demonstrate melting?
 \end{itemize}
+
+
+
+%\begin{figure}%{wrapfigure}{r}{0.5\textwidth}
+%  \centering
+%  \includegraphics[scale=0.5]{Mars1_q_error}
+%\caption{Error from assuming steady-state conduction in the lid, compared to the PDE solution in \citet{Thiriet2019}}
+%\label{fig:q_sfc_error}
+%\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1\linewidth]{h_comparison}
+\caption{Variation of the root-mean-square of dynamic topography amplitude $\Delta h$ with Rayleigh number. The thick black and grey lines are based on our thermal history model Venus case, using the \citet{Parsons1983} scaling (equation \ref{eq:PD83}) and the classical stress scaling (equation \ref{eq:dyn_top_stress}), respectively. The prefactor in the stress scaling is taken to be equal to 2. The pink circles show the minimum and maximum values (of a time-evolution) from \citet{Kiefer1998}, the magenta dashed line is the log-log fit from a numerical model (equation \ref{eq:KH92}) in \citet{Kiefer1992}, and the yellow stars are the inferred dynamic topography from a number of individual features by \citet{Nimmo1996}. The lilac shapes are our RMS estimates from the power spectra of \citet{Golle2012} for their instantaeous viscous flow case, \citet{Huang2013}, and \citet{Yang2016}. Asterisks denote that the reported peak topography has been reduced by 0.707 to approximate an RMS.}
+\label{fig:RMS_benchmark}
+\end{figure}
+
 
 \subsection{Purely-dynamic topography for solar system analogues}
 
-This analysis results in values for dynamic topography which are rather far off from what is seen in the solar system. We can compare our results to Table \ref{tab:dyn_topo_obvs}...
+We can use the thermal history results from the previous section in simple dynamic topography scaling relationships. The Rayleigh number is the most representative parameter of the topographic amplitudes \citep[e.g.,][]{Kiefer1992}. In figure \ref{fig:RMS_benchmark}, we show several scalings from our model in comparison with numerical calculations from the literature (Table \ref{tab:dyn_topo_obvs}), focusing on studies of Venus---these models were broadly tuned to match certian observed features. Overall---as explained in the introduction---different modelling choices complicate one-to-one intercomparison. %it is tricky to intercompare different dynamic topography models, due to a hidden lack of agreement on what constitutes ``dynamic topography"; i.e., whether one includes the thermal isostasy inherent to temperature perturbations by convection \citep{Molnar2015}. 
+\citet{Nimmo1996} use the topography model of \citet{Parsons1983}, whose scaling law we employ.
 
 
-\subsubsection{Variation of dynamic topography with planet mass}
+The choice of model geometry and heating mode can also double or halve $\Delta h$ \citep[e.g.,][figure ]{Kiefer1992}. The authors of \citet{Kiefer1992} imply that their predictions in cylindrical geometry are higher than those of \citep{Parsons1983} in Cartesian geometry, although \citet{Nimmo1996} demonstrate the latter approach in axisymmetric geometry (albeit with fluid ``in a box"). 
 
-\begin{itemize}
-\item Figure plotting mass (x axis) versus RMS (y axis), maybe for different rheologies, with solar system data points marked
-\end{itemize}
+To a lesser extent, we must also differentiate between ``peak topographic uplift," which may be associated with a single mantle plume/topographic feature---and which forms the bulk of Venus studies that used observed topography as an observable for constraining the interior---versus root-mean-square amplitude, which is more representative of the entire planet (and should be related to the ``average mantle" Rayleigh number. As a very crude approximation, models that report a ``peak uplift" are scaled by 0.707 (the RMS of a sinusoidal signal); these are marked by an asterisk in figure \ref{fig:RMS_benchmark}. On the other hand, when only a global spherical harmonic power spectrum is reported, we calculate the RMS using $\Sigma_l [S(l)/(2l + 1)]^{1/2}$, where $l$ is spherical harmonic degree and $S(l)$ is the power at that degree.
+
+As is obvious from figure \ref{fig:RMS_benchmark}, our calculations are much lower in terms of absolute dynamic topography than what is inferred for Venus. However, our values are comparable when adjusted for our very high Rayleigh numbers. The Rayleigh number of the ``Venusian average" upper mantle is expected to be more like $10^6$ (REF). Our values of $10^8$ are carried up by our low viscosities, which in turn come from the high temperatures our thermal history produces---Venus' upper mantle is usually said to have $\eta\sim 10^{21}$--$10^{22}$, while ours are a few orders of magnitude lower \citep{Benesova2012}. To a lesser extent, Ra is also held aloft by our low temperature contrast across the convecting region. Because the core cools down to the mantle temperature so quickly, $\Delta T_m \sim \Delta T_{rh}$, about 300~K \citet[cf. 1000 K assumed by]{Kiefer1992}.
+
+
+
+\subsubsection{Variation of dynamic topography with planet mass, age, and radiogenic abundance}
+
+We are mostly interested in how $\Delta h$ scales with the bulk properties of the planet. We can see this by looking at how topography behaves relative to each model's reference value, regardless of the spread on absolute topography between different choices of models (figure \ref{fig:RMS_v_planet}). The input parameters $M_p$ and $H_{0}$, as well as the planet age, represent some of those parameters within the realm of possibility of constraining observationally for increasingly smaller exoplanets. How they alter dynamic topography follows what we expect based on their relationships with Ra.
+
+ Increasing a planet's mass increases Ra via hotter ambient temperature (lower $\eta_m$), higher gravity, and a deeperconvecting region. Increased radiogenic heating at any time in a planet's history also means that the mantle is running hotter with a higher Ra, all else being constant. An older planet will generally be slightly cooler.As Ra increases, the planform of convection changes: upwellings and downwellings are more narrow, as is the thermal boundary layer. Spectrally, less-broad upwellings means less long-wavelength power in the boundary layer topography (more short-wavelength power, which is supported elastically). If we consider density contrasts within the boundary layer providing isostatic support, then a thinner boundary layer can provide less support \citet{Kiefer1992}.
+ 
+As per the classic scaling, $\Delta h \propto \Delta T_{rh} \delta_{u}$, the main analytic effect of high Ra is to decrease $\delta_{u}$, since $\delta_{u} \propto {\rm Ra}^{-1/3}$, which overshadows the hot mantle's elevated $\Delta T_{rh}$. The topography of the surface essentially reflects the topography and thickness of the boundary layer, reflecting Ra in turn.
+
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1\linewidth]{relative_h}
+\caption{Dependence of model dynamic topography, $\Delta h_{\rm RMS}$, on planet age (\textit{left}), mass (\textit{centre}), and radiogenic heating rate at 4.5 Gyr ($H_{4.5}$; \textit{right}) for different dynamic topography scalings: \citet{Parsons1983} (equation \ref{eq:PD83}; red line), \citet{Kiefer1992} (equation \ref{eq:KH92}; dark green line), and the basic scaling of $\Delta h$ with stress (equation \ref{eq:dyn_top_stress}; yellow line).  The prefactor in (\ref{eq:dyn_top_stress}) is taken to be equal to 2. All input parameters other than that varied on the $x$ axis are held constant. In the centre and right subplots, the yellow and red lines nearly coincide.}
+\label{fig:RMS_v_planet}
+\end{figure}
+
+

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.3.28)  29 MAR 2020 23:30
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.3.28)  7 MAY 2020 15:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -371,9 +371,54 @@ Now handling font encoding U ...
    defining Unicode char U+2122 (decimal 8482)
    defining Unicode char U+2423 (decimal 9251)
 ))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2016/07/10 v1.1e Standard LaTeX Color (DPC)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: pdftex.def on input line 147.
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+(/usr/share/texlive/texmf-dist/tex/latex/soul/soul.sty
+Package: soul 2003/11/17 v2.4 letterspacing/underlining (mf)
+\SOUL@word=\toks18
+\SOUL@lasttoken=\toks19
+\SOUL@cmds=\toks20
+\SOUL@buffer=\toks21
+\SOUL@token=\toks22
+\SOUL@spaceskip=\skip43
+\SOUL@ttwidth=\dimen111
+\SOUL@uldp=\dimen112
+\SOUL@ulht=\dimen113
+)
+(/usr/share/texlive/texmf-dist/tex/latex/sectsty/sectsty.sty
+Package: sectsty 2002/02/25 v2.0.2 Commands to change all sectional heading sty
+les
+)
+(/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+LaTeX Info: Redefining \color on input line 709.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+)
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
 Package: amsmath 2017/09/02 v2.17a AMS math features
-\@mathmargin=\skip43
+\@mathmargin=\skip44
 
 For additional information on amsmath, use the `?' option.
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
@@ -381,12 +426,12 @@ Package: amstext 2000/06/29 v2.01 AMS text
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
-\@emptytoks=\toks18
-\ex@=\dimen111
+\@emptytoks=\toks23
+\ex@=\dimen114
 ))
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen112
+\pmbraise@=\dimen115
 )
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2016/03/08 v2.02 operator names
@@ -403,7 +448,7 @@ LaTeX Info: Redefining \dots on input line 475.
 LaTeX Info: Redefining \cdots on input line 596.
 \Mathstrutbox@=\box26
 \strutbox@=\box27
-\big@size=\dimen113
+\big@size=\dimen116
 LaTeX Font Info:    Redeclaring font encoding OML on input line 712.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
 \macc@depth=\count95
@@ -411,21 +456,21 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
 \dotsspace@=\muskip10
 \c@parentequation=\count97
 \dspbrk@lvl=\count98
-\tag@help=\toks19
+\tag@help=\toks24
 \row@=\count99
 \column@=\count100
 \maxfields@=\count101
-\andhelp@=\toks20
-\eqnshift@=\dimen114
-\alignsep@=\dimen115
-\tagshift@=\dimen116
-\tagwidth@=\dimen117
-\totwidth@=\dimen118
-\lineht@=\dimen119
-\@envbody=\toks21
-\multlinegap=\skip44
-\multlinetaggap=\skip45
-\mathdisplay@stack=\toks22
+\andhelp@=\toks25
+\eqnshift@=\dimen117
+\alignsep@=\dimen118
+\tagshift@=\dimen119
+\tagwidth@=\dimen120
+\totwidth@=\dimen121
+\lineht@=\dimen122
+\@envbody=\toks26
+\multlinegap=\skip45
+\multlinetaggap=\skip46
+\mathdisplay@stack=\toks27
 LaTeX Info: Redefining \[ on input line 2817.
 LaTeX Info: Redefining \] on input line 2818.
 )
@@ -439,12 +484,20 @@ LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 )
+(/usr/share/texlive/texmf-dist/tex/latex/wrapfig/wrapfig.sty
+\wrapoverhang=\dimen123
+\WF@size=\dimen124
+\c@WF@wrappedlines=\count102
+\WF@box=\box28
+\WF@everypar=\toks28
+Package: wrapfig 2003/01/31  v 3.6
+)
 (/usr/share/texlive/texmf-dist/tex/latex/natbib/natbib.sty
 Package: natbib 2010/09/13 8.31b (PWD, AO)
-\bibhang=\skip46
-\bibsep=\skip47
+\bibhang=\skip47
+\bibsep=\skip48
 LaTeX Info: Redefining \cite on input line 694.
-\c@NAT@ctr=\count102
+\c@NAT@ctr=\count103
 )
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2018/02/06 v6.86b Hypertext links for LaTeX
@@ -498,16 +551,16 @@ Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
 (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
 Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
 )
-\@linkdim=\dimen120
-\Hy@linkcounter=\count103
-\Hy@pagecounter=\count104
+\@linkdim=\dimen125
+\Hy@linkcounter=\count104
+\Hy@pagecounter=\count105
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2018/02/06 v6.86b Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
 )
-\Hy@SavedSpaceFactor=\count105
+\Hy@SavedSpaceFactor=\count106
 
 (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/hyperref.cfg
 File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
@@ -519,17 +572,17 @@ Package hyperref Info: Plain pages OFF on input line 4524.
 Package hyperref Info: Backreferencing OFF on input line 4529.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4762.
-\c@Hy@tempcnt=\count106
+\c@Hy@tempcnt=\count107
 
 (/usr/share/texlive/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip11
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 5115.
-\XeTeXLinkMargin=\dimen121
-\Fld@menulength=\count107
-\Field@Width=\dimen122
-\Fld@charsize=\dimen123
+\XeTeXLinkMargin=\dimen126
+\Fld@menulength=\count108
+\Field@Width=\dimen127
+\Fld@charsize=\dimen128
 Package hyperref Info: Hyper figures OFF on input line 6369.
 Package hyperref Info: Link nesting OFF on input line 6374.
 Package hyperref Info: Hyper index ON on input line 6377.
@@ -539,23 +592,23 @@ Package hyperref Info: Link coloring with OCG OFF on input line 6394.
 Package hyperref Info: PDF/A mode OFF on input line 6399.
 LaTeX Info: Redefining \ref on input line 6439.
 LaTeX Info: Redefining \pageref on input line 6443.
-\Hy@abspage=\count108
-\c@Item=\count109
-\c@Hfootnote=\count110
+\Hy@abspage=\count109
+\c@Item=\count110
+\c@Hfootnote=\count111
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
 File: hpdftex.def 2018/02/06 v6.86b Hyperref driver for pdfTeX
-\Fld@listcount=\count111
-\c@bookmark@seq@number=\count112
+\Fld@listcount=\count112
+\c@bookmark@seq@number=\count113
 
 (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
 Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 82.
 )
-\Hy@SectionHShift=\skip48
+\Hy@SectionHShift=\skip49
 )
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
@@ -570,87 +623,173 @@ Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 99.
-
-(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
-File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
-))
-\Gin@req@height=\dimen124
-\Gin@req@width=\dimen125
+)
+\Gin@req@height=\dimen129
+\Gin@req@width=\dimen130
 )
 (/usr/share/texlive/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2016/11/25 v2.2 Span multiple rows of a table
-\multirow@colwidth=\skip49
-\multirow@cntb=\count113
-\multirow@dima=\skip50
-\bigstrutjot=\dimen126
+\multirow@colwidth=\skip50
+\multirow@cntb=\count114
+\multirow@dima=\skip51
+\bigstrutjot=\dimen131
 )
-(/usr/share/texlive/texmf-dist/tex/latex/caption/subcaption.sty
-Package: subcaption 2016/05/22 v1.1-161 Sub-captions (AR)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2014/10/28 v4.11 Multi-page Table package (DPC)
+\LTleft=\skip52
+\LTright=\skip53
+\LTpre=\skip54
+\LTpost=\skip55
+\LTchunksize=\count115
+\LTcapwidth=\dimen132
+\LT@head=\box29
+\LT@firsthead=\box30
+\LT@foot=\box31
+\LT@lastfoot=\box32
+\LT@cols=\count116
+\LT@rows=\count117
+\c@LT@tables=\count118
+\c@LT@chunks=\count119
+\LT@p@ftn=\toks29
+)
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/pdflscape.sty
+Package: pdflscape 2016/05/14 v0.11 Display of landscape pages in PDF (HO)
 
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/lscape.sty
+Package: lscape 2000/10/22 v3.01 Landscape Pages (DPC)
+)
+Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/titlesec/titlesec.sty
+Package: titlesec 2016/03/21 v2.10.2 Sectioning titles
+\ttl@box=\box33
+\beforetitleunit=\skip56
+\aftertitleunit=\skip57
+\ttl@plus=\dimen133
+\ttl@minus=\dimen134
+\ttl@toksa=\toks30
+\titlewidth=\dimen135
+\titlewidthlast=\dimen136
+\titlewidthfirst=\dimen137
+)
 (/usr/share/texlive/texmf-dist/tex/latex/caption/caption.sty
 Package: caption 2016/02/21 v3.3-144 Customizing captions (AR)
 
 (/usr/share/texlive/texmf-dist/tex/latex/caption/caption3.sty
 Package: caption3 2016/05/22 v1.7-166 caption3 kernel (AR)
 Package caption3 Info: TeX engine: e-TeX on input line 67.
-\captionmargin=\dimen127
-\captionmargin@=\dimen128
-\captionwidth=\dimen129
-\caption@tempdima=\dimen130
-\caption@indent=\dimen131
-\caption@parindent=\dimen132
-\caption@hangindent=\dimen133
+\captionmargin=\dimen138
+\captionmargin@=\dimen139
+\captionwidth=\dimen140
+\caption@tempdima=\dimen141
+\caption@indent=\dimen142
+\caption@parindent=\dimen143
+\caption@hangindent=\dimen144
 )
-\c@ContinuedFloat=\count114
+\c@ContinuedFloat=\count120
 Package caption Info: hyperref package is loaded.
+Package caption Info: longtable package is loaded.
+
+(/usr/share/texlive/texmf-dist/tex/latex/caption/ltcaption.sty
+Package: ltcaption 2013/06/09 v1.4-94 longtable captions (AR)
 )
-\c@subfigure=\count115
-\c@subtable=\count116
+Package caption Info: wrapfig package is loaded.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2016/05/22 v1.1-161 Sub-captions (AR)
+\c@subfigure=\count121
+\c@subtable=\count122
 )
 (/usr/share/texlive/texmf-dist/tex/latex/tools/array.sty
 Package: array 2016/10/06 v2.4d Tabular extension package (FMi)
-\col@sep=\dimen134
-\extrarowheight=\dimen135
-\NC@list=\toks23
-\extratabsurround=\skip51
-\backup@length=\skip52
+\col@sep=\dimen145
+\extrarowheight=\dimen146
+\NC@list=\toks31
+\extratabsurround=\skip58
+\backup@length=\skip59
 )
 (/usr/share/texlive/texmf-dist/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2016/04/27 v1.618033 publication quality tables
-\heavyrulewidth=\dimen136
-\lightrulewidth=\dimen137
-\cmidrulewidth=\dimen138
-\belowrulesep=\dimen139
-\belowbottomsep=\dimen140
-\aboverulesep=\dimen141
-\abovetopsep=\dimen142
-\cmidrulesep=\dimen143
-\cmidrulekern=\dimen144
-\defaultaddspace=\dimen145
-\@cmidla=\count117
-\@cmidlb=\count118
-\@aboverulesep=\dimen146
-\@belowrulesep=\dimen147
-\@thisruleclass=\count119
-\@lastruleclass=\count120
-\@thisrulewidth=\dimen148
+\heavyrulewidth=\dimen147
+\lightrulewidth=\dimen148
+\cmidrulewidth=\dimen149
+\belowrulesep=\dimen150
+\belowbottomsep=\dimen151
+\aboverulesep=\dimen152
+\abovetopsep=\dimen153
+\cmidrulesep=\dimen154
+\cmidrulekern=\dimen155
+\defaultaddspace=\dimen156
+\@cmidla=\count123
+\@cmidlb=\count124
+\@aboverulesep=\dimen157
+\@belowrulesep=\dimen158
+\@thisruleclass=\count125
+\@lastruleclass=\count126
+\@thisrulewidth=\dimen159
+)
+(/usr/share/texlive/texmf-dist/tex/latex/units/nicefrac.sty
+Package: nicefrac 1998/08/04 v0.9b Nice fractions
+\L@UnitsRaiseDisplaystyle=\skip60
+\L@UnitsRaiseTextstyle=\skip61
+\L@UnitsRaiseScriptstyle=\skip62
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+))
+(/usr/share/texlive/texmf-dist/tex/latex/makecell/makecell.sty
+Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
+\rotheadsize=\dimen160
+\c@nlinenum=\count127
+\TeXr@lab=\toks32
+)
+(/usr/share/texlive/texmf-dist/tex/latex/lineno/lineno.sty
+Package: lineno 2005/11/02 line numbers on paragraphs v4.41
+\linenopenalty=\count128
+\output=\toks33
+\linenoprevgraf=\count129
+\linenumbersep=\dimen161
+\linenumberwidth=\dimen162
+\c@linenumber=\count130
+\c@pagewiselinenumber=\count131
+\c@LN@truepage=\count132
+\c@internallinenumber=\count133
+\c@internallinenumbers=\count134
+\quotelinenumbersep=\dimen163
+\bframerule=\dimen164
+\bframesep=\dimen165
+\bframebox=\box34
+LaTeX Info: Redefining \\ on input line 3056.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2017/06/30 v3.9a Extensive control of page headers and footer
+s
+\f@nch@headwidth=\skip63
+\f@nch@O@elh=\skip64
+\f@nch@O@erh=\skip65
+\f@nch@O@olh=\skip66
+\f@nch@O@orh=\skip67
+\f@nch@O@elf=\skip68
+\f@nch@O@erf=\skip69
+\f@nch@O@olf=\skip70
+\f@nch@O@orf=\skip71
 ) (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -686,38 +825,19 @@ LaTeX Font Info:    ... okay on input line 23.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-\AtBeginShipoutBox=\box28
-Package hyperref Info: Link coloring OFF on input line 23.
-(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
-Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
-
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
-Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
-)
-\c@section@level=\count121
-)
-LaTeX Info: Redefining \ref on input line 23.
-LaTeX Info: Redefining \pageref on input line 23.
-LaTeX Info: Redefining \nameref on input line 23.
-
-(./main.out) (./main.out)
-\@outlinefile=\write3
-\openout3 = `main.out'.
-
-
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count122
-\scratchdimen=\dimen149
-\scratchbox=\box29
-\nofMPsegments=\count123
-\nofMParguments=\count124
-\everyMPshowfont=\toks24
-\MPscratchCnt=\count125
-\MPscratchDim=\dimen150
-\MPnumerator=\count126
-\makeMPintoPDFobject=\count127
-\everyMPtoPDFconversion=\toks25
+\scratchcounter=\count135
+\scratchdimen=\dimen166
+\scratchbox=\box35
+\nofMPsegments=\count136
+\nofMParguments=\count137
+\everyMPshowfont=\toks34
+\MPscratchCnt=\count138
+\MPscratchDim=\dimen167
+\MPnumerator=\count139
+\makeMPintoPDFobject=\count140
+\everyMPtoPDFconversion=\toks35
 ) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
 
@@ -735,169 +855,439 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
+\AtBeginShipoutBox=\box36
+Package hyperref Info: Link coloring OFF on input line 76.
+
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
+Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
+)
+\c@section@level=\count141
+)
+LaTeX Info: Redefining \ref on input line 76.
+LaTeX Info: Redefining \pageref on input line 76.
+LaTeX Info: Redefining \nameref on input line 76.
+
+(./main.out) (./main.out)
+\@outlinefile=\write3
+\openout3 = `main.out'.
+
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
-LaTeX Font Info:    Try loading font information for U+msa on input line 26.
+<figs/cats.png, id=144, 979.66pt x 1202.4925pt>
+File: figs/cats.png Graphic file (type png)
+<use figs/cats.png>
+Package pdftex.def Info: figs/cats.png  used on input line 82.
+(pdftex.def)             Requested size: 56.62099pt x 69.48589pt.
+LaTeX Font Info:    Try loading font information for U+msa on input line 83.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 26.
+LaTeX Font Info:    Try loading font information for U+msb on input line 83.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Overfull \hbox (6.68582pt too wide) in paragraph at lines 26--26
- [][] 
- []
+<figs/cam.png, id=146, 214.8025pt x 248.93pt>
+File: figs/cam.png Graphic file (type png)
+<use figs/cam.png>
+Package pdftex.def Info: figs/cam.png  used on input line 86.
+(pdftex.def)             Requested size: 56.62099pt x 65.61668pt.
+ (./tex/abstract.tex) (./main.toc [1
 
-(./tex/abstract.tex) (./main.toc [1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./figs/cats.png> <./figs/c
+am.png>])
 \tf@toc=\write4
 \openout4 = `main.toc'.
 
- (./main.lof)
-\tf@lof=\write5
-\openout5 = `main.lof'.
+ (./tex/introduction.tex [2] [3] [4]
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 112.
 
- (./tex/introduction.tex
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 4.
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/omlcmr.fd
+File: omlcmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 112.
+ [5] [6]
+
+Package natbib Warning: Citation `Hoggard2020' on page 7 undefined on input lin
+e 203.
+
+[7] [8]
+Underfull \hbox (badness 10000) in paragraph at lines 289--289
+[]|\OT1/cmr/m/sc/8 Internal
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 292--292
+[]|\OT1/cmr/m/n/8 general Re-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 299--299
+[]|\OT1/cmr/m/n/8 Axisymmetric con-vec-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 307--307
+[]|\OT1/cmr/m/n/8 Frank-
+ []
+
+
+Underfull \hbox (badness 3354) in paragraph at lines 312--312
+[]|\OT1/cmr/m/n/8 Spherical ax-isym-met-ric
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 312--314
+[]|\OT1/cmr/m/n/8 Thermal bound-ary
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 317--317
+[]|\OT1/cmr/m/n/8 Frank-
+ []
+
+
+Underfull \hbox (badness 7047) in paragraph at lines 326--326
+\OT1/cmr/m/n/8 cou-pled with ther-mal
+ []
+
+LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <8> not available
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 330.
+[9
+
+] [10
+
+]
+
+Package natbib Warning: Citation `Hoggard2020' on page 11 undefined on input li
+ne 412.
+
+[11] [12] [13]) (./tex/methods.tex [14] [15]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 181.
+
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 4.
- [2]
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 181.
+ [16])
+(./tex/results.tex
+<figs/thermal_Mars1.pdf, id=1171, 860.01299pt x 426.39299pt>
+File: figs/thermal_Mars1.pdf Graphic file (type pdf)
+<use figs/thermal_Mars1.pdf>
+Package pdftex.def Info: figs/thermal_Mars1.pdf  used on input line 9.
+(pdftex.def)             Requested size: 362.37569pt x 179.66287pt.
+ [17]
+<figs/h_comparison.pdf, id=1212, 968.08801pt x 281.85298pt>
+File: figs/h_comparison.pdf Graphic file (type pdf)
+<use figs/h_comparison.pdf>
+Package pdftex.def Info: figs/h_comparison.pdf  used on input line 37.
+(pdftex.def)             Requested size: 452.9679pt x 131.88171pt.
+ [18 <./figs/thermal_Mars1.pdf>] [19 <./figs/h_comparison.pdf>]
+<figs/relative_h.pdf, id=1334, 855.83937pt x 281.85298pt>
+File: figs/relative_h.pdf Graphic file (type pdf)
+<use figs/relative_h.pdf>
+Package pdftex.def Info: figs/relative_h.pdf  used on input line 69.
+(pdftex.def)             Requested size: 452.9679pt x 149.17923pt.
+) (./tex/discussion.tex
+<figs/Ea-effect-evol.pdf, id=1351, 606.07765pt x 643.20918pt>
+File: figs/Ea-effect-evol.pdf Graphic file (type pdf)
+<use figs/Ea-effect-evol.pdf>
+Package pdftex.def Info: figs/Ea-effect-evol.pdf  used on input line 9.
+(pdftex.def)             Requested size: 226.48395pt x 240.3588pt.
+<figs/h-effect-evol.pdf, id=1352, 596.75174pt x 643.20299pt>
+File: figs/h-effect-evol.pdf Graphic file (type pdf)
+<use figs/h-effect-evol.pdf>
+Package pdftex.def Info: figs/h-effect-evol.pdf  used on input line 15.
+(pdftex.def)             Requested size: 226.48395pt x 244.1056pt.
+<figs/a_rh-effect-evol.pdf, id=1353, 606.42264pt x 643.20299pt>
+File: figs/a_rh-effect-evol.pdf Graphic file (type pdf)
+<use figs/a_rh-effect-evol.pdf>
+Package pdftex.def Info: figs/a_rh-effect-evol.pdf  used on input line 22.
+(pdftex.def)             Requested size: 226.48395pt x 240.21907pt.
+<figs/ocean_vol.pdf, id=1368, 716.00212pt x 321.6015pt>
+File: figs/ocean_vol.pdf Graphic file (type pdf)
+<use figs/ocean_vol.pdf>
+Package pdftex.def Info: figs/ocean_vol.pdf  used on input line 45.
+(pdftex.def)             Requested size: 362.37569pt x 162.76324pt.
+ [20 <./figs/relative_h.pdf>] [21 <./figs/Ea-effect-evol.pdf> <./figs/h-effect-
+evol.pdf
 
-Package natbib Warning: Citation `Korenaga?' on page 3 undefined on input line 
-71.
+pdfTeX warning: pdflatex (file ./figs/h-effect-evol.pdf): PDF inclusion: multip
+le pdfs with page group included in a single page
+> <./figs/a_rh-effect-evol.pdf
 
-
-LaTeX Warning: Reference `eq:d_ubl' on page 3 undefined on input line 89.
-
-[3]
-Underfull \hbox (badness 10000) in paragraph at lines 129--129
-[]|[]\OT1/cmr/m/n/8 Solomatov[]
+pdfTeX warning: pdflatex (file ./figs/a_rh-effect-evol.pdf): PDF inclusion: mul
+tiple pdfs with page group included in a single page
+>]) (./tex/future.tex [22 <./figs/ocean_vol.pdf>] [23]) (./main.bbl [24]
+[25]
+Underfull \hbox (badness 2253) in paragraph at lines 228--237
+[]\OT1/cmr/m/n/10 Geoffrey F. Davies.  Ther-mal his-to-ries of con-vec-tive Ear
+th mod-els and con-straints on ra-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 129--130
-[]|\OT1/cmr/m/n/8 Topography from
+Underfull \hbox (badness 2818) in paragraph at lines 228--237
+\OT1/cmr/m/n/10 dio-genic heat pro-duc-tion in the Earth.  \OT1/cmr/m/it/10 Jou
+r-nal of Geo-phys-i-cal Re-search: Solid Earth\OT1/cmr/m/n/10 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 130--130
-[]|[]\OT1/cmr/m/n/8 Huang
+Underfull \hbox (badness 4899) in paragraph at lines 228--237
+\OT1/cmr/m/n/10 85(B5):2517--2530, 1980.  ISSN 2156-2202.  doi: $10 . 1029 / JB
+085iB05p02517$.  []eprint:
+ []
+
+[26]
+Underfull \hbox (badness 10000) in paragraph at lines 386--394
+[]\OT1/cmr/m/n/10 A. C. Fowler.  Fast Ther-mo-vis-cous Con-vec-tion.  \OT1/cmr/
+m/it/10 Stud-ies in Ap-plied Math-e-mat-ics\OT1/cmr/m/n/10 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 132--132
-[]|\OT1/cmr/m/n/8 Separated dy-namic
+Underfull \hbox (badness 10000) in paragraph at lines 386--394
+\OT1/cmr/m/n/10 72(3):189--219, 1985.  ISSN 1467-9590.  doi: $10 . 1002 / sapm1
+985723189$.  []eprint:
  []
 
 
-Underfull \hbox (badness 2717) in paragraph at lines 132--132
-\OT1/cmr/m/n/8 and iso-static com-po-
+Underfull \hbox (badness 1014) in paragraph at lines 444--453
+[]\OT1/cmr/m/n/10 Robert E. Grimm and Roger J. Phillips.  Grav-ity anoma-lies, 
+com-pen-sa-tion mech-a-nisms, and
  []
 
 
-Package natbib Warning: Citation `Jaupart2007' on page 4 undefined on input lin
-e 135.
-
-
-Package natbib Warning: Citation `Kiefer1998' on page 4 undefined on input line
- 136.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 136--137
-[]|\OT1/cmr/m/n/8 Given non-
+Underfull \hbox (badness 1303) in paragraph at lines 444--453
+\OT1/cmr/m/n/10 the geo-dy-nam-ics of West-ern Ishtar Terra, Venus.  \OT1/cmr/m
+/it/10 Jour-nal of Geo-phys-i-cal Re-search: Solid
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 136--137
-\OT1/cmr/m/n/8 dimensionalized,
+Underfull \hbox (badness 3701) in paragraph at lines 444--453
+\OT1/cmr/m/it/10 Earth\OT1/cmr/m/n/10 , 96(B5):8305--8324, 1991.  ISSN 2156-220
+2.  doi: $10 . 1029 / 91JB00055$.  []eprint:
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 137--137
-[]|[]\OT1/cmr/m/n/8 Amante
+Underfull \hbox (badness 3240) in paragraph at lines 455--464
+[]\OT1/cmr/m/n/10 Robert E. Grimm and Roger J. Phillips.  Anatomy of a Venu-sia
+n hot spot: Ge-ol-ogy,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 138--138
-[]|[]\OT1/cmr/m/n/8 Arnould
+Underfull \hbox (badness 2359) in paragraph at lines 455--464
+\OT1/cmr/m/n/10 grav-ity, and man-tle dy-nam-ics of Eistla Re-gio.  \OT1/cmr/m/
+it/10 Jour-nal of Geo-phys-i-cal Re-search: Plan-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 139--139
-[]|[]\OT1/cmr/m/n/8 Davies
+Underfull \hbox (badness 3439) in paragraph at lines 455--464
+\OT1/cmr/m/it/10 ets\OT1/cmr/m/n/10 , 97(E10):16035--16054, 1992.  ISSN 2156-22
+02.  doi: $10 . 1029 / 92JE01500$.  []eprint:
  []
 
-) (./tex/methods.tex [4] [5] [6] [7]) (./tex/results.tex) (./tex/discussion.tex
-[8]) (./tex/future.tex) (./main.bbl [9]
-Underfull \hbox (badness 4739) in paragraph at lines 205--211
-[]\OT1/cmr/m/n/10 Donald Tur-cotte and Ger-ald Schu-bert.  Rock Rhe-ol-ogy.  /c
-ore/books/geodynamics/rock-
+[27]
+Underfull \hbox (badness 7030) in paragraph at lines 542--551
+[]\OT1/cmr/m/n/10 W. L. Jaeger, E. P. Tur-tle, L. P. Keszthe-lyi, J. Rade-baugh
+, A. S. McEwen, and
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 205--211
-\OT1/cmr/m/n/10 rheology/18B40E89784F629FBAC2EFD53D34AC9D, April 2014.  Li-brar
-y Cat-a-log:
+Underfull \hbox (badness 7685) in paragraph at lines 542--551
+\OT1/cmr/m/n/10 R. T. Pap-palardo.  Oro-genic tec-ton-ism on Io.  \OT1/cmr/m/it
+/10 Jour-nal of Geo-phys-i-cal Re-search:
  []
 
-[10])
+
+Underfull \hbox (badness 7379) in paragraph at lines 542--551
+\OT1/cmr/m/it/10 Plan-ets\OT1/cmr/m/n/10 , 108(E8), 2003.  ISSN 2156-2202.  doi
+: $10 . 1029 / 2002JE001946$.  []eprint:
+ []
+
+[28]
+Underfull \hbox (badness 10000) in paragraph at lines 712--720
+[]\OT1/cmr/m/n/10 Walter S. Kiefer, Mark A. Richards, Brad-ford H. Hager, and B
+ruce G. Bills.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 712--720
+\OT1/cmr/m/n/10 A dy-namic model of Venus's grav-ity field.  \OT1/cmr/m/it/10 G
+eo-phys-i-cal Re-search Let-ters\OT1/cmr/m/n/10 , 13
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 712--720
+\OT1/cmr/m/n/10 (1):14--17, 1986.  ISSN 1944-8007.  doi: $10 . 1029 / GL013i001
+p00014$.  []eprint:
+ []
+
+[29] [30]
+Underfull \hbox (badness 4108) in paragraph at lines 1002--1011
+[]\OT1/cmr/m/n/10 Takehiro Miyagoshi, Masanori Kameyama, and Masaki Ogawa.  The
+r-mal con-vec-tion and
+ []
+
+
+Underfull \hbox (badness 2229) in paragraph at lines 1002--1011
+\OT1/cmr/m/n/10 the con-vec-tive regime di-a-gram in super-Earths.  \OT1/cmr/m/
+it/10 Jour-nal of Geo-phys-i-cal Re-search: Plan-
+ []
+
+
+Underfull \hbox (badness 3690) in paragraph at lines 1002--1011
+\OT1/cmr/m/it/10 ets\OT1/cmr/m/n/10 , 120(7):1267--1278, 2015.  ISSN 2169-9100.
+  doi: $10 . 1002 / 2015JE004793$.  []eprint:
+ []
+
+[31] [32]
+Underfull \hbox (badness 10000) in paragraph at lines 1181--1189
+[]\OT1/cmr/m/n/10 C. P. Orth and V. S. Solo-ma-tov.  The iso-static stag-nant l
+id ap-prox-i-ma-tion and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1181--1189
+\OT1/cmr/m/n/10 global vari-a-tions in the Venu-sian litho-spheric thick-ness. 
+ \OT1/cmr/m/it/10 Geo-chem-istry, Geo-physics,
+ []
+
+
+Underfull \hbox (badness 5519) in paragraph at lines 1181--1189
+\OT1/cmr/m/it/10 Geosys-tems\OT1/cmr/m/n/10 , 12(7), 2011.  ISSN 1525-2027.  do
+i: $10 . 1029 / 2011GC003582$.  []eprint:
+ []
+
+
+Underfull \hbox (badness 5260) in paragraph at lines 1235--1243
+[]\OT1/cmr/m/n/10 Gordon H. Pet-tengill, Pe-ter G. Ford, and Robert J. Wilt.  V
+enus sur-face ra-dio-ther-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1235--1243
+\OT1/cmr/m/n/10 mal emis-sion as ob-served by Mag-el-lan.  \OT1/cmr/m/it/10 Jou
+r-nal of Geo-phys-i-cal Re-search: Plan-
+ []
+
+
+Underfull \hbox (badness 4144) in paragraph at lines 1235--1243
+\OT1/cmr/m/it/10 ets\OT1/cmr/m/n/10 , 97(E8):13091--13102, 1992.  ISSN 2156-220
+2.  doi: $10 . 1029 / 92JE01356$.  []eprint:
+ []
+
+[33]
+Underfull \hbox (badness 4726) in paragraph at lines 1323--1329
+[]\OT1/cmr/m/n/10 G Schu-bert.  Nu-mer-i-cal Mod-els of Man-tle Con-vec-tion.  
+\OT1/cmr/m/it/10 An-nual Re-view of Fluid Me-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1323--1329
+\OT1/cmr/m/it/10 chan-ics\OT1/cmr/m/n/10 , 24(1):359--394, 1992.  doi: $10 . 11
+46 / annurev . ^^M . 24 . 010192 . 002043$.  []eprint:
+ []
+
+[34] [35]
+Underfull \hbox (badness 5217) in paragraph at lines 1689--1697
+[]\OT1/cmr/m/n/10 A. V. Ve-zo-lainen, V. S. Solo-ma-tov, A. T. Basilevsky, and 
+J. W. Head.  Up-lift of
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1689--1697
+\OT1/cmr/m/n/10 Beta Re-gio: Three-dimensional mod-els.  \OT1/cmr/m/it/10 Jour-
+nal of Geo-phys-i-cal Re-search: Plan-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1689--1697
+\OT1/cmr/m/it/10 ets\OT1/cmr/m/n/10 , 109(E8), 2004.  ISSN 2156-2202.  doi: $10
+ . 1029 / 2004JE002259$.  []eprint:
+ []
+
+
+Underfull \hbox (badness 1210) in paragraph at lines 1707--1716
+[]\OT1/cmr/m/n/10 James C. G. Walker, P. B. Hays, and J. F. Kast-ing.  A neg-a-
+tive feed-back mech-a-nism for
+ []
+
+[36]
+Underfull \hbox (badness 10000) in paragraph at lines 1759--1768
+[]\OT1/cmr/m/n/10 Mark A. Wiec-zorek and Maria T. Zu-ber.  Thick-ness of the Ma
+r-tian crust: Im-
+ []
+
+
+Underfull \hbox (badness 7486) in paragraph at lines 1759--1768
+\OT1/cmr/m/n/10 proved con-straints from geoid-to-topography ra-tios.  \OT1/cmr
+/m/it/10 Jour-nal of Geo-phys-i-cal Re-search:
+ []
+
+
+Underfull \hbox (badness 7379) in paragraph at lines 1759--1768
+\OT1/cmr/m/it/10 Plan-ets\OT1/cmr/m/n/10 , 109(E1), 2004.  ISSN 2156-2202.  doi
+: $10 . 1029 / 2003JE002153$.  []eprint:
+ []
+
+)
 
 Package natbib Warning: There were undefined citations.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 41.
-[11]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 41.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 108.
+[37]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 108.
  (./main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 41.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 41.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 108.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 108.
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: D9C921F34FBFB06074A02532C7886A20;2417.
-
-
-LaTeX Warning: There were undefined references.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 41.
+(rerunfilecheck)             Checksum: 3CB87E08E33DC0B0047CB41F193B2AEB;2851.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 108.
  ) 
 Here is how much of TeX's memory you used:
- 8469 strings out of 494880
- 123084 string characters out of 6179601
- 225398 words of memory out of 5000000
- 11562 multiletter control sequences out of 15000+600000
- 12326 words of font info for 48 fonts, out of 8000000 for 9000
+ 11086 strings out of 494880
+ 161190 string characters out of 6179601
+ 284048 words of memory out of 5000000
+ 13872 multiletter control sequences out of 15000+600000
+ 15851 words of font info for 58 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 42i,11n,40p,1088b,474s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,17n,49p,1536b,834s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/share/texli
-ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-r17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texl
-ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmtt10.pfb>
-Output written on main.pdf (11 pages, 299725 bytes).
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texlive/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr1
+0.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><
+/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/sh
+are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texl
+ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmss8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></u
+sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb>
+Output written on main.pdf (37 pages, 1141590 bytes).
 PDF statistics:
- 494 PDF objects out of 1000 (max. 8388607)
- 455 compressed objects within 5 object streams
- 103 named destinations out of 1000 (max. 500000)
- 241 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1807 PDF objects out of 2073 (max. 8388607)
+ 1675 compressed objects within 17 object streams
+ 335 named destinations out of 1000 (max. 500000)
+ 326 words of extra memory for PDF output out of 10000 (max. 10000000)
 

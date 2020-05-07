@@ -1,12 +1,19 @@
 import numpy as np
 import parameters as p
 
-def nu_Driscoll(T, nu_0=7e7, Ea=3e5, **kwargs):
+def nu_Driscoll(T, pl=None, nu_0=7e7, Ea=3e5, **kwargs):
     """kinematic viscosity (upper mantle) from eqn 6 in Driscoll & Bercovici"""
-    return nu_0*np.exp(Ea/(p.R_b*T))/10
+    if pl is not None:
+        Ea = pl.Ea
+        nu_0 = pl.nu_0
+    return nu_0*np.exp(Ea/(p.R_b*T))
 
-def nu_Dorn(T, nu_0=1.6e20, Ea=300e3, T_0=1800, **kwargs):
+def nu_Dorn(T, pl=None, nu_0=1.6e20, Ea=300e3, T_0=1800, **kwargs):
     # viscosity (below lithosphere) from Dorn, Noack & Rozal 2018
+    if pl is not None:
+        Ea = pl.Ea
+        nu_0 = pl.nu_0
+        T_0 = pl.T_0
     return nu_0*np.exp(Ea/p.R_b*(T**-1-T_0**-1))
 
 def eta_KW(T, pl=None, P=0, Ea=300e3, V_rh=6e-6, mu=80e9, A_rh=8.7e15, h_rh=2.07e-3, B_rh=0.5e-9, m_rh=2.5, **kwargs): 
@@ -31,7 +38,12 @@ def eta_KW(T, pl=None, P=0, Ea=300e3, V_rh=6e-6, mu=80e9, A_rh=8.7e15, h_rh=2.07
         
     return b*np.exp(Q/(p.R_b*T))
 
-def eta_Thi(T, eta_0=1e21, T_ref=1600, Ea=300e3, **kwargs): # diffusion creep, dry rheology (Thiriet+ 2019)
+def eta_Thi(T, pl=None, eta_0=1e21, T_ref=1600, Ea=300e3, **kwargs): # diffusion creep, dry rheology (Thiriet+ 2019)
+    if pl is not None:
+        Ea = pl.Ea
+        eta_0 = pl.eta_0
+        T_ref = pl.T_ref
+    
     return eta_0*np.exp(Ea/p.R_b*(T**-1 - T_ref**-1))
 
 def eta_FK(T, pl=None, T_s=None, eta_s=None, T_i=None, Ea=300e3, P=0, V_rh=6e-6, **kwargs): 
@@ -48,19 +60,21 @@ def eta_FK(T, pl=None, T_s=None, eta_s=None, T_i=None, Ea=300e3, P=0, V_rh=6e-6,
     gamma = Q/(p.R_b*T_i**2)
     return eta_s*np.exp(-gamma*(T - T_s))
 
-def dynamic_viscosity(T=None, visc_type=None, **kwargs): # note kwargs can contain planet object
+def dynamic_viscosity(T=None, pl=None, visc_type=None, **kwargs): # note kwargs can contain planet object
     if visc_type=='constant':
-        return nu_0*rho_m
+        return pl.nu_0*pl.rho_m
     elif visc_type=='Dorn':
-        return nu_Dorn(T, **kwargs)*rho_m
+        return nu_Dorn(T, pl=pl, **kwargs)*pl.rho_m
     elif visc_type=='KW':
-        return eta_KW(T, **kwargs)
+        return eta_KW(T, pl=pl, **kwargs)
     elif visc_type=='Driscoll':
-        return nu_Driscoll(T, **kwargs)*rho_m
+        return nu_Driscoll(T, pl=pl, **kwargs)*pl.rho_m
     elif visc_type=='Thi':
-        return eta_Thi(T, **kwargs)
+        return eta_Thi(T, pl=pl, **kwargs)
     elif visc_type=='FK':
-        return eta_FK(T, T_i=T, **kwargs)
+        return eta_FK(T, T_i=T, pl=pl, **kwargs)
+    else:
+        print('missing viscosity method')
     
 def grain_size(A_rh, eta_0, Ea, T_ref, m, B_rh, mu):
     # calculate grain size to correspond to linearization

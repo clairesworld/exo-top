@@ -27,8 +27,8 @@ class TerrestrialPlanet():
                             CMF = 0.3, # needs a value to avoid errors
                             rho_c = 7200, # Density of iron core in kg m^-3 
                             rho_m = 3500, # Density of silicate mantle in kg m^-3 rho_lith = 2800,
-                            Ra_crit_u = 660, # critical Rayleigh number (in Driscoll & Bercovici 2014)
-                            beta_u = 0.335, # defaults to 1/3
+                            Ra_crit_u = 450, # critical Rayleigh number (660 in Driscoll & Bercovici 2014)
+                            beta_u = None, # defaults to 1/3
                             beta_c = None, # defaults to 1/3
                             # what pressure should you take densities at?
                             
@@ -37,7 +37,7 @@ class TerrestrialPlanet():
                             c_c = 840, # speific heat capacity iron core Thiriet+ 2019
                             alpha_m = 2e-5, # thermal expansivity of silicate mantle in K^-1
                             k_m = 4, # thermal conductivity of silicate mantle in W m^−1 K^−1
-                            k_lm = 10, # thermal conductivity lower mantle in W m^−1 K^−1 from Driscoll & Bercovici
+                            k_lm = 4, # thermal conductivity lower mantle in W m^−1 K^−1, 10 from Driscoll & Bercovici
                             
                             # radioisotope defaults
                             lambda_n = p.lambda_n, # astrophysically constant
@@ -58,7 +58,7 @@ class TerrestrialPlanet():
                             V_rh=6e-6, # activation volume in m^3, K&W (1993)  dry olivine
                             mu=80e9, # shear modulus in Pa, K&W (1993)  dry olivine
                             A_rh=8.7e15, # pre-exponential factor in s^-1, K&W (1993)  dry olivine
-                            h_rh=10**-2, # grain size in m, K&W (1993)  dry olivine
+                            h_rh=2.07e-3, # grain size in m, K&W (1993)  dry olivine
                             B_rh=0.5e-9, # Burgers vector, K&W (1993)  dry olivine
                             m_rh=2.5, # grain size exponent, K&W (1993)  dry olivine
                            )  
@@ -83,7 +83,8 @@ class TerrestrialPlanet():
         else:
             self.R_p = self.R_p0
         if self.R_c0 is None:
-            self.M_m = self.M_p*(1 - self.CMF) # mass of mantle
+            self.M_m = self.M_p*(1 - self.CMF) # mass of mantle, updated immediately in thermal code including lid dynamics
+
             self.CRF = self.CMF**0.5 # Zeng & Jacobsen 2017
             self.M_c = self.M_p*self.CMF # M_p - M_m
             self.R_c = self.R_p*self.CRF

@@ -2,49 +2,48 @@ This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
 Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: main.aux
 The style file: plainnat.bst
+Reallocated field_info (elt_size=4) to 10712 items from 5000.
 Database file #1: ../exogeodynamics.bib
-Warning--I didn't find a database entry for "Korenaga?"
-Warning--I didn't find a database entry for "Jaupart2007"
-Warning--I didn't find a database entry for "Kiefer1998"
-You've used 27 entries,
+Warning--I didn't find a database entry for "Hoggard2020"
+You've used 203 entries,
             2773 wiz_defined-function locations,
-            841 strings with 10902 characters,
-and the built_in function-call counts, 13699 in all, are:
-= -- 1330
-> -- 752
-< -- 15
-+ -- 252
-- -- 225
-* -- 1215
-:= -- 2140
-add.period$ -- 129
-call.type$ -- 27
-change.case$ -- 156
-chr.to.int$ -- 27
-cite$ -- 54
-duplicate$ -- 556
-empty$ -- 1055
-format.name$ -- 274
-if$ -- 2843
-int.to.chr$ -- 1
+            2134 strings with 51328 characters,
+and the built_in function-call counts, 109679 in all, are:
+= -- 10348
+> -- 6939
+< -- 115
++ -- 2338
+- -- 2133
+* -- 9933
+:= -- 17406
+add.period$ -- 1004
+call.type$ -- 203
+change.case$ -- 1315
+chr.to.int$ -- 201
+cite$ -- 406
+duplicate$ -- 4218
+empty$ -- 7884
+format.name$ -- 2480
+if$ -- 22556
+int.to.chr$ -- 3
 int.to.str$ -- 1
-missing$ -- 25
-newline$ -- 190
-num.names$ -- 108
-pop$ -- 227
+missing$ -- 208
+newline$ -- 1414
+num.names$ -- 816
+pop$ -- 1942
 preamble$ -- 1
-purify$ -- 129
+purify$ -- 1116
 quote$ -- 0
-skip$ -- 410
+skip$ -- 3219
 stack$ -- 0
-substring$ -- 627
-swap$ -- 56
-text.length$ -- 2
+substring$ -- 4476
+swap$ -- 432
+text.length$ -- 7
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 297
+type$ -- 2208
 warning$ -- 0
-while$ -- 125
+while$ -- 934
 width$ -- 0
-write$ -- 450
-(There were 3 warnings)
+write$ -- 3423
+(There was 1 warning)

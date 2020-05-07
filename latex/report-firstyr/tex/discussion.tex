@@ -2,19 +2,61 @@
 
 \subsection{How does a planet's rheology govern its thermal history?}
 
-\begin{itemize}
+\begin{figure}
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{Ea-effect-evol}
+  \caption{Activation energy}
+  \label{fig:Ea}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{h-effect-evol}
+  \caption{Grain size}
+  \label{fig:h_rh} 
+\end{subfigure} 
 
-\item Changing the rheology of the planet sends it down very different temperature paths
-\item But rheological parameters hardly affect convective stresses \citep{Reese2005}, and have an insignificant effect on the ```evolved" / steady-state dynamic topography. This is due to the competing effects of $\eta_m$ and $q_{\rm ubl}$ in equation (\ref{eq:RMS}): for example, increasing $E_a$ means a more sensitive viscosity that is higher to start, but this makes it worse at convecting away heat, and $q_{\rm ubl}$ is lower.
-\item boundary layer flux is a regulation mechanism in that stress, topography, viscosity etc are all anti-correlated with it... the system wants to reach a state where the bl flux and sfc flux are equal, the lid grows or shrinks to minimize their difference
-\item Not all these relationships are obvious without numerically solving the governing ODEs because the lag in stagnant lid growth induces hysteresis...
-\item How dynamic viscosity is parameterized/linearized matters as well---depending on which $T_0, \eta_0$ pair we choose we can get very different evolutions even for the same activation energy, so need to be careful.
-\end{itemize}
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{a_rh-effect-evol}
+  \caption{Rheological temperature scale prefactor}
+  \label{fig:a_rh} 
+\end{subfigure}
+\caption{The effects on thermal evolution of Arrhenius diffusion creep rheological parameters $E_a$ \textit{(a)} and $h_{rh}$ (\textit{b}), and the rheological temperature scale proportionality constant, $a_{rh}$ (\textit{c}). $T_m$ is mantle potential temperature, $\Delta h$ is the topography from the \citet{Parsons1983} model, $q_{u}$ is the flux through the upper thermal boundary layer, log$_{10}\eta_m$ is the mantle viscosity logarithm, $\delta_{ubl}$ is the upper thermal boundary layer thickness, and Ur is the Urey ratio. Colours denote low-to-high values from violet to red.}
+\label{fig:rheology}
+\end{figure}
 
-\subsection{Under what conditions is simple dynamic topography useful/relevant?}
+How a planet deforms plays an interesting role in its overall evolution. Strongly temperature-dependent rheology invokes feedbacks that are not necessarily obvious analytically. The lag in the growth of the stagnant lid introduces hysteresis, for example. Figure \ref{fig:rheology} briefly studies some of these rheological trade-offs, comparing temperature evolutions as a function of $E_a$, $h_{rh}$, and $a_{rh}$. Grain size $h_{rh}$ is essentially a proxy for the viscosity law prefactor, as it represents the biggest unknown.
+
+Changing the dependence of viscosity on temperature sends the planet down very different temperature paths (figure \ref{fig:rheology}a,b), which are rapidly amplified, even if $\eta_m$ later converges across evolved runs to within an order of magnitude. If $\eta_m$ is scaled higher with or is more sensitive to $T_m$, then for the same initial temperature, $\eta_m$ will be higher or will increase faster. The interior then loses heat out of the top less efficiently because high $\eta_m$ is associated with sluggish convection. Thus the planet will maintain a higher $T_m$ in the quasi-steady state. We see the viscosity thermostat actually making our lives harder when trying to model the thermal evolution of a stagnant lid planet without melting---Ra is too high by a couple orders of magnitude, and viscosity self-limits itself from lowering Ra enough.
+
+However, as predicted by boundary layer theory \citep{Solomatov1995, Reese2005}, the viscosity-law parameters (figure \ref{fig:rheology}a,b) hardly affect convective stresses, and have an insignificant effect on the ``evolved" dynamic topography. This is due to the competing effects of Ra (via $\eta_m$) and $\delta_{u}$ in equation (\ref{eq:dyn_top_stress}): as above, the high-viscosity mantle with elevated $E_a$ has a thinner thermal boundary layer.
+
+In this sense, $q_{u}$ acts as a regulation mechanism in that $\Delta h$ and $\eta_m$ are anti-correlated with it. The system prefers a situation where $q_{u}$ balances $h_{\rm rad}$. The stagnant lid itself adds another opportunity for thermal (im)balance; the lid grows or shrinks to minimize $q_{u} - q_{s}$ in turn (equation \ref{eq:D_l}).
+
+This would suggest in theory that the scaling parameter in front of $\Delta T_{rh}$ is quite important (figure \ref{fig:rheology}c): for a given quasi-steady state $q_{u}$, $\Delta T_{rh}$ dictates how thick $\delta_{u}$ can be. This parameter can only be constrained by numerical convection models, and has order unity. While rheological self-regulation means that there is little leeway on $\delta_{u}$ with the choice of diffusion creep law, increasing $a_{rh}$ allows $\delta_{u}$ to increase, supporting higher $\Delta h$.
 
 
-\begin{itemize}
-\item Prefer thick lid (how thick?)...
-\item Much trickier for Earth because of continents/oceans, dynamic topography is negligible compared to other processes creating topography, don't really care about it (I guess some people in Bullard do)
-\end{itemize}
+\subsection{Implications for planetary systems science}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\linewidth]{ocean_vol}
+\caption{The volume of water that will overwhelm a planet's peak dynamic topography, as a function of its age \textit{(left)}, mass \textit{(centre)}, and radiogenic heating rate at the 4.5-Gyr mark \textit{(right)}. Values are scaled to 4.5 Gyr, 1 Venus mass, and 4.6 pW kg$^{-1}$, respectively.}
+\label{fig:ocean}
+\end{figure}
+
+The effects of topography on the larger workings of the planet are complex and important; indeed, this is the actual motivation of our work. As a starting point, we consider that if a planet's topography is too low, the entire land area could be submerged more easily by a surface ocean. Figure \ref{fig:ocean} shows the maximum allowable ocean volume before this occurs, approximated as $4\pi/3 \left[(R_p + \Delta h_{peak} )^3 - R_p^3\right]$. Of course, the actual volume of surface water depends on the volatile delivery during accretion (a stochastic process) and the cumulative outgassing of the planet (tied strongly to its thermal history). This preliminary calculation shows that massive planets' greater surface area can more than make up for their lower topography in terms of ocean basin volume. This suggests that the contribution of dynamic topography to subaerial land area is insignificant compared to the water inventory and cycling history, while radiogenic heating could play some role \citep[cf.][]{Komacek2016}.
+
+
+
+\subsection{Under what conditions is simple dynamic topography useful?}
+
+Dynamic topography seems to dominate at low Ra, thin elastic lithospheres, and old ages \citep{Breuer2015}. However, it is clearly a negligble process for Earth's overall hypsometric curve---depending on one's definition, the dynamic component of Earth's topography is probably not higher than the oceans are deep \citep{Molnar2015, Hoggard2016}. Venus is a planet thought to be expressing its plumes, but the nature of this support is now strongly questioned \citep{Orth2011}, and many of its highest-topography regions, such as Ishtar Terra in the north, are compositionally isostatic \citep{Grimm1991, Yang2016}. So why do we choose to model dynamic topography at all? An obvious answer is that it is indeed the most simple, in that it scales with decently-understood physics---isostasy, meanwhile, depends on density profiles that require assumptions about petrology. Dynamic topography is based directly on a thermal history model, which would be a required starting point for any geophysical process on exoplanets.
+
+It is certainly worth noting that the dynamic topography scaling relationships available in the literature are not based on the same assumptions that we are using. These are: the type of rheological law (temperature-dependent, depth-dependent, or constant), model geometry (cartesian, cylindrical, or spherical), mode of mantle heating (basal or internal), whether there is a stagnant lid, and quite imporantly, whether thermal buoyancy effects in the boundary layer are ``counted." For example,\citet{Kiefer1992} and \citet{Parsons1983} both assume an isoviscous mantle and no internal heating (for $\beta=0.5$), for example, yet the former suggests that their $\Delta h$ predictions are much higher because of their cylindrical geometry, as opposed to cartesian. The mode of mantle heating affects the planform of convection \citep[e.g.,][]{Choblet2009}, and thus the shape of topographic swells and associated spherical harmonic power spectrum---while internal heating creates diffuse upwellings, basal heating leads to broad plumes. A parameterized convection scaling of dynamic topography does not account for the global distribution and localization of peaks, which is probably important if we are concerned with topographic consequences, such as subaerial land fraction.
+
+To our knowledge there is no published scaling law for the dynamic topography on a temperature-dependent viscosity, mixed-heating, stagnant lid planet. Although we rely on the present scalings now, we would be interested in learning how wrong they make us.
+
+

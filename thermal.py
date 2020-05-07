@@ -7,6 +7,7 @@ import astroenvironment as ast
 import geometry as geom
 import rheology as rh
 import terrestrialplanet as tp
+from collections.abc import Iterable
 
 
 
@@ -38,12 +39,12 @@ def Ra(nu=None, eta=None, kappa=None, alpha=None, rho=None, g=None, deltaT=None,
     elif (nu is not None) and (eta is None):
         return alpha*deltaT*l**3*g/(kappa*nu)
     
-def d_lid_ss(Tm, a_rh=None, k=None, Ea=None, H0=None, Ra_crit=None, eta_0=None, T_ref=None, 
-          kappa_m=None, alpha_m=None, g_sfc=None, rho_m=None, Ts=None, **kwargs):
-    """ from sympy solution for d in steady state """
-    R_b = p.R_b
-    return ((-R_b*Tm**2*a_rh*k + np.sqrt(k*(2.0*Ea**2*H0*Tm*(Ea*Ra_crit*eta_0*kappa_m*np.exp(Ea/(R_b*Tm) - Ea/(R_b*T_ref))/(R_b*Tm**2*a_rh*alpha_m*g_sfc*rho_m))**0.666666666666667 - 2.0*Ea**2*H0*Ts*(Ea*Ra_crit*eta_0*kappa_m*np.exp(Ea/(R_b*Tm) - Ea/(R_b*T_ref))/(R_b*Tm**2*a_rh*alpha_m*g_sfc*rho_m))**0.666666666666667 - 2.0*Ea*H0*R_b*Tm**2*a_rh*(Ea*Ra_crit*eta_0*kappa_m*np.exp(Ea/(R_b*Tm) - Ea/(R_b*T_ref))/(R_b*Tm**2*a_rh*alpha_m*g_sfc*rho_m))**0.666666666666667 + R_b**2*Tm**4*a_rh**2*k)))/(Ea*H0*(Ea*Ra_crit*eta_0*kappa_m*np.exp(Ea/(R_b*Tm) - Ea/(R_b*T_ref))/(R_b*Tm**2*a_rh*alpha_m*g_sfc*rho_m))**(1/3)))
-    
+def Ra_F(nu=None, eta=None, kappa=None, H=None, alpha=None, k=None, rho=None, g=None, l=None, F_b=None): # basal heating Ra
+    # H is volumetric heating, F_b is bottom heating in W/m^2
+    if eta is None:
+        eta = nu*rho
+    return rho*g*alpha*(F_b + H*l)*l**4 / (k*kappa*eta)
+
 def sph_conduction(r, k_m=None, T_l=None, T_s=None, R_p=None, R_l=None,
                    a0=None, **kwargs):
     c1 = k_m*(T_l - T_s - a0/(6*k_m)*(R_p**2 - R_l**2))/(R_l**-1 - R_p**-1)
@@ -77,15 +78,17 @@ def T_mean(T_m=None, T_l=None, R_p=None, R_l=None, R_c=None, T_s=None, k_m=None,
  #####################################################################
     
     
-def bdy_thickness_beta(dT=None, R_l=None, R_c=None, Ra_crit=None, beta=None, g=None,
+def bdy_thickness_beta(dT=None, d_m=None, Ra_crit=None, beta=None, g=None, Ra_rh=None,
                        kappa_m=None, eta_m=None, alpha_m=None, rho_m=None, **kwargs):
     """Thickness of thermal boundary layer """
     if beta is None:
         beta = 1/3
- 
-    Ra_rh = alpha_m*rho_m*g*dT*(R_l - R_c)**3 / (kappa_m*eta_m)
-    
-    return (R_l - R_c) * (Ra_crit/Ra_rh)**beta
+    try:
+        if Ra_rh is None:
+            Ra_rh = alpha_m*rho_m*g*dT*(d_m)**3 / (kappa_m*eta_m)
+        return (d_m) * (Ra_crit/Ra_rh)**beta
+    except RuntimeWarning:
+        return (Ra_crit/ (alpha_m*rho_m*g*dT / (kappa_m*eta_m)))**(1/3)
 
 def inv_bdy_thickness(dT=None, Ra_crit=None, g=None, kappa_m=None, eta_m=None, alpha_m=None, rho_m=None, 
                   **kwargs):
@@ -199,13 +202,18 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
                           T_ref=pl.T_ref, kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, g_sfc=pl.g_sfc, rho_m=pl.rho_m, 
                           Ts=pl.T_s)
     if hasattr(pl, 'D_l_const'):
-        pl.D_l = pl.D_l_const*np.ones_like(t) # keep lid constant for testing purposes
+        pl.D_l = [pl.D_l_const]*np.ones_like(t) # keep lid constant for testing purposes
     
     pl.R_l = pl.R_p - pl.D_l
     pl.T_l = T_lid(T_m=pl.T_m, a_rh=pl.a_rh, Ea=pl.Ea)
     V_lid = 4/3*np.pi*(pl.R_p**3 - pl.R_l**3)
     pl.M_lid = V_lid*pl.rho_m # should use another density?
     pl.M_conv = pl.M_m - pl.M_lid
+    if not hasattr(pl, 'd_m_const'): # if exploring a constant convecting region height
+        pl.d_m = pl.R_l - pl.R_c
+    else:
+        pl.d_m = [pl.d_m_const]*np.ones_like(t)
+    
 #     print('mantle eta')
     pl.eta_m = rh.dynamic_viscosity(T=pl.T_m, pl=pl, **kwargs)
 #     print('cmb eta')
@@ -213,25 +221,52 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     pl.nu_m = pl.eta_m/pl.rho_m
     pl.nu_cmb = pl.eta_cmb/pl.rho_m
 #     ('upper bl')
-    pl.TBL_u = bdy_thickness_beta(dT=pl.T_c-pl.T_l, R_l=pl.R_l, R_c=pl.R_c, g=pl.g_sfc, Ra_crit=pl.Ra_crit_u, 
-                                  rho_m=pl.rho_m, 
-                                  beta=pl.beta_u, kappa_m=pl.kappa_m, eta_m=pl.eta_m, alpha_m=pl.alpha_m, **kwargs)
+
+    if hasattr(pl, 'dT_m_const'):
+        pl.deltaT_m = pl.dT_m_const
+    else:
+        pl.deltaT_m = pl.T_c - pl.T_l
+    if (not isinstance(pl.deltaT_m, Iterable)) and (abs(pl.deltaT_m) < 1e-9):
+#         print('catching small dT', pl.T_c, '-', pl.T_l)
+        pl.deltaT_m = pl.T_m - pl.T_l
+    if (not isinstance(pl.deltaT_m, Iterable)) and (pl.deltaT_m < 0):
+        pl.deltaT_m = 1e-5
+        
+    pl.Ra_i = Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, deltaT=abs(pl.deltaT_m), l=pl.d_m, kappa=pl.kappa_m, 
+                 alpha=pl.alpha_m)
+    
+    if (not isinstance(pl.Ra_i, Iterable)) and (abs(pl.Ra_i) < 1e-9):
+        print('Ra', pl.Ra_i, 'eta', pl.eta_m, 'deltaT', pl.deltaT_m, 'l', pl.d_m, 'T_c - T-l', pl.T_c, '-', pl.T_l)
+    elif (not isinstance(pl.Ra_i, Iterable)) and (pl.Ra_i < 0):
+        print('NEGATIVE: Ra', pl.Ra_i, 'eta', pl.eta_m, 'deltaT', pl.deltaT_m, 'l', pl.d_m, 'T_c - T-l', pl.T_c, '-', pl.T_l)
+            
+    pl.TBL_u = bdy_thickness_beta(d_m=pl.d_m, Ra_crit=pl.Ra_crit_u, Ra_rh = pl.Ra_i, beta=pl.beta_u, **kwargs)
+    
+    if (not isinstance(pl.TBL_u, Iterable)) and (abs(pl.TBL_u) > 1e9):
+        print('Ra', pl.Ra_i, 'eta', pl.eta_m, 'deltaT', pl.deltaT_m, 'l', pl.d_m, 'T_c - T-l', pl.T_c, '-', pl.T_l)
+    
     pl.q_ubl = q_bl(deltaT=pl.T_m-pl.T_l, k=pl.k_m, d_bl=pl.TBL_u, beta=pl.beta_u, **kwargs)
     pl.Q_ubl = Q_bl(q=pl.q_ubl, R=pl.R_l) 
-    pl.Ra_i = Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, deltaT=pl.T_m-pl.T_l, l=pl.R_l-pl.R_c, kappa=pl.kappa_m, 
-                 alpha=pl.alpha_m)
+    
+    
     pl.Ra_crit_c = 0.28*pl.Ra_i**0.21  
     
     if pl.SA_c>0: 
-        TBL_c_inv = inv_bdy_thickness(dT=pl.T_c-pl.T_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c, 
+        TBL_c_inv = inv_bdy_thickness(dT=pl.deltaT_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c, 
                                       kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, rho_m=pl.rho_m, **kwargs)  
-        pl.q_core = q_bl(deltaT=pl.T_c-pl.T_m, k=pl.k_lm, d_bl_inv=TBL_c_inv, beta=pl.beta_c, **kwargs)
+        if hasattr(pl, 'q_core_const'):
+            pl.q_core = pl.q_core_const
+        else:    
+            pl.q_core = q_bl(deltaT=pl.T_c-pl.T_m, k=pl.k_lm, d_bl_inv=TBL_c_inv, beta=pl.beta_c, **kwargs)
         pl.Q_core = Q_bl(q=pl.q_core, R=pl.R_c) 
         pl.TBL_c = TBL_c_inv**-1
     else:
         pl.TBL_c = None
         pl.Q_core = 0
-        
+    
+    pl.Ra_F = Ra_F(eta=pl.eta_m, kappa=pl.kappa_m, H=pl.h_rad_m, alpha=pl.alpha_m, k=pl.k_m, rho=pl.rho_m, 
+                   g=pl.g_sfc, l=pl.R_l - pl.R_c, F_b=pl.q_core)
+    
     pl.H_rad_m = H_rad(h=pl.h_rad_m, M=pl.M_conv, **kwargs) # mantle radiogenic heating in W
     pl.H_rad_lid = H_rad(h=pl.h_rad_m, M=pl.M_lid, **kwargs) # lid radiogenic heating in W
     
@@ -254,3 +289,15 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
 #     print('eta_m', pl.eta_m)
 #     print('delta_bl', pl.TBL_u)
     return pl
+
+
+def d_lid_ss(Tm, a_rh=None, k=None, Ea=None, H0=None, Ra_crit=None, eta_0=None, T_ref=None, 
+          kappa_m=None, alpha_m=None, g_sfc=None, rho_m=None, Ts=None, visc_type=None, **kwargs):
+    """ from sympy solution for d in steady state """
+    R_b = p.R_b
+    if visc_type is 'Thi':
+        return ((-R_b*Tm**2*a_rh*k + np.sqrt(k*(2.0*Ea**2*H0*Tm*(Ea*Ra_crit*eta_0*kappa_m*np.exp(Ea/(R_b*Tm) - Ea/(R_b*T_ref))/(R_b*Tm**2*a_rh*alpha_m*g_sfc*rho_m))**0.666666666666667 - 2.0*Ea**2*H0*Ts*(Ea*Ra_crit*eta_0*kappa_m*np.exp(Ea/(R_b*Tm) - Ea/(R_b*T_ref))/(R_b*Tm**2*a_rh*alpha_m*g_sfc*rho_m))**0.666666666666667 - 2.0*Ea*H0*R_b*Tm**2*a_rh*(Ea*Ra_crit*eta_0*kappa_m*np.exp(Ea/(R_b*Tm) - Ea/(R_b*T_ref))/(R_b*Tm**2*a_rh*alpha_m*g_sfc*rho_m))**0.666666666666667 + R_b**2*Tm**4*a_rh**2*k)))/(Ea*H0*(Ea*Ra_crit*eta_0*kappa_m*np.exp(Ea/(R_b*Tm) - Ea/(R_b*T_ref))/(R_b*Tm**2*a_rh*alpha_m*g_sfc*rho_m))**(1/3)))
+    
+    elif visc_type is 'KW':
+        return R_p - 0.111111111111111*(9.0*R_p**2 - 6.0e-14*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(1/3) - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(1/3))/(H_0*rho_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(1/3)))/(-R_p**3 + (-(R_p**2 - 6.66666666666667e-15*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m))**3 + (-R_p**3 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**2)**0.5 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**(1/3) - 1.0*(-R_p**3 + (-(R_p**2 - 6.66666666666667e-15*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m))**3 + (-R_p**3 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**2)**0.5 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**(1/3), R_p - 0.111111111111111*(-0.5 - 0.866025403784439*I)*(9.0*R_p**2 - 6.0e-14*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(1/3) - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(1/3))/(H_0*rho_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(1/3)))/(-R_p**3 + (-(R_p**2 - 6.66666666666667e-15*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m))**3 + (-R_p**3 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**2)**0.5 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**(1/3) - 1.0*(-0.5 + 0.866025403784439*I)*(-R_p**3 + (-(R_p**2 - 6.66666666666667e-15*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m))**3 + (-R_p**3 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**2)**0.5 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**(1/3), R_p - 0.111111111111111*(-0.5 + 0.866025403784439*I)*(9.0*R_p**2 - 6.0e-14*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(1/3) - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(1/3))/(H_0*rho_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(1/3)))/(-R_p**3 + (-(R_p**2 - 6.66666666666667e-15*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m))**3 + (-R_p**3 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**2)**0.5 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**(1/3) - 1.0*(-0.5 - 0.866025403784439*I)*(-R_p**3 + (-(R_p**2 - 6.66666666666667e-15*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m))**3 + (-R_p**3 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**2)**0.5 + 1.0e-14*R_p*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**(-0.333333333333333)*(-377976314968461.0*R_p*T_l*k_m + 377976314968461.0*R_p*T_m*k_m + 300000000000000.0*T_l*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333 - 300000000000000.0*T_s*k_m*(Ra_crit*kappa_m*mu*(h_rh/B_rh)**m_rh*exp(Ea/(R_b*T_m))/(A_rh*T_c*alpha_m*g_sfc*rho_m - A_rh*T_m*alpha_m*g_sfc*rho_m))**0.333333333333333)/(H_0*rho_m) + 0.5*(-6.0*R_p*T_l*k_m + 6.0*R_p*T_s*k_m)/(H_0*rho_m))**(1/3)
+

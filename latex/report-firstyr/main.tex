@@ -1,33 +1,100 @@
 \documentclass[10pt,a4paper]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage[utf8]{inputenc}
+\usepackage{color,soul}
+\usepackage{sectsty}% http://ctan.org/pkg/sectsty
+\usepackage{xcolor}% http://ctan.org/pkg/xcolor
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\usepackage{wrapfig}
 \usepackage{natbib}
 \bibliographystyle{plainnat}
+\setcitestyle{authoryear, open={(},close={)}}
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{multirow}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage{titlesec}
+\usepackage{caption}
 \usepackage{subcaption}
 \usepackage{array}
 \usepackage{booktabs}
-\graphicspath{figs/}
+\usepackage{nicefrac}
+\usepackage{makecell}
+\usepackage{lineno}
+\usepackage{fancyhdr}
+\graphicspath{{figs/}}
 \renewcommand{\arraystretch}{1.2}
 \renewcommand{\d}{\mathrm{d}}
+\newcommand*\mean[1]{\bar{#1}}
 
-\author{Claire Marie Guimond \\ Dr. Oliver Shorttle \& Dr. John Rudge, supervisors \\ First-Year Report to the Department of Earth Sciences of the University of Cambridge}
-\title{Mountains on massive rocky exoplanets?: \\ \Large Theoretical limits to topography}
+\definecolor{blue}{RGB}{0,0,204}
+\definecolor{red1}{RGB}{102,0,14}
+\definecolor{teal1}{RGB}{0,138,124}
+\definecolor{teal2}{RGB}{0,212,184}
+\definecolor{darkgrey}{RGB}{25,55,50}
 
+\definecolor{frugalGreyishPurple}{RGB}{136,113,145}
+\definecolor{polledElectricPurple}{RGB}{170,35,255}
+\definecolor{balkingMud}{RGB}{115,92,18}
+
+\captionsetup[figure]{font=footnotesize,labelfont={it,bf,footnotesize,color=teal1}}
+\captionsetup[table]{font=footnotesize,labelfont={it,bf,footnotesize,color=teal1}}
+
+\setulcolor{polledElectricPurple}
+
+\sectionfont{\color{darkgrey}\itshape}
+\subsectionfont{\color{frugalGreyishPurple}\itshape}
+\subsubsectionfont{\color{teal1}} %teal1
+
+
+\pagestyle{fancy}
+\thispagestyle{empty}
+
+% Define a new fontfamily for the subsubsection font
+% Don't use \fontspec directly to change the font
+%\newfontfamily\sectionfont[Color=MSLightBlue]{CMU Sans Serif Demi Condensed}
+%\newfontfamily\subsectionfont[Color=MSLightBlue]{CMU Typewriter Text}
+%\newfontfamily\subsubsectionfont[Color=MSLightBlue]{CMU Serif Extra BoldSlanted}
+%\titleformat*{\section}{\Large\bfseries}
+%\titleformat*{\subsection}{\large\bfseries\sffamily}
+%\titleformat*{\subsubsection}{\itshape}
+
+%\renewcommand{\cellalign/theadalign}{vh}
+%\titleformat{\section}
+%  {\normalfont\sffamily\Large\bfseries}
+%  {\thesection}{1em}{}
+
+\author{C. M. Guimond \\ \normalsize O. Shorttle \& J. F. Rudge, supervisors \\ \textit{First-Year Report to the Department of Earth Sciences}}
+\title{Mountains on massive rocky exoplanets?: \\ \large Theoretical limits to topography}
+
+\fancyhead[L]{Exoplanet topography}
+\fancyhead[R]{C. M. Guimond}
 
 \begin{document}
 
+\begin{figure}
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.25\textwidth]{cats} % first figure itself
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.25\textwidth]{cam} % second figure itself
+    \end{minipage}
+\end{figure}
+
 \maketitle
+
+\linenumbers
 
 \input{tex/abstract}
 
 \tableofcontents
-\listoffigures
+%\listoffigures
 
 \input{tex/introduction}
 \input{tex/methods}
