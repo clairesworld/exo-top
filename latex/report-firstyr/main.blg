@@ -1,49 +1,48 @@
 This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
 Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: main.aux
-The style file: plainnat.bst
-Reallocated field_info (elt_size=4) to 10712 items from 5000.
+The style file: bibstyle.bst
 Database file #1: ../exogeodynamics.bib
-Warning--I didn't find a database entry for "Hoggard2020"
-You've used 203 entries,
+Warning--empty journal in James2014
+You've used 148 entries,
             2773 wiz_defined-function locations,
-            2134 strings with 51328 characters,
-and the built_in function-call counts, 109679 in all, are:
-= -- 10348
-> -- 6939
-< -- 115
-+ -- 2338
-- -- 2133
-* -- 9933
-:= -- 17406
-add.period$ -- 1004
-call.type$ -- 203
-change.case$ -- 1315
-chr.to.int$ -- 201
-cite$ -- 406
-duplicate$ -- 4218
-empty$ -- 7884
-format.name$ -- 2480
-if$ -- 22556
+            1745 strings with 37037 characters,
+and the built_in function-call counts, 76544 in all, are:
+= -- 7360
+> -- 4418
+< -- 79
++ -- 1489
+- -- 1339
+* -- 6881
+:= -- 12060
+add.period$ -- 734
+call.type$ -- 148
+change.case$ -- 889
+chr.to.int$ -- 146
+cite$ -- 297
+duplicate$ -- 3067
+empty$ -- 5758
+format.name$ -- 1593
+if$ -- 15823
 int.to.chr$ -- 3
 int.to.str$ -- 1
-missing$ -- 208
-newline$ -- 1414
-num.names$ -- 816
-pop$ -- 1942
+missing$ -- 149
+newline$ -- 1036
+num.names$ -- 594
+pop$ -- 1250
 preamble$ -- 1
-purify$ -- 1116
+purify$ -- 742
 quote$ -- 0
-skip$ -- 3219
+skip$ -- 2268
 stack$ -- 0
-substring$ -- 4476
-swap$ -- 432
-text.length$ -- 7
+substring$ -- 3299
+swap$ -- 305
+text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 2208
-warning$ -- 0
-while$ -- 934
+type$ -- 1623
+warning$ -- 1
+while$ -- 685
 width$ -- 0
-write$ -- 3423
+write$ -- 2502
 (There was 1 warning)

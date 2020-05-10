@@ -1,35 +1,32 @@
 \BOOKMARK [1][-]{section.1}{Background}{}% 1
 \BOOKMARK [2][-]{subsection.1.1}{Terrestrial planet interiors through time}{section.1}% 2
 \BOOKMARK [2][-]{subsection.1.2}{Parameterized convection models}{section.1}% 3
-\BOOKMARK [3][-]{subsubsection.1.2.1}{Our understanding of mantle rheology}{subsection.1.2}% 4
-\BOOKMARK [3][-]{subsubsection.1.2.2}{Self-regulation of viscosity}{subsection.1.2}% 5
-\BOOKMARK [2][-]{subsection.1.3}{Regimes of mantle convection}{section.1}% 6
-\BOOKMARK [2][-]{subsection.1.4}{Stress and topography}{section.1}% 7
-\BOOKMARK [3][-]{subsubsection.1.4.1}{Mechanisms of topographic support}{subsection.1.4}% 8
-\BOOKMARK [3][-]{subsubsection.1.4.2}{Dynamic topography forward models}{subsection.1.4}% 9
-\BOOKMARK [3][-]{subsubsection.1.4.3}{Dynamic topography in the solar system}{subsection.1.4}% 10
-\BOOKMARK [2][-]{subsection.1.5}{Scaling up to super-}{section.1}% 11
-\BOOKMARK [3][-]{subsubsection.1.5.1}{A note on terminology}{subsection.1.5}% 12
-\BOOKMARK [3][-]{subsubsection.1.5.2}{Observational constraints}{subsection.1.5}% 13
-\BOOKMARK [3][-]{subsubsection.1.5.3}{Interior dynamics}{subsection.1.5}% 14
-\BOOKMARK [2][-]{subsection.1.6}{Topography in a planetary system}{section.1}% 15
-\BOOKMARK [2][-]{subsection.1.7}{Statement of the problem}{section.1}% 16
-\BOOKMARK [1][-]{section.2}{Model description}{}% 17
-\BOOKMARK [2][-]{subsection.2.1}{Temperature-dependent viscosity, stagnant lid convection}{section.2}% 18
-\BOOKMARK [3][-]{subsubsection.2.1.1}{Heat fluxes}{subsection.2.1}% 19
-\BOOKMARK [3][-]{subsubsection.2.1.2}{Temperatures and heat flow in the lid}{subsection.2.1}% 20
-\BOOKMARK [3][-]{subsubsection.2.1.3}{Lid thickness}{subsection.2.1}% 21
-\BOOKMARK [2][-]{subsection.2.2}{Height of dynamic topography}{section.2}% 22
-\BOOKMARK [1][-]{section.3}{Preliminary results}{}% 23
-\BOOKMARK [2][-]{subsection.3.1}{Thermal evolution}{section.3}% 24
-\BOOKMARK [2][-]{subsection.3.2}{Purely-dynamic topography for solar system analogues}{section.3}% 25
-\BOOKMARK [3][-]{subsubsection.3.2.1}{Variation of dynamic topography with planet mass, age, and radiogenic abundance}{subsection.3.2}% 26
-\BOOKMARK [1][-]{section.4}{Discussion}{}% 27
-\BOOKMARK [2][-]{subsection.4.1}{How does a planet's rheology govern its thermal history?}{section.4}% 28
-\BOOKMARK [2][-]{subsection.4.2}{Implications for planetary systems science}{section.4}% 29
-\BOOKMARK [2][-]{subsection.4.3}{Under what conditions is simple dynamic topography useful?}{section.4}% 30
-\BOOKMARK [1][-]{section.5}{Future work}{}% 31
-\BOOKMARK [2][-]{subsection.5.1}{Importance of melting on thermal history}{section.5}% 32
-\BOOKMARK [2][-]{subsection.5.2}{Plate flexure and lithospheric strength models}{section.5}% 33
-\BOOKMARK [2][-]{subsection.5.3}{More exotic planets}{section.5}% 34
-\BOOKMARK [2][-]{subsection.5.4}{Observables}{section.5}% 35
+\BOOKMARK [2][-]{subsection.1.3}{Regimes of mantle convection}{section.1}% 4
+\BOOKMARK [2][-]{subsection.1.4}{Stress and topography}{section.1}% 5
+\BOOKMARK [3][-]{subsubsection.1.4.1}{Mechanisms of topographic support}{subsection.1.4}% 6
+\BOOKMARK [3][-]{subsubsection.1.4.2}{Dynamic topography forward models}{subsection.1.4}% 7
+\BOOKMARK [3][-]{subsubsection.1.4.3}{Dynamic topography in the solar system}{subsection.1.4}% 8
+\BOOKMARK [2][-]{subsection.1.5}{Topography in a systems science context}{section.1}% 9
+\BOOKMARK [2][-]{subsection.1.6}{Statement of the problem}{section.1}% 10
+\BOOKMARK [1][-]{section.2}{Preliminary results}{}% 11
+\BOOKMARK [2][-]{subsection.2.1}{Thermal evolution}{section.2}% 12
+\BOOKMARK [2][-]{subsection.2.2}{Purely-dynamic topography for solar system analogues}{section.2}% 13
+\BOOKMARK [2][-]{subsection.2.3}{Dynamic topography as a function of planet age, mass, and radiogenic element abundance}{section.2}% 14
+\BOOKMARK [1][-]{section.3}{Discussion}{}% 15
+\BOOKMARK [2][-]{subsection.3.1}{How does a planet's rheology govern its thermal history?}{section.3}% 16
+\BOOKMARK [2][-]{subsection.3.2}{Implications for planetary systems science}{section.3}% 17
+\BOOKMARK [2][-]{subsection.3.3}{Under what conditions is parameterized dynamic topography useful?}{section.3}% 18
+\BOOKMARK [1][-]{section.4}{Future work}{}% 19
+\BOOKMARK [2][-]{subsection.4.1}{Importance of melting on thermal history}{section.4}% 20
+\BOOKMARK [2][-]{subsection.4.2}{Plate flexure and lithospheric strength models}{section.4}% 21
+\BOOKMARK [2][-]{subsection.4.3}{Convection dynamics at higher massses}{section.4}% 22
+\BOOKMARK [2][-]{subsection.4.4}{Bulk compositions}{section.4}% 23
+\BOOKMARK [2][-]{subsection.4.5}{Model validation}{section.4}% 24
+\BOOKMARK [1][-]{Appendix.1.A}{A note on terminology}{}% 25
+\BOOKMARK [1][-]{Appendix.1.B}{Model description}{}% 26
+\BOOKMARK [2][-]{subsection.1.B.1}{Temperature-dependent viscosity, stagnant lid convection}{Appendix.1.B}% 27
+\BOOKMARK [3][-]{subsubsection.1.B.1.1}{Mantle rheology}{subsection.1.B.1}% 28
+\BOOKMARK [3][-]{subsubsection.1.B.1.2}{Heat fluxes}{subsection.1.B.1}% 29
+\BOOKMARK [3][-]{subsubsection.1.B.1.3}{Temperatures and heat flow in the lid}{subsection.1.B.1}% 30
+\BOOKMARK [3][-]{subsubsection.1.B.1.4}{Lid thickness}{subsection.1.B.1}% 31
+\BOOKMARK [2][-]{subsection.1.B.2}{Height of dynamic topography}{Appendix.1.B}% 32

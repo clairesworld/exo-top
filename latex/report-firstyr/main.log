@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.3.28)  7 MAY 2020 15:08
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.3.28)  10 MAY 2020 21:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -773,23 +773,29 @@ s
 \f@nch@O@erf=\skip69
 \f@nch@O@olf=\skip70
 \f@nch@O@orf=\skip71
+)
+(/usr/share/texlive/texmf-dist/tex/latex/appendix/appendix.sty
+Package: appendix 2009/09/02 v1.2b extra appendix facilities
+\c@@pps=\count135
+\c@@ppsavesec=\count136
+\c@@ppsaveapp=\count137
 ) (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -827,16 +833,16 @@ LaTeX Font Info:    ... okay on input line 76.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count135
+\scratchcounter=\count138
 \scratchdimen=\dimen166
 \scratchbox=\box35
-\nofMPsegments=\count136
-\nofMParguments=\count137
+\nofMPsegments=\count139
+\nofMParguments=\count140
 \everyMPshowfont=\toks34
-\MPscratchCnt=\count138
+\MPscratchCnt=\count141
 \MPscratchDim=\dimen167
-\MPnumerator=\count139
-\makeMPintoPDFobject=\count140
+\MPnumerator=\count142
+\makeMPintoPDFobject=\count143
 \everyMPtoPDFconversion=\toks35
 ) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
@@ -856,7 +862,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \AtBeginShipoutBox=\box36
-Package hyperref Info: Link coloring OFF on input line 76.
+Package hyperref Info: Link coloring OFF on input line 77.
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -864,11 +870,11 @@ Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count141
+\c@section@level=\count144
 )
-LaTeX Info: Redefining \ref on input line 76.
-LaTeX Info: Redefining \pageref on input line 76.
-LaTeX Info: Redefining \nameref on input line 76.
+LaTeX Info: Redefining \ref on input line 77.
+LaTeX Info: Redefining \pageref on input line 77.
+LaTeX Info: Redefining \nameref on input line 77.
 
 (./main.out) (./main.out)
 \@outlinefile=\write3
@@ -876,25 +882,25 @@ LaTeX Info: Redefining \nameref on input line 76.
 
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
-<figs/cats.png, id=144, 979.66pt x 1202.4925pt>
+<figs/cats.png, id=132, 979.66pt x 1202.4925pt>
 File: figs/cats.png Graphic file (type png)
 <use figs/cats.png>
-Package pdftex.def Info: figs/cats.png  used on input line 82.
+Package pdftex.def Info: figs/cats.png  used on input line 83.
 (pdftex.def)             Requested size: 56.62099pt x 69.48589pt.
-LaTeX Font Info:    Try loading font information for U+msa on input line 83.
+LaTeX Font Info:    Try loading font information for U+msa on input line 84.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 83.
+LaTeX Font Info:    Try loading font information for U+msb on input line 84.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<figs/cam.png, id=146, 214.8025pt x 248.93pt>
+<figs/cam.png, id=134, 214.8025pt x 248.93pt>
 File: figs/cam.png Graphic file (type png)
 <use figs/cam.png>
-Package pdftex.def Info: figs/cam.png  used on input line 86.
+Package pdftex.def Info: figs/cam.png  used on input line 87.
 (pdftex.def)             Requested size: 56.62099pt x 65.61668pt.
  (./tex/abstract.tex) (./main.toc [1
 
@@ -903,121 +909,96 @@ am.png>])
 \tf@toc=\write4
 \openout4 = `main.toc'.
 
- (./tex/introduction.tex [2] [3] [4]
-LaTeX Font Info:    Try loading font information for OML+cmr on input line 112.
-
+ (./tex/introduction.tex [2] [3]
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 56.
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 112.
- [5] [6]
-
-Package natbib Warning: Citation `Hoggard2020' on page 7 undefined on input lin
-e 203.
-
-[7] [8]
-Underfull \hbox (badness 10000) in paragraph at lines 289--289
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 56.
+<figs/stagnantlid.png, id=357, 702.625pt x 662.475pt>
+File: figs/stagnantlid.png Graphic file (type png)
+<use figs/stagnantlid.png>
+Package pdftex.def Info: figs/stagnantlid.png  used on input line 64.
+(pdftex.def)             Requested size: 226.48395pt x 213.54294pt.
+ [4 <./figs/stagnantlid.png>] [5] [6]
+Underfull \hbox (badness 10000) in paragraph at lines 201--201
 []|\OT1/cmr/m/sc/8 Internal
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 292--292
-[]|\OT1/cmr/m/n/8 general Re-
+Underfull \hbox (badness 10000) in paragraph at lines 204--204
+[]|\OT1/cmr/m/n/8 multiple Re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 299--299
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
 []|\OT1/cmr/m/n/8 Axisymmetric con-vec-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 307--307
-[]|\OT1/cmr/m/n/8 Frank-
+Underfull \hbox (badness 10000) in paragraph at lines 224--224
+[]|\OT1/cmr/m/n/8 Hemispherical ax-isym-
  []
 
 
-Underfull \hbox (badness 3354) in paragraph at lines 312--312
-[]|\OT1/cmr/m/n/8 Spherical ax-isym-met-ric
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 312--314
-[]|\OT1/cmr/m/n/8 Thermal bound-ary
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 317--317
-[]|\OT1/cmr/m/n/8 Frank-
- []
-
-
-Underfull \hbox (badness 7047) in paragraph at lines 326--326
+Underfull \hbox (badness 7047) in paragraph at lines 239--239
 \OT1/cmr/m/n/8 cou-pled with ther-mal
  []
 
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <8> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 330.
-[9
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 243.
 
-] [10
+Overfull \hbox (2.07156pt too wide) in alignment at lines 193--258
+ [] [] [] [] [] [] [] [] [] 
+ []
 
-]
+[7
 
-Package natbib Warning: Citation `Hoggard2020' on page 11 undefined on input li
-ne 412.
+] [8
 
-[11] [12] [13]) (./tex/methods.tex [14] [15]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 181.
+] [9]
+Overfull \hbox (3.7808pt too wide) in paragraph at lines 389--390
+\OT1/cmr/m/n/10 While 2D and 3D nu-mer-i-cal mod-els of dy-namic to-pog-ra-phy 
+ex-ist for stag-nant lid plan-ets with temperature-
+ []
 
-
-(/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 181.
- [16])
-(./tex/results.tex
-<figs/thermal_Mars1.pdf, id=1171, 860.01299pt x 426.39299pt>
+) (./tex/results.tex
+<figs/thermal_Mars1.pdf, id=716, 860.01299pt x 643.20299pt>
 File: figs/thermal_Mars1.pdf Graphic file (type pdf)
 <use figs/thermal_Mars1.pdf>
-Package pdftex.def Info: figs/thermal_Mars1.pdf  used on input line 9.
-(pdftex.def)             Requested size: 362.37569pt x 179.66287pt.
- [17]
-<figs/h_comparison.pdf, id=1212, 968.08801pt x 281.85298pt>
+Package pdftex.def Info: figs/thermal_Mars1.pdf  used on input line 10.
+(pdftex.def)             Requested size: 362.37569pt x 271.01689pt.
+ [10] [11 <./figs/thermal_Mars1.pdf>]
+<figs/h_comparison.pdf, id=814, 1131.37537pt x 281.85298pt>
 File: figs/h_comparison.pdf Graphic file (type pdf)
 <use figs/h_comparison.pdf>
-Package pdftex.def Info: figs/h_comparison.pdf  used on input line 37.
-(pdftex.def)             Requested size: 452.9679pt x 131.88171pt.
- [18 <./figs/thermal_Mars1.pdf>] [19 <./figs/h_comparison.pdf>]
-<figs/relative_h.pdf, id=1334, 855.83937pt x 281.85298pt>
+Package pdftex.def Info: figs/h_comparison.pdf  used on input line 30.
+(pdftex.def)             Requested size: 452.9679pt x 112.84671pt.
+ [12 <./figs/h_comparison.pdf>]
+<figs/relative_h.pdf, id=933, 855.83937pt x 281.85298pt>
 File: figs/relative_h.pdf Graphic file (type pdf)
 <use figs/relative_h.pdf>
-Package pdftex.def Info: figs/relative_h.pdf  used on input line 69.
+Package pdftex.def Info: figs/relative_h.pdf  used on input line 74.
 (pdftex.def)             Requested size: 452.9679pt x 149.17923pt.
-) (./tex/discussion.tex
-<figs/Ea-effect-evol.pdf, id=1351, 606.07765pt x 643.20918pt>
+) (./tex/discussion.tex [13]
+<figs/Ea-effect-evol.pdf, id=961, 606.07765pt x 643.20918pt>
 File: figs/Ea-effect-evol.pdf Graphic file (type pdf)
 <use figs/Ea-effect-evol.pdf>
 Package pdftex.def Info: figs/Ea-effect-evol.pdf  used on input line 9.
 (pdftex.def)             Requested size: 226.48395pt x 240.3588pt.
-<figs/h-effect-evol.pdf, id=1352, 596.75174pt x 643.20299pt>
+<figs/h-effect-evol.pdf, id=962, 596.75174pt x 643.20299pt>
 File: figs/h-effect-evol.pdf Graphic file (type pdf)
 <use figs/h-effect-evol.pdf>
 Package pdftex.def Info: figs/h-effect-evol.pdf  used on input line 15.
 (pdftex.def)             Requested size: 226.48395pt x 244.1056pt.
-<figs/a_rh-effect-evol.pdf, id=1353, 606.42264pt x 643.20299pt>
+<figs/a_rh-effect-evol.pdf, id=963, 606.42264pt x 643.20299pt>
 File: figs/a_rh-effect-evol.pdf Graphic file (type pdf)
 <use figs/a_rh-effect-evol.pdf>
 Package pdftex.def Info: figs/a_rh-effect-evol.pdf  used on input line 22.
 (pdftex.def)             Requested size: 226.48395pt x 240.21907pt.
-<figs/ocean_vol.pdf, id=1368, 716.00212pt x 321.6015pt>
-File: figs/ocean_vol.pdf Graphic file (type pdf)
-<use figs/ocean_vol.pdf>
-Package pdftex.def Info: figs/ocean_vol.pdf  used on input line 45.
-(pdftex.def)             Requested size: 362.37569pt x 162.76324pt.
- [20 <./figs/relative_h.pdf>] [21 <./figs/Ea-effect-evol.pdf> <./figs/h-effect-
+ [14 <./figs/relative_h.pdf>] [15 <./figs/Ea-effect-evol.pdf> <./figs/h-effect-
 evol.pdf
 
 pdfTeX warning: pdflatex (file ./figs/h-effect-evol.pdf): PDF inclusion: multip
@@ -1026,268 +1007,222 @@ le pdfs with page group included in a single page
 
 pdfTeX warning: pdflatex (file ./figs/a_rh-effect-evol.pdf): PDF inclusion: mul
 tiple pdfs with page group included in a single page
->]) (./tex/future.tex [22 <./figs/ocean_vol.pdf>] [23]) (./main.bbl [24]
-[25]
-Underfull \hbox (badness 2253) in paragraph at lines 228--237
-[]\OT1/cmr/m/n/10 Geoffrey F. Davies.  Ther-mal his-to-ries of con-vec-tive Ear
-th mod-els and con-straints on ra-
+>]
+<figs/ocean_vol.pdf, id=1065, 716.00212pt x 321.6015pt>
+File: figs/ocean_vol.pdf Graphic file (type pdf)
+<use figs/ocean_vol.pdf>
+Package pdftex.def Info: figs/ocean_vol.pdf  used on input line 57.
+(pdftex.def)             Requested size: 362.37569pt x 162.76324pt.
+) (./tex/future.tex [16 <./figs/ocean_vol.pdf>] [17]) (./main.bbl [18]
+Underfull \hbox (badness 1173) in paragraph at lines 41--50
+\OT1/cmr/m/it/10 search: Plan-ets\OT1/cmr/m/n/10 , 117(E12), 2012.  ISSN 2156-2
+202.  doi: $10 . 1029 / 2012JE004231$.  []eprint:
  []
 
 
-Underfull \hbox (badness 2818) in paragraph at lines 228--237
-\OT1/cmr/m/n/10 dio-genic heat pro-duc-tion in the Earth.  \OT1/cmr/m/it/10 Jou
-r-nal of Geo-phys-i-cal Re-search: Solid Earth\OT1/cmr/m/n/10 ,
+Underfull \hbox (badness 3646) in paragraph at lines 149--158
+[]\OT1/cmr/m/n/10 Davies, G. F.  Ther-mal his-to-ries of con-vec-tive Earth mod
+-els and con-straints on ra-dio-
  []
 
 
-Underfull \hbox (badness 4899) in paragraph at lines 228--237
+Underfull \hbox (badness 4805) in paragraph at lines 149--158
+\OT1/cmr/m/n/10 genic heat pro-duc-tion in the Earth.  \OT1/cmr/m/it/10 Jour-na
+l of Geo-phys-i-cal Re-search: Solid Earth\OT1/cmr/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 4899) in paragraph at lines 149--158
 \OT1/cmr/m/n/10 85(B5):2517--2530, 1980.  ISSN 2156-2202.  doi: $10 . 1029 / JB
 085iB05p02517$.  []eprint:
  []
 
-[26]
-Underfull \hbox (badness 10000) in paragraph at lines 386--394
-[]\OT1/cmr/m/n/10 A. C. Fowler.  Fast Ther-mo-vis-cous Con-vec-tion.  \OT1/cmr/
+[19]
+Underfull \hbox (badness 10000) in paragraph at lines 267--275
+[]\OT1/cmr/m/n/10 Fowler, A. C.  Fast Ther-mo-vis-cous Con-vec-tion.  \OT1/cmr/
 m/it/10 Stud-ies in Ap-plied Math-e-mat-ics\OT1/cmr/m/n/10 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 386--394
+Underfull \hbox (badness 10000) in paragraph at lines 267--275
 \OT1/cmr/m/n/10 72(3):189--219, 1985.  ISSN 1467-9590.  doi: $10 . 1002 / sapm1
 985723189$.  []eprint:
  []
 
 
-Underfull \hbox (badness 1014) in paragraph at lines 444--453
-[]\OT1/cmr/m/n/10 Robert E. Grimm and Roger J. Phillips.  Grav-ity anoma-lies, 
-com-pen-sa-tion mech-a-nisms, and
+Underfull \hbox (badness 1728) in paragraph at lines 312--321
+[]\OT1/cmr/m/n/10 Grimm, R. E. and Phillips, R. J.  Grav-ity anoma-lies, com-pe
+n-sa-tion mech-a-nisms, and the
  []
 
 
-Underfull \hbox (badness 1303) in paragraph at lines 444--453
-\OT1/cmr/m/n/10 the geo-dy-nam-ics of West-ern Ishtar Terra, Venus.  \OT1/cmr/m
-/it/10 Jour-nal of Geo-phys-i-cal Re-search: Solid
+Underfull \hbox (badness 3735) in paragraph at lines 312--321
+\OT1/cmr/m/n/10 geo-dy-nam-ics of West-ern Ishtar Terra, Venus.  \OT1/cmr/m/it/
+10 Jour-nal of Geo-phys-i-cal Re-search: Solid
  []
 
 
-Underfull \hbox (badness 3701) in paragraph at lines 444--453
+Underfull \hbox (badness 3701) in paragraph at lines 312--321
 \OT1/cmr/m/it/10 Earth\OT1/cmr/m/n/10 , 96(B5):8305--8324, 1991.  ISSN 2156-220
 2.  doi: $10 . 1029 / 91JB00055$.  []eprint:
  []
 
 
-Underfull \hbox (badness 3240) in paragraph at lines 455--464
-[]\OT1/cmr/m/n/10 Robert E. Grimm and Roger J. Phillips.  Anatomy of a Venu-sia
-n hot spot: Ge-ol-ogy,
+Underfull \hbox (badness 3058) in paragraph at lines 323--332
+[]\OT1/cmr/m/n/10 Grimm, R. E. and Phillips, R. J.  Anatomy of a Venu-sian hot 
+spot: Ge-ol-ogy, grav-
  []
 
 
-Underfull \hbox (badness 2359) in paragraph at lines 455--464
-\OT1/cmr/m/n/10 grav-ity, and man-tle dy-nam-ics of Eistla Re-gio.  \OT1/cmr/m/
-it/10 Jour-nal of Geo-phys-i-cal Re-search: Plan-
+Underfull \hbox (badness 5022) in paragraph at lines 323--332
+\OT1/cmr/m/n/10 ity, and man-tle dy-nam-ics of Eistla Re-gio.  \OT1/cmr/m/it/10
+ Jour-nal of Geo-phys-i-cal Re-search: Plan-
  []
 
 
-Underfull \hbox (badness 3439) in paragraph at lines 455--464
+Underfull \hbox (badness 3439) in paragraph at lines 323--332
 \OT1/cmr/m/it/10 ets\OT1/cmr/m/n/10 , 97(E10):16035--16054, 1992.  ISSN 2156-22
 02.  doi: $10 . 1029 / 92JE01500$.  []eprint:
  []
 
-[27]
-Underfull \hbox (badness 7030) in paragraph at lines 542--551
-[]\OT1/cmr/m/n/10 W. L. Jaeger, E. P. Tur-tle, L. P. Keszthe-lyi, J. Rade-baugh
-, A. S. McEwen, and
+[20] [21] [22]
+Underfull \hbox (badness 6893) in paragraph at lines 661--670
+[]\OT1/cmr/m/n/10 Miyagoshi, T., Kameyama, M., and Ogawa, M.  Ther-mal con-vec-
+tion and the con-
  []
 
 
-Underfull \hbox (badness 7685) in paragraph at lines 542--551
-\OT1/cmr/m/n/10 R. T. Pap-palardo.  Oro-genic tec-ton-ism on Io.  \OT1/cmr/m/it
-/10 Jour-nal of Geo-phys-i-cal Re-search:
+Underfull \hbox (badness 10000) in paragraph at lines 661--670
+\OT1/cmr/m/n/10 vec-tive regime di-a-gram in super-Earths.  \OT1/cmr/m/it/10 Jo
+ur-nal of Geo-phys-i-cal Re-search: Plan-
  []
 
 
-Underfull \hbox (badness 7379) in paragraph at lines 542--551
-\OT1/cmr/m/it/10 Plan-ets\OT1/cmr/m/n/10 , 108(E8), 2003.  ISSN 2156-2202.  doi
-: $10 . 1029 / 2002JE001946$.  []eprint:
- []
-
-[28]
-Underfull \hbox (badness 10000) in paragraph at lines 712--720
-[]\OT1/cmr/m/n/10 Walter S. Kiefer, Mark A. Richards, Brad-ford H. Hager, and B
-ruce G. Bills.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 712--720
-\OT1/cmr/m/n/10 A dy-namic model of Venus's grav-ity field.  \OT1/cmr/m/it/10 G
-eo-phys-i-cal Re-search Let-ters\OT1/cmr/m/n/10 , 13
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 712--720
-\OT1/cmr/m/n/10 (1):14--17, 1986.  ISSN 1944-8007.  doi: $10 . 1029 / GL013i001
-p00014$.  []eprint:
- []
-
-[29] [30]
-Underfull \hbox (badness 4108) in paragraph at lines 1002--1011
-[]\OT1/cmr/m/n/10 Takehiro Miyagoshi, Masanori Kameyama, and Masaki Ogawa.  The
-r-mal con-vec-tion and
- []
-
-
-Underfull \hbox (badness 2229) in paragraph at lines 1002--1011
-\OT1/cmr/m/n/10 the con-vec-tive regime di-a-gram in super-Earths.  \OT1/cmr/m/
-it/10 Jour-nal of Geo-phys-i-cal Re-search: Plan-
- []
-
-
-Underfull \hbox (badness 3690) in paragraph at lines 1002--1011
+Underfull \hbox (badness 3690) in paragraph at lines 661--670
 \OT1/cmr/m/it/10 ets\OT1/cmr/m/n/10 , 120(7):1267--1278, 2015.  ISSN 2169-9100.
   doi: $10 . 1002 / 2015JE004793$.  []eprint:
  []
 
-[31] [32]
-Underfull \hbox (badness 10000) in paragraph at lines 1181--1189
-[]\OT1/cmr/m/n/10 C. P. Orth and V. S. Solo-ma-tov.  The iso-static stag-nant l
-id ap-prox-i-ma-tion and
+[23]
+Underfull \hbox (badness 10000) in paragraph at lines 805--813
+[]\OT1/cmr/m/n/10 Orth, C. P. and Solo-ma-tov, V. S.  The iso-static stag-nant 
+lid ap-prox-i-ma-tion and
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1181--1189
+Underfull \hbox (badness 10000) in paragraph at lines 805--813
 \OT1/cmr/m/n/10 global vari-a-tions in the Venu-sian litho-spheric thick-ness. 
  \OT1/cmr/m/it/10 Geo-chem-istry, Geo-physics,
  []
 
 
-Underfull \hbox (badness 5519) in paragraph at lines 1181--1189
+Underfull \hbox (badness 5519) in paragraph at lines 805--813
 \OT1/cmr/m/it/10 Geosys-tems\OT1/cmr/m/n/10 , 12(7), 2011.  ISSN 1525-2027.  do
 i: $10 . 1029 / 2011GC003582$.  []eprint:
  []
 
 
-Underfull \hbox (badness 5260) in paragraph at lines 1235--1243
-[]\OT1/cmr/m/n/10 Gordon H. Pet-tengill, Pe-ter G. Ford, and Robert J. Wilt.  V
-enus sur-face ra-dio-ther-
+Underfull \hbox (badness 3049) in paragraph at lines 908--917
+[]\OT1/cmr/m/n/10 Schubert, G., Steven-son, D., and Cassen, P.  Whole planet co
+ol-ing and the ra-dio-genic
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1235--1243
-\OT1/cmr/m/n/10 mal emis-sion as ob-served by Mag-el-lan.  \OT1/cmr/m/it/10 Jou
-r-nal of Geo-phys-i-cal Re-search: Plan-
+Underfull \hbox (badness 2547) in paragraph at lines 908--917
+\OT1/cmr/m/n/10 heat source con-tents of the Earth and Moon.  \OT1/cmr/m/it/10 
+Jour-nal of Geo-phys-i-cal Re-search: Solid
+ []
+
+[24] [25]
+Underfull \hbox (badness 7273) in paragraph at lines 1185--1193
+[]\OT1/cmr/m/n/10 Vezolainen, A. V., Solo-ma-tov, V. S., Basilevsky, A. T., and
+ Head, J. W.  Up-
  []
 
 
-Underfull \hbox (badness 4144) in paragraph at lines 1235--1243
-\OT1/cmr/m/it/10 ets\OT1/cmr/m/n/10 , 97(E8):13091--13102, 1992.  ISSN 2156-220
-2.  doi: $10 . 1029 / 92JE01356$.  []eprint:
- []
-
-[33]
-Underfull \hbox (badness 4726) in paragraph at lines 1323--1329
-[]\OT1/cmr/m/n/10 G Schu-bert.  Nu-mer-i-cal Mod-els of Man-tle Con-vec-tion.  
-\OT1/cmr/m/it/10 An-nual Re-view of Fluid Me-
+Underfull \hbox (badness 10000) in paragraph at lines 1185--1193
+\OT1/cmr/m/n/10 lift of Beta Re-gio: Three-dimensional mod-els.  \OT1/cmr/m/it/
+10 Jour-nal of Geo-phys-i-cal Re-search:
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1323--1329
-\OT1/cmr/m/it/10 chan-ics\OT1/cmr/m/n/10 , 24(1):359--394, 1992.  doi: $10 . 11
-46 / annurev . ^^M . 24 . 010192 . 002043$.  []eprint:
+Underfull \hbox (badness 7379) in paragraph at lines 1185--1193
+\OT1/cmr/m/it/10 Plan-ets\OT1/cmr/m/n/10 , 109(E8), 2004.  ISSN 2156-2202.  doi
+: $10 . 1029 / 2004JE002259$.  []eprint:
  []
 
-[34] [35]
-Underfull \hbox (badness 5217) in paragraph at lines 1689--1697
-[]\OT1/cmr/m/n/10 A. V. Ve-zo-lainen, V. S. Solo-ma-tov, A. T. Basilevsky, and 
-J. W. Head.  Up-lift of
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1689--1697
-\OT1/cmr/m/n/10 Beta Re-gio: Three-dimensional mod-els.  \OT1/cmr/m/it/10 Jour-
-nal of Geo-phys-i-cal Re-search: Plan-
+[26]
+Underfull \hbox (badness 1845) in paragraph at lines 1203--1212
+[]\OT1/cmr/m/n/10 Walker, J. C. G., Hays, P. B., and Kast-ing, J. F.  A neg-a-t
+ive feed-back mech-a-nism for
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1689--1697
-\OT1/cmr/m/it/10 ets\OT1/cmr/m/n/10 , 109(E8), 2004.  ISSN 2156-2202.  doi: $10
- . 1029 / 2004JE002259$.  []eprint:
+Underfull \hbox (badness 3128) in paragraph at lines 1230--1239
+[]\OT1/cmr/m/n/10 Wieczorek, M. A. and Zu-ber, M. T.  Thick-ness of the Mar-tia
+n crust: Im-proved con-
  []
 
 
-Underfull \hbox (badness 1210) in paragraph at lines 1707--1716
-[]\OT1/cmr/m/n/10 James C. G. Walker, P. B. Hays, and J. F. Kast-ing.  A neg-a-
-tive feed-back mech-a-nism for
- []
-
-[36]
-Underfull \hbox (badness 10000) in paragraph at lines 1759--1768
-[]\OT1/cmr/m/n/10 Mark A. Wiec-zorek and Maria T. Zu-ber.  Thick-ness of the Ma
-r-tian crust: Im-
+Underfull \hbox (badness 10000) in paragraph at lines 1230--1239
+\OT1/cmr/m/n/10 straints from geoid-to-topography ra-tios.  \OT1/cmr/m/it/10 Jo
+ur-nal of Geo-phys-i-cal Re-search: Plan-
  []
 
 
-Underfull \hbox (badness 7486) in paragraph at lines 1759--1768
-\OT1/cmr/m/n/10 proved con-straints from geoid-to-topography ra-tios.  \OT1/cmr
-/m/it/10 Jour-nal of Geo-phys-i-cal Re-search:
+Underfull \hbox (badness 10000) in paragraph at lines 1230--1239
+\OT1/cmr/m/it/10 ets\OT1/cmr/m/n/10 , 109(E1), 2004.  ISSN 2156-2202.  doi: $10
+ . 1029 / 2003JE002153$.  []eprint:
  []
 
-
-Underfull \hbox (badness 7379) in paragraph at lines 1759--1768
-\OT1/cmr/m/it/10 Plan-ets\OT1/cmr/m/n/10 , 109(E1), 2004.  ISSN 2156-2202.  doi
-: $10 . 1029 / 2003JE002153$.  []eprint:
- []
-
-)
-
-Package natbib Warning: There were undefined citations.
-
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 108.
-[37]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 108.
+) (./tex/terminology.tex [27]) (./tex/methods.tex [28] [29])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 118.
+ [30]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 118.
  (./main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 108.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 108.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 118.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 118.
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 3CB87E08E33DC0B0047CB41F193B2AEB;2851.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 108.
+(rerunfilecheck)             Checksum: 878B1FAA90BF3082E1B030DE602653F6;2619.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 118.
  ) 
 Here is how much of TeX's memory you used:
- 11086 strings out of 494880
- 161190 string characters out of 6179601
- 284048 words of memory out of 5000000
- 13872 multiletter control sequences out of 15000+600000
- 15851 words of font info for 58 fonts, out of 8000000 for 9000
+ 10942 strings out of 494880
+ 158230 string characters out of 6179601
+ 285754 words of memory out of 5000000
+ 13792 multiletter control sequences out of 15000+600000
+ 16249 words of font info for 59 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 36i,17n,49p,1536b,834s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,17n,49p,1877b,706s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texlive/
 texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist/fonts/t
-ype1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr1
-0.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><
-/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texl
-ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmss8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
-/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></u
-sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/sha
-re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb>
-Output written on main.pdf (37 pages, 1141590 bytes).
+dist/fonts/type1/public/amsfonts/cmextra/cmex8.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></u
+sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
+msy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb>
+Output written on main.pdf (30 pages, 1144046 bytes).
 PDF statistics:
- 1807 PDF objects out of 2073 (max. 8388607)
- 1675 compressed objects within 17 object streams
- 335 named destinations out of 1000 (max. 500000)
- 326 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1524 PDF objects out of 1728 (max. 8388607)
+ 1393 compressed objects within 14 object streams
+ 267 named destinations out of 1000 (max. 500000)
+ 307 words of extra memory for PDF output out of 10000 (max. 10000000)
 

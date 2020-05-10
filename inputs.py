@@ -204,7 +204,7 @@ Mars_Breuer_in = dict(
      k_lm=4, # thermal conduvtivity lower mantle
      beta_u=None, # defaults to 1/3
      beta_c=None, # defaults to 1/3 
-     a_rh=2.44, # for beta=1/3 
+     a_rh=2.21, # for beta=1/3 
      Ea=300e3, # activation energy in J for viscosity law
      eta_0=1e21, # reference dynamic viscosity in Pa s
      T_ref=1600, # viscosity law reference temperature in K
@@ -215,18 +215,47 @@ Mars_Breuer_in = dict(
 Mars_Breuer_run =  dict(T_m0=1900, T_c0=2200, D_l0=100e3, tf=4.5, visc_type='KW', complexity=3)
 
 
-Venus_Driscoll_in = dict( # table 3
-    ident = 'Venus_Driscoll',
-     H_0=1.5e-8, # final radiogenic heating in W/kg
+Mars_Hauck_in = dict(
+    ident = 'Mars_Hauck',
+     Alb=None, 
+     H_0=5e-11, # final radiogenic heating in W/kg
      X_K=305, # initial abundance of K in wt ppm
      X_U=16e-3, # initial abundane of U in wt ppm 
      X_Th=56e-3, # initial abundance of Th in wt ppm 
      L=None, 
+     Ra_crit_u=450, 
+     R_p0=3390e3, 
+     R_c0=1550e3,
+     alpha_m=2e-5, # thermal expansivity
+     k_m=4, # silicate thermal conductivity
+     rho_c=7200, # core density
+     rho_m=3527, # mantle density 
+     rho_lith=None, 
+     c_m=1149, #<----??? TODO: check if you need constant volume c_p
+     c_c=571, # specific heat for core in J/K/kg
+     k_lm=4, # thermal conduvtivity lower mantle
+     beta_u=None, # defaults to 1/3
+     beta_c=None, # defaults to 1/3 
+     A_rh = 5.3e15,
+     B_rh = 5e-10,
+     mu = 80e9,
+     h_rh = 1e-3,
+     m_rh = 1,
+     a_rh=2.21, # for beta=1/3 
+     Ea=240e3, # activation energy in J for viscosity law
+     T_s=220, # fixed surface temp in K
+     M_p=6.39e23, # only used for gravity in this case
+     sma=None, 
+)
+Mars_Hauck_run =  dict(T_m0=1723, T_c0=2000, D_l0=100e3, tf=4.5, visc_type='KW', complexity=3)
+
+Venus_Driscoll_in = dict( # table 3
+    ident = 'Venus_Driscoll',
+     H_0=2.98e-12, # final radiogenic heating in W/kg
+     L=None, 
      Ra_crit_u=660, 
      R_p0=6371e3, 
      R_c0=3480e3,
-     #d_m_const = 2891,# already constant if no lid
-     D_l_const = 0,
      rho_m = 4800,
      rho_c = 11900,
      k_m = 4.2,
@@ -240,7 +269,7 @@ Venus_Driscoll_in = dict( # table 3
      M_p=4.867e24, # only used for gravity in this case
      sma=None, 
 )
-Venus_Driscoll_run =  dict(T_m0=3000, T_c0=6000, D_l0=0, tf=4.5, visc_type='Driscoll', complexity=3)
+Venus_Driscoll_run =  dict(T_m0=3000, T_c0=5000, D_l0=300e3, tf=4.5, visc_type='KW', complexity=3)
 
 Venus_in = dict(
     ident = 'Venus', # must match dict name ****_in

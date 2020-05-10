@@ -9,9 +9,9 @@
 \usepackage{amssymb}
 \usepackage{wrapfig}
 \usepackage{natbib}
-\bibliographystyle{plainnat}
+\bibliographystyle{bibstyle}
 \setcitestyle{authoryear, open={(},close={)}}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{graphicx}
 \usepackage{multirow}
 \usepackage{longtable}
@@ -25,6 +25,7 @@
 \usepackage{makecell}
 \usepackage{lineno}
 \usepackage{fancyhdr}
+\usepackage[title]{appendix}
 \graphicspath{{figs/}}
 \renewcommand{\arraystretch}{1.2}
 \renewcommand{\d}{\mathrm{d}}
@@ -89,7 +90,7 @@
 
 \maketitle
 
-\linenumbers
+%\linenumbers
 
 \input{tex/abstract}
 
@@ -97,12 +98,21 @@
 %\listoffigures
 
 \input{tex/introduction}
-\input{tex/methods}
 \input{tex/results}
 \input{tex/discussion}
 \input{tex/future}
-
 \bibliography{../exogeodynamics}
+
+
+\setcounter{equation}{0}
+\renewcommand{\theequation}{A\arabic{equation}}
+\setcounter{table}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+\begin{appendices}
+\input{tex/terminology}
+\input{tex/methods}
+\end{appendices}
+
 
 
 \end{document}

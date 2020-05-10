@@ -83,12 +83,10 @@ def bdy_thickness_beta(dT=None, d_m=None, Ra_crit=None, beta=None, g=None, Ra_rh
     """Thickness of thermal boundary layer """
     if beta is None:
         beta = 1/3
-    try:
-        if Ra_rh is None:
-            Ra_rh = alpha_m*rho_m*g*dT*(d_m)**3 / (kappa_m*eta_m)
-        return (d_m) * (Ra_crit/Ra_rh)**beta
-    except RuntimeWarning:
-        return (Ra_crit/ (alpha_m*rho_m*g*dT / (kappa_m*eta_m)))**(1/3)
+
+    if Ra_rh is None:
+        Ra_rh = alpha_m*rho_m*g*dT*(d_m)**3 / (kappa_m*eta_m)
+    return (d_m) * (Ra_crit/Ra_rh)**beta
 
 def inv_bdy_thickness(dT=None, Ra_crit=None, g=None, kappa_m=None, eta_m=None, alpha_m=None, rho_m=None, 
                   **kwargs):

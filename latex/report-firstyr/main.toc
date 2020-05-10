@@ -1,35 +1,32 @@
 \contentsline {section}{\numberline {1}Background}{2}{section.1}
-\contentsline {subsection}{\numberline {1.1}Terrestrial planet interiors through time}{3}{subsection.1.1}
-\contentsline {subsection}{\numberline {1.2}Parameterized convection models}{4}{subsection.1.2}
-\contentsline {subsubsection}{\numberline {1.2.1}Our understanding of mantle rheology}{4}{subsubsection.1.2.1}
-\contentsline {subsubsection}{\numberline {1.2.2}Self-regulation of viscosity}{5}{subsubsection.1.2.2}
-\contentsline {subsection}{\numberline {1.3}Regimes of mantle convection}{5}{subsection.1.3}
-\contentsline {subsection}{\numberline {1.4}Stress and topography}{6}{subsection.1.4}
-\contentsline {subsubsection}{\numberline {1.4.1}Mechanisms of topographic support}{7}{subsubsection.1.4.1}
-\contentsline {subsubsection}{\numberline {1.4.2}Dynamic topography forward models}{7}{subsubsection.1.4.2}
-\contentsline {subsubsection}{\numberline {1.4.3}Dynamic topography in the solar system}{10}{subsubsection.1.4.3}
-\contentsline {subsection}{\numberline {1.5}Scaling up to super-}{11}{subsection.1.5}
-\contentsline {subsubsection}{\numberline {1.5.1}A note on terminology}{12}{subsubsection.1.5.1}
-\contentsline {subsubsection}{\numberline {1.5.2}Observational constraints}{12}{subsubsection.1.5.2}
-\contentsline {subsubsection}{\numberline {1.5.3}Interior dynamics}{12}{subsubsection.1.5.3}
-\contentsline {subsection}{\numberline {1.6}Topography in a planetary system}{13}{subsection.1.6}
-\contentsline {subsection}{\numberline {1.7}Statement of the problem}{13}{subsection.1.7}
-\contentsline {section}{\numberline {2}Model description}{14}{section.2}
-\contentsline {subsection}{\numberline {2.1}Temperature-dependent viscosity, stagnant lid convection}{15}{subsection.2.1}
-\contentsline {subsubsection}{\numberline {2.1.1}Heat fluxes}{15}{subsubsection.2.1.1}
-\contentsline {subsubsection}{\numberline {2.1.2}Temperatures and heat flow in the lid}{16}{subsubsection.2.1.2}
-\contentsline {subsubsection}{\numberline {2.1.3}Lid thickness}{16}{subsubsection.2.1.3}
-\contentsline {subsection}{\numberline {2.2}Height of dynamic topography}{16}{subsection.2.2}
-\contentsline {section}{\numberline {3}Preliminary results}{17}{section.3}
-\contentsline {subsection}{\numberline {3.1}Thermal evolution}{17}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Purely-dynamic topography for solar system analogues}{18}{subsection.3.2}
-\contentsline {subsubsection}{\numberline {3.2.1}Variation of dynamic topography with planet mass, age, and radiogenic abundance}{19}{subsubsection.3.2.1}
-\contentsline {section}{\numberline {4}Discussion}{20}{section.4}
-\contentsline {subsection}{\numberline {4.1}How does a planet's rheology govern its thermal history?}{20}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Implications for planetary systems science}{20}{subsection.4.2}
-\contentsline {subsection}{\numberline {4.3}Under what conditions is simple dynamic topography useful?}{22}{subsection.4.3}
-\contentsline {section}{\numberline {5}Future work}{22}{section.5}
-\contentsline {subsection}{\numberline {5.1}Importance of melting on thermal history}{23}{subsection.5.1}
-\contentsline {subsection}{\numberline {5.2}Plate flexure and lithospheric strength models}{23}{subsection.5.2}
-\contentsline {subsection}{\numberline {5.3}More exotic planets}{23}{subsection.5.3}
-\contentsline {subsection}{\numberline {5.4}Observables}{24}{subsection.5.4}
+\contentsline {subsection}{\numberline {1.1}Terrestrial planet interiors through time}{2}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Parameterized convection models}{3}{subsection.1.2}
+\contentsline {subsection}{\numberline {1.3}Regimes of mantle convection}{4}{subsection.1.3}
+\contentsline {subsection}{\numberline {1.4}Stress and topography}{4}{subsection.1.4}
+\contentsline {subsubsection}{\numberline {1.4.1}Mechanisms of topographic support}{5}{subsubsection.1.4.1}
+\contentsline {subsubsection}{\numberline {1.4.2}Dynamic topography forward models}{5}{subsubsection.1.4.2}
+\contentsline {subsubsection}{\numberline {1.4.3}Dynamic topography in the solar system}{8}{subsubsection.1.4.3}
+\contentsline {subsection}{\numberline {1.5}Topography in a systems science context}{8}{subsection.1.5}
+\contentsline {subsection}{\numberline {1.6}Statement of the problem}{10}{subsection.1.6}
+\contentsline {section}{\numberline {2}Preliminary results}{10}{section.2}
+\contentsline {subsection}{\numberline {2.1}Thermal evolution}{10}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Purely-dynamic topography for solar system analogues}{12}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Dynamic topography as a function of planet age, mass, and radiogenic element abundance}{13}{subsection.2.3}
+\contentsline {section}{\numberline {3}Discussion}{14}{section.3}
+\contentsline {subsection}{\numberline {3.1}How does a planet's rheology govern its thermal history?}{14}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Implications for planetary systems science}{16}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Under what conditions is parameterized dynamic topography useful?}{16}{subsection.3.3}
+\contentsline {section}{\numberline {4}Future work}{17}{section.4}
+\contentsline {subsection}{\numberline {4.1}Importance of melting on thermal history}{17}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Plate flexure and lithospheric strength models}{17}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Convection dynamics at higher massses}{17}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Bulk compositions}{18}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}Model validation}{18}{subsection.4.5}
+\contentsline {section}{\numberline {A}A note on terminology}{27}{Appendix.1.A}
+\contentsline {section}{\numberline {B}Model description}{28}{Appendix.1.B}
+\contentsline {subsection}{\numberline {B.1}Temperature-dependent viscosity, stagnant lid convection}{28}{subsection.1.B.1}
+\contentsline {subsubsection}{\numberline {B.1.1}Mantle rheology}{28}{subsubsection.1.B.1.1}
+\contentsline {subsubsection}{\numberline {B.1.2}Heat fluxes}{29}{subsubsection.1.B.1.2}
+\contentsline {subsubsection}{\numberline {B.1.3}Temperatures and heat flow in the lid}{29}{subsubsection.1.B.1.3}
+\contentsline {subsubsection}{\numberline {B.1.4}Lid thickness}{30}{subsubsection.1.B.1.4}
+\contentsline {subsection}{\numberline {B.2}Height of dynamic topography}{30}{subsection.1.B.2}
