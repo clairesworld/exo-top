@@ -39,9 +39,19 @@ def Ra(nu=None, eta=None, kappa=None, alpha=None, rho=None, g=None, deltaT=None,
     elif (nu is not None) and (eta is None):
         return alpha*deltaT*l**3*g/(kappa*nu)
     
-def Ra_F(nu=None, eta=None, kappa=None, H=None, alpha=None, k=None, rho=None, g=None, l=None, F_b=None): # basal heating Ra
+def Ra_F(pl=None, nu=None, eta=None, kappa=None, H=None, alpha=None, k=None, rho=None, g=None, l=None, F_b=None): # basal heating Ra
     # H is volumetric heating, F_b is bottom heating in W/m^2
-    if eta is None:
+    if pl is not None:
+        eta = pl.eta_m
+        kappa = pl.kappa_m
+        H = 0#pl.h_rad*pl.rho_m
+        alpha = pl.alpha_m
+        k = pl.k_m
+        rho = pl.rho_m
+        g = pl.g_sfc
+        l = pl.d_m
+        F_b = pl.q_ubl
+    elif eta is None:
         eta = nu*rho
     return rho*g*alpha*(F_b + H*l)*l**4 / (k*kappa*eta)
 
@@ -204,6 +214,7 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     
     pl.R_l = pl.R_p - pl.D_l
     pl.T_l = T_lid(T_m=pl.T_m, a_rh=pl.a_rh, Ea=pl.Ea)
+    pl.T_rh = pl.a_rh*(p.R_b*pl.T_m**2/pl.Ea)
     V_lid = 4/3*np.pi*(pl.R_p**3 - pl.R_l**3)
     pl.M_lid = V_lid*pl.rho_m # should use another density?
     pl.M_conv = pl.M_m - pl.M_lid

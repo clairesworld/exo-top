@@ -89,6 +89,9 @@ class TerrestrialPlanet():
             self.M_c = self.M_p*self.CMF # M_p - M_m
             self.R_c = self.R_p*self.CRF
             #R_c = struct.radius_seager(M_p*CMF, CMF=0, m1=4.34*M_E, r1=2.23*R_E) # EoS for iron... is this consistent?
+
+#             print('d_m with 150-km lid', (self.R_p - 150e3 - self.R_c)*1e-3, 'km')
+        
         else:
             self.R_c = self.R_c0
             self.CRF = self.R_c0/self.R_p0
