@@ -93,7 +93,7 @@ def pd_top(case, t1, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/',
 #     print('timesteps using:', np.array(t_used).min(), 'to', np.array(t_used).max())
     return np.percentile(peak_list, qs), np.percentile(rms_list, qs), fig, ax
 
-def plot_evol(case, i, fig=None, ax=None, savefig=True, fig_path='figs/', fend='_f.png',
+def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,
               setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path='/raid1/cmg76/aspect/figs/'):
     if not setxlabel:
@@ -117,7 +117,7 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fig_path='figs/', fend='
         fig.savefig(fig_path+case+fend)
     return fig, ax
 
-def case_subplots(cases, fig_path='figs/', labels=None, labelsize=16, labelpad=5, t1=None, save=True,
+def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True,
                   fig_path='/raid1/cmg76/aspect/figs/'):
     # rows are cases, columns are v_rms, q, hist
     ncases = len(cases)

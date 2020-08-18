@@ -1,6 +1,7 @@
 import sys
-sys.path.insert(0,'~/Works/exo-top/')
+sys.path.insert(0,'/home/cmg76/Works/exo-top/')
 import numpy as np
+import exotop
 from exotop import aspect_scalings as sc
 
 # set times at which quasi steady-state begins

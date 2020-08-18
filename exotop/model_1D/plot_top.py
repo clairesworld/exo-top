@@ -1,13 +1,11 @@
 """ mostly plotting results for rocky planet evolution + topographies """
 
 import numpy as np
-# import parameters as p
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors
 from collections.abc import Iterable
 import collections
 import six
-from scipy import interpolate
 import pandas as pd
 from IPython.display import display, Math
 import random as rand
