@@ -1,4 +1,4 @@
-\begin{thebibliography}{148}
+\begin{thebibliography}{155}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -45,8 +45,20 @@ Armann, M. and Tackley, P.~J.
   2012.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/2012JE004231}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2012JE004231.
+
+\bibitem[Bangerth et~al.(2018)Bangerth, Dannberg, Gassm{\"o}ller, and
+  Heister]{Bangerth2018}
+Bangerth, W., Dannberg, J., Gassm{\"o}ller, R., and Heister, T.
+\newblock {{ASPECT}} v2.0.1 [software], 2018.
+
+\bibitem[Bean et~al.(2017)Bean, Abbot, and Kempton]{Bean2017}
+Bean, J.~L., Abbot, D.~S., and Kempton, E. M.-R.
+\newblock A {{Statistical Comparative Planetology Approach}} to the {{Hunt}}
+  for {{Habitable Exoplanets}} and {{Life Beyond}} the {{Solar System}}.
+\newblock \emph{The Astrophysical Journal Letters}, 841:\penalty0 L24, June
+  2017.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.3847/2041-8213/aa738a}.
 
 \bibitem[Bene{\v s}ov{\'a} and {\v C}{\'i}{\v z}kov{\'a}(2012)]{Benesova2012}
 Bene{\v s}ov{\'a}, N. and {\v C}{\'i}{\v z}kov{\'a}, H.
@@ -110,6 +122,13 @@ Bunge, H.-P., Richards, M.~A., and Baumgardner, J.~R.
 \newblock ISSN 1476-4687.
 \newblock \doi{10.1038/379436a0}.
 
+\bibitem[Checlair et~al.(2020)Checlair, Feng, Webber, Bean, Robinson, and
+  Abbot]{Checlair2020}
+Checlair, J.~H., Feng, Y., Webber, R.~J., Bean, J.~L., Robinson, T.~D., and
+  Abbot, D.~S.
+\newblock Testing the {{Habitable Zone}}.
+\newblock 235:\penalty0 354.01, January 2020.
+
 \bibitem[Choblet and Parmentier(2009)]{Choblet2009}
 Choblet, G. and Parmentier, E.~M.
 \newblock Thermal convection heated both volumetrically and from below:
@@ -127,8 +146,15 @@ Christensen, U.
   77\penalty0 (2):\penalty0 343--384, 1984.
 \newblock ISSN 1365-246X.
 \newblock \doi{10.1111/j.1365-246X.1984.tb01939.x}.
-\newblock \_eprint:
-  https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1365-246X.1984.tb01939.x.
+
+\bibitem[Cowan and Abbot(2014)]{Cowan2014}
+Cowan, N.~B. and Abbot, D.~S.
+\newblock {{WATER CYCLING BETWEEN OCEAN AND MANTLE}}: {{SUPER}}-{{EARTHS NEED
+  NOT BE WATERWORLDS}}.
+\newblock \emph{The Astrophysical Journal}, 781\penalty0 (1):\penalty0 27,
+  January 2014.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.1088/0004-637X/781/1/27}.
 
 \bibitem[Cowan and Fujii(2018)]{Cowan2018}
 Cowan, N.~B. and Fujii, Y.
@@ -153,8 +179,6 @@ Davies, G.~F.
   (B5):\penalty0 2517--2530, 1980.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/JB085iB05p02517}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/JB085iB05p02517.
 
 \bibitem[Dorn et~al.(2017{\natexlab{a}})Dorn, Venturini, Khan, Heng, Alibert,
   Helled, Rivoldini, and Benz]{Dorn2017}
@@ -227,6 +251,15 @@ Dumoulin, C., {\v C}adek, O., and Choblet, G.
 \newblock ISSN 0956-540X.
 \newblock \doi{10.1093/gji/ggt363}.
 
+\bibitem[{Elkins-Tanton}(2008)]{Elkins-Tanton2008}
+{Elkins-Tanton}, L.~T.
+\newblock Linked magma ocean solidification and atmospheric growth for
+  {{Earth}} and {{Mars}}.
+\newblock \emph{Earth and Planetary Science Letters}, 271\penalty0
+  (1):\penalty0 181--191, July 2008.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/j.epsl.2008.03.062}.
+
 \bibitem[Farr et~al.(2018)Farr, Farr, Cowan, Haggard, and Robinson]{Farr2018}
 Farr, B., Farr, W.~M., Cowan, N.~B., Haggard, H.~M., and Robinson, T.
 \newblock Exocartographer: {{A Bayesian Framework}} for {{Mapping Exoplanets}}
@@ -270,16 +303,6 @@ Fowler, A.~C.
   189--219, 1985.
 \newblock ISSN 1467-9590.
 \newblock \doi{10.1002/sapm1985723189}.
-\newblock \_eprint:
-  https://onlinelibrary.wiley.com/doi/pdf/10.1002/sapm1985723189.
-
-\bibitem[Frank et~al.(2014)Frank, Meyer, and Mojzsis]{Frank2014}
-Frank, E.~A., Meyer, B.~S., and Mojzsis, S.~J.
-\newblock A radiogenic heating evolution model for cosmochemically
-  {{Earth}}-like exoplanets.
-\newblock \emph{Icarus}, 243:\penalty0 274--286, November 2014.
-\newblock ISSN 0019-1035.
-\newblock \doi{10.1016/j.icarus.2014.08.031}.
 
 \bibitem[Gaidos et~al.(2010)Gaidos, Conrad, Manga, and Hernlund]{Gaidos2010}
 Gaidos, E., Conrad, C.~P., Manga, M., and Hernlund, J.
@@ -308,6 +331,13 @@ Golle, O., Dumoulin, C., Choblet, G., and Cadek, O.
 \newblock ISSN 0956-540X.
 \newblock \doi{10.1111/j.1365-246X.2012.05364.x}.
 
+\bibitem[Graham and Pierrehumbert(2020)]{Graham2020}
+Graham, R.~J. and Pierrehumbert, R.~T.
+\newblock Thermodynamic and {{Energetic Limits}} on {{Continental Silicate
+  Weathering Strongly Impact}} the {{Climate}} and {{Habitability}} of {{Wet}},
+  {{Rocky Worlds}}.
+\newblock \emph{arXiv e-prints}, 2004:\penalty0 arXiv:2004.14058, April 2020.
+
 \bibitem[Grimm and Phillips(1991)]{Grimm1991}
 Grimm, R.~E. and Phillips, R.~J.
 \newblock Gravity anomalies, compensation mechanisms, and the geodynamics of
@@ -316,8 +346,6 @@ Grimm, R.~E. and Phillips, R.~J.
   (B5):\penalty0 8305--8324, 1991.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/91JB00055}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/91JB00055.
 
 \bibitem[Grimm and Phillips(1992)]{Grimm1992}
 Grimm, R.~E. and Phillips, R.~J.
@@ -327,8 +355,6 @@ Grimm, R.~E. and Phillips, R.~J.
   (E10):\penalty0 16035--16054, 1992.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/92JE01500}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/92JE01500.
 
 \bibitem[Guimond and Cowan(2018)]{Guimond2018}
 Guimond, C.~M. and Cowan, N.~B.
@@ -465,8 +491,6 @@ Kiefer, W.~S. and Hager, B.~H.
   (E4):\penalty0 20947--20966, 1991.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/91JE02221}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/91JE02221.
 
 \bibitem[Kiefer and Hager(1992)]{Kiefer1992}
 Kiefer, W.~S. and Hager, B.~H.
@@ -493,8 +517,6 @@ Kiefer, W.~S., Richards, M.~A., Hager, B.~H., and Bills, B.~G.
   14--17, 1986.
 \newblock ISSN 1944-8007.
 \newblock \doi{10.1029/GL013i001p00014}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/GL013i001p00014.
 
 \bibitem[Kite et~al.(2009)Kite, Manga, and Gaidos]{Kite2009}
 Kite, E.~S., Manga, M., and Gaidos, E.
@@ -629,8 +651,6 @@ McKenzie, D.
   48\penalty0 (2):\penalty0 211--238, 1977.
 \newblock ISSN 1365-246X.
 \newblock \doi{10.1111/j.1365-246X.1977.tb01297.x}.
-\newblock \_eprint:
-  https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1365-246X.1977.tb01297.x.
 
 \bibitem[McKenzie(1994)]{McKenzie1994}
 McKenzie, D.
@@ -665,8 +685,6 @@ Miyagoshi, T., Kameyama, M., and Ogawa, M.
   (7):\penalty0 1267--1278, 2015.
 \newblock ISSN 2169-9100.
 \newblock \doi{10.1002/2015JE004793}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1002/2015JE004793.
 
 \bibitem[Miyazaki and Korenaga(2020)]{Miyazaki2020}
 Miyazaki, Y. and Korenaga, J.
@@ -690,8 +708,6 @@ Moore, W.~B. and Schubert, G.
   429--432, 1995.
 \newblock ISSN 1944-8007.
 \newblock \doi{10.1029/94GL02055}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/94GL02055.
 
 \bibitem[Moore and Schubert(1997)]{Moore1997}
 Moore, W.~B. and Schubert, G.
@@ -729,8 +745,6 @@ Moresi, L. and Parsons, B.
   (E10):\penalty0 21155--21171, 1995.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/95JE01622}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/95JE01622.
 
 \bibitem[Morris and Canright(1984)]{Morris1984}
 Morris, S. and Canright, D.
@@ -808,8 +822,6 @@ Orth, C.~P. and Solomatov, V.~S.
 \newblock \emph{Geochemistry, Geophysics, Geosystems}, 12\penalty0 (7), 2011.
 \newblock ISSN 1525-2027.
 \newblock \doi{10.1029/2011GC003582}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2011GC003582.
 
 \bibitem[Parsons and Daly(1983)]{Parsons1983}
 Parsons, B. and Daly, S.
@@ -853,6 +865,15 @@ Phillips, R.~J. and Hansen, V.~L.
 \newblock ISSN 0036-8075, 1095-9203.
 \newblock \doi{10.1126/science.279.5356.1492}.
 
+\bibitem[Rappaport et~al.(1999)Rappaport, Konopliv, Kucinskas, and
+  Ford]{Rappaport1999}
+Rappaport, N.~J., Konopliv, A.~S., Kucinskas, A.~B., and Ford, P.~G.
+\newblock An {{Improved}} 360 {{Degree}} and {{Order Model}} of {{Venus
+  Topography}}.
+\newblock \emph{Icarus}, 139\penalty0 (1):\penalty0 19--31, May 1999.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1006/icar.1999.6081}.
+
 \bibitem[Reese and Solomatov(2006)]{Reese2006}
 Reese, C.~C. and Solomatov, V.~S.
 \newblock Fluid dynamics of local martian magma oceans.
@@ -887,7 +908,7 @@ Rogers, L.~A. and Seager, S.
 
 \bibitem[Rogers(2015)]{Rogers2015}
 Rogers, L.~A.
-\newblock {{MOST1}}.6 {{EARTH}}-{{RADIUS PLANETS ARE NOT ROCKY}}.
+\newblock Most 1.6 {{Earth}}-radius planets are not rocky.
 \newblock \emph{The Astrophysical Journal}, 801\penalty0 (1):\penalty0 41,
   March 2015.
 \newblock ISSN 0004-637X.
@@ -912,8 +933,6 @@ Schubert, G., Stevenson, D., and Cassen, P.
   (B5):\penalty0 2531--2538, 1980.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/JB085iB05p02531}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/JB085iB05p02531.
 
 \bibitem[Seager et~al.(2007)Seager, Kuchner, {Hier-Majumder}, and
   Militzer]{Seager2007}
@@ -975,8 +994,6 @@ Smrekar, S.~E. and Parmentier, E.~M.
   (B3):\penalty0 5397--5410, 1996.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/95JB02877}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/95JB02877.
 
 \bibitem[Smrekar and Phillips(1991)]{Smrekar1991}
 Smrekar, S.~E. and Phillips, R.~J.
@@ -1019,6 +1036,15 @@ Solomatov, V.~S. and Moresi, L.-N.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/95JE03361}.
 
+\bibitem[Solomatov and Moresi(2000)]{Solomatov2000}
+Solomatov, V.~S. and Moresi, L.-N.
+\newblock Scaling of time-dependent stagnant lid convection: {{Application}} to
+  small-scale convection on {{Earth}} and other terrestrial planets.
+\newblock \emph{Journal of Geophysical Research: Solid Earth}, 105\penalty0
+  (B9):\penalty0 21795--21817, 2000.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/2000JB900197}.
+
 \bibitem[Stamenkovi{\'c} et~al.(2012)Stamenkovi{\'c}, Noack, Breuer, and
   Spohn]{Stamenkovic2012}
 Stamenkovi{\'c}, V., Noack, L., Breuer, D., and Spohn, T.
@@ -1031,7 +1057,7 @@ Stamenkovi{\'c}, V., Noack, L., Breuer, D., and Spohn, T.
 \bibitem[Stevenson(2003)]{Stevenson2003}
 Stevenson, D.~J.
 \newblock Les styles de convection du manteau et leur influence sur
-  l'{\'e}volution des plan{\`e}tes.
+  l'\'evolution des plan\`etes.
 \newblock \emph{Comptes Rendus Geoscience}, 335:\penalty0 99--111, January
   2003.
 \newblock ISSN 1631-0713.
@@ -1129,8 +1155,8 @@ Unterborn, C.~T., Johnson, J.~A., and Panero, W.~R.
 
 \bibitem[Urey(1955)]{Urey1955}
 Urey, H.~C.
-\newblock {{THE COSMIC ABUNDANCES OF POTASSIUM}}, {{URANIUM}}, {{AND THORIUM
-  AND THE HEAT BALANCES OF THE EARTH}}, {{THE MOON}}, {{AND MARS}}*.
+\newblock The cosmic abundances of potassium, uranium, and thorium and the heat
+  balances of the {{Earth}}, the {{Moon}}, and {{Mars}}.
 \newblock \emph{Proceedings of the National Academy of Sciences of the United
   States of America}, 41\penalty0 (3):\penalty0 127--144, March 1955.
 \newblock ISSN 0027-8424.
@@ -1188,8 +1214,6 @@ Vezolainen, A.~V., Solomatov, V.~S., Basilevsky, A.~T., and Head, J.~W.
   2004.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/2004JE002259}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2004JE002259.
 
 \bibitem[Wagner et~al.(2012)Wagner, Tosi, Sohl, Rauer, and Spohn]{Wagner2012}
 Wagner, F.~W., Tosi, N., Sohl, F., Rauer, H., and Spohn, T.
@@ -1207,8 +1231,6 @@ Walker, J. C.~G., Hays, P.~B., and Kasting, J.~F.
   (C10):\penalty0 9776--9782, 1981.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/JC086iC10p09776}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/JC086iC10p09776.
 
 \bibitem[Watts(2001)]{Watts2001}
 Watts, A.~B.
@@ -1234,8 +1256,6 @@ Wieczorek, M.~A. and Zuber, M.~T.
   2004.
 \newblock ISSN 2156-2202.
 \newblock \doi{10.1029/2003JE002153}.
-\newblock \_eprint:
-  https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2003JE002153.
 
 \bibitem[Wordsworth(2016)]{Wordsworth2016}
 Wordsworth, R.~D.

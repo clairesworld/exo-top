@@ -3,46 +3,49 @@ Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: main.aux
 The style file: bibstyle.bst
 Database file #1: ../exogeodynamics.bib
+Warning--entry type for "Bangerth2018" isn't style-file defined
+--line 215 of file ../exogeodynamics.bib
+Warning--empty journal in Checlair2020
 Warning--empty journal in James2014
-You've used 148 entries,
+You've used 155 entries,
             2773 wiz_defined-function locations,
-            1745 strings with 37037 characters,
-and the built_in function-call counts, 76544 in all, are:
-= -- 7360
-> -- 4418
-< -- 79
-+ -- 1489
-- -- 1339
-* -- 6881
-:= -- 12060
-add.period$ -- 734
-call.type$ -- 148
-change.case$ -- 889
-chr.to.int$ -- 146
-cite$ -- 297
-duplicate$ -- 3067
-empty$ -- 5758
-format.name$ -- 1593
-if$ -- 15823
+            1775 strings with 37015 characters,
+and the built_in function-call counts, 79865 in all, are:
+= -- 7640
+> -- 4626
+< -- 83
++ -- 1559
+- -- 1402
+* -- 7192
+:= -- 12566
+add.period$ -- 744
+call.type$ -- 155
+change.case$ -- 931
+chr.to.int$ -- 153
+cite$ -- 312
+duplicate$ -- 3205
+empty$ -- 6032
+format.name$ -- 1669
+if$ -- 16508
 int.to.chr$ -- 3
 int.to.str$ -- 1
-missing$ -- 149
-newline$ -- 1036
-num.names$ -- 594
-pop$ -- 1250
+missing$ -- 155
+newline$ -- 1060
+num.names$ -- 622
+pop$ -- 1339
 preamble$ -- 1
-purify$ -- 742
+purify$ -- 777
 quote$ -- 0
-skip$ -- 2268
+skip$ -- 2375
 stack$ -- 0
-substring$ -- 3299
-swap$ -- 305
+substring$ -- 3450
+swap$ -- 316
 text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 1623
-warning$ -- 1
-while$ -- 685
+type$ -- 1700
+warning$ -- 2
+while$ -- 714
 width$ -- 0
-write$ -- 2502
-(There was 1 warning)
+write$ -- 2569
+(There were 3 warnings)
