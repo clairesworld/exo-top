@@ -215,6 +215,7 @@ def plot_h_Ra(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/asp
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
         fig.savefig(fig_path+fname, bbox_inches='tight')
+    return fig, ax
 
 def plot_h_eta(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', picklefrom=None, pickleto=None,
                save=True, fname='h_eta.png', plotpd=True, sigma=2, labelsize=16,
@@ -253,3 +254,4 @@ def plot_h_eta(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/as
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
         fig.savefig(fig_path+fname, bbox_inches='tight')
+    return fig, ax
