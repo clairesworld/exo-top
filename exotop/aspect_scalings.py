@@ -33,6 +33,25 @@ def read_evol(case, i, path='model-output/', skiprows=None):
 #     print(df)
     return np.array(df.iloc[:, 1]), np.array(df.iloc[:, i-1]), len(df.index)
 
+def top_profile(case, savefig=True, fig_path='/raid1/cmg76/aspect/figs/', path='model-output/'):
+    time, y, nsteps = read_evol(case, i=2, path=path)
+    snap = nsteps - 2 # honestly not sure why it's -2 but seems to work haha
+    x, h = read_topo_stats(case, snap)
+    # normalize to 0 mean
+    h_norm = trapznorm(h)
+    fig = plt.figure()
+    plt.plot(x, h_norm)
+    plt.xlabel('x')
+    plt.ylabel('dynamic topography')
+    plt.title(case)
+    print('mean:',trapzmean(h_norm))
+    print('max:', np.max(h_norm))
+    print('min:', np.min(h_norm))
+    if savefig:
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)    
+        fig.savefig(fig_path+case+'_h_'+'{:05}'.format(snap)+'.png')
+    
 def pd_quasiss(case, i, t1, path='model-output/'):
     time, y, nsteps = read_evol(case, i, path=path)
     x, h = read_topo_stats(case, nsteps-2)
@@ -45,39 +64,53 @@ def pd_quasiss(case, i, t1, path='model-output/'):
     plt.gca().hist(y[i_time])
     
 def pd_top(case, t1, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', sigma=2, plot=True, fig=None, 
-           ax=None,savefig=True,settitle=True, setxlabel=True, legend=True, labelsize=16):
+           ax=None,savefig=True,settitle=True, setxlabel=True, legend=True, labelsize=16, pickleto=None, picklefrom=None,
+           c_peak='xkcd:forest green', c_rms='xkcd:periwinkle'):
     if sigma==2:
         qs = [2.5, 50, 97.5]
     elif sigma==1:
-        qs = [16, 50, 84]
-    time, v_rms, nsteps = read_evol(case, i=11, path=path)
-    # what is the probability distribution of i from t1 to end?
-    i_time = np.nonzero(time > t1)
-#     print('i_time', i_time)
-    rms_list = []
-    peak_list = []
-    t_used = []
-    for ii in i_time[0]:
+        qs = [16, 50, 84]    
+
+
+    if (picklefrom is not None) and (os.path.exists(fig_path+'data/'+picklefrom)):
         try:
-            x, h = read_topo_stats(case, ii)
-            h_norm = trapznorm(h)
-            peak, rms = peak_and_rms(h_norm)
-            rms_list.append(rms)
-            peak_list.append(peak)
-            t_used.append(ii)
-        except FileNotFoundError:
-#             print('D.T. file', ii, 'not found')
-            pass
+            peak_list, rms_list = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ))
+        except ValueError:
+            peak_list, rms_list = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ), protocol=2)
+    
+    else:    
+        time, v_rms, nsteps = read_evol(case, i=11, path=path)
+        # what is the probability distribution of i from t1 to end?
+        i_time = np.nonzero(time > t1)
+    #     print('i_time', i_time)
+        rms_list = []
+        peak_list = []
+        t_used = []
+        for ii in i_time[0]:
+            try:
+                x, h = read_topo_stats(case, ii)
+                h_norm = trapznorm(h)
+                peak, rms = peak_and_rms(h_norm)
+                rms_list.append(rms)
+                peak_list.append(peak)
+                t_used.append(ii)
+            except FileNotFoundError:
+    #             print('D.T. file', ii, 'not found')
+                pass
+    
+    if pickleto is not None:
+        pkl.dump((peak_list, rms_list), open( fig_path+'data/'+pickleto, "wb" ))
+    
     if plot:
         if ax is None:
             fig = plt.figure()
             ax = plt.gca()
-        ax.hist(rms_list, color='r', histtype='step', label='rms')
-        ax.hist(peak_list, color='b', histtype='step', label='peak')
+        ax.hist(rms_list, color=c_rms, histtype='step', label='rms')
+        ax.hist(peak_list, color=c_peak, histtype='step', label='peak')
         ax.axvline(x=np.median(rms_list), color='k', ls='--', label='median')
         ax.axvline(x=np.median(peak_list), color='k', ls='--')
-        ax.axvline(x=np.mean(rms_list), color='k', ls='-', lw=0.5, label='mean')
-        ax.axvline(x=np.mean(peak_list), color='k', ls='-', lw=0.5)
+        ax.axvline(x=np.mean(rms_list), color='k', ls='-', lw=1, label='mean')
+        ax.axvline(x=np.mean(peak_list), color='k', ls='-', lw=1)
         ax.yaxis.set_ticks([])
         if legend:
             ax.legend(frameon=False)
@@ -104,7 +137,8 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
         fig = plt.figure()
         ax = plt.gca()
     time, y, nsteps = read_evol(case, i=i)
-    ax.plot(time, y*yscale, c=c, label=label)
+    ax.plot(time, y*yscale, c=c, lw=0.5, label=label)
+    ax.set_xlim(0,ax.get_xlim()[1])
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=labelpad)
     if settitle:
@@ -117,13 +151,13 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
         fig.savefig(fig_path+case+fend)
     return fig, ax
 
-def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True,
-                  fig_path='/raid1/cmg76/aspect/figs/'):
+def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0,0.065), fname='cases.png',
+                  fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, dumppickle=False, suptitle=''):
     # rows are cases, columns are v_rms, q, hist
     ncases = len(cases)
     fig, axes = plt.subplots(ncases, 3, figsize=(15, ncases*2.5))
     for ii, case in enumerate(cases):
-        print('reading',case)
+        print('loading',case)
         if ii==ncases-1:
             setxlabel=True
         else:
@@ -142,7 +176,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                             labelsize=labelsize, labelpad=labelpad, legend=False)
         
         # Create a Rectangle patch to mark "transient" times
-        rect = patches.Rectangle((0,0), t1[ii], ax.get_ylim()[1] - ax.get_ylim()[0],
+        rect = patches.Rectangle((ax.get_xlim()[0],ax.get_ylim()[0]), t1[ii], ax.get_ylim()[1] - ax.get_ylim()[0],
                                  edgecolor='None',facecolor='k', alpha=0.2, zorder=0)
         ax.add_patch(rect)
         
@@ -161,95 +195,110 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                             labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend)
         
         # Create a Rectangle patch to mark "transient" times
-        rect = patches.Rectangle((0,0), t1[ii], ax.get_ylim()[1] - ax.get_ylim()[0],
+        rect = patches.Rectangle((ax.get_xlim()[0],ax.get_ylim()[0]), t1[ii], ax.get_ylim()[1] - ax.get_ylim()[0],
                                  edgecolor='None',facecolor='k', alpha=0.2, zorder=0)
         ax.add_patch(rect)
         
         ax = axes[ii, 2]
+        picklefile = case+'_pdtop.pkl'
+        if loadpickle:
+            picklefrom = picklefile
+        else:
+            picklefrom = None
+        if dumppickle:
+            pickleto = picklefile
+        else:
+            pickleto = None
         _, _, fig, ax = pd_top(case, t1[ii], path='model-output/', sigma=2, plot=True, fig=fig, ax=ax, 
                               savefig=False, settitle=False, setxlabel=setxlabel, legend=legend,
-                              labelsize=labelsize)
+                              labelsize=labelsize, pickleto=pickleto, picklefrom=picklefrom)
+        ax.set_xlim(dt_xlim[0], dt_xlim[1]) # for fair comparison
         
+    plt.suptitle(suptitle, fontsize=labelsize, y=1.02)
     fig.tight_layout()
-    if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path+'cases-Ra.png', bbox_inches='tight')
-    return fig, ax
-
-def plot_h_Ra(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', picklefrom=None, pickleto=None,
-              save=True, fname='h_Ra.png', plotpd=True, sigma=2, labelsize=16, 
-              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle'):
-    # Ra is list of strings, t1 is a list of numbers the same length
-    if t1 is None:
-        t1 = [0.005]*len(Ra)
-    if picklefrom is not None:
-        h_peak, h_rms = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ))
-    else:
-        h_peak = np.zeros((len(Ra), 3))
-        h_rms = np.zeros((len(Ra), 3))
-        for ii, r in enumerate(Ra):
-            case = 'Ra'+r+'-eta'+eta+'-wide'
-            print(case)
-            # assume time-dependent convection (if steady state then shouldn't matter)
-            # assuming quasi steady state from 0.005 but defo need to check
-            h_peak[ii,:], h_rms[ii,:], _, _ = pd_top(case, t1=t1[ii], path=path, plot=plotpd, sigma=sigma) 
-            # also plot probability distribution and velocity evolution to check steady state 
-    if pickleto is not None:
-        pkl.dump((h_peak, h_rms), open( fig_path+'data/'+pickleto, "wb" ))
-           
-    fig = plt.figure()
-    ax = plt.gca()
-#     ax.plot([float(s) for s in Ra], h_peak[:,1], label='peak')
-#     ax.plot([float(s) for s in Ra], h_rms[:,1], label='RMS')
-    ax.errorbar([float(s) for s in Ra], h_peak[:,1], yerr=[h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]], 
-                label='peak', fmt='-o', c=c_peak, alpha=0.9)
-    ax.errorbar([float(s) for s in Ra], h_rms[:,1], yerr=[h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]], 
-                label='rms', c=c_rms, alpha=0.9)
-    ax.legend(frameon=False)
-    ax.set_xscale('log')
-    ax.set_ylabel('dynamic topography', labelsize=labelsize)
-    ax.set_xlabel('Ra', labelsize=labelsize)
-    ax.set_title('$\Delta \eta = $'+eta, labelsize=labelsize)
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
         fig.savefig(fig_path+fname, bbox_inches='tight')
     return fig, ax
 
-def plot_h_eta(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', picklefrom=None, pickleto=None,
+def plot_h_Ra(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, dumppickle=False,
+              save=True, fname='h_Ra.png', plotpd=True, sigma=2, labelsize=16, 
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle'):
+    # Ra is list of strings, t1 is a list of numbers the same length
+    if t1 is None:
+        t1 = [0.005]*len(Ra)
+    else:
+        h_peak = np.zeros((len(Ra), 3))
+        h_rms = np.zeros((len(Ra), 3))
+        for ii, r in enumerate(Ra):
+            case = 'Ra'+r+'-eta'+eta+'-wide'
+            picklefile = case+'_pdtop.pkl'
+            if loadpickle:
+                picklefrom = picklefile
+            else:
+                picklefrom = None
+            if dumppickle:
+                pickleto = picklefile
+            else:
+                pickleto = None
+            # assume time-dependent convection (if steady state then shouldn't matter)
+            h_peak[ii,:], h_rms[ii,:], _, _ = pd_top(case, t1=t1[ii], path=path, plot=plotpd, sigma=sigma,
+                                                     pickleto=pickleto, picklefrom=picklefrom) 
+    fig = plt.figure()
+    ax = plt.gca()
+#     ax.plot([float(s) for s in Ra], h_peak[:,1], label='peak')
+#     ax.plot([float(s) for s in Ra], h_rms[:,1], label='RMS')
+    ax.errorbar([float(s) for s in Ra], h_peak[:,1], yerr=[h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]], 
+                label='peak', fmt='-o', c=c_peak, alpha=0.9, capsize=5)
+    ax.errorbar([float(s) for s in Ra], h_rms[:,1], yerr=[h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]], 
+                label='rms', fmt='-o', c=c_rms, alpha=0.9, capsize=5)
+    ax.legend(frameon=False)
+    ax.set_xscale('log')
+    ax.set_ylabel('dynamic topography', fontsize=labelsize)
+    ax.set_xlabel('Ra', fontsize=labelsize)
+    ax.set_title('$\Delta \eta = $'+eta, fontsize=labelsize)
+    if save:
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
+        fig.savefig(fig_path+fname, bbox_inches='tight')
+    return fig, ax
+
+def plot_h_eta(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False,dumppickle=False,
                save=True, fname='h_eta.png', plotpd=True, sigma=2, labelsize=16,
                c_peak='xkcd:forest green', c_rms='xkcd:periwinkle'):
     # Ra is list of strings, t1 is a list of numbers the same length
     if t1 is None:
         t1 = [0.005]*len(Ra)
-    if picklefrom is not None:
-        h_peak, h_rms = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ))
     else:
         h_peak = np.zeros((len(Ra), 3))
         h_rms = np.zeros((len(Ra), 3))
         for jj, e in enumerate(eta):
-            print(Ra)
             case = 'Ra'+Ra+'-eta'+e+'-wide'
-            print(case)
+            picklefile = case+'_pdtop.pkl'
+            if loadpickle:
+                picklefrom = picklefile
+            else:
+                picklefrom = None
+            if dumppickle:
+                pickleto = picklefile
+            else:
+                pickleto = None
             # assume time-dependent convection (if steady state then shouldn't matter)
-            # assuming quasi steady state from 0.005 but defo need to check
-            h_peak[jj, :], h_rms[jj, :], _, _ = pd_top(case, t1=t1[jj], path=path, plot=plotpd, sigma=sigma) 
-            # also plot probability distribution and velocity evolution to check steady state 
-    if pickleto is not None:
-        pkl.dump((h_peak, h_rms), open( fig_path+'data/'+pickleto, "wb" ))
-           
+            h_peak[jj, :], h_rms[jj, :], _, _ = pd_top(case, t1=t1[jj], path=path, plot=plotpd, sigma=sigma,
+                                                       pickleto=pickleto, picklefrom=picklefrom) 
+
     fig = plt.figure()
     ax = plt.gca()
-    ax.errorbar([float(s) for s in Ra], h_peak[:,1], yerr=[h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]], 
-                label='peak', fmt='-o', c=c_peak, alpha=0.9)
-    ax.errorbar([float(s) for s in Ra], h_rms[:,1], yerr=[h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]], 
-                label='rms', c=c_rms, alpha=0.9)
+    ax.errorbar([float(s) for s in eta], h_peak[:,1], yerr=[h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]], 
+                label='peak', fmt='-o', c=c_peak, alpha=0.9, capsize=5)
+    ax.errorbar([float(s) for s in eta], h_rms[:,1], yerr=[h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]], 
+                label='rms', fmt='-o', c=c_rms, alpha=0.9, capsize=5)
     ax.legend(frameon=False)
     ax.set_xscale('log')
-    ax.set_ylabel('dynamic topography', labelsize=labelsize)
-    ax.set_xlabel('$\Delta \eta = $', labelsize=labelsize)
-    ax.set_title('Ra ='+Ra, labelsize=labelsize)
+    ax.set_ylabel('dynamic topography', fontsize=labelsize)
+    ax.set_xlabel('$\Delta \eta = $', fontsize=labelsize)
+    ax.set_title('Ra ='+Ra, fontsize=labelsize)
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
