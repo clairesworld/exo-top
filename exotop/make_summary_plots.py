@@ -13,7 +13,7 @@ fig, ax = sc.case_subplots(
                            t1=t1_Ra, loadpickle=True, dumppickle=True, fname='cases-Ra.png', suptitle='$\Delta \eta$=1e5')
 print('Ra subplots complete')
 
-fig, ax = sc.plot_h_Ra(Ra=['3e5', '1e6', '3e6', '1e7', '3e7', '1e8'], eta='1e5', t1=t1_Ra, sigma=2, 
+fig, ax = sc.plot_h_Ra(Ra=['1e6', '3e6', '1e7', '3e7', '1e8'], eta='1e5', t1=t1_Ra[1:], sigma=2, 
                        loadpickle=True, dumppickle=True,  plotpd=False)
 print('Ra scaling complete')
 
