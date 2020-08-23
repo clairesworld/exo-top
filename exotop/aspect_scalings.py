@@ -5,6 +5,9 @@ import matplotlib.patches as patches
 import pandas as pd
 import random as rand
 import pickle as pkl
+import collections
+import six
+from exotop import aspect_postprocessing2 as post # from exotop
 cwd = os.getcwd()
 
 def read_topo_stats(case, snap, path='model-output/'):
@@ -64,7 +67,7 @@ def pd_quasiss(case, i, t1, path='model-output/'):
     plt.gca().hist(y[i_time])
     
 def pd_top(case, t1, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', sigma=2, plot=True, fig=None, 
-           ax=None,savefig=True,settitle=True, setxlabel=True, legend=True, labelsize=16, pickleto=None, picklefrom=None,
+           ax=None, savefig=True, settitle=True, setxlabel=True, legend=True, labelsize=16, pickleto=None, picklefrom=None,
            c_peak='xkcd:forest green', c_rms='xkcd:periwinkle'):
     if sigma==2:
         qs = [2.5, 50, 97.5]
@@ -81,12 +84,12 @@ def pd_top(case, t1, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/',
     else:    
         time, v_rms, nsteps = read_evol(case, i=11, path=path)
         # what is the probability distribution of i from t1 to end?
-        i_time = np.nonzero(time > t1)
+        i_time = np.nonzero(time > t1)[0]
     #     print('i_time', i_time)
         rms_list = []
         peak_list = []
         t_used = []
-        for ii in i_time[0]:
+        for ii in i_time:
             try:
                 x, h = read_topo_stats(case, ii)
                 h_norm = trapznorm(h)
@@ -125,6 +128,66 @@ def pd_top(case, t1, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/',
 
 #     print('timesteps using:', np.array(t_used).min(), 'to', np.array(t_used).max())
     return np.percentile(peak_list, qs), np.percentile(rms_list, qs), fig, ax
+
+
+def pd_h_components(case, t1, data_path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', sigma=2,
+                    pickleto=None, picklefrom=None, plot=False, savefig=False, settitle=True, setxlabel=True, legend=True, 
+                    labelsize=16,  fig=None, ax=None):
+    # probability distribution of h' = f(x) for single case
+    # it's a bit annoying because you're switching methods...
+    if sigma==2:
+        qs = [2.5, 50, 97.5]
+    elif sigma==1:
+        qs = [16, 50, 84]    
+   
+
+    if (picklefrom is not None) and (os.path.exists(fig_path+'data/'+picklefrom)):
+        try:
+            x_list = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ))
+        except ValueError:
+            x_list = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ), protocol=2)
+    
+    else:    
+        dat = post.Aspect_Data(directory=data_path+'output-'+case+'/')
+        dat.read_statistics(verbose=False)
+        time = dat.stats_time
+        snaps = dat.read_stats_sol_files()
+        i_time = np.nonzero(time > t1)[0]
+        n_quasi = np.unique(snaps[i_time]) # find graphical snapshots within time range
+
+        x_list = []
+        for n in n_quasi:
+            n = int(n)
+            x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
+            x, y, z, T = dat.read_temperature(n, verbose=False)
+            x = dat.h_components(n, T=T, u=u, v=v)
+            x_list.append(x)
+        
+    if pickleto is not None:
+        pkl.dump(x_list, open( fig_path+'data/'+pickleto, "wb" ))
+    
+    if plot:
+        if ax is None:
+            fig = plt.figure()
+            ax = plt.gca()
+        ax.hist(x_list, color='k', histtype='step')
+        ax.axvline(x=np.median(x_list), color='k', ls='--', label='median')
+        ax.axvline(x=np.mean(x_list), color='k', ls='-', lw=1, label='mean')
+        ax.yaxis.set_ticks([])
+        if legend:
+            ax.legend(frameon=False)
+        if setxlabel:
+            ax.set_xlabel('$\Delta T_{rh} \delta_u$', fontsize=labelsize)
+        if settitle:
+            ax.set_title(case, fontsize=labelsize)
+        if savefig:
+            if not os.path.exists(fig_path):
+                os.makedirs(fig_path)    
+            fig.savefig(fig_path+case+'_x_hist.png')
+    
+    return np.percentile(x_list, qs), fig, ax
+    
+    
 
 def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,
@@ -222,18 +285,48 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
         fig.savefig(fig_path+fname, bbox_inches='tight')
     return fig, ax
 
-def plot_h_Ra(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, dumppickle=False,
-              save=True, fname='h_Ra.png', plotpd=True, sigma=2, labelsize=16, 
-              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle'):
-    # Ra is list of strings, t1 is a list of numbers the same length
-    if t1 is None:
-        t1 = [0.005]*len(Ra)
+def get_cases_list(Ra, eta):
+    # either Ra or eta is iterable
+    if (isinstance(Ra, collections.Iterable) and not isinstance(Ra, six.string_types)):
+        x_var = Ra
+        cases = ['Ra'+r+'-eta'+eta+'-wide' for r in Ra]
+    elif (isinstance(eta, collections.Iterable) and not isinstance(eta, six.string_types)):
+        x_var = eta
+        cases = ['Ra'+Ra+'-eta'+e+'-wide' for e in eta]
     else:
-        h_peak = np.zeros((len(Ra), 3))
-        h_rms = np.zeros((len(Ra), 3))
-        for ii, r in enumerate(Ra):
-            case = 'Ra'+r+'-eta'+eta+'-wide'
-            picklefile = case+'_pdtop.pkl'
+        raise Exception('Ra or eta must be iterable')
+    return cases, x_var
+    
+    
+
+def plot_h_vs(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, dumppickle=False,
+              save=True, fname='h.png', plotpd=True, sigma=2, labelsize=16, xlabel='', title='',
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', x_components=False, fit=False):
+    # Ra or eta is list of strings, t1 is a list of numbers the same length
+    cases, x_var = get_cases_list(Ra, eta)  
+    if t1 is None:
+        t1 = [0]*len(x_var)
+
+    h_peak = np.zeros((len(x_var), 3))
+    h_rms = np.zeros((len(x_var), 3))
+    x = np.zeros((len(x_var), 3)) 
+    for ii, case in enumerate(cases):
+        picklefile = case+'_pdtop.pkl'
+        if loadpickle:
+            picklefrom = picklefile
+        else:
+            picklefrom = None
+        if dumppickle:
+            pickleto = picklefile
+        else:
+            pickleto = None
+        # assume time-dependent convection (if steady state then shouldn't matter)
+        h_peak[ii,:], h_rms[ii,:], _, _ = pd_top(case, t1=t1[ii], path=path, plot=plotpd, sigma=sigma,
+                                                 pickleto=pickleto, picklefrom=picklefrom) 
+        
+        if x_components:
+            # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
+            picklefile = case+'_pdx.pkl'
             if loadpickle:
                 picklefrom = picklefile
             else:
@@ -243,64 +336,89 @@ def plot_h_Ra(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/asp
             else:
                 pickleto = None
             # assume time-dependent convection (if steady state then shouldn't matter)
-            h_peak[ii,:], h_rms[ii,:], _, _ = pd_top(case, t1=t1[ii], path=path, plot=plotpd, sigma=sigma,
-                                                     pickleto=pickleto, picklefrom=picklefrom) 
+            x[ii,:], _, _ = pd_h_components(case, t1=t1[ii], data_path=path, sigma=sigma, pickleto=pickleto, 
+                                            picklefrom=picklefrom, fig_path=fig_path)
+        else:
+            x[ii,1] = float(x_var[ii])
+
+    
+    yerr_peak = [h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]]
+    yerr_rms = [h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]]
+    if x_components:
+        x_err = [x[:,1]-x[:,0], x[:,2]-x[:,1]]
+    else:
+        x_err = None
+    
     fig = plt.figure()
     ax = plt.gca()
 #     ax.plot([float(s) for s in Ra], h_peak[:,1], label='peak')
 #     ax.plot([float(s) for s in Ra], h_rms[:,1], label='RMS')
-    ax.errorbar([float(s) for s in Ra], h_peak[:,1], yerr=[h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]], 
+    ax.errorbar(x[:,1], h_peak[:,1], yerr=yerr_peak, xerr=xerr,
                 label='peak', fmt='-o', c=c_peak, alpha=0.9, capsize=5)
-    ax.errorbar([float(s) for s in Ra], h_rms[:,1], yerr=[h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]], 
+    ax.errorbar(x[:,1], h_rms[:,1], yerr=yerr_rms, xerr=xerr,
                 label='rms', fmt='-o', c=c_rms, alpha=0.9, capsize=5)
     ax.legend(frameon=False)
     ax.set_xscale('log')
     ax.set_ylabel('dynamic topography', fontsize=labelsize)
-    ax.set_xlabel('Ra', fontsize=labelsize)
-    ax.set_title('$\Delta \eta = $'+eta, fontsize=labelsize)
+    ax.set_xlabel(xlabel, fontsize=labelsize)
+    ax.set_title(title, fontsize=labelsize)
+    
+    if fit:
+        m, b = fit_h(x_var, h_rms[:,1], h_err=None)
+        ax.plot(x[:,1], m*x[:,1] + b, c='xkcd:grey', alpha=0.5, ls='--')
+        print('C =', b)
+    
+    
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
         fig.savefig(fig_path+fname, bbox_inches='tight')
     return fig, ax
 
-def plot_h_eta(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False,dumppickle=False,
-               save=True, fname='h_eta.png', plotpd=True, sigma=2, labelsize=16,
-               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle'):
-    # Ra is list of strings, t1 is a list of numbers the same length
-    if t1 is None:
-        t1 = [0.005]*len(Ra)
-    else:
-        h_peak = np.zeros((len(Ra), 3))
-        h_rms = np.zeros((len(Ra), 3))
-        for jj, e in enumerate(eta):
-            case = 'Ra'+Ra+'-eta'+e+'-wide'
-            picklefile = case+'_pdtop.pkl'
-            if loadpickle:
-                picklefrom = picklefile
-            else:
-                picklefrom = None
-            if dumppickle:
-                pickleto = picklefile
-            else:
-                pickleto = None
-            # assume time-dependent convection (if steady state then shouldn't matter)
-            h_peak[jj, :], h_rms[jj, :], _, _ = pd_top(case, t1=t1[jj], path=path, plot=plotpd, sigma=sigma,
-                                                       pickleto=pickleto, picklefrom=picklefrom) 
 
-    fig = plt.figure()
-    ax = plt.gca()
-    ax.errorbar([float(s) for s in eta], h_peak[:,1], yerr=[h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]], 
-                label='peak', fmt='-o', c=c_peak, alpha=0.9, capsize=5)
-    ax.errorbar([float(s) for s in eta], h_rms[:,1], yerr=[h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]], 
-                label='rms', fmt='-o', c=c_rms, alpha=0.9, capsize=5)
-    ax.legend(frameon=False)
-    ax.set_xscale('log')
-    ax.set_ylabel('dynamic topography', fontsize=labelsize)
-    ax.set_xlabel('$\Delta \eta = $', fontsize=labelsize)
-    ax.set_title('Ra ='+Ra, fontsize=labelsize)
-    if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path+fname, bbox_inches='tight')
-    return fig, ax
+def fit_h(x, h, h_err):
+    p = np.polyfit(x, h, 1)
+    return p[1], p[0]
+    
+
+# def plot_h_eta(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, dumppickle=False,
+#                save=True, fname='h_eta.png', plotpd=True, sigma=2, labelsize=16,
+#                c_peak='xkcd:forest green', c_rms='xkcd:periwinkle'):
+#     # Ra is list of strings, t1 is a list of numbers the same length
+#     if t1 is None:
+#         t1 = [0.005]*len(Ra)
+#     else:
+#         h_peak = np.zeros((len(Ra), 3))
+#         h_rms = np.zeros((len(Ra), 3))
+#         for jj, e in enumerate(eta):
+#             case = 'Ra'+Ra+'-eta'+e+'-wide'
+#             picklefile = case+'_pdtop.pkl'
+#             if loadpickle:
+#                 picklefrom = picklefile
+#             else:
+#                 picklefrom = None
+#             if dumppickle:
+#                 pickleto = picklefile
+#             else:
+#                 pickleto = None
+#             # assume time-dependent convection (if steady state then shouldn't matter)
+#             h_peak[jj, :], h_rms[jj, :], _, _ = pd_top(case, t1=t1[jj], path=path, plot=plotpd, sigma=sigma,
+#                                                        pickleto=pickleto, picklefrom=picklefrom) 
+
+#     fig = plt.figure()
+#     ax = plt.gca()
+#     ax.errorbar([float(s) for s in eta], h_peak[:,1], yerr=[h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]], 
+#                 label='peak', fmt='-o', c=c_peak, alpha=0.9, capsize=5)
+#     ax.errorbar([float(s) for s in eta], h_rms[:,1], yerr=[h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]], 
+#                 label='rms', fmt='-o', c=c_rms, alpha=0.9, capsize=5)
+#     ax.legend(frameon=False)
+#     ax.set_xscale('log')
+#     ax.set_ylabel('dynamic topography', fontsize=labelsize)
+#     ax.set_xlabel('$\Delta \eta = $', fontsize=labelsize)
+#     ax.set_title('Ra ='+Ra, fontsize=labelsize)
+#     if save:
+#         if not os.path.exists(fig_path):
+#             os.makedirs(fig_path)
+#         fig.savefig(fig_path+fname, bbox_inches='tight')
+#     return fig, ax
+

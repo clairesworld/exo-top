@@ -79,7 +79,7 @@ def max_slope(x,y, which='max', plot=False, tol=1):
 def horizontal_mean(A, x):
     int_x = trapz(A, x = x, axis = 0)
     int_x = int_x / ((max(x)-min(x)))
-    return int_x
+    return int_x.T[0]
     
 
 class Aspect_Data():
@@ -104,7 +104,7 @@ class Aspect_Data():
         self.read_parameters()
         self.print_summary()
 
-    def read_mesh(self, n):
+    def read_mesh(self, n, verbose=True):
         if not(hasattr(self, 'snames')):
             self.get_solution_filenames()
         
@@ -115,7 +115,8 @@ class Aspect_Data():
         mesh_filename = self.directory+self.mnames[n]
         self.mesh_file= self.mnames[n]
         
-        print("Reading mesh from", mesh_filename)
+        if verbose:
+            print("Reading mesh from", mesh_filename)
         
         if self.format=='hdf5':
             mesh_file = h5py.File(mesh_filename,"r")
@@ -162,14 +163,15 @@ class Aspect_Data():
         
         return self.x, self.y, self.z
     
-    def get_solution_filenames(self):
+    def get_solution_filenames(self, verbose=True):
         if self.format == 'hdf5':
             root_filename = self.directory+"solution.xdmf"
             
         if self.format == 'vtu':
             root_filename = self.directory+"solution.pvd"
-            
-        print("Reading filelist from", root_filename)
+        
+        if verbose:
+            print("Reading filelist from", root_filename)
         
         snames=[]
         mnames=[]
@@ -208,7 +210,7 @@ class Aspect_Data():
         str_f = self.get_solution_filenames()[1][-1]
         return int(re.search(r'\d+', str_f).group(0))
         
-    def read_temperature(self, n):
+    def read_temperature(self, n, verbose=True):
         if not(hasattr(self, 'snames')):
             self.get_solution_filenames()
             
@@ -216,7 +218,8 @@ class Aspect_Data():
             self.read_mesh(n)
         
         filename = self.directory + self.snames[n]
-        print("Reading temperature from", filename)
+        if verbose:
+            print("Reading temperature from", filename)
         
         if self.format == 'hdf5':
             f = h5py.File(filename,"r")
@@ -237,7 +240,7 @@ class Aspect_Data():
 #         print('final shape', np.shape(T))
         return self.x, self.y, self.z, T
 
-    def read_velocity(self, n):
+    def read_velocity(self, n, verbose=True):
         if not(hasattr(self, 'snames')):
             self.get_solution_filenames()
             
@@ -245,7 +248,8 @@ class Aspect_Data():
             self.read_mesh(n)
         
         filename = self.directory + self.snames[n]
-        print("Reading velocity from", filename)
+        if verbose:
+            print("Reading velocity from", filename)
         
         if self.format == 'hdf5':
             f = h5py.File(filename,"r")
@@ -275,9 +279,10 @@ class Aspect_Data():
 
         return self.x, self.y, self.z, u, v, w
     
-    def read_statistics(self, skip_header=26):
+    def read_statistics(self, skip_header=26, verbose=True):
         filename = self.directory + "statistics"
-        print("Reading statistics from", filename)
+        if verbose:
+            print("Reading statistics from", filename)
         
         data = np.genfromtxt(filename, skip_header=skip_header)
         all_data = np.genfromtxt(filename, skip_header=26, dtype=None)
@@ -310,10 +315,11 @@ class Aspect_Data():
         i_n = np.where(sol_files == n)[0]
         return i_n[0]
         
-    def read_parameters(self):
+    def read_parameters(self, verbose=True):
         # parse the parameters file into a python dictionary
         filename = self.directory + "parameters.prm"
-        print("Reading parameters from", filename)
+        if verbose:
+            print("Reading parameters from", filename)
     
         parameter_file = open(filename).readlines()
 
@@ -377,6 +383,13 @@ class Aspect_Data():
         self.Ra = Ra
         return Ra
     
+    def Ra_1(self):
+        p = self.parameters
+        Ra_0 = p['Material model']['Nondimensional model']['Ra']
+        deltaeta = p['Material model']['Nondimensional model']['Viscosity temperature prefactor']
+        deltaeta = np.round(np.exp(deltaeta))
+        return Ra_0*deltaeta
+    
     def Nu(self, k=1):
         # Nusselt number with no internal heating
         p = self.parameters
@@ -391,31 +404,27 @@ class Aspect_Data():
     def ubl_thickness(self, n, T_l=None, T_i=None, k=1, **kwargs):
         # get upper boundary layer thickness
         if T_i is None:
-            T_i = internal_temperature(self, **kwargs)
+            T_i = self.internal_temperature(self, **kwargs)
         if T_l is None:
-            T_l = lid_base_temperature(self, **kwargs)
+            T_l = self.lid_base_temperature(self, **kwargs)
         ts = self.find_time_at_sol(n)
         F = self.stats_heatflux_top[ts]/self.parameters['Geometry model']['Box']['X extent']
-        print('dT =', T_i - T_l)
-        print('F =', F)
         return k*(T_i - T_l)/F
         
 
-    def lid_thickness(self, u, v, tol=1, cut=False, plot=True): # 2D only
+    def lid_thickness(self, u, v, tol=1, cut=False, plot=True, **kwargs): # 2D only
         x = self.x
         y = self.y
         # get horizontal average of vertical velocity
-#         u = reduce_dims(u)
-#         v = reduce_dims(v)
         mag = np.sqrt(u**2 + v**2)
-        mag_av = horizontal_mean(mag, x) 
+        mag_av = horizontal_mean(mag, x)
         if plot:
             self.plot_profile(mag, xlabel='velocity magnitude')
         if cut:
             # take upper half but need to inspect each case individually
             mag_av = mag_av[int(len(mag_av)/2):]
             y = y[int(len(y)/2):]
-            
+        
         # maximum gradient of averaged velocity profile
         grad = np.diff(mag_av, axis=0) / np.diff(y)
         grad_max = np.min(grad) # actually want the minimum because you expect a negative slope
@@ -436,6 +445,7 @@ class Aspect_Data():
         
 #         m1, idx = max_slope(y, mag_av, maximum=False, plot=plot, tol=tol) # want most negative slope
         
+    
         b = y_grad_max - m1*x_grad_max
         y_tan = m1*x_vel + b
         if plot:
@@ -443,26 +453,24 @@ class Aspect_Data():
 
         return b
     
-    def lid_base_temperature(self, T, y_l=None, u=None, v=None, cut=False, plot=False):
+    def lid_base_temperature(self, T, y_l=None, u=None, v=None, cut=False, plot=False, **kwargs):
         x = self.x
         y = self.y
-#         T = reduce_dims(T)
         T_av = horizontal_mean(T, x)
         if (y_l is None) and (u is not None) and (v is not None):
-            y_l = lid_thickness(u=u, v=v, cut=cut, plot=plot)
+            y_l = self.lid_thickness(u=u, v=v, cut=cut, plot=plot)
         # find T at y_L
         T_l = T_av[find_nearest_idx(y, y_l)]
         return T_l
         
-    def internal_temperature(self, T=None, plot=False):
-#         T = reduce_dims(T)
+    def internal_temperature(self, T=None, plot=False, **kwargs):
         x = self.x
         y = self.y
         T_av = horizontal_mean(T, x)
 
         # find inflection point for max core temperature
         z = y
-        f_prime = np.gradient(T_av[:,0]) # differential approximation
+        f_prime = np.gradient(T_av) # differential approximation
         idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
         y_infections = z[idx]
         T_inflections = T_av[idx]
@@ -480,10 +488,26 @@ class Aspect_Data():
     def dT_rh(self, T_l=None, T_i=None, **kwargs):
         # rheological temperature scale
         if T_i is None:
-            T_i = internal_temperature(self, **kwargs)
+            T_i = self.internal_temperature(self, **kwargs)
         if T_l is None:
-            T_l = lid_base_temperature(self, **kwargs)
+            T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
+    
+    def h_components(self, n, T_i=None, T_l=None, delta_u=None, **kwargs):
+        # return RHS of h' \propto (dT_rh/dT_m)*(delta_u/d_m)
+        
+        p = self.parameters
+        d_m = p['Geometry model']['Box']['Y extent']
+        dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
+        if T_i is None:
+            T_i, y_i = self.internal_temperature(**kwargs)
+        if T_l is None:
+            T_l = self.lid_base_temperature(**kwargs)
+        if delta_u is None:
+            delta_u = self.ubl_thickness(n, T_l=T_l, T_i=T_i, **kwargs)
+        dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
+        print('dT_rh', dT_rh, 'dT_m', dT_m, 'delta_u', delta_u, 'd_m', d_m, 'T_l', T_l, 'T_i', T_i)
+        return (dT_rh/dT_m)*(delta_u/d_m)
     
     def vbcs(self):
         # Determine velocity boundary conditions from the input parameters
