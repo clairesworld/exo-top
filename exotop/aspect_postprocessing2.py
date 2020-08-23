@@ -76,6 +76,12 @@ def max_slope(x,y, which='max', plot=False, tol=1):
         plt.legend(frameon=False)
     return m, i_max
 
+def horizontal_mean(A, x):
+    int_x = trapz(A, x = x, axis = 0)
+    int_x = int_x / ((max(x)-min(x)))
+    return int_x
+    
+
 class Aspect_Data():
     def __init__(self, directory):
         self.directory = directory
@@ -269,22 +275,11 @@ class Aspect_Data():
 
         return self.x, self.y, self.z, u, v, w
     
-    def read_statistics(self):
+    def read_statistics(self, skip_header=26):
         filename = self.directory + "statistics"
         print("Reading statistics from", filename)
         
-#         df = pd.read_csv(filename, header=None,skiprows=None,
-#                          index_col=False, delimiter=r"\s+", engine='python', comment='#')
-#         self.stats_timestep = np.array(df.iloc[:, 0])
-#         self.stats_time = np.array(df.iloc[:, 1])
-#         self.stats_rms_velocity = np.array(df.iloc[:, 10])
-#         self.stats_average_T = np.array(df.iloc[:, 13])
-#         self.stats_heatflux_left = np.array(df.iloc[:, 16])
-#         self.stats_heatflux_right = np.array(df.iloc[:, 17])
-#         self.stats_heatflux_bottom = np.array(df.iloc[:, 18])
-#         self.stats_heatflux_top = np.array(df.iloc[:, 19])
-        
-        data = np.genfromtxt(filename, skip_header=26)
+        data = np.genfromtxt(filename, skip_header=skip_header)
         all_data = np.genfromtxt(filename, skip_header=26, dtype=None)
         self.stats_timestep = np.array([d[0] for d in all_data])
         self.stats_time = data[:,1]
@@ -294,8 +289,27 @@ class Aspect_Data():
         self.stats_heatflux_right = data[:,17]
         self.stats_heatflux_bottom = data[:,18]
         self.stats_heatflux_top = data[:,19]
-#         self.stats_sol_files = [d[-1][-14:] for d in all_data]
-    
+        self.stats_average_viscosity = data[:,22]
+
+    def read_stats_sol_files(self, i_vis=20, skip_header=26):
+        filename = self.directory + "statistics"
+        all_data = np.genfromtxt(filename, skip_header=skip_header, dtype=None)
+        last = 0
+        files = np.zeros(len(all_data))
+        #  find last instance that's not ""
+        for n, d in enumerate(all_data):
+            s = d[i_vis][-14:]
+            if not s.decode()=='""':
+                last = int(re.search(r'\d+', s.decode()).group(0))
+            files[n] = last
+        return files
+
+    def find_time_at_sol(self, n, i_vis=20, skip_header=26):
+        # input solution file and get first timestep
+        sol_files = self.read_stats_sol_files(i_vis=i_vis, skip_header=skip_header)
+        i_n = np.where(sol_files == n)[0]
+        return i_n[0]
+        
     def read_parameters(self):
         # parse the parameters file into a python dictionary
         filename = self.directory + "parameters.prm"
@@ -363,31 +377,47 @@ class Aspect_Data():
         self.Ra = Ra
         return Ra
     
-    def Nu(self):
+    def Nu(self, k=1):
         # Nusselt number with no internal heating
-        return self.stats_heatflux_top/self.parameters['Geometry model']['Box']['X extent']
+        p = self.parameters
+        F = self.stats_heatflux_top/p['Geometry model']['Box']['X extent']
+        d = p['Geometry model']['Box']['Y extent']
+        dT = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
+        Nu = d*F/(k*dT)
+        self.Nu = Nu
+        return Nu
+        
+    
+    def ubl_thickness(self, n, T_l=None, T_i=None, k=1, **kwargs):
+        # get upper boundary layer thickness
+        if T_i is None:
+            T_i = internal_temperature(self, **kwargs)
+        if T_l is None:
+            T_l = lid_base_temperature(self, **kwargs)
+        ts = self.find_time_at_sol(n)
+        F = self.stats_heatflux_top[ts]/self.parameters['Geometry model']['Box']['X extent']
+        print('dT =', T_i - T_l)
+        print('F =', F)
+        return k*(T_i - T_l)/F
+        
 
     def lid_thickness(self, u, v, tol=1, cut=False, plot=True): # 2D only
         x = self.x
         y = self.y
         # get horizontal average of vertical velocity
-        u = reduce_dims(u)
-        v = reduce_dims(v)
+#         u = reduce_dims(u)
+#         v = reduce_dims(v)
         mag = np.sqrt(u**2 + v**2)
-        mag_int = np.trapz(mag, x=x)
-        mag_av = mag_int/(np.shape(v)[1]-1)
+        mag_av = horizontal_mean(mag, x) 
         if plot:
             self.plot_profile(mag, xlabel='velocity magnitude')
         if cut:
             # take upper half but need to inspect each case individually
             mag_av = mag_av[int(len(mag_av)/2):]
             y = y[int(len(y)/2):]
-
-            
-        #    
             
         # maximum gradient of averaged velocity profile
-        grad = np.diff(mag_av) / np.diff(y)
+        grad = np.diff(mag_av, axis=0) / np.diff(y)
         grad_max = np.min(grad) # actually want the minimum because you expect a negative slope
         i_max = np.nonzero(grad == grad_max)[0][0] # would add one to take right hand value
         x_grad_max = mag_av[i_max]
@@ -404,8 +434,6 @@ class Aspect_Data():
         m1 = (y_grad_max1-y_grad_max0)/(x_grad_max1-x_grad_max0)
     #     print('m should be',m1)
         
-        #
-        
 #         m1, idx = max_slope(y, mag_av, maximum=False, plot=plot, tol=tol) # want most negative slope
         
         b = y_grad_max - m1*x_grad_max
@@ -413,37 +441,49 @@ class Aspect_Data():
         if plot:
             plt.plot(x_vel, y_tan, c='g', ls='--')
 
-        self.D_l = b # store in object
         return b
     
-    def lid_base_temperature(self, T, y_L):
+    def lid_base_temperature(self, T, y_l=None, u=None, v=None, cut=False, plot=False):
         x = self.x
         y = self.y
-        T = reduce_dims(T)
-        T_av = np.trapz(T, x=x)/(np.shape(T)[1]-1)
+#         T = reduce_dims(T)
+        T_av = horizontal_mean(T, x)
+        if (y_l is None) and (u is not None) and (v is not None):
+            y_l = lid_thickness(u=u, v=v, cut=cut, plot=plot)
         # find T at y_L
-#         print('index of y_L:', find_nearest_idx(y, y_L))
-        T_L = T_av[find_nearest_idx(y, y_L)]
-        return T_L, y_L
+        T_l = T_av[find_nearest_idx(y, y_l)]
+        return T_l
         
-    def internal_temperature(self, T):
+    def internal_temperature(self, T=None, plot=False):
+#         T = reduce_dims(T)
         x = self.x
         y = self.y
-        T = reduce_dims(T)
-        T_av = np.trapz(T, x=x)/(np.shape(T)[1]-1)
+        T_av = horizontal_mean(T, x)
 
         # find inflection point for max core temperature
-      
+        z = y
+        f_prime = np.gradient(T_av[:,0]) # differential approximation
+        idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
+        y_infections = z[idx]
+        T_inflections = T_av[idx]
         
-        return T_max, y_max
+        if plot:
+            print ('inflection point', y_infections) 
+            fig, ax = plt.subplots (figsize = (7, 7))
+            ax.plot (z, T_av, 'bo-', ms = 2)
+            ax.plot (y_infections, T_inflections, 'ro', ms = 5)
+            ax.set_xlabel('depth')
+            ax.set_ylabel('T')
+            
+        return T_inflections[-1], y_infections[-1]
         
-    def dT_rh(self, T_i, T_L):
+    def dT_rh(self, T_l=None, T_i=None, **kwargs):
         # rheological temperature scale
-        return -(T_L - T_i)
-    
-    def delta_rh(self, y_L, y_T_i):
-        # upper thermal boundary layer thickness
-        return y_L - y_T_i
+        if T_i is None:
+            T_i = internal_temperature(self, **kwargs)
+        if T_l is None:
+            T_l = lid_base_temperature(self, **kwargs)
+        return -(T_l - T_i)
     
     def vbcs(self):
         # Determine velocity boundary conditions from the input parameters
@@ -497,11 +537,11 @@ class Aspect_Data():
         y = self.y
         fig, ax = plt.subplots(figsize=(4,4))
         try:
-            a = np.trapz(s, x=x)/(np.shape(s)[1]-1)
+            a = horizontal_mean(s, x)
             ax.plot(a, y, c='k')
         except ValueError:
             s = reduce_dims(s)
-            a = np.trapz(s, x=x)/(np.shape(s)[1]-1)
+            a = horizontal_mean(s, x)
             ax.plot(a, y, c='k')
         ax.set_xlabel(xlabel, fontsize=18)
         ax.set_ylabel('depth', fontsize=18)
