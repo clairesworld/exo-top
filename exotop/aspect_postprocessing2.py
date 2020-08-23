@@ -1,4 +1,3 @@
-from vtk import *
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
