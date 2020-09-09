@@ -1,3 +1,8 @@
+import sys
+src_paths = ['/usr/lib/python36.zip', 'usr/lib/python3.6', '/usr/lib/python3.6/lib-dynload', '/usr/local/lib/python3.6/dist-packages', '/usr/lib/python3/dist-packages']
+for s in src_paths:
+    sys.path.insert(0, s)
+
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
@@ -13,8 +18,9 @@ import h5py
 import re
 import pandas as pd
 from scipy.signal import periodogram
-import seaborn as sns
+#import seaborn as sns
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import pickle as pkl
 
 rasterized=True
 
@@ -492,9 +498,15 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
     
-    def h_components(self, n, T_i=None, T_l=None, delta_u=None, **kwargs):
+    def h_components(self, n, T_i=None, T_l=None, delta_u=None, picklefrom=None, pickleto=None, **kwargs):
         # return RHS of h' \propto (dT_rh/dT_m)*(delta_u/d_m)
         
+        if (picklefrom is not None) and (os.path.exists(fig_path+'data/'+picklefrom)):
+            try:
+                dT_rh, dT_m, delta_u, d_m = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ))
+            except ValueError:
+                dT_rh, dT_m, delta_u, d_m = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ), protocol=2)
+
         p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
@@ -506,6 +518,14 @@ class Aspect_Data():
             delta_u = self.ubl_thickness(n, T_l=T_l, T_i=T_i, **kwargs)
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
         print('dT_rh', dT_rh, 'dT_m', dT_m, 'delta_u', delta_u, 'd_m', d_m, 'T_l', T_l, 'T_i', T_i)
+        
+        pickleto = self.directory+'h_components.pkl'
+        if pickleto is not None:
+            try:
+                pkl.dump((dT_rh, dT_m, delta_u, d_m), open( fig_path+'data/'+pickleto, "wb" ))
+            except Exception as e:
+                print('aspect_postprocessing2.py line 525:', e)
+        
         return (dT_rh/dT_m)*(delta_u/d_m)
     
     def vbcs(self):

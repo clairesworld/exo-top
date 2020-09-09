@@ -214,69 +214,75 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
         fig.savefig(fig_path+case+fend)
     return fig, ax
 
-def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0,0.065), fname='cases.png',
-                  fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, dumppickle=False, suptitle=''):
+def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0,0.065), fname='cases.png', data_path='model-output/',
+                  fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, dumppickle=False, suptitle='', includepd=True):
     # rows are cases, columns are v_rms, q, hist
     ncases = len(cases)
     fig, axes = plt.subplots(ncases, 3, figsize=(15, ncases*2.5))
+    if t1 is None:
+        t1 = [0]*ncases
     for ii, case in enumerate(cases):
-        print('loading',case)
-        if ii==ncases-1:
-            setxlabel=True
-        else:
-            setxlabel=False
-        if ii==int(np.median(range(ncases))):
-            setylabel=True
-        else:
-            setylabel=False
-        legend=True
-        if ii>0:
-            legend=False
-            
-        ax = axes[ii, 0]
-        fig, ax = plot_evol(case, i=11, fig=fig, ax=ax, savefig=False, ylabel='rms velocity', 
-                            c='k', settitle=False, setxlabel=setxlabel, setylabel=setylabel, 
-                            labelsize=labelsize, labelpad=labelpad, legend=False)
-        
-        # Create a Rectangle patch to mark "transient" times
-        rect = patches.Rectangle((ax.get_xlim()[0],ax.get_ylim()[0]), t1[ii], ax.get_ylim()[1] - ax.get_ylim()[0],
-                                 edgecolor='None',facecolor='k', alpha=0.2, zorder=0)
-        ax.add_patch(rect)
-        
-        try:
-            ax.text(0.01, 0.95, labels[ii],horizontalalignment='left', verticalalignment='top',
-                    transform = ax.transAxes, fontsize=labelsize)
-        except:
-            pass
+        if (os.path.exists(data_path+'output-'+case)):
+            print('loading',case)
+            if ii==ncases-1:
+                setxlabel=True
+            else:
+                setxlabel=False
+            if ii==int(np.median(range(ncases))):
+                setylabel=True
+            else:
+                setylabel=False
+            legend=True
+            if ii>0:
+                legend=False
 
-        ax = axes[ii, 1]
-        fig, ax = plot_evol(case, i=20, fig=fig, ax=ax, savefig=False, ylabel='heat flux', 
-                            c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                            labelsize=labelsize, labelpad=labelpad, label='top')
-        fig, ax = plot_evol(case, i=19, fig=fig, ax=ax, savefig=False, ylabel='heat flux', yscale=-1,
-                            c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                            labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend)
+            ax = axes[ii, 0]
+            fig, ax = plot_evol(case, i=11, fig=fig, ax=ax, savefig=False, ylabel='rms velocity', 
+                                c='k', settitle=False, setxlabel=setxlabel, setylabel=setylabel, 
+                                labelsize=labelsize, labelpad=labelpad, legend=False)
+
+            # Create a Rectangle patch to mark "transient" times
+            rect = patches.Rectangle((ax.get_xlim()[0],ax.get_ylim()[0]), t1[ii], ax.get_ylim()[1] - ax.get_ylim()[0],
+                                     edgecolor='None',facecolor='k', alpha=0.2, zorder=0)
+            ax.add_patch(rect)
+
+            try:
+                ax.text(0.01, 0.95, labels[ii],horizontalalignment='left', verticalalignment='top',
+                        transform = ax.transAxes, fontsize=labelsize)
+            except:
+                pass
+
+            ax = axes[ii, 1]
+            fig, ax = plot_evol(case, i=20, fig=fig, ax=ax, savefig=False, ylabel='heat flux', 
+                                c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
+                                labelsize=labelsize, labelpad=labelpad, label='top')
+            fig, ax = plot_evol(case, i=19, fig=fig, ax=ax, savefig=False, ylabel='heat flux', yscale=-1,
+                                c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
+                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend)
+
+            # Create a Rectangle patch to mark "transient" times
+            rect = patches.Rectangle((ax.get_xlim()[0],ax.get_ylim()[0]), t1[ii], ax.get_ylim()[1] - ax.get_ylim()[0],
+                                     edgecolor='None',facecolor='k', alpha=0.2, zorder=0)
+            ax.add_patch(rect)
+
+            if includepd:
+                ax = axes[ii, 2]
+                picklefile = case+'_pdtop.pkl'
+                if loadpickle:
+                    picklefrom = picklefile
+                else:
+                    picklefrom = None
+                if dumppickle:
+                    pickleto = picklefile
+                else:
+                    pickleto = None
+                _, _, fig, ax = pd_top(case, t1[ii], path='model-output/', sigma=2, plot=True, fig=fig, ax=ax, 
+                                      savefig=False, settitle=False, setxlabel=setxlabel, legend=legend,
+                                      labelsize=labelsize, pickleto=pickleto, picklefrom=picklefrom)
+                ax.set_xlim(dt_xlim[0], dt_xlim[1]) # for fair comparison
         
-        # Create a Rectangle patch to mark "transient" times
-        rect = patches.Rectangle((ax.get_xlim()[0],ax.get_ylim()[0]), t1[ii], ax.get_ylim()[1] - ax.get_ylim()[0],
-                                 edgecolor='None',facecolor='k', alpha=0.2, zorder=0)
-        ax.add_patch(rect)
-        
-        ax = axes[ii, 2]
-        picklefile = case+'_pdtop.pkl'
-        if loadpickle:
-            picklefrom = picklefile
         else:
-            picklefrom = None
-        if dumppickle:
-            pickleto = picklefile
-        else:
-            pickleto = None
-        _, _, fig, ax = pd_top(case, t1[ii], path='model-output/', sigma=2, plot=True, fig=fig, ax=ax, 
-                              savefig=False, settitle=False, setxlabel=setxlabel, legend=legend,
-                              labelsize=labelsize, pickleto=pickleto, picklefrom=picklefrom)
-        ax.set_xlim(dt_xlim[0], dt_xlim[1]) # for fair comparison
-        
+            print(case, 'not found')
     plt.suptitle(suptitle, fontsize=labelsize, y=1.02)
     fig.tight_layout()
     if save:
@@ -321,12 +327,20 @@ def plot_h_vs(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/asp
         else:
             pickleto = None
         # assume time-dependent convection (if steady state then shouldn't matter)
-        h_peak[ii,:], h_rms[ii,:], _, _ = pd_top(case, t1=t1[ii], path=path, plot=plotpd, sigma=sigma,
+
+        try:
+            h_peak[ii,:], h_rms[ii,:], _, _ = pd_top(case, t1=t1[ii], path=path, plot=plotpd, sigma=sigma,
                                                  pickleto=pickleto, picklefrom=picklefrom) 
-        
+        except Exception as e:
+            print('aspect_scalings.py line 332:', e)
+            h_peak[ii,:], h_rms[ii,:] = ([np.nan,np.nan,np.nan],[np.nan,np.nan,np.nan])
         if x_components:
             # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
             picklefile = case+'_pdx.pkl'
+            oldload = loadpickle
+            olddump = dumppickle
+            loadpickle = True
+            dumppickle = True
             if loadpickle:
                 picklefrom = picklefile
             else:
@@ -336,18 +350,30 @@ def plot_h_vs(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/asp
             else:
                 pickleto = None
             # assume time-dependent convection (if steady state then shouldn't matter)
-            x[ii,:], _, _ = pd_h_components(case, t1=t1[ii], data_path=path, sigma=sigma, pickleto=pickleto, 
+            try:
+                x[ii,:], _, _ = pd_h_components(case, t1=t1[ii], data_path=path, sigma=sigma, pickleto=pickleto,
                                             picklefrom=picklefrom, fig_path=fig_path)
+            except Exception as e:
+                print('aspect_scalings.py line 350:', e)
+                x[ii,:] = (np.nan,np.nan,np.nan)
+            loadpickle = oldload
+            dumppickle = olddump
+
         else:
-            x[ii,1] = float(x_var[ii])
+            x[ii,:] = float(x_var[ii])
 
     
     yerr_peak = [h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]]
     yerr_rms = [h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]]
     if x_components:
-        x_err = [x[:,1]-x[:,0], x[:,2]-x[:,1]]
+        print('x', x)
+        try:
+            xerr = [x[:,1]-x[:,0], x[:,2]-x[:,1]]
+        except Exception as e1:
+            print('aspect_scalings.py line 364', e1)
+
     else:
-        x_err = None
+        xerr = None
     
     fig = plt.figure()
     ax = plt.gca()
@@ -364,9 +390,13 @@ def plot_h_vs(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/asp
     ax.set_title(title, fontsize=labelsize)
     
     if fit:
-        m, b = fit_h(x_var, h_rms[:,1], h_err=None)
-        ax.plot(x[:,1], m*x[:,1] + b, c='xkcd:grey', alpha=0.5, ls='--')
-        print('C =', b)
+        print('fitting x =',x[:,1],'h =',  h_rms[:,1])
+        try:
+            m, b = fit_h(x[:,1], h_rms[:,1], h_err=None)
+            ax.plot(x[:,1], m*x[:,1] + b, c='xkcd:grey', alpha=0.5, ls='--')
+            print('C =', b)
+        except Exception as e:
+            print('aspect_scalings.py line 386:', e)
     
     
     if save:
@@ -377,7 +407,8 @@ def plot_h_vs(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/asp
 
 
 def fit_h(x, h, h_err):
-    p = np.polyfit(x, h, 1)
+    idx = np.argwhere(np.isnan(x)==False)
+    p = np.polyfit(x[idx], h[idx], 1)
     return p[1], p[0]
     
 
