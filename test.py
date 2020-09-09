@@ -7,7 +7,6 @@ import random as rand
 import pickle as pkl
 import collections
 import six
-from scipy.optimize import curve_fit
 from exotop import aspect_postprocessing2 as post # from exotop
 cwd = os.getcwd()
 
@@ -306,19 +305,13 @@ def get_cases_list(Ra, eta):
     
     
 
-def plot_h_vs(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, 
-              dumppickle=False,
+def plot_h_vs(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, dumppickle=False,
               save=True, fname='h.png', plotpd=True, sigma=2, labelsize=16, xlabel='', title='',
-              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', x_components=False, 
-              fit=False, fitRa=None, fitfn='exp', cases=None, x_var=None):
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', x_components=False, fit=False):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
-    if cases is None:
-        cases, x_var = get_cases_list(Ra, eta)  
+    cases, x_var = get_cases_list(Ra, eta)  
     if t1 is None:
         t1 = [0]*len(x_var)
-    if fitRa is None:
-        fitRa = Ra
-    
 
     h_peak = np.zeros((len(x_var), 3))
     h_rms = np.zeros((len(x_var), 3))
@@ -337,17 +330,13 @@ def plot_h_vs(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/raid1
 
         try:
             h_peak[ii,:], h_rms[ii,:], _, _ = pd_top(case, t1=t1[ii], path=path, plot=plotpd, sigma=sigma,
-                                                 pickleto=pickleto, picklefrom=picklefrom, fig_path=fig_path) 
+                                                 pickleto=pickleto, picklefrom=picklefrom) 
         except Exception as e:
             print('aspect_scalings.py line 332:', e)
             h_peak[ii,:], h_rms[ii,:] = ([np.nan,np.nan,np.nan],[np.nan,np.nan,np.nan])
         if x_components:
             # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
             picklefile = case+'_pdx.pkl'
-            oldload = loadpickle
-            olddump = dumppickle
-            loadpickle = True
-            dumppickle = True
             if loadpickle:
                 picklefrom = picklefile
             else:
@@ -363,9 +352,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/raid1
             except Exception as e:
                 print('aspect_scalings.py line 350:', e)
                 x[ii,:] = (np.nan,np.nan,np.nan)
-            loadpickle = oldload
-            dumppickle = olddump
-
         else:
             x[ii,:] = float(x_var[ii])
 
@@ -373,7 +359,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/raid1
     yerr_peak = [h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]]
     yerr_rms = [h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]]
     if x_components:
-#         print('x', x)
+        print('x', x)
         try:
             xerr = [x[:,1]-x[:,0], x[:,2]-x[:,1]]
         except Exception as e1:
@@ -390,23 +376,21 @@ def plot_h_vs(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/raid1
                 label='peak', fmt='-o', c=c_peak, alpha=0.9, capsize=5)
     ax.errorbar(x[:,1], h_rms[:,1], yerr=yerr_rms, xerr=xerr,
                 label='rms', fmt='-o', c=c_rms, alpha=0.9, capsize=5)
-    
-    if fit and len(fitRa)>0:
-        fitx = [float(ss) for ss in fitRa]
-        fitidx = np.where(np.intersect1d(x[:,1], fitx))[0]
-        if len(fitidx)>0:
-            if fitfn=='line':
-                m, b = fit_h(x[fitidx,1], h_rms[fitidx,1], h_err=None, fn='line')
-                ax.plot(x[fitidx,1], m*x[fitidx,1] + b, c='xkcd:red', ls='--', label='linear regression', zorder=100)
-            elif fitfn=='exp':
-                C, n = fit_h(x[fitidx,1], h_rms[fitidx,1], h_err=None, fn='exp')
-                ax.plot(x[fitidx,1], C*x[fitidx,1]**n, c='xkcd:red', ls='--', label='linear regression', zorder=100)
-    
     ax.legend(frameon=False)
     ax.set_xscale('log')
     ax.set_ylabel('dynamic topography', fontsize=labelsize)
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_title(title, fontsize=labelsize)
+    
+    if fit:
+        print('fitting x =',x[:,1],'h =',  h_rms[:,1])
+        try:
+            m, b = fit_h(x[:,1], h_rms[:,1], h_err=None)
+            ax.plot(x[:,1], m*x[:,1] + b, c='xkcd:grey', alpha=0.5, ls='--')
+            print('C =', b)
+        except Exception as e:
+            print('aspect_scalings.py line 386:', e)
+    
     
     if save:
         if not os.path.exists(fig_path):
@@ -415,26 +399,49 @@ def plot_h_vs(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/raid1
     return fig, ax
 
 
-def fit_h(x, h, h_err, fn='exp'):
-    def line(x, a, b):
-        return a * x + b
-
-    def expon(x, C, n):
-        return C * x**n
-    
-    idx = np.nonzero(np.isnan(x)==False)[0]
-    x = x[idx]
-    h = h[idx]
-    if h_err is not None:
-        h_err = h_err[idx]
-    print('fitting x =',x,'h =',  h)
-    if fn=='line':
-        popt, pcov = curve_fit(line, x, h, sigma=h_err)
-        print('slope:', popt[0], 'intercept:', popt[1])
-    elif fn=='exp':
-        popt, pcov = curve_fit(expon, x, h, sigma=h_err)
-        print('n:', popt[1])
-    return popt[0], popt[1]
+def fit_h(x, h, h_err):
+    idx = np.argwhere(np.isnan(x)==False)
+    p = np.polyfit(x[idx], h[idx], 1)
+    return p[1], p[0]
     
 
+# def plot_h_eta(Ra, eta, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, dumppickle=False,
+#                save=True, fname='h_eta.png', plotpd=True, sigma=2, labelsize=16,
+#                c_peak='xkcd:forest green', c_rms='xkcd:periwinkle'):
+#     # Ra is list of strings, t1 is a list of numbers the same length
+#     if t1 is None:
+#         t1 = [0.005]*len(Ra)
+#     else:
+#         h_peak = np.zeros((len(Ra), 3))
+#         h_rms = np.zeros((len(Ra), 3))
+#         for jj, e in enumerate(eta):
+#             case = 'Ra'+Ra+'-eta'+e+'-wide'
+#             picklefile = case+'_pdtop.pkl'
+#             if loadpickle:
+#                 picklefrom = picklefile
+#             else:
+#                 picklefrom = None
+#             if dumppickle:
+#                 pickleto = picklefile
+#             else:
+#                 pickleto = None
+#             # assume time-dependent convection (if steady state then shouldn't matter)
+#             h_peak[jj, :], h_rms[jj, :], _, _ = pd_top(case, t1=t1[jj], path=path, plot=plotpd, sigma=sigma,
+#                                                        pickleto=pickleto, picklefrom=picklefrom) 
 
+#     fig = plt.figure()
+#     ax = plt.gca()
+#     ax.errorbar([float(s) for s in eta], h_peak[:,1], yerr=[h_peak[:,1]-h_peak[:,0], h_peak[:,2]-h_peak[:,1]], 
+#                 label='peak', fmt='-o', c=c_peak, alpha=0.9, capsize=5)
+#     ax.errorbar([float(s) for s in eta], h_rms[:,1], yerr=[h_rms[:,1]-h_rms[:,0], h_rms[:,2]-h_rms[:,1]], 
+#                 label='rms', fmt='-o', c=c_rms, alpha=0.9, capsize=5)
+#     ax.legend(frameon=False)
+#     ax.set_xscale('log')
+#     ax.set_ylabel('dynamic topography', fontsize=labelsize)
+#     ax.set_xlabel('$\Delta \eta = $', fontsize=labelsize)
+#     ax.set_title('Ra ='+Ra, fontsize=labelsize)
+#     if save:
+#         if not os.path.exists(fig_path):
+#             os.makedirs(fig_path)
+#         fig.savefig(fig_path+fname, bbox_inches='tight')
+#     return fig, ax

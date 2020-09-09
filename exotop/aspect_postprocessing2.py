@@ -574,18 +574,19 @@ class Aspect_Data():
         
         return xu, yu, topo
     
-    def plot_profile(self, s, xlabel=None):
+    def plot_profile(self, s, xlabel=None, fig=None, ax=None, **plotkwargs):
         # s is a 2D array
         x = self.x
         y = self.y
-        fig, ax = plt.subplots(figsize=(4,4))
+        if fig is None:
+            fig, ax = plt.subplots(figsize=(4,4))
         try:
             a = horizontal_mean(s, x)
-            ax.plot(a, y, c='k')
+            ax.plot(a, y, **plotkwargs)
         except ValueError:
             s = reduce_dims(s)
             a = horizontal_mean(s, x)
-            ax.plot(a, y, c='k')
+            ax.plot(a, y, **plotkwargs)
         ax.set_xlabel(xlabel, fontsize=18)
         ax.set_ylabel('depth', fontsize=18)
         ax.set_ylim(y.min(), y.max())
