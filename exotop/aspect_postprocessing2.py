@@ -7,6 +7,8 @@ import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
 import scipy
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.integrate import trapz
 from scipy.ndimage.interpolation import zoom
@@ -417,7 +419,7 @@ class Aspect_Data():
         return k*(T_i - T_l)/F
         
 
-    def lid_thickness(self, u, v, tol=1, cut=False, plot=True, **kwargs): # 2D only
+    def lid_thickness(self, u, v, tol=1, cut=False, plot=True, cutdiv=2, **kwargs): # 2D only
         x = self.x
         y = self.y
         # get horizontal average of vertical velocity
@@ -425,37 +427,40 @@ class Aspect_Data():
         mag_av = horizontal_mean(mag, x)
         if plot:
             self.plot_profile(mag, xlabel='velocity magnitude')
-        if cut:
-            # take upper half but need to inspect each case individually
-            mag_av = mag_av[int(len(mag_av)/2):]
-            y = y[int(len(y)/2):]
         
-        # maximum gradient of averaged velocity profile
-        grad = np.diff(mag_av, axis=0) / np.diff(y)
-        grad_max = np.min(grad) # actually want the minimum because you expect a negative slope
-        i_max = np.nonzero(grad == grad_max)[0][0] # would add one to take right hand value
-        x_grad_max = mag_av[i_max]
-        y_grad_max = y[i_max]
-        if plot:
-            plt.scatter(x_grad_max, y_grad_max, c='k')
+        if not cut:
+            cutdiv=1
+        
+        b=1.1
+        while b>1:
+            # take upper half by defualt (cutdiv=2) but need to inspect each case individually
+            mag_avprime = mag_av[int(len(mag_av)/cutdiv):]
+            yprime = y[int(len(y)/cutdiv):]
 
-        # intersection of this tangent with y-axis
-        x_vel = np.linspace(0, np.max(mag_av))
-        x_grad_max0 = mag_av[np.nonzero(grad == grad_max)[0][0]-tol]
-        y_grad_max0 = y[np.nonzero(grad == grad_max)[0][0]-tol]
-        x_grad_max1 = mag_av[np.nonzero(grad == grad_max)[0][0]+tol]
-        y_grad_max1 = y[np.nonzero(grad == grad_max)[0][0]+tol]
-        m1 = (y_grad_max1-y_grad_max0)/(x_grad_max1-x_grad_max0)
-    #     print('m should be',m1)
+            # maximum gradient of averaged velocity profile
+            grad = np.diff(mag_avprime, axis=0) / np.diff(yprime)
+            grad_max = np.min(grad) # actually want the minimum because you expect a negative slope
+            i_max = np.nonzero(grad == grad_max)[0][0] # would add one to take right hand value
+            x_grad_max = mag_avprime[i_max]
+            y_grad_max = yprime[i_max]
+            if plot:
+                plt.scatter(x_grad_max, y_grad_max, c='k', label='max gradient in velocity/depth')
+
+            # intersection of this tangent with y-axis
+            x_vel = np.linspace(0, np.max(mag_avprime))
+            x_grad_max0 = mag_avprime[np.nonzero(grad == grad_max)[0][0]-tol]
+            y_grad_max0 = yprime[np.nonzero(grad == grad_max)[0][0]-tol]
+            x_grad_max1 = mag_avprime[np.nonzero(grad == grad_max)[0][0]+tol]
+            y_grad_max1 = yprime[np.nonzero(grad == grad_max)[0][0]+tol]
+            m1 = (y_grad_max1-y_grad_max0)/(x_grad_max1-x_grad_max0)
+            b = y_grad_max - m1*x_grad_max
+            if b>1: # if this doesn't work it's probably because lid base is below 50% depth, need to recut profile
+                print('y_grad_max', y_grad_max)
+                cutdiv = cutdiv-0.25
         
-#         m1, idx = max_slope(y, mag_av, maximum=False, plot=plot, tol=tol) # want most negative slope
-        
-    
-        b = y_grad_max - m1*x_grad_max
         y_tan = m1*x_vel + b
         if plot:
-            plt.plot(x_vel, y_tan, c='g', ls='--')
-
+            plt.plot(x_vel, y_tan, c='g', ls='--', label='tangent to max gradient')
         return b
     
     def lid_base_temperature(self, T, y_l=None, u=None, v=None, cut=False, plot=False, **kwargs):
@@ -498,35 +503,23 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
     
-    def h_components(self, n, T_i=None, T_l=None, delta_u=None, picklefrom=None, pickleto=None, **kwargs):
+    def h_components(self, n, T_i=None, T_l=None, delta_u=None, y_l=None, u=None, v=None, cut=False, plot=False, **kwargs):
         # return RHS of h' \propto (dT_rh/dT_m)*(delta_u/d_m)
-        
-        if (picklefrom is not None) and (os.path.exists(fig_path+'data/'+picklefrom)):
-            try:
-                dT_rh, dT_m, delta_u, d_m = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ))
-            except ValueError:
-                dT_rh, dT_m, delta_u, d_m = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ), protocol=2)
 
         p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
+        if y_l is None:
+            y_l = self.lid_thickness(u=u, v=v, cut=cut, plot=plot)
         if T_i is None:
             T_i, y_i = self.internal_temperature(**kwargs)
         if T_l is None:
-            T_l = self.lid_base_temperature(**kwargs)
+            T_l = self.lid_base_temperature(y_l=y_l, cut=cut, **kwargs)
         if delta_u is None:
             delta_u = self.ubl_thickness(n, T_l=T_l, T_i=T_i, **kwargs)
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
-        print('dT_rh', dT_rh, 'dT_m', dT_m, 'delta_u', delta_u, 'd_m', d_m, 'T_l', T_l, 'T_i', T_i)
-        
-        pickleto = self.directory+'h_components.pkl'
-        if pickleto is not None:
-            try:
-                pkl.dump((dT_rh, dT_m, delta_u, d_m), open( fig_path+'data/'+pickleto, "wb" ))
-            except Exception as e:
-                print('aspect_postprocessing2.py line 525:', e)
-        
-        return (dT_rh/dT_m)*(delta_u/d_m)
+#         print('dT_rh', dT_rh, 'dT_m', dT_m, 'delta_u', delta_u, 'd_m', d_m, 'T_l', T_l, 'T_i', T_i)
+        return dT_rh, dT_m, delta_u, d_m, y_l, T_l
     
     def vbcs(self):
         # Determine velocity boundary conditions from the input parameters
@@ -574,7 +567,7 @@ class Aspect_Data():
         
         return xu, yu, topo
     
-    def plot_profile(self, s, xlabel=None, fig=None, ax=None, **plotkwargs):
+    def plot_profile(self, s, xlabel='', ylabel='depth', fig=None, ax=None, **plotkwargs):
         # s is a 2D array
         x = self.x
         y = self.y
@@ -588,7 +581,7 @@ class Aspect_Data():
             a = horizontal_mean(s, x)
             ax.plot(a, y, **plotkwargs)
         ax.set_xlabel(xlabel, fontsize=18)
-        ax.set_ylabel('depth', fontsize=18)
+        ax.set_ylabel(ylabel, fontsize=18)
         ax.set_ylim(y.min(), y.max())
         return fig, ax
         
