@@ -436,6 +436,7 @@ class Aspect_Data():
             # take upper half by defualt (cutdiv=2) but need to inspect each case individually
             mag_avprime = mag_av[int(len(mag_av)/cutdiv):]
             yprime = y[int(len(y)/cutdiv):]
+            print('y range', np.min(yprime), np.max(yprime))
 
             # maximum gradient of averaged velocity profile
             grad = np.diff(mag_avprime, axis=0) / np.diff(yprime)
@@ -444,7 +445,9 @@ class Aspect_Data():
             x_grad_max = mag_avprime[i_max]
             y_grad_max = yprime[i_max]
             if plot:
-                plt.scatter(x_grad_max, y_grad_max, c='k', label='max gradient in velocity/depth')
+                plt.scatter(x_grad_max, y_grad_max, c='k', label='max grad: ({:04.1f}),({:04.1f})'.format(x_grad_max, 
+                                                                                                          y_grad_max))
+                plt.axhline(y=np.min(yprime), alpha=0.2, c='k', ls='--')
 
             # intersection of this tangent with y-axis
             x_vel = np.linspace(0, np.max(mag_avprime))
@@ -454,13 +457,15 @@ class Aspect_Data():
             y_grad_max1 = yprime[np.nonzero(grad == grad_max)[0][0]+tol]
             m1 = (y_grad_max1-y_grad_max0)/(x_grad_max1-x_grad_max0)
             b = y_grad_max - m1*x_grad_max
+            print('y intercept:', b)
             if b>1: # if this doesn't work it's probably because lid base is below 50% depth, need to recut profile
-                print('y_grad_max', y_grad_max)
-                cutdiv = cutdiv-0.25
+                print('\n recutting')
+                cutdiv = cutdiv+0.2
         
         y_tan = m1*x_vel + b
         if plot:
             plt.plot(x_vel, y_tan, c='g', ls='--', label='tangent to max gradient')
+            plt.legend()
         return b
     
     def lid_base_temperature(self, T, y_l=None, u=None, v=None, cut=False, plot=False, **kwargs):
