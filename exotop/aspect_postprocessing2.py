@@ -643,7 +643,7 @@ class Aspect_Data():
         fpath = path+fname+ext
 
         xv, yv = np.meshgrid(x, y)
-        out = np.column_stack((xv, yv, np.zeros_like(xv)))
+        out = np.vstack((xv, yv, np.zeros_like(xv)))
         A = reduce_dims(A)
         print('xv, yv, A, out', np.shape(xv), np.shape(yv), np.shape(A), np.shape(out))
         row = 0
