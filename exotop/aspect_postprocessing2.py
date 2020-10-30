@@ -642,11 +642,12 @@ class Aspect_Data():
         header = 'POINTS: {:d} {:d}'.format(nx, ny) + '\nColumns: x y temperature'
         fpath = path+fname+ext
 
-        # xv, yv = np.meshgrid(x, y)
+        xv, yv = np.meshgrid(x, y)
         out = np.zeros((nx*ny, 3))
         # out = np.vstack((xv, yv, np.zeros_like(xv)))
         A = reduce_dims(A)
         print('xv, yv, A, out', np.shape(xv), np.shape(yv), np.shape(A), np.shape(out))
+        
         row = 0
         for ii in range(nx):
             for jj in range(ny):
