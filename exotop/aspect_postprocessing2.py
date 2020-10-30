@@ -90,7 +90,7 @@ def horizontal_mean(A, x):
     
 
 class Aspect_Data():
-    def __init__(self, directory):
+    def __init__(self, directory, verbose=True):
         self.directory = directory
         
         xdmf_filename = directory + "solution.xdmf"
@@ -105,15 +105,17 @@ class Aspect_Data():
             self.format='vtu'
         else:
             raise Exception('No Aspect Data found in folder '+directory)
-        print("Aspect data found in", self.format, "format")
+        if verbose:
+            print("Aspect data found in", self.format, "format")
         self.mesh_file=''
         
-        self.read_parameters()
-        self.print_summary()
+        self.read_parameters(verbose=verbose)
+        if verbose:
+            self.print_summary()
 
     def read_mesh(self, n, verbose=True):
         if not(hasattr(self, 'snames')):
-            self.get_solution_filenames()
+            self.get_solution_filenames(verbose=verbose)
         
         #if self.format=='hdf5':
         #    mesh_filename = self.directory+"mesh-00000.h5"
@@ -222,7 +224,7 @@ class Aspect_Data():
             self.get_solution_filenames()
             
         if self.mesh_file != self.mnames[n]:
-            self.read_mesh(n)
+            self.read_mesh(n, verbose=verbose)
         
         filename = self.directory + self.snames[n]
         if verbose:
@@ -252,7 +254,7 @@ class Aspect_Data():
             self.get_solution_filenames()
             
         if self.mesh_file != self.mnames[n]:
-            self.read_mesh(n)
+            self.read_mesh(n, verbose=verbose)
         
         filename = self.directory + self.snames[n]
         if verbose:
@@ -316,11 +318,23 @@ class Aspect_Data():
             files[n] = last
         return files
 
-    def find_time_at_sol(self, n, i_vis=20, skip_header=26):
-        # input solution file and get first timestep
-        sol_files = self.read_stats_sol_files(i_vis=i_vis, skip_header=skip_header)
-        i_n = np.where(sol_files == n)[0]
-        return i_n[0]
+    def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, i_vis=20, skip_header=26):
+        # input solution file and get first timestep - for n or all solutions
+        # n is the number in the solution filename
+        if sol_files is None:
+            sol_files = self.read_stats_sol_files(i_vis=i_vis, skip_header=skip_header)
+        u, indices = np.unique(sol_files, return_index=True)
+        if return_indices:
+            if n is None:
+                return indices
+            else:
+                return indices[n]
+        else:
+            time = self.stats_time
+            if n is None:
+                return time[indices]
+            else:
+                return time[indices[n]]
         
     def read_parameters(self, verbose=True):
         # parse the parameters file into a python dictionary
@@ -436,7 +450,6 @@ class Aspect_Data():
             # take upper half by defualt (cutdiv=2) but need to inspect each case individually
             mag_avprime = mag_av[int(len(mag_av)/cutdiv):]
             yprime = y[int(len(y)/cutdiv):]
-            print('y range', np.min(yprime), np.max(yprime))
 
             # maximum gradient of averaged velocity profile
             grad = np.diff(mag_avprime, axis=0) / np.diff(yprime)
@@ -457,7 +470,6 @@ class Aspect_Data():
             y_grad_max1 = yprime[np.nonzero(grad == grad_max)[0][0]+tol]
             m1 = (y_grad_max1-y_grad_max0)/(x_grad_max1-x_grad_max0)
             b = y_grad_max - m1*x_grad_max
-            print('y intercept:', b)
             if b>1: # if this doesn't work it's probably because lid base is below 50% depth, need to recut profile
                 print('\n recutting')
                 cutdiv = cutdiv+0.2
@@ -478,10 +490,13 @@ class Aspect_Data():
         T_l = T_av[find_nearest_idx(y, y_l)]
         return T_l
         
-    def internal_temperature(self, T=None, plot=False, **kwargs):
+    def internal_temperature(self, T=None, T_av=None, plot=False, **kwargs):
         x = self.x
         y = self.y
-        T_av = horizontal_mean(T, x)
+        if T is None:
+            _, _, _, T = self.read_temperature(n, verbose=verbose)
+        if T_av is None:
+            T_av = horizontal_mean(T, x)
 
         # find inflection point for max core temperature
         z = y
@@ -508,23 +523,30 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
     
-    def h_components(self, n, T_i=None, T_l=None, delta_u=None, y_l=None, u=None, v=None, cut=False, plot=False, **kwargs):
+    def T_components(self, n, T=None, T_i=None, T_l=None, delta_u=None, y_l=None, u=None, v=None, cut=False, plot=False, 
+                     verbose=False, **kwargs):
         # return RHS of h' \propto (dT_rh/dT_m)*(delta_u/d_m)
 
+        x = self.x
+        y = self.y
+        if T is None:
+            _, _, _, T = self.read_temperature(n, verbose=verbose)
+        T_av = horizontal_mean(T, x)
         p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
         if y_l is None:
             y_l = self.lid_thickness(u=u, v=v, cut=cut, plot=plot)
         if T_i is None:
-            T_i, y_i = self.internal_temperature(**kwargs)
+            T_i, y_i = self.internal_temperature(T_av=T_av, T=T, **kwargs)
         if T_l is None:
-            T_l = self.lid_base_temperature(y_l=y_l, cut=cut, **kwargs)
+            T_l = self.lid_base_temperature(T=T, y_l=y_l, cut=cut, **kwargs)
         if delta_u is None:
             delta_u = self.ubl_thickness(n, T_l=T_l, T_i=T_i, **kwargs)
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
 #         print('dT_rh', dT_rh, 'dT_m', dT_m, 'delta_u', delta_u, 'd_m', d_m, 'T_l', T_l, 'T_i', T_i)
-        return dT_rh, dT_m, delta_u, d_m, y_l, T_l
+       
+        return {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_u':delta_u, 'd_m':d_m, 'y_l':y_l, 'T_l':T_l, 'T_i':T_i, 'T_av':T_av, 'y':y}
     
     def vbcs(self):
         # Determine velocity boundary conditions from the input parameters
@@ -604,5 +626,8 @@ class Aspect_Data():
         cax.set_xlabel(vlabel, fontsize=18)       
         return fig, ax
         
+    def hello(self):
+        print('                                    i am here')
     # end class
+
 
