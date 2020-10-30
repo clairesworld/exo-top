@@ -645,11 +645,11 @@ class Aspect_Data():
         xv, yv = np.meshgrid(x, y)
         out = np.column_stack((xv, yv, np.zeros_like(xv)))
         A = reduce_dims(A)
-        print('xv, yv, A, out', np.shape(xv), np.shape(yv), np.shape(A))
+        print('xv, yv, A, out', np.shape(xv), np.shape(yv), np.shape(A), np.shape(out))
         row = 0
         for ii in range(nx):
             for jj in range(ny):
-                out[row, 2] = A[ii, jj]
+                out[row, 2] = A[jj, ii]
 
         np.savetxt(fpath, out, delimiter=" ", fmt="%s", header=header)
         print('writing to ascii file', fpath)
