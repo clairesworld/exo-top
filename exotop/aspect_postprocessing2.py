@@ -642,14 +642,19 @@ class Aspect_Data():
         header = 'POINTS: {:d} {:d}'.format(nx, ny) + '\nColumns: x y temperature'
         fpath = path+fname+ext
 
-        xv, yv = np.meshgrid(x, y)
-        out = np.vstack((xv, yv, np.zeros_like(xv)))
+        # xv, yv = np.meshgrid(x, y)
+        out = np.zeros((nx*ny, 3))
+        # out = np.vstack((xv, yv, np.zeros_like(xv)))
         A = reduce_dims(A)
         print('xv, yv, A, out', np.shape(xv), np.shape(yv), np.shape(A), np.shape(out))
         row = 0
         for ii in range(nx):
             for jj in range(ny):
+                out[row, 0] = x[ii]
+                out[row, 1] = y[jj]
                 out[row, 2] = A[jj, ii]
+                row = row + 1
+                # out[row, 2] = A[jj, ii]
 
         np.savetxt(fpath, out, delimiter=" ", fmt="%s", header=header)
         print('writing to ascii file', fpath)
