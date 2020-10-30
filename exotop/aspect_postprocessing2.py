@@ -647,10 +647,10 @@ class Aspect_Data():
         # out = np.vstack((xv, yv, np.zeros_like(xv)))
         A = reduce_dims(A)
         print('xv, yv, A, out', np.shape(xv), np.shape(yv), np.shape(A), np.shape(out))
-        
+
         row = 0
-        for ii in range(nx):
-            for jj in range(ny):
+        for jj in range(ny):
+            for ii in range(nx):
                 out[row, 0] = x[ii]
                 out[row, 1] = y[jj]
                 out[row, 2] = A[jj, ii]
