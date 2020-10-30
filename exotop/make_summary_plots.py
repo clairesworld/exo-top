@@ -2,6 +2,7 @@ import sys
 sys.path.insert(0,'/home/cmg76/Works/exo-top/')
 import numpy as np
 from exotop import aspect_scalings as sc
+from exotop import aspect_postprocessing2 as asp
 # import matplotlib
 # matplotlib.use('Agg')
 # import matplotlib.pyplot as plt
@@ -35,19 +36,19 @@ t1 = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 1], # eta 1e5
 
 # plot summaries
 
-for ii, eta in enumerate(eta_ls): # eta_ls
-    cases_ii = ['Ra'+Ra+'-eta'+eta+'-wide' for Ra in Ra_ls]	
-    labels_ii = ['Ra='+Ra for Ra in Ra_ls]
-    fig, ax = sc.case_subplots(
-        cases_ii, 
-        labels=labels_ii,
-        t1=t1[ii], save=True, loadpickle=True, dumppickle=False, 
-        includeTz=True, 
-        loadpicklex=True, dumppicklex=True,
-        fname='all-eta'+eta+'.png', suptitle='$\Delta \eta$='+eta,
-        includepd=True, # turn on once you know where steady state starts
-        includegraphic=True,
-       )
+# for ii, eta in enumerate(eta_ls): # eta_ls
+#     cases_ii = ['Ra'+Ra+'-eta'+eta+'-wide' for Ra in Ra_ls]
+#     labels_ii = ['Ra='+Ra for Ra in Ra_ls]
+#     fig, ax = sc.case_subplots(
+#         cases_ii,
+#         labels=labels_ii,
+#         t1=t1[ii], save=True, loadpickle=True, dumppickle=False,
+#         includeTz=True,
+#         loadpicklex=True, dumppicklex=True,
+#         fname='all-eta'+eta+'.png', suptitle='$\Delta \eta$='+eta,
+#         includepd=True, # turn on once you know where steady state starts
+#         includegraphic=True,
+#        )
 
 # compare 64 and 129 resolution for Ra=3e7
 # fig, ax = sc.case_subplots(
@@ -69,3 +70,7 @@ for ii, eta in enumerate(eta_ls): # eta_ls
 
 print('summary plots complete')
 
+cases_to_ascii = ['Ra1e8-eta1e7-wide']
+for case in cases_to_ascii:
+    dat = asp.Aspect_Data(directory='/raid1/cmg76/aspect/model-output/output-'+case+'/', verbose=False)
+    dat.write_ascii(A=None, fname='Tf_'+case, ext='.txt', path='/raid1/cmg76/aspect/model-input/ascii/', n=None, default_field='T')
