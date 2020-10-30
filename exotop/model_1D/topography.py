@@ -1,5 +1,5 @@
 ###### TOPOGRAPHY ######
-# import parameters as p
+from . import parameters as p
 import numpy as np
 
 def topography(pl, C='a_rh', **kwargs):

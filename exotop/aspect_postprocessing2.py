@@ -2,7 +2,6 @@ import sys
 src_paths = ['/usr/lib/python36.zip', 'usr/lib/python3.6', '/usr/lib/python3.6/lib-dynload', '/usr/local/lib/python3.6/dist-packages', '/usr/lib/python3/dist-packages']
 for s in src_paths:
     sys.path.insert(0, s)
-
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
@@ -420,8 +419,7 @@ class Aspect_Data():
         Nu = d*F/(k*dT)
         self.Nu = Nu
         return Nu
-        
-    
+
     def ubl_thickness(self, n, T_l=None, T_i=None, k=1, **kwargs):
         # get upper boundary layer thickness
         if T_i is None:
@@ -431,7 +429,6 @@ class Aspect_Data():
         ts = self.find_time_at_sol(n)
         F = self.stats_heatflux_top[ts]/self.parameters['Geometry model']['Box']['X extent']
         return k*(T_i - T_l)/F
-        
 
     def lid_thickness(self, u, v, tol=1, cut=False, plot=True, cutdiv=2, **kwargs): # 2D only
         x = self.x
@@ -626,8 +623,32 @@ class Aspect_Data():
         cax.set_xlabel(vlabel, fontsize=18)       
         return fig, ax
         
+    def write_ascii(self, A=None, fname='ascii', ext='.txt', path='', n=None, default_field='T', **kwargs):
+        # format ascii file for initialising future ASPECT runs. A is 2D array
+        x = self.x
+        y = self.y
+        nx = len(x)
+        ny = len(y)
+        header = 'POINTS: {:d} {:d}'.format(nx, ny) + '\nColumns: x y temperature'
+        fpath = path+fname+ext
+
+        if A is None:  # load default_field
+            if n is None:
+                n = self.final_step()
+            if default_field == 'T':
+                A = self.read_temperature(n, verbose=False)
+
+        xv, yv = np.meshgrid(x, y)
+        out = np.column_stack(xv, yv, np.zeros_like(xv))
+        print('xv, yv, A, out', np.shape(xv), np.shape(yv), np.shape(A))
+        row = 0
+        for ii in range(nx):
+            for jj in range(ny):
+                out[row, 2] = A[ii, jj]
+
+        np.savetxt(fpath, out, delimiter=" ", fmt="%s", header=header)
+        print('writing to ascii file', fpath)
+
     def hello(self):
         print('                                    i am here')
     # end class
-
-

@@ -2,6 +2,11 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from . import inputs
+from . import terrestrialplanet as tp
+from . import parameters
+from . import thermal
+from . import topography
 from matplotlib import cm, colors
 from collections.abc import Iterable
 import collections
@@ -11,7 +16,6 @@ from IPython.display import display, Math
 import random as rand
 # import terrestrialplanet as tp
 # import thermal as therm
-# import topography as top
 # import rheology as rh
 # import inputs as ins
 # from mpl_tools import colorize
@@ -40,8 +44,8 @@ def bulk_planets(N=1, name=None, mini=None, maxi=None, like=None, visc_type='Thi
     """varying single parameter 'name' between mini and maxi, use default values otherwise."""
     
     if like is not None:
-        pl_kwargs = eval('ins.'+like+'_in') 
-        model_kwargs =  eval('ins.'+like+'_run')
+        pl_kwargs = eval('inputs.'+like+'_in') 
+        model_kwargs =  eval('inputs.'+like+'_run')
     else:
         pl_kwargs = {}
         model_kwargs = dict(T_m0=T_m0, T_c0=T_c0, D_l0=D_l0, tf=tf, visc_type=visc_type) # model params
@@ -61,22 +65,22 @@ def bulk_planets(N=1, name=None, mini=None, maxi=None, like=None, visc_type='Thi
         new_kwargs.update({name:val})
         pl = tp.TerrestrialPlanet(**new_kwargs)
         
-        pl = therm.solve(pl, t_eval=t_eval, **model_kwargs) # T_m, T_c, D_l
-        pl = top.topography(pl, C=1)
+        pl = thermal.solve(pl, t_eval=t_eval, **model_kwargs) # T_m, T_c, D_l
+        pl = topography.topography(pl, C=1)
         planets.append(pl)
         ii+=1
     return planets
 
 def build_planet(ident='Earthbaseline', run_args=None, update_args=None):
-    planet_kwargs = eval('ins.'+ident+'_in') 
-    model_kwargs = eval('ins.'+ident+'_run')
+    planet_kwargs = eval('inputs.'+ident+'_in') 
+    model_kwargs = eval('inputs.'+ident+'_run')
     if run_args is not None:
         model_kwargs.update(run_args)
     if update_args is not None:
         planet_kwargs.update(update_args)
     pl = tp.TerrestrialPlanet(**planet_kwargs)
-    pl = therm.solve(pl, **model_kwargs) # T_m, T_c, D_l
-    pl = top.topography(pl, C=2)
+    pl = thermal.solve(pl, **model_kwargs) # T_m, T_c, D_l
+    pl = topography.topography(pl, C=2)
     return pl
 
 def build_solarsystem(run_args=None, ident_list=['Moon1', 'Mercury1', 'Mars1', 'Venus', 'Earth'], dicts=False):
@@ -116,7 +120,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, ve
     if (fig is None) and (axes is None):
         fig, axes = plt.subplots(nrows, ncols, figsize=(ncols*4, nrows*3))
     if tspan is None:
-        tspan = (0, t[-1]*1e-9/p.years2sec)
+        tspan = (0, t[-1]*1e-9/parameters.years2sec)
     out_vars = list(names.keys())
     ylabels = list(names.values()) # tuple (ylabel, yscale)
     if label is None:
@@ -134,7 +138,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, ve
             yl = str(ylabels[n][0])
             if (par=='eta_m') or (par=='Ra_i'): # always log scale for viscosity, Ra
                 y = np.log10(y)
-            plot_one(ax, t*1e-9/p.years2sec, y*ylabels[n][1], xlabel='', ylabel=yl, ticksize=ticksize, labelpad=labelpad,
+            plot_one(ax, t*1e-9/parameters.years2sec, y*ylabels[n][1], xlabel='', ylabel=yl, ticksize=ticksize, labelpad=labelpad,
                      label=label, fontname=fontname, labelsize=labelsize, legsize=legsize, line_args=line_args)
             if compare_dir is not None: 
                 # if data exists to benchmark this param
@@ -161,7 +165,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, ve
                     print('file', str(par+'.csv'), 'not found')
                     pass
             if par=='urey' and print_tf: # print final value of urey ratio
-                ii = np.where(t*1e-9/p.years2sec<=tspan[-1])
+                ii = np.where(t*1e-9/parameters.years2sec<=tspan[-1])
                 ax.annotate('%.2f'%(y[ii][-1]), xy=(tspan[-1], y[ii][-1]), fontsize=legsize, 
                             color=annotate_colour,
                             textcoords="axes fraction", xytext=(0.95, 0.2),
@@ -197,8 +201,8 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, ve
         plt.savefig(fig_path+fname+fformat, bbox_inches='tight') 
     if verbose:
         print('\n        n timesteps =', len(t))
-        print('$t_f$ =', t[-1]*p.sec2Gyr, 'Gyr')
-        print(r'$R_p$ =', '%.2f'%(pl.R_p/p.R_E), 'R_E =', '%.2f'%(pl.R_p*1e-3), 'km')
+        print('$t_f$ =', t[-1]*parameters.sec2Gyr, 'Gyr')
+        print(r'$R_p$ =', '%.2f'%(pl.R_p/parameters.R_E), 'R_E =', '%.2f'%(pl.R_p*1e-3), 'km')
 #         print(r'$R_c$ =', '%.2f'%(kwargs['CRF']*kwargs['R_p']*1e-3), 'km')
         print('M_c', '%.2e'%pl.M_c, 'kg')   
         print(r'$M_{m+lid}$ =', '%.2e'%(pl.M_m), 'kg')
@@ -225,7 +229,7 @@ def snaps(pl, plot_snapshots=None, fig_path=None, plots_save=False, ident=None, 
         n_col = 1
     fig2, axes2 = plt.subplots(1, n_col,figsize=(3*n_col,5))
     for iax, tx in enumerate(plot_snapshots): # tx is the time value u want nearest
-        ii = min(enumerate(t), key=lambda x: abs(tx - x[1]*p.sec2Gyr))[0]
+        ii = min(enumerate(t), key=lambda x: abs(tx - x[1]*parameters.sec2Gyr))[0]
         plot_structure(ax=axes2[iax], t=t[ii], T_m=pl.T_m[ii], T_c=pl.T_c[ii], T_s=pl.T_s,
                        T_l=pl.T_l[ii], R_l=pl.R_l[ii], R_p=pl.R_p, R_c=pl.R_c, h_rad_m=pl.h_rad_m[ii],
                        d_lbl = pl.TBL_c[ii], d_ubl = pl.TBL_u[ii], q_ubl = pl.q_ubl[ii], a0=pl.a0[ii],
@@ -244,11 +248,11 @@ def plot_structure(ax=None, t=None, T_m=None, T_c=None, R_p=None, R_l=None, R_c=
     r_m = np.linspace((R_c+d_lbl)*1e-3, (R_l-d_ubl)*1e-3) # radius for mantle in km
     r_ubl = np.linspace((R_l-d_ubl)*1e-3, (R_l)*1e-3)
     r_l = np.linspace(R_l*1e-3, R_p*1e-3) # radius for lid
-    T_cond = therm.sph_conduction(r_l*1e3, a0=a0, T_l=T_l, R_p=R_p, R_l=R_l, T_s=T_s, k_m=k_m, **kwargs)
-    q = therm.sph_flux(r_l*1e3, a0=a0, T_l=T_l, T_s=T_s, R_p=R_p, R_l=R_l, k_m=k_m, **kwargs)
+    T_cond = thermal.sph_conduction(r_l*1e3, a0=a0, T_l=T_l, R_p=R_p, R_l=R_l, T_s=T_s, k_m=k_m, **kwargs)
+    q = thermal.sph_flux(r_l*1e3, a0=a0, T_l=T_l, T_s=T_s, R_p=R_p, R_l=R_l, k_m=k_m, **kwargs)
     if Tlid_ini=='linear':
-        T_cond = therm.sph_conduction(r_l*1e3, a0=0, T_l=T_l, R_p=R_p, R_l=R_l, T_s=T_s, k_m=k_m,**kwargs)
-        q = therm.sph_flux(r_l*1e3, a0=0, T_l=T_l, T_s=T_s, R_p=R_p, R_l=R_l, k_m=k_m,**kwargs)
+        T_cond = thermal.sph_conduction(r_l*1e3, a0=0, T_l=T_l, R_p=R_p, R_l=R_l, T_s=T_s, k_m=k_m,**kwargs)
+        q = thermal.sph_flux(r_l*1e3, a0=0, T_l=T_l, T_s=T_s, R_p=R_p, R_l=R_l, k_m=k_m,**kwargs)
     
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize=(3,5))
@@ -277,7 +281,7 @@ def plot_structure(ax=None, t=None, T_m=None, T_c=None, R_p=None, R_l=None, R_c=
     ax2.annotate('$q_{ubl}$', (q_ubl*1e3, r_ubl[-1]), color='xkcd:grey', fontsize=12, ha="left", va="top")
     ax2.tick_params(axis='x', labelcolor='xkcd:grey')
     
-    ax.set_title(('%.1f'%(t*1e-9/p.years2sec))+' Gyr', fontsize=labelsize)
+    ax.set_title(('%.1f'%(t*1e-9/parameters.years2sec))+' Gyr', fontsize=labelsize)
 
     return ax
 
@@ -297,7 +301,7 @@ def plot_qsfc_error(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=Fa
         fig3, ax3 = plt.subplots(1, 1, figsize=(5,5))
         
     t_D_l, f_D_l_interp = interp_benchmark(path=compare_dir+'/D_l.csv', yscale=1e3) # in Gyr, m
-    temp = t*1e-9/p.years2sec # in Gyr
+    temp = t*1e-9/parameters.years2sec # in Gyr
     
     try:
         t_T_l, f_T_l_interp = interp_benchmark(path=compare_dir+'/T_l.csv')# in Gyr, K
@@ -314,7 +318,7 @@ def plot_qsfc_error(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=Fa
 
     D_l_interp = f_D_l_interp(times0) # published plot interpolated to model times, in m
     R_l_interp = pl.R_p - D_l_interp
-    q_sfc_interp = therm.sph_flux(pl.R_p, a0=pl.a0[iii], T_l=T_l_interp, T_s=pl.T_s, R_l=R_l_interp, 
+    q_sfc_interp = thermal.sph_flux(pl.R_p, a0=pl.a0[iii], T_l=T_l_interp, T_s=pl.T_s, R_l=R_l_interp, 
                                   R_p=pl.R_p, k_m=pl.k_m, **kwargs) # sfc flux in W m^-2
 
     ax3.plot(times0, pl.q_sfc[iii]*1e3, c='xkcd:black', label='this work')
@@ -353,13 +357,13 @@ def plot_Tavg(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, i
     t_D_l, f_D_l_interp = interp_benchmark(path=compare_dir+'/D_l.csv', yscale=1e3) # in Gyr, m
     
     # select model time points in interpolation range
-    temp = t*1e-9/p.years2sec # in Gyr
+    temp = t*1e-9/parameters.years2sec # in Gyr
     iii = np.where((temp>=t_D_l.min()) & (temp<=t_D_l.max()))
     times0 = temp[iii] # time points of ODE solver subset to interpolation range
     D_l_interp = f_D_l_interp(times0) # published D_l at model time points in m
     R_l_interp = pl.R_p - D_l_interp # m
     
-    T_avg_interp = therm.T_mean(T_m=pl.T_m[iii], T_l=pl.T_l[iii], R_p=pl.R_p, R_l=R_l_interp, 
+    T_avg_interp = thermal.T_mean(T_m=pl.T_m[iii], T_l=pl.T_l[iii], R_p=pl.R_p, R_l=R_l_interp, 
                                 R_c=pl.R_c, a0=pl.a0[iii], T_s=pl.T_s, k_m=pl.k_m, **kwargs)
     ax3.plot(times0, pl.T_avg[iii], c='xkcd:black', label='this work')
     ax3.plot(times0, T_avg_interp, c='xkcd:blue', label='this work with Thiriet D_l')
@@ -449,15 +453,15 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
                      'urey':('Ur',1),
                      'T_l':('$T_l$ (K)',1), 
                     }
-    planet_kwargs = eval('ins.'+ident+'_in') 
-    model_kwargs = eval('ins.'+ident+'_run')
+    planet_kwargs = eval('inputs.'+ident+'_in') 
+    model_kwargs = eval('inputs.'+ident+'_run')
     if pl_update_args is not None:
         planet_kwargs.update(pl_update_args)
     if model_update_args is not None:
         model_kwargs.update(model_update_args)
     pl = tp.TerrestrialPlanet(**planet_kwargs)
-    pl = therm.solve(pl, **model_kwargs) # T_m, T_c, D_l
-    pl = top.topography(pl, C=1)
+    pl = thermal.solve(pl, **model_kwargs) # T_m, T_c, D_l
+    pl = topography.topography(pl, C=1)
 
    # print('T_mf', pl.T_m[-1])
 
@@ -519,7 +523,7 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
             try:
                 for ip, pl in enumerate(lplanets): # planets to plot as line
                     t = pl.t
-                    it = min(enumerate(t), key=lambda x: abs(snap - x[1]*p.sec2Gyr))[0] # get time index nearest to desired snap given in Gyr
+                    it = min(enumerate(t), key=lambda x: abs(snap - x[1]*parameters.sec2Gyr))[0] # get time index nearest to desired snap given in Gyr
                     data_x = eval('pl.'+xparam)*xlabels[1]
                     if isinstance(data_x, Iterable):
                         data_x = data_x[it] # if an evolution model then take certain snap

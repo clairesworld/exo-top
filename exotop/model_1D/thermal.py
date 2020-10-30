@@ -2,10 +2,10 @@ import numpy as np
 from scipy import integrate
 import six
 import math
-# import parameters as p
+from . import parameters as p
 # import astroenvironment as ast
 # import geometry as geom
-# import rheology as rh
+from . import rheology as rh
 # import terrestrialplanet as tp
 from collections.abc import Iterable
 
@@ -224,11 +224,13 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
         pl.d_m = [pl.d_m_const]*np.ones_like(t)
     
 #     print('mantle eta')
+    pl.eta_l = rh.dynamic_viscosity(T=pl.T_l, pl=pl, **kwargs)
     pl.eta_m = rh.dynamic_viscosity(T=pl.T_m, pl=pl, **kwargs)
 #     print('cmb eta')
     pl.eta_cmb = rh.dynamic_viscosity(T=(pl.T_c+pl.T_m)/2, pl=pl, **kwargs)
     pl.nu_m = pl.eta_m/pl.rho_m
     pl.nu_cmb = pl.eta_cmb/pl.rho_m
+    pl.delta_eta = pl.eta_l - pl.eta_cmb
 #     ('upper bl')
 
     if hasattr(pl, 'dT_m_const'):
@@ -298,6 +300,9 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
 #     print('eta_m', pl.eta_m)
 #     print('delta_bl', pl.TBL_u)
     return pl
+
+
+
 
 
 def d_lid_ss(Tm, a_rh=None, k=None, Ea=None, H0=None, Ra_crit=None, eta_0=None, T_ref=None, 

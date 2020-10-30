@@ -1,5 +1,5 @@
 import numpy as np
-# import parameters as p
+from . import parameters as p
 
 def nu_Driscoll(T, pl=None, nu_0=7e7, Ea=3e5, **kwargs):
     """kinematic viscosity (upper mantle) from eqn 6 in Driscoll & Bercovici"""
@@ -79,3 +79,6 @@ def dynamic_viscosity(T=None, pl=None, visc_type=None, **kwargs): # note kwargs 
 def grain_size(A_rh, eta_0, Ea, T_ref, m, B_rh, mu):
     # calculate grain size to correspond to linearization
     return B_rh * (2*A_rh*eta_0*np.exp(-Ea/(p.R_b*T_ref))/mu)**(1/m)
+
+def viscosity_contrast(T1, T2):
+    pass

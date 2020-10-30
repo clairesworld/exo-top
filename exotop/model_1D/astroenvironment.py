@@ -1,5 +1,5 @@
 import numpy as np
-# import parameters as p
+from . import parameters as p
 
 
 ###### ASTRONOMY ######

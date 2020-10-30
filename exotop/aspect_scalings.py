@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib import container
 import matplotlib.image as mpimg
+from matplotlib.colors import LinearSegmentedColormap
 import pandas as pd
 import random as rand
 import pickle as pkl
@@ -16,6 +17,7 @@ import six
 from scipy.optimize import curve_fit
 from exotop import aspect_postprocessing2 as post # from exotop
 from exotop.mpl_tools import colorize
+from scipy import stats
 
 def read_topo_stats(case, snap, path='model-output/'):
     df = pd.read_csv(path+'output-'+case+'/dynamic_topography_surface.'+'{:05}'.format(snap), header=None,
@@ -249,7 +251,7 @@ def pd_top(case, t1=0, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/
     if (not peak_list) or (not rms_list): # empty
         print(case, '- h list is empty')
         return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), fig, ax
-    return np.percentile(peak_list, qs), np.percentile(rms_list, qs), fig, ax
+    return np.percentile(peak_list, qs), np.percentile(rms_list, qs), fig, a
 
 def pd_h_components(case, t1=0, data_path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', sigma=2,
                     pickleto=None, picklefrom=None, plotTz=False, savefig=False, 
@@ -731,7 +733,6 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/ra
         fig.savefig(fig_path+fname, bbox_inches='tight')
     return fig, ax
 
-from scipy import stats
 def fit_log(x, h, plot=True):
     x1 = np.log10(np.array(x)) # this should work for time-series of all x corresponding to h
     h1 = np.log10(np.array(h))
@@ -977,7 +978,6 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, path='model-output/', fig_pat
                                          pickleto=None, picklefrom=picklefrom, plotTz=False,
                                          fig_path=fig_path) 
 
-                print('T_params', T_params.keys())
                 # extract Nu
                 dat.read_statistics(verbose=False)
                 Nu = dat.Nu(k=1)
@@ -987,29 +987,14 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, path='model-output/', fig_pat
                 delta_plot.append(np.median(T_params['delta_u']))
                             
             if compare_pub is not None:
-                ax = axes[0]
                 S95label = 'S95'
-                if (jj>0) and (ii>0):
-                    S95label=None
-    #             dat = post.Aspect_Data(directory=path+'output-'+case+'/', verbose=False) # last case assuming theyre the same except for Ra/eta
-    #             par = self.parameters
-    #             T0 = par['Boundary temperature model']['Box']['Bottom temperature']
-    #             T1 = par['Boundary temperature model']['Box']['Top temperature']
-    #             dT = T0 - T1
-                T0 = 1
-                dT = 1
-                T_i = np.median(T_params['T_i'])
-                gamma = np.log(float(eta_str)) # gamma for this eta
-                p = gamma*dT
-                eta_0 = np.exp(-gamma*T0)
-                eta_i = np.exp(-gamma*T_i)
-                Ra_i = np.array(Ra_plot)*eta_0/eta_i
-                delta_S95 = 1.85*p**1.3185 * Ra_i**-0.3185
-                ax.plot(Ra_i, delta_S95, '^', alpha=0.7, c=c_scatter, label=S95label)
+                if (jj > 0) and (ii > 0):
+                    S95label = None
+                Ra_i, delta_S95, Nu_S95 = solomatov95(Ra=Ra_plot[ii], d_eta=float(eta_str), T_params=T_params)
+                axes[0].plot(Ra_i, delta_S95, '^', alpha=0.7, c=c_scatter, label=S95label)
+                axes[1].plot(Ra_i, Nu_S95, '^', alpha=0.7, c=c_scatter, label=S95label)
 #                 ax.legend()
-        
-        print('delta plot', delta_plot)
-        print('Nu plot', Nu_plot)
+
         fig, axes[0] = Ra_scaling(Ra_data=Ra_plot, y_data=delta_plot, t1=t1, 
                                   path=path, fig_path=fig_path, 
                                   save=False, sigma=sigma, showallscatter=False,
@@ -1023,16 +1008,46 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, path='model-output/', fig_pat
                                   c_scatter=c_scatter, fit=fitNu, logx=logx, logy=logy,
                                   fig=fig, ax=axes[1], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
         
-    scat = axes[1].scatter(logeta_fl,logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
-                           vmin=vmin, vmax=vmax) # dummy
+    scat = axes[1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
+                           vmin=vmin, vmax=vmax)  # dummy
     cbar = fig.colorbar(scat, ax=[axes[0], axes[1]])
-    cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=15)
+    cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=18)
     
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
         fig.savefig(fig_path+fname, bbox_inches='tight')
     return fig, axes
+
+def solomatov95(Ra=None, d_eta=None, T_params=None, case=None,
+                path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', picklefrom=None):
+    #             dat = post.Aspect_Data(directory=path+'output-'+case+'/', verbose=False)  # most recent case
+    #             par = self.parameters
+    #             T0 = par['Boundary temperature model']['Box']['Bottom temperature']
+    #             T1 = par['Boundary temperature model']['Box']['Top temperature']
+    #             dT = T0 - T1
+    if T_params is None:
+        T_params, _, _ = get_T_params(case=case, path=path, fig_path=fig_path, picklefrom=picklefrom)
+    T0 = 1
+    dT = 1
+    T_i = np.median(T_params['T_i'])
+    gamma = np.log(d_eta)  # gamma for this delta eta
+    p = gamma*dT
+    eta_0 = np.exp(-gamma*T0)
+    eta_i = np.exp(-gamma*T_i)
+    Ra_i = np.array(Ra)*eta_0/eta_i
+    delta_0 = 1.85*p**1.3185 * Ra_i**-0.3185
+    delta_1 = p**-1 * delta_0
+    Nu = (delta_0 + delta_1)**-1
+    return Ra_i, delta_0, Nu
+
+def moresi95(Ra=None, d_eta=None, T_params=None, case=None,
+                path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', picklefrom=None):
+    if T_params is None:
+        T_params, _, _ = get_T_params(case=case, path=path, fig_path=fig_path, picklefrom=picklefrom)
+    T0 = 1
+    dT = 1
+
 
 def plot_convection_regimes(Ra, eta, regime_grid, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, 
                             dumppickle=False, save=True, fname='regimes.png', labelsize=16, sigma=2,
@@ -1097,7 +1112,6 @@ def plot_convection_regimes(Ra, eta, regime_grid, path='model-output/', fig_path
             os.makedirs(fig_path)
         fig.savefig(fig_path+fname, bbox_inches='tight')
 
-from matplotlib.colors import LinearSegmentedColormap
 def cmap_from_list(clist, n_bin=None, cmap_name=''):
     if n_bin is None:
         n_bin = len(clist)
