@@ -18,6 +18,8 @@ from scipy.optimize import curve_fit
 from exotop import aspect_postprocessing2 as post # from exotop
 from exotop.mpl_tools import colorize
 from scipy import stats
+data_path_bullard = '/raid1/cmg76/aspect/model-output/'
+fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 
 def read_topo_stats(case, snap, path='model-output/'):
     df = pd.read_csv(path+'output-'+case+'/dynamic_topography_surface.'+'{:05}'.format(snap), header=None,
@@ -37,7 +39,7 @@ def trapzmean(A):
 def peak_and_rms(h):
     return np.max(h), np.sqrt(trapzmean(h**2))
 
-def read_evol(case, i, path='model-output/', skiprows=None):
+def read_evol(case, i, path=data_path_bullard, skiprows=None):
     # e.g. return time, column i, nsteps (from statistics file)
     df = pd.read_csv(path+'output-'+case+'/statistics', header=None,
                  skiprows=skiprows,
@@ -45,7 +47,7 @@ def read_evol(case, i, path='model-output/', skiprows=None):
 #     print(df)
     return np.array(df.iloc[:, 1]), np.array(df.iloc[:, i-1]), len(df.index)
 
-def top_profile(case, savefig=True, fig_path='/raid1/cmg76/aspect/figs/', path='model-output/'):
+def top_profile(case, savefig=True, fig_path=fig_path_bullard, path=data_path_bullard):
     time, y, nsteps = read_evol(case, i=2, path=path)
     snap = nsteps - 2 # honestly not sure why it's -2 but seems to work haha
     x, h = read_topo_stats(case, snap)
@@ -64,7 +66,7 @@ def top_profile(case, savefig=True, fig_path='/raid1/cmg76/aspect/figs/', path='
             os.makedirs(fig_path)    
         fig.savefig(fig_path+case+'_h_'+'{:05}'.format(snap)+'.png')
     
-def pd_quasiss(case, i, t1, path='model-output/'):
+def pd_quasiss(case, i, t1, path=data_path_bullard):
     time, y, nsteps = read_evol(case, i, path=path)
     x, h = read_topo_stats(case, nsteps-2)
     h_norm = trapznorm(h)
@@ -75,9 +77,9 @@ def pd_quasiss(case, i, t1, path='model-output/'):
     fig = plt.figure()
     plt.gca().hist(y[i_time])
 
-def get_T_params(case, t1=0, path='model-output/', pickleto=None, picklefrom=None, plotTz=False,
+def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=None, plotTz=False,
                  setylabel=True, setxlabel=True, savefig=True, verbose=False,
-                 fig_path='/raid1/cmg76/aspect/figs/', fig=None, ax=None, 
+                 fig_path=fig_path_bullard, fig=None, ax=None, 
                  legend=True, labelsize=16, **kwargs):
     if (os.path.exists(path+'output-'+case)):
         flag=False
@@ -164,8 +166,8 @@ def get_T_params(case, t1=0, path='model-output/', pickleto=None, picklefrom=Non
         print('case', case, 'not found')
         return {}, fig, ax
     
-def get_h(case, t1=0, path='model-output/', pickleto=None, picklefrom=None, 
-          fig_path='/raid1/cmg76/aspect/figs/', hscale=1,**kwargs):
+def get_h(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=None, 
+          fig_path=fig_path_bullard, hscale=1,**kwargs):
     flag=False
     if (picklefrom is not None) and (os.path.exists(fig_path+'data/'+picklefrom)):
         try:
@@ -213,7 +215,7 @@ def get_h(case, t1=0, path='model-output/', pickleto=None, picklefrom=None,
     except:
         return [np.nan], [np.nan]
     
-def pd_top(case, t1=0, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', sigma=2, 
+def pd_top(case, t1=0, path=data_path_bullard, fig_path=fig_path_bullard, sigma=2, 
            plot=True, fig=None, ax=None, savefig=True, settitle=True, setxlabel=True, legend=True, 
            labelsize=16, pickleto=None, picklefrom=None,
            c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', peak_list=None, rms_list=None):
@@ -253,7 +255,7 @@ def pd_top(case, t1=0, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/
         return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), fig, ax
     return np.percentile(peak_list, qs), np.percentile(rms_list, qs), fig, a
 
-def pd_h_components(case, t1=0, data_path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', sigma=2,
+def pd_h_components(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
                     pickleto=None, picklefrom=None, plotTz=False, savefig=False, 
                     settitle=True, setxlabel=True, c='xkcd:pale purple', params_list=None,
                     legend=True, plotpd=False, labelsize=16, fig=None, ax=None, alpha=None):
@@ -305,7 +307,7 @@ def pd_h_components(case, t1=0, data_path='model-output/', fig_path='/raid1/cmg7
 
 def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,
-              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path='/raid1/cmg76/aspect/figs/'):
+              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path=fig_path_bullard):
     if not setxlabel:
         xlabel=''
     if not setylabel:
@@ -329,7 +331,7 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
     return fig, ax
 
 def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0,0.065), 
-                  fname='cases.png', data_path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', 
+                  fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard, 
                   loadpickle=False, dumppickle=False, dumppicklex=False, includegraphic=False,
                   suptitle='', includepd=True, includeTz=True, loadpicklex=False):
     # rows are cases, columns are v_rms, q, T(z), hist
@@ -488,7 +490,7 @@ def get_cases_list(Ra, eta):
         raise Exception('Ra or eta must be iterable')
     return cases, x_var  
 
-def plot_h_vs_Ra(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', 
+def plot_h_vs_Ra(Ra=None, eta=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard, 
               loadpickle=False, dumppickle=False, showallscatter=False,
               save=True, fname='h.png', plotpd=False, sigma=2, 
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
@@ -585,7 +587,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/ra
         fig.savefig(fig_path+fname, bbox_inches='tight')
     return fig, ax
 
-def plot_h_vs_Td(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', 
+def plot_h_vs_Td(Ra=None, eta=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard, 
               loadpickle=False, dumppickle=False, loadpicklex=False, 
               save=True, fname='h_T.png', plotpd=False, sigma=2, showallscatter=False,
               labelsize=16, xlabel=r'$\delta_u \Delta T_{rh}$', ylabel='dynamic topography', title='',
@@ -762,7 +764,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppickle=False, save=True, 
                   sigma=2, t1=None, fit=False, loadpicklex=False, nrows=2, ncols=2, x_components=False,
-                  path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', fname='h_Ra_all.png',
+                  path=data_path_bullard, fig_path=fig_path_bullard, fname='h_Ra_all.png',
                   ylim=(6e-3,7e-2), labelsize=14, xlim=None, xlabel='Ra', ylabel='dynamic topography',
                  logx=True, logy=True, showallscatter=False, xlabelpad=12, ylabelpad=2, hscale=1):
     # subplots for different eta
@@ -878,7 +880,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppi
                     bbox_extra_artists=(outer_legend,))  
     return fig, axes
 
-def Ra_scaling(Ra_data=None, y_data=None, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', 
+def Ra_scaling(Ra_data=None, y_data=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard, 
               save=True, fname='claire.png',  sigma=2, showallscatter=False,
               labelsize=16, ylabel='', xlabel='Ra', title='',
               c_scatter='xkcd:forest green', legend=True, 
@@ -928,7 +930,7 @@ def Ra_scaling(Ra_data=None, y_data=None, t1=None, path='model-output/', fig_pat
         fig.savefig(fig_path+fname, bbox_inches='tight')
     return fig, ax
 
-def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', 
+def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard, 
               loadpicklex=False, save=True, fname='bl-Nu.png',  sigma=2, showallscatter=False,
               labelsize=16, ylabel=[r'$\delta$','Nu'], xlabel='Ra', title='',
               c_scatter='xkcd:forest green', legend=True, cmap='magma', compare_pub=None,
@@ -1020,7 +1022,7 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, path='model-output/', fig_pat
     return fig, axes
 
 def solomatov95(Ra=None, d_eta=None, T_params=None, case=None,
-                path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', picklefrom=None):
+                path=data_path_bullard, fig_path=fig_path_bullard, picklefrom=None):
     #             dat = post.Aspect_Data(directory=path+'output-'+case+'/', verbose=False)  # most recent case
     #             par = self.parameters
     #             T0 = par['Boundary temperature model']['Box']['Bottom temperature']
@@ -1042,14 +1044,14 @@ def solomatov95(Ra=None, d_eta=None, T_params=None, case=None,
     return Ra_i, delta_0, Nu
 
 def moresi95(Ra=None, d_eta=None, T_params=None, case=None,
-                path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', picklefrom=None):
+                path=data_path_bullard, fig_path=fig_path_bullard, picklefrom=None):
     if T_params is None:
         T_params, _, _ = get_T_params(case=case, path=path, fig_path=fig_path, picklefrom=picklefrom)
     T0 = 1
     dT = 1
 
 
-def plot_convection_regimes(Ra, eta, regime_grid, path='model-output/', fig_path='/raid1/cmg76/aspect/figs/', loadpickle=False, 
+def plot_convection_regimes(Ra, eta, regime_grid, path=data_path_bullard, fig_path=fig_path_bullard, loadpickle=False, 
                             dumppickle=False, save=True, fname='regimes.png', labelsize=16, sigma=2,
                             overploth=False, nlevels=10, clist=None, cmap_contours='spring', **kwargs):
     # Ra and eta are lists of strings
