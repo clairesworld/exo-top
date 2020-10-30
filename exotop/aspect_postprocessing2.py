@@ -625,18 +625,22 @@ class Aspect_Data():
         
     def write_ascii(self, A=None, fname='ascii', ext='.txt', path='', n=None, default_field='T', **kwargs):
         # format ascii file for initialising future ASPECT runs. A is 2D array
-        x = self.x
-        y = self.y
+        if n is None:
+            n = self.final_step()
+
+        if A is not None:
+            if self.mesh_file != self.mnames[n]:
+                self.read_mesh(n, verbose=verbose)
+            x = self.x
+            y = self.y
+        else:  # load default_field
+            if default_field == 'T':
+                x, y, _, A = self.read_temperature(n, verbose=False)
+
         nx = len(x)
         ny = len(y)
         header = 'POINTS: {:d} {:d}'.format(nx, ny) + '\nColumns: x y temperature'
         fpath = path+fname+ext
-
-        if A is None:  # load default_field
-            if n is None:
-                n = self.final_step()
-            if default_field == 'T':
-                A = self.read_temperature(n, verbose=False)
 
         xv, yv = np.meshgrid(x, y)
         out = np.column_stack(xv, yv, np.zeros_like(xv))
