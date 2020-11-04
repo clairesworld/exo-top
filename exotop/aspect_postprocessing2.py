@@ -7,7 +7,7 @@ from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
 import scipy
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.integrate import trapz
 from scipy.ndimage.interpolation import zoom
