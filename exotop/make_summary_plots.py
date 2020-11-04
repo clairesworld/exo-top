@@ -7,7 +7,7 @@ from exotop import aspect_postprocessing2 as asp
 # matplotlib.use('Agg')
 # import matplotlib.pyplot as plt
 
-Ra_ls = ['1e6', '3e6', '1e7', '3e7', '1e8', '3e8'] # 3e5 no convection, 3e8 doesn't converge (also problem with 128 mesh??)
+Ra_ls = ['1e6', '3e6', '1e7', '3e7', '1e8', '3e8'] # 3e5 no convection
 eta_ls = ['1e5', '1e6', '1e7', '1e8']
 t1 = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 1], # eta 1e5
                [0.9, 0.3, 0.3, 0.4, 0.3, 1],  # eta 1e6
@@ -58,19 +58,19 @@ t1 = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 1], # eta 1e5
 #     includepd=True, # turn on once you know where steady state starts
 #    )
 
-# Ra_ls = ['1e6', '3e6', '1e7', '3e7', '8e7', '1e8', '3e8']
-# fig, ax = sc.case_subplots(
-#     ['Ra'+Ra+'-eta1e5-wide' for Ra in Ra_ls], 
-#     labels=['Ra='+Ra for Ra in Ra_ls],
-#     t1=None, save=True, loadpickle=True, dumppickle=True, 
-#     includeTz=True, loadpicklex=True, dumppicklex=True,
-#     fname='all-eta1e5.png', suptitle='$\Delta \eta$=1e5',
-#     includepd=True, # turn on once you know where steady state starts
-#        )
+eta_ls = ['1e5', '1e6', '1e7', '1e8']
+fig, ax = sc.case_subplots(
+    ['Ra3e8-eta'+eta+'-wide' for eta in eta_ls],
+    labels=[r'$\Delta \eta$='+eta for eta in eta_ls],
+    t1=None, save=True, loadpickle=False, dumppickle=True,
+    includeTz=True, loadpicklex=False, dumppicklex=True,
+    fname='all-Ra3e8.png', suptitle='Ra = 3e8',
+    includepd=False, # turn on once you know where steady state starts
+       )
 
 print('summary plots complete')
-
-cases_to_ascii = ['Ra1e8-eta1e7-wide']
-for case in cases_to_ascii:
-    dat = asp.Aspect_Data(directory='/raid1/cmg76/aspect/model-output/output-'+case+'/', verbose=False)
-    dat.write_ascii(A=None, fname='Tf_'+case, ext='.txt', path='/raid1/cmg76/aspect/model-input/ascii/', n=None, default_field='T')
+#
+# cases_to_ascii = ['Ra1e8-eta1e7-wide']
+# for case in cases_to_ascii:
+#     dat = asp.Aspect_Data(directory='/raid1/cmg76/aspect/model-output/output-'+case+'/', verbose=False)
+#     dat.write_ascii(A=None, fname='Tf_'+case, ext='.txt', path='/raid1/cmg76/aspect/model-input/ascii/', n=None, default_field='T')
