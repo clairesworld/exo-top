@@ -58,9 +58,11 @@ t1 = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 1], # eta 1e5
 #     includepd=True, # turn on once you know where steady state starts
 #    )
 
+# compare Ra 3e8
 eta_ls = ['1e5', '1e6', '1e7', '1e8']
+end = ['', '', '-ascii', '-ascii']
 fig, ax = sc.case_subplots(
-    ['Ra3e8-eta'+eta+'-wide' for eta in eta_ls],
+    ['Ra3e8-eta'+eta+'-wide'+end for eta in eta_ls],
     labels=[r'$\Delta \eta$='+eta for eta in eta_ls],
     t1=None, save=True, loadpickle=False, dumppickle=True,
     includeTz=False, loadpicklex=False, dumppicklex=True,
