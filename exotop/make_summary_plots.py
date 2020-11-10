@@ -64,10 +64,10 @@ end = ['', '', '-ascii', '-ascii']
 fig, ax = sc.case_subplots(
     ['Ra3e8-eta'+eta+'-wide'+e for eta, e in zip(eta_ls, end)],
     labels=[r'$\Delta \eta$='+eta for eta in eta_ls],
-    t1=None, save=True, loadpickle=False, dumppickle=True,
-    includeTz=False, loadpicklex=False, dumppicklex=True,
+    t1=[0.046,0.05,0.042,0.045], save=True, loadpickle=False, dumppickle=True,
+    includeTz=True, loadpicklex=False, dumppicklex=True,
     fname='all-Ra3e8.png', suptitle='Ra = 3e8',
-    includepd=False,  # turn on once you know where steady state starts
+    includepd=True,  # turn on once you know where steady state starts
        )
 
 print('summary plots complete')

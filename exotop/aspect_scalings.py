@@ -15,7 +15,7 @@ import pickle as pkl
 import collections
 import six
 from scipy.optimize import curve_fit
-from exotop import aspect_postprocessing2 as post # from exotop
+from exotop import aspect_postprocessing2 as post
 from exotop.mpl_tools import colorize
 from scipy import stats
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
