@@ -85,7 +85,8 @@ def max_slope(x,y, which='max', plot=False, tol=1):
 def horizontal_mean(A, x):
     int_x = trapz(A, x = x, axis = 0)
     int_x = int_x / ((max(x)-min(x)))
-    print('int_x', np.shape(int_x), 'int_x[0]', np.shape(int_x[0]))
+    print('int_x', np.shape(int_x), 'int_x.T[0]', np.shape(int_x.T[0]))
+    print('ndim = ', int_x.T[0].ndim)
     return int_x.T[0]
 
 class Aspect_Data():
