@@ -591,11 +591,12 @@ class Aspect_Data():
         return xu, yu, topo
     
     def plot_profile(self, s, xlabel='', ylabel='depth', fig=None, ax=None, **plotkwargs):
-        # s is a 2D array
+        # s is a 2D or 1D array
         x = self.x
         y = self.y
         if fig is None:
             fig, ax = plt.subplots(figsize=(4,4))
+        print('s', np.shape(s), 's[0]', np.shape(s[0]))
         try:
             a = horizontal_mean(s, x)
             ax.plot(a, y, **plotkwargs)

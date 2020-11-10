@@ -86,16 +86,20 @@ def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=N
         if (picklefrom is not None) and (os.path.exists(fig_path+'data/'+picklefrom)):
             try:
                 T_params = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ))
+                dummy = T_params['delta_u']
                 print('loaded T profiles from', case)
             except ValueError:
-                T_params = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ), 
-                                                             protocol=2)
+                T_params = pkl.load(open( fig_path+'data/'+picklefrom, "rb" ), protocol=2)
                 print('loaded T profiles from', case)
+            except KeyError:
+                flag = True
+                pickleto = picklefrom
+                print(picklefrom, 'incomplete, re-calculating...')
 #             if not T_params['dT_rh']: # if empty
 #                 flag=True
         else:
             flag=True
-            if picklefrom is not None: # save if tried to load but failed
+            if picklefrom is not None:  # save if tried to load but failed
                 pickleto = picklefrom
                 print(picklefrom, 'not found, re-calculating...')
 
@@ -106,7 +110,7 @@ def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=N
             dat.read_statistics(verbose=False)
             time = dat.stats_time
             snaps = dat.read_stats_sol_files()
-            i_time = np.argmax(time > t1) # index of first timestep in quasi-ss
+            i_time = np.argmax(time > t1)  # index of first timestep in quasi-ss
             if i_time > 0:
                 n_quasi = snaps[i_time:] # find graphical snapshots within time range
                 for n in np.unique(n_quasi):
