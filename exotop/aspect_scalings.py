@@ -131,18 +131,18 @@ def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=N
             pkl.dump(T_params, open( fig_path+'data/'+pickleto, "wb" )) 
 
         if plotTz and ((not flag) or (len(n_quasi)>2)):
-            if not flag: # load last time step if haven't yet
-                try:
-                    test = dat.hello()
-                except:
-                    dat = post.Aspect_Data(directory=path+'output-'+case+'/', verbose=False)
-#                     n = dat.final_step()
-#                     x, y, z, T = dat.read_temperature(n, verbose=False)
-                dT_rh_f = T_params['dT_rh'][-1]
-                delta_f = T_params['delta_u'][-1]
-                D_l_f = T_params['D_l'][-1]
-                T_l_f = T_params['T_l'][-1]
-                T_f = T_params['T'][-1]
+#             if not flag: # load last time step if haven't yet
+#                 try:
+#                     test = dat.hello()
+#                 except:
+#                     dat = post.Aspect_Data(directory=path+'output-'+case+'/', verbose=False)
+# #                     n = dat.final_step()
+# #                     x, y, z, T = dat.read_temperature(n, verbose=False)
+            dT_rh_f = T_params['dT_rh'][-1]
+            delta_f = T_params['delta_u'][-1]
+            D_l_f = T_params['D_l'][-1]
+            T_l_f = T_params['T_l'][-1]
+            T_f = T_params['T'][-1]
             fig, ax = dat.plot_profile(T_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
             ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
             ax.axhline(D_l_f-delta_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
