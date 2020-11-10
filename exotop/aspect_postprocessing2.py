@@ -85,8 +85,6 @@ def max_slope(x,y, which='max', plot=False, tol=1):
 def horizontal_mean(A, x):
     int_x = trapz(A, x = x, axis = 0)
     int_x = int_x / ((max(x)-min(x)))
-    print('int_x', np.shape(int_x), 'int_x.T[0]', np.shape(int_x.T[0]))
-    print('ndim = ', int_x.T[0].ndim)
     return int_x.T[0]
 
 class Aspect_Data():
@@ -529,11 +527,7 @@ class Aspect_Data():
         y = self.y
         if T is None:
             _, _, _, T = self.read_temperature(n, verbose=verbose)
-        print('x', np.shape(x))
-        print('y', np.shape(y))
-        print('T', np.shape(T))
         T_av = horizontal_mean(T, x)
-        print('T_av', np.shape(T_av))
         p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
@@ -601,14 +595,12 @@ class Aspect_Data():
         y = self.y
         if fig is None:
             fig, ax = plt.subplots(figsize=(4,4))
-        print('s', np.shape(s), 's[0]', np.shape(s[0]))
-        try:
-            a = horizontal_mean(s, x)
-            ax.plot(a, y, **plotkwargs)
-        except ValueError:
+        if s.ndim == 2:  # s is not horizontally- averaged yet
+            s = horizontal_mean(s, x)
+        elif s.ndim > 2:  # still in 3D default shape
             s = reduce_dims(s)
-            a = horizontal_mean(s, x)
-            ax.plot(a, y, **plotkwargs)
+            s = horizontal_mean(s, x)
+        ax.plot(s, y, **plotkwargs)
         ax.set_xlabel(xlabel, fontsize=18)
         ax.set_ylabel(ylabel, fontsize=18)
         ax.set_ylim(y.min(), y.max())
