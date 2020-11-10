@@ -527,6 +527,7 @@ class Aspect_Data():
         y = self.y
         if T is None:
             _, _, _, T = self.read_temperature(n, verbose=verbose)
+        T = reduce_dims(T)
         print('x', np.shape(x))
         print('y', np.shape(y))
         print('T', np.shape(T))
