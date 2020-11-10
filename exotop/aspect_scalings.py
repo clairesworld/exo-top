@@ -142,7 +142,7 @@ def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=N
             delta_f = T_params['delta_u'][-1]
             D_l_f = T_params['y_l'][-1]
             T_l_f = T_params['T_l'][-1]
-            T_f = T_params['T'][-1]
+            T_f = T_params['T_av'][-1]
             fig, ax = dat.plot_profile(T_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
             ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
             ax.axhline(D_l_f-delta_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
