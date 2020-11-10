@@ -527,7 +527,11 @@ class Aspect_Data():
         y = self.y
         if T is None:
             _, _, _, T = self.read_temperature(n, verbose=verbose)
+        print('x', np.shape(x))
+        print('y', np.shape(y))
+        print('T', np.shape(T))
         T_av = horizontal_mean(T, x)
+        print('T_av', np.shape(T_av))
         p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
