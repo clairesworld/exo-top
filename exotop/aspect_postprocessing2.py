@@ -527,7 +527,6 @@ class Aspect_Data():
         y = self.y
         if T is None:
             _, _, _, T = self.read_temperature(n, verbose=verbose)
-        T = reduce_dims(T)
         print('x', np.shape(x))
         print('y', np.shape(y))
         print('T', np.shape(T))
@@ -545,7 +544,6 @@ class Aspect_Data():
         if delta_u is None:
             delta_u = self.ubl_thickness(n, T_l=T_l, T_i=T_i, **kwargs)
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
-#         print('dT_rh', dT_rh, 'dT_m', dT_m, 'delta_u', delta_u, 'd_m', d_m, 'T_l', T_l, 'T_i', T_i)
        
         return {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_u':delta_u, 'd_m':d_m, 'y_l':y_l, 'T_l':T_l, 'T_i':T_i, 'T_av':T_av, 'y':y}
     
