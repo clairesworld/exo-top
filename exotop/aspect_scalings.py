@@ -140,7 +140,7 @@ def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=N
 # #                     x, y, z, T = dat.read_temperature(n, verbose=False)
             dT_rh_f = T_params['dT_rh'][-1]
             delta_f = T_params['delta_u'][-1]
-            D_l_f = T_params['D_l'][-1]
+            D_l_f = T_params['y_l'][-1]
             T_l_f = T_params['T_l'][-1]
             T_f = T_params['T'][-1]
             fig, ax = dat.plot_profile(T_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)

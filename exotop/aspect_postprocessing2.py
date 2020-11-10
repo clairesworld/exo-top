@@ -86,7 +86,6 @@ def horizontal_mean(A, x):
     int_x = trapz(A, x = x, axis = 0)
     int_x = int_x / ((max(x)-min(x)))
     return int_x.T[0]
-    
 
 class Aspect_Data():
     def __init__(self, directory, verbose=True):
