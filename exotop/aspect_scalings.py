@@ -142,14 +142,14 @@ def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=N
                 delta_f = T_params['delta_u'][-1]
                 D_l_f = T_params['D_l'][-1]
                 T_l_f = T_params['T_l'][-1]
-                T = T_params['T'][-1]
-            fig, ax = dat.plot_profile(T, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
-            ax.axhline(D_l_n, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
-            ax.axhline(D_l_n-delta_n, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
-            ax.text(0, D_l_n-delta_n, r'$\delta = $'+'{:04.2f}'.format(delta_n), ha='left', va='top',
+                T_f = T_params['T'][-1]
+            fig, ax = dat.plot_profile(T_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
+            ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
+            ax.axhline(D_l_f-delta_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
+            ax.text(0, D_l_f-delta_f, r'$\delta = $'+'{:04.2f}'.format(delta_f), ha='left', va='top',
                    color='xkcd:red orange', fontsize=labelsize-2)
-            ax.plot([T_l_n, T_l_n], [0, D_l_n], ls='--', alpha=0.5, lw=0.5, c='xkcd:tangerine')
-            ax.plot([T_l_n+dT_rh_n, T_l_n+dT_rh_n], [0, D_l_n-delta_n], ls='--', alpha=0.5, lw=0.5, 
+            ax.plot([T_l_f, T_l_f], [0, D_l_f], ls='--', alpha=0.5, lw=0.5, c='xkcd:tangerine')
+            ax.plot([T_l_f+dT_rh_f, T_l_f+dT_rh_f], [0, D_l_f-delta_f], ls='--', alpha=0.5, lw=0.5,
                     c='xkcd:red orange')
             if legend:
                 ax.legend(frameon=False, fontsize=labelsize-2)
