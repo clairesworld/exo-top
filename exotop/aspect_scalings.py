@@ -119,7 +119,11 @@ def process_at_solutions(case, postprocess_functions, t1=0, path=data_path_bulla
         dict_to_append['time'] = []
         dict_to_append['timestep'] = []
     if dat is None:
-        dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
+        try:
+            dat = dict_to_append['dat']
+        except KeyError:
+            dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
+            dict_to_append['dat'] = dat
     time = dat.stats_time
     snaps = dat.read_stats_sol_files()
     i_time = np.argmax(time > t1)  # index of first timestep to process
@@ -137,6 +141,7 @@ def process_at_solutions(case, postprocess_functions, t1=0, path=data_path_bulla
         dict_to_append['time'].extend(time[n_indices])
         dict_to_append['timestep'].extend(n_indices)
         dict_to_append['nsols'] = len(n_quasi)
+        dict_to_append['dat'] = dat
 
     else:
         times_at_sols = dat.find_time_at_sol(sol_files=snaps, return_indices=False)
@@ -158,13 +163,15 @@ def get_T_params(case=None, n=None, dict_to_append={}, dat=None, **kwargs):
         except KeyError:  # key does not exist yet
             T_params[key] = []
             T_params[key].append(T_params_n[key])
-    return T_params
+    return T_params, dat
 
 
 def plot_T_params(case, T_params, n=-1,
                  setylabel=True, setxlabel=True, savefig=True,
                  fig_path=fig_path_bullard, fig=None, ax=None,
-                 legend=True, labelsize=16, **kwargs):
+                 legend=True, labelsize=16, path=data_path_bullard, **kwargs):
+    if dat is None:
+        dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
     dT_rh_f = T_params['dT_rh'][n]
     delta_rh_f = T_params['delta_rh'][n]
     D_l_f = T_params['delta_L'][n]
