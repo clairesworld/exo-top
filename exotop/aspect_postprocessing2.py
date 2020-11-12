@@ -658,6 +658,8 @@ class Aspect_Data():
             if n is None:
                 n = self.final_step()
             self.read_mesh(n=n, verbose=False)
+            x = self.x
+            y = self.y
         if fig is None:
             fig, ax = plt.subplots(figsize=(4,4))
         if s.ndim == 2:  # s is not horizontally- averaged yet
