@@ -10,7 +10,6 @@ from setup_postprocessing import Ra_ls, eta_ls, t1, end
 for ii, eta in enumerate(eta_ls):  # across eta_ls
     cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end)]
     labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
-    print('cases_ii', cases_ii)
     fig, ax = sc.case_subplots(
         cases_ii,
         labels=labels_ii,
