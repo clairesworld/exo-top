@@ -155,10 +155,10 @@ def get_T_params(case=None, n=None, dict_to_append={}, dat=None, **kwargs):
     for key in T_params_n.keys():
         try:
             T_params[key].append(T_params_n[key])
-        except:  # key does not exist yet
+        except KeyError:  # key does not exist yet
             T_params[key] = []
             T_params[key].append(T_params_n[key])
-     return T_params
+    return T_params
 
 
 def plot_T_params(case, T_params, n=-1,
