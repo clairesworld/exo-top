@@ -5,24 +5,13 @@ for s in src_paths:
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
-import scipy
-import matplotlib
-# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.integrate import trapz
-from scipy.ndimage.interpolation import zoom
-from scipy.fftpack import dct, idct
-from scipy import ndimage
 import xml.etree.ElementTree
 import os
 import h5py
 import re
-import pandas as pd
-from scipy.signal import periodogram
-#import seaborn as sns
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import pickle as pkl
-
 rasterized=True
 
 def unique_rows(a):
@@ -93,7 +82,7 @@ def horizontal_mean(A, x, axis=None):
         return int_x.T[0]
 
 class Aspect_Data():
-    def __init__(self, directory, verbose=True):
+    def __init__(self, directory, read_parameters=True, read_statistics=False, verbose=True):
         self.directory = directory
         
         xdmf_filename = directory + "solution.xdmf"
@@ -112,7 +101,10 @@ class Aspect_Data():
             print("Aspect data found in", self.format, "format")
         self.mesh_file=''
         
-        self.read_parameters(verbose=verbose)
+        if read_parameters:
+            self.read_parameters(verbose=verbose)
+        if read_statistics:
+            self.read_statistics(verbose=verbose)
         if verbose:
             self.print_summary()
 
@@ -308,14 +300,14 @@ class Aspect_Data():
         self.stats_heatflux_top = data[:,19]
         self.stats_average_viscosity = data[:,22]
 
-    def read_stats_sol_files(self, i_vis=20, skip_header=26):
+    def read_stats_sol_files(self, col_vis=20, skip_header=26):
         filename = self.directory + "statistics"
         all_data = np.genfromtxt(filename, skip_header=skip_header, dtype=None)
         last = 0
         files = np.zeros(len(all_data))
         #  find last instance that's not ""
         for n, d in enumerate(all_data):
-            s = d[i_vis][-14:]
+            s = d[col_vis][-14:]
             if not s.decode()=='""':
                 last = int(re.search(r'\d+', s.decode()).group(0))
             files[n] = last
@@ -325,7 +317,7 @@ class Aspect_Data():
         # input solution file and get first timestep - for n or all solutions
         # n is the number in the solution filename
         if sol_files is None:
-            sol_files = self.read_stats_sol_files(i_vis=i_vis, skip_header=skip_header)
+            sol_files = self.read_stats_sol_files(col_vis=i_vis, skip_header=skip_header)
         u, indices = np.unique(sol_files, return_index=True)
         if return_indices:
             if n is None:

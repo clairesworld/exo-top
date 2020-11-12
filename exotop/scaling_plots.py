@@ -2,10 +2,6 @@ import sys
 sys.path.insert(0,'/home/cmg76/Works/exo-top/')
 import numpy as np
 from exotop import aspect_scalings as sc
-from exotop.mpl_tools import colorize
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 from setup_postprocessing import Ra_ls, eta_ls, t1, end
 
 # Ra from 1e6 to 3e8

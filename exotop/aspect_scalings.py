@@ -1,34 +1,92 @@
 import os
 import sys
-sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from matplotlib import container
 import matplotlib.image as mpimg
 from matplotlib.colors import LinearSegmentedColormap
 import pandas as pd
-import random as rand
 import pickle as pkl
-import collections
-import six
+from collections import Iterable
+from types import StringTypes
 from scipy.optimize import curve_fit
+from scipy import stats
+sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_postprocessing2 as post
 from exotop.mpl_tools import colorize
-from scipy import stats
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 
 
-def read_topo_stats(case, snap, path='model-output/'):
-    df = pd.read_csv(path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(snap), header=None,
+def read_topo_stats(case, ts, path='model-output/'):
+    df = pd.read_csv(path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
                      names=['x', 'y', 'h'],
                      skiprows=1,
                      index_col=False, delimiter=r"\s+", engine='python')
     return df['x'], df['h']
+
+
+def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat=None,
+             path=data_path_bullard, fig_path=fig_path_bullard, fend='.pkl', **kwargs):
+    # do pickling strategy
+    fname = case + suffix + fend
+    run_dict = {}
+    dump_flag = False
+    reprocess_flag = False
+    t1_new = t1
+
+    if os.path.exists(path + 'output-' + case):  # do nothing if case doesn't exist
+        if (load == 'auto' or load is True):
+            if os.path.exists(fig_path + 'data/' + fname):
+                # open pickled file
+                try:
+                    run_dict = pkl.load(open(fig_path + 'data/' + fname, "rb"))
+                    print('loaded', fname)
+                except ValueError:  # python 2?
+                    run_dict = pkl.load(open(fig_path + 'data/' + fname, "rb"), protocol=2)
+                    print('loaded', fname)
+
+                if load == 'auto':  # check for additional timesteps
+                    time_old = run_dict['time']  # should all be after t1
+                    if dat is None:
+                        dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False,
+                                               read_statistics=True, read_parameters=False)
+                    time_new = dat.stats_time
+                    t1_new = np.argmax(time_new > time_old[-1])
+                    if t1_new > 0:  # new timesteps
+                        reprocess_flag = True
+                        print('updating', fname)
+
+            elif load == 'auto':  # pkl file not found
+                reprocess_flag = True
+                print(fname, 'not found, re-calculating...')
+
+        else:  # load is False so automatically calculate shit
+            reprocess_flag = True
+
+        if reprocess_flag and (t1 != 1):
+            run_dict = process_at_solutions(case, postprocess_functions=postprocess_functions, t1=t1_new, path=path,
+                                            dat=dat, dict_to_append=run_dict, **kwargs)
+            dump_flag = True  # always save if you did something
+
+        if dump_flag:
+            pkl.dump(run_dict, open(fig_path + 'data/' + fname, "wb"))
+
+    return run_dict   # TODO: will returning None break?
+
+
+def get_cases_list(Ra, eta):
+    # either Ra or eta is iterable
+    if isinstance(Ra, Iterable) and not isinstance(Ra, StringTypes):
+        x_var = Ra
+        cases = ['Ra' + r + '-eta' + eta + '-wide' for r in Ra]
+    elif (isinstance(eta, Iterable) and not isinstance(eta, StringTypes)):
+        x_var = eta
+        cases = ['Ra' + Ra + '-eta' + e + '-wide' for e in eta]
+    else:
+        raise Exception('Ra or eta must be iterable')
+    return cases, x_var
 
 
 def trapznorm(A):
@@ -50,43 +108,87 @@ def read_evol(case, i, path=data_path_bullard, skiprows=None):
     df = pd.read_csv(path + 'output-' + case + '/statistics', header=None,
                      skiprows=skiprows,
                      index_col=False, delimiter=r"\s+", engine='python', comment='#')
-    #     print(df)
     return np.array(df.iloc[:, 1]), np.array(df.iloc[:, i - 1]), len(df.index)
 
 
-def top_profile(case, savefig=True, fig_path=fig_path_bullard, path=data_path_bullard):
-    time, y, nsteps = read_evol(case, i=2, path=path)
-    snap = nsteps - 2  # honestly not sure why it's -2 but seems to work haha
-    x, h = read_topo_stats(case, snap)
-    # normalize to 0 mean
-    h_norm = trapznorm(h)
-    fig = plt.figure()
-    plt.plot(x, h_norm)
-    plt.xlabel('x')
-    plt.ylabel('dynamic topography')
-    plt.title(case)
-    print('mean:', trapzmean(h_norm))
-    print('max:', np.max(h_norm))
-    print('min:', np.min(h_norm))
+def process_at_solutions(case, postprocess_functions, t1=0, path=data_path_bullard, dict_to_append={}, dat=None, **kwargs):
+    try:
+        dict_to_append['sol'].extend([])
+    except KeyError:
+        dict_to_append['sol'] = []
+        dict_to_append['time'] = []
+        dict_to_append['timestep'] = []
+    if dat is None:
+        dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
+    time = dat.stats_time
+    snaps = dat.read_stats_sol_files()
+    i_time = np.argmax(time > t1)  # index of first timestep to process
+    if i_time > 0:  # probably don't want to process every timestep
+        sols_in_time = snaps[i_time:]
+        n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
+        for ii, n in enumerate(n_quasi):
+            n = int(n)
+            ts = time[n_indices[ii]]
+            for fn in postprocess_functions:
+                dict_to_append = fn(case, n=n, dict_to_append=dict_to_append, ts=ts, dat=dat, **kwargs)
+                print('    read', fn, 'for solution', n, '/', int(n_quasi[-1]))
+
+        dict_to_append['sol'].extend(n_quasi)
+        dict_to_append['time'].extend(time[n_indices])
+        dict_to_append['timestep'].extend(n_indices)
+        dict_to_append['nsols'] = len(n_quasi)
+
+    else:
+        times_at_sols = dat.find_time_at_sol(sol_files=snaps, return_indices=False)
+        print('no quasi-steady state solutions up to', times_at_sols[-1])
+    return dict_to_append
+
+
+def get_T_params(case=None, n=None, dict_to_append={}, dat=None, **kwargs):
+    T_params = dict_to_append
+    if dat is None:
+        dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
+    n = int(n)
+    x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
+    x, y, z, T = dat.read_temperature(n, verbose=False)
+    T_params_n = dat.T_components(n, T=T, u=u, v=v, cut=True)
+    for key in T_params_n.keys():
+        try:
+            T_params[key].append(T_params_n[key])
+        except:  # key does not exist yet
+            T_params[key] = []
+            T_params[key].append(T_params_n[key])
+     return T_params
+
+
+def plot_T_params(case, T_params, n=-1,
+                 setylabel=True, setxlabel=True, savefig=True,
+                 fig_path=fig_path_bullard, fig=None, ax=None,
+                 legend=True, labelsize=16, **kwargs):
+    dT_rh_f = T_params['dT_rh'][n]
+    delta_rh_f = T_params['delta_rh'][n]
+    D_l_f = T_params['delta_L'][n]
+    T_l_f = T_params['T_l'][n]
+    T_f = T_params['T_av'][n]
+    fig, ax = dat.plot_profile(T_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
+    ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
+    ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
+    ax.text(0, D_l_f - delta_rh_f, r'$\delta = $' + '{:04.2f}'.format(delta_rh_f), ha='left', va='top',
+            color='xkcd:red orange', fontsize=labelsize - 2)
+    ax.plot([T_l_f, T_l_f], [0, D_l_f], ls='--', alpha=0.5, lw=0.5, c='xkcd:tangerine')
+    ax.plot([T_l_f + dT_rh_f, T_l_f + dT_rh_f], [0, D_l_f - delta_rh_f], ls='--', alpha=0.5, lw=0.5,
+            c='xkcd:red orange')
+    if legend:
+        ax.legend(frameon=False, fontsize=labelsize - 2)
+    if setxlabel:
+        ax.set_xlabel('temperature', fontsize=labelsize)
+    if setylabel:
+        ax.set_ylabel('depth', fontsize=labelsize)
     if savefig:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + case + '_h_' + '{:05}'.format(snap) + '.png')
+        fig.savefig(fig_path + case + '-T_z.png', bbox_inches='tight')
+    return fig, ax
 
-
-def pd_quasiss(case, i, t1, path=data_path_bullard):
-    time, y, nsteps = read_evol(case, i, path=path)
-    x, h = read_topo_stats(case, nsteps - 2)
-    h_norm = trapznorm(h)
-    peak, rms = peak_and_rms(h_norm)
-    # what is the probability distribution of i from t1 to end?
-    i_time = np.nonzero(time > t1)
-    print('pretending transience ends at timestep', i_time[0][0])
-    fig = plt.figure()
-    plt.gca().hist(y[i_time])
-
-
-def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=None, plotTz=False,
+def get_T_params_old(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=None, plotTz=False,
                  setylabel=True, setxlabel=True, savefig=True, verbose=False,
                  fig_path=fig_path_bullard, fig=None, ax=None,
                  legend=True, labelsize=16, **kwargs):
@@ -115,8 +217,7 @@ def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=N
         if flag and (t1 != 1):
             print('calculating T profiles from', case)
             T_params = {}
-            dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False)
-            dat.read_statistics(verbose=False)
+            dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
             time = dat.stats_time
             snaps = dat.read_stats_sol_files()
             i_time = np.argmax(time > t1)  # index of first timestep in quasi-ss
@@ -173,7 +274,29 @@ def get_T_params(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=N
         return {}, fig, ax
 
 
-def get_h(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=None,
+def get_h(case=None, dict_to_append={}, ts=None, hscale=1, **kwargs):
+    h_params = dict_to_append
+    try:
+        x, h = read_topo_stats(case, ts)
+        h_norm = trapznorm(h)
+        peak, rms = peak_and_rms(h_norm)
+        h_params_n['h_peak'] = peak*hscale
+        h_params_n['h_rms'] = rms*hscale
+
+    except FileNotFoundError as e:
+        print('file not found:', e)
+        return None
+
+    for key in h_params_n.keys():
+        try:
+            h_params[key].append(h_params_n[key])
+        except:  # key does not exist yet
+            h_params[key] = []
+            h_params[key].append(h_params_n[key])
+    return h_params
+
+
+def get_h_old(case, t1=0, path=data_path_bullard, dict_to_append={}, dat=None,
           fig_path=fig_path_bullard, hscale=1, **kwargs):
     flag = False
     if (picklefrom is not None) and (os.path.exists(fig_path + 'data/' + picklefrom)):
@@ -223,53 +346,60 @@ def get_h(case, t1=0, path=data_path_bullard, pickleto=None, picklefrom=None,
         return [np.nan], [np.nan]
 
 
-def pd_top(case, t1=0, path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
-           plot=True, fig=None, ax=None, savefig=True, settitle=True, setxlabel=True, legend=True,
-           labelsize=16, pickleto=None, picklefrom=None,
-           c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', peak_list=None, rms_list=None):
-    if sigma == 2:
-        qs = [2.5, 50, 97.5]
-    elif sigma == 1:
-        qs = [16, 50, 84]
+# def pd_top(case, t1=0, path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
+#            plot=True, load='auto', peak_list=None, rms_list=None):
+#     if sigma == 2:
+#         qs = [2.5, 50, 97.5]
+#     elif sigma == 1:
+#         qs = [16, 50, 84]
+#
+#     if (peak_list is None) or (rms_list is None):
+#         peak_list, rms_list = get_h(case, t1, path, pickleto, picklefrom)
+#
+#     if (not peak_list) or (not rms_list):  # empty
+#         print(case, '- h list is empty')
+#         return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), fig, ax
+#
+#     if plot:
+#         fig, ax = plot_h_pdf(case, rms_list, peak_list, fig_path=fig_path,
+#           fig=None, ax=None, savefig=True, settitle=True, setxlabel=True, legend=True,
+#            labelsize=16, fend='.png', c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', **kwargs)
+#         return np.percentile(peak_list, qs), np.percentile(rms_list, qs), fig, ax
+#
+#     return np.percentile(peak_list, qs), np.percentile(rms_list, qs)
 
-    if (peak_list is None) or (rms_list is None):
-        peak_list, rms_list = get_h(case, t1, path, pickleto, picklefrom)
 
-    if plot:
-        if ax is None:
-            fig = plt.figure()
-            ax = plt.gca()
-        ax.hist(rms_list, color=c_rms, histtype='step', label='rms')
-        ax.hist(peak_list, color=c_peak, histtype='step', label='peak')
-        ax.axvline(x=np.median(rms_list), color='k', ls='--', label='median')
-        ax.axvline(x=np.median(peak_list), color='k', ls='--')
-        ax.axvline(x=np.mean(rms_list), color='k', ls='-', lw=1, label='mean')
-        ax.axvline(x=np.mean(peak_list), color='k', ls='-', lw=1)
-        ax.yaxis.set_ticks([])
-        ax.text(0.05, 0.05, 'n={:d}'.format(len(rms_list)), ha='left', va='bottom', transform=ax.transAxes)
-        if legend:
-            ax.legend(frameon=False, fontsize=labelsize - 2)
-        if setxlabel:
-            ax.set_xlabel('dynamic topography', fontsize=labelsize)
-        if settitle:
-            ax.set_title(case, fontsize=labelsize)
-        if savefig:
-            if not os.path.exists(fig_path):
-                os.makedirs(fig_path)
-            fig.savefig(fig_path + case + '_h_hist.png')
-
-    if (not peak_list) or (not rms_list):  # empty
-        print(case, '- h list is empty')
-        return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), fig, ax
-    return np.percentile(peak_list, qs), np.percentile(rms_list, qs), fig, a
-
+def plot_h_pdf(case, rms_list, peak_list, fig_path=fig_path_bullard, fig=None, ax=None, savefig=True, settitle=True,
+               setxlabel=True, legend=True, labelsize=16, fend='.png', c_peak='xkcd:forest green',
+               c_rms='xkcd:periwinkle', **kwargs):
+    if ax is None:
+        fig = plt.figure()
+        ax = plt.gca()
+    ax.hist(rms_list, color=c_rms, histtype='step', label='rms')
+    ax.hist(peak_list, color=c_peak, histtype='step', label='peak')
+    ax.axvline(x=np.median(rms_list), color='k', ls='--', label='median')
+    ax.axvline(x=np.median(peak_list), color='k', ls='--')
+    ax.axvline(x=np.mean(rms_list), color='k', ls='-', lw=1, label='mean')
+    ax.axvline(x=np.mean(peak_list), color='k', ls='-', lw=1)
+    ax.yaxis.set_ticks([])
+    ax.text(0.05, 0.05, 'n={:d}'.format(len(rms_list)), ha='left', va='bottom', transform=ax.transAxes)
+    if legend:
+        ax.legend(frameon=False, fontsize=labelsize - 2)
+    if setxlabel:
+        ax.set_xlabel('dynamic topography', fontsize=labelsize)
+    if settitle:
+        ax.set_title(case, fontsize=labelsize)
+    if savefig:
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
+        fig.savefig(fig_path + case + '_h_hist'+fend, bbox_inches='tight')
+    return fig, ax
 
 def pd_h_components(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
                     pickleto=None, picklefrom=None, plotTz=False, savefig=False,
                     settitle=True, setxlabel=True, c='xkcd:pale purple', params_list=None,
                     legend=True, plotpd=False, labelsize=16, fig=None, ax=None, alpha=None):
     # probability distribution of h' = f(x) for single case
-    # it's a bit annoying because you're switching methods...
     if sigma == 2:
         qs = [2.5, 50, 97.5]
     elif sigma == 1:
@@ -289,7 +419,7 @@ def pd_h_components(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_b
         alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
 
     x_list = alpha * (np.array(T_params['dT_rh']) / np.array(T_params['dT_m'])) * (
-                np.array(T_params['delta_rh']) / np.array(T_params['d_m']))
+            np.array(T_params['delta_rh']) / np.array(T_params['d_m']))
     if plotpd and (not plotTz):
         if ax is None:
             fig = plt.figure()
@@ -316,7 +446,7 @@ def pd_h_components(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_b
     return np.percentile(x_list, qs), fig, ax
 
 
-def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
+def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png', mark_used=True, t1=0,
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,
               setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path=fig_path_bullard):
     if not setxlabel:
@@ -335,6 +465,12 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
         ax.set_title(case, fontsize=labelsize)
     if legend:
         ax.legend(frameon=False, fontsize=labelsize - 2)
+    if mark_used:
+        # Create a Rectangle patch to mark "transient" times
+        rect = patches.Rectangle((ax.get_xlim()[0], ax.get_ylim()[0]), t1,
+                                 ax.get_ylim()[1] - ax.get_ylim()[0],
+                                 edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
+        ax.add_patch(rect)
     if savefig:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
@@ -344,7 +480,7 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png',
 
 def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
                   fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard,
-                  loadpickle=False, dumppickle=False, dumppicklex=False, includegraphic=False,
+                  loadh='auto', loadT='auto', includegraphic=False,
                   suptitle='', includepd=True, includeTz=True, loadpicklex=False):
     # rows are cases, columns are v_rms, q, T(z), hist
     ncases = len(cases)
@@ -361,6 +497,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
     numplotted = 0
     delrow = []
     for ii, case in enumerate(cases):
+        run_dict = {}
         icol = 0
         if (os.path.exists(data_path + 'output-' + case)):
             print('plotting summary for', case)
@@ -380,13 +517,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             ax = axes[ii, icol]
             fig, ax = plot_evol(case, i=11, fig=fig, ax=ax, savefig=False, ylabel='rms velocity',
                                 c='k', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, legend=False)
-
-            # Create a Rectangle patch to mark "transient" times
-            rect = patches.Rectangle((ax.get_xlim()[0], ax.get_ylim()[0]), t1[ii],
-                                     ax.get_ylim()[1] - ax.get_ylim()[0],
-                                     edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
-            ax.add_patch(rect)
+                                labelsize=labelsize, labelpad=labelpad, legend=False, mark_used=True, t1=t1[ii])
 
             try:
                 ax.text(0.01, 0.95, labels[ii], horizontalalignment='left', verticalalignment='top',
@@ -398,36 +529,20 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             ax = axes[ii, icol]
             fig, ax = plot_evol(case, i=20, fig=fig, ax=ax, savefig=False, ylabel='heat flux',
                                 c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='top')
+                                labelsize=labelsize, labelpad=labelpad, label='top', mark_used=True, t1=t1[ii])
             fig, ax = plot_evol(case, i=19, fig=fig, ax=ax, savefig=False, ylabel='heat flux', yscale=-1,
                                 c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend)
-
-            # Create a Rectangle patch to mark "transient" times
-            rect = patches.Rectangle((ax.get_xlim()[0], ax.get_ylim()[0]), t1[ii], ax.get_ylim()[1] - ax.get_ylim()[0],
-                                     edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
-            ax.add_patch(rect)
+                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend, mark_used=False)
 
             if includeTz:  # final timestep only
                 icol = icol + 1
                 ax = axes[ii, icol]
-                #                 if t1[ii] > axes[ii, 0].get_xlim()[1]:
-                #                     pass # fig.delaxes(ax)
-                #                 else:
-                picklefile = case + '_pdx.pkl'
-                if loadpicklex:
-                    picklefrom = picklefile
-                else:
-                    picklefrom = None
-                if dumppicklex:
-                    pickleto = picklefile
-                else:
-                    pickleto = None
-                _, fig, ax = get_T_params(case, t1=t1[ii], path=data_path, savefig=False,
-                                          pickleto=pickleto, picklefrom=picklefrom, plotTz=True,
-                                          setxlabel=setxlabel, setylabel=False,
-                                          legend=False,
-                                          fig_path=fig_path, fig=fig, ax=ax)
+
+                T_dict = pickleio(case, suffix='_T_processed', postprocess_functions=[get_T_params], t1=t1[ii], load=loadT,
+                                    path=path, fig_path=fig_path, **kwargs)
+
+                fig, ax = plot_T_params(case, T_params=T_dict, path=data_path, savefig=False, setxlabel=setxlabel,
+                                        setylabel=False, legend=False, fig_path=fig_path, fig=fig, ax=ax)
                 if legend:
                     ax.legend(frameon=False)
                 if setxlabel:
@@ -438,22 +553,11 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             if includepd:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                #                 if t1[ii] > axes[ii, 0].get_xlim()[1]:
-                #                     fig.delaxes(ax)
-                #                 else:
-                picklefile = case + '_pdtop.pkl'
-                if loadpickle:
-                    picklefrom = picklefile
-                else:
-                    picklefrom = None
-                if dumppickle:
-                    pickleto = picklefile
-                else:
-                    pickleto = None
-                _, _, fig, ax = pd_top(case, t1[ii], path=data_path, sigma=2, plot=True,
+                h_dict = pickleio(case, suffix='_h_processed', postprocess_functions=[get_T_params], t1=t1[ii],
+                                  load=loadh, path=path, fig_path=fig_path, **kwargs)
+                fig, ax = plot_h_pdf(case, h_dict['h_rms'], h_dict['h_peak'], path=data_path,
                                        fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
-                                       legend=legend, labelsize=labelsize,
-                                       pickleto=pickleto, picklefrom=picklefrom)
+                                       legend=legend, labelsize=labelsize)
                 ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison
 
             if includegraphic:
@@ -489,18 +593,6 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
         fig.savefig(fig_path + fname, bbox_inches='tight')
     return fig, axes
 
-
-def get_cases_list(Ra, eta):
-    # either Ra or eta is iterable
-    if (isinstance(Ra, collections.Iterable) and not isinstance(Ra, six.string_types)):
-        x_var = Ra
-        cases = ['Ra' + r + '-eta' + eta + '-wide' for r in Ra]
-    elif (isinstance(eta, collections.Iterable) and not isinstance(eta, six.string_types)):
-        x_var = eta
-        cases = ['Ra' + Ra + '-eta' + e + '-wide' for e in eta]
-    else:
-        raise Exception('Ra or eta must be iterable')
-    return cases, x_var
 
 
 def plot_h_vs_Ra(Ra=None, eta=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard,
@@ -663,7 +755,7 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, path=data_path_bullard, fig_path=fi
                                       fig_path=fig_path)
         alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
         x_list = alpha * (np.array(T_params['dT_rh']) / np.array(T_params['dT_m'])) * (
-                    np.array(T_params['delta_rh']) / np.array(T_params['d_m']))
+                np.array(T_params['delta_rh']) / np.array(T_params['d_m']))
 
         try:
             x[ii, :], _, _ = pd_h_components(case, t1=t1_ii, data_path=path, sigma=sigma,
@@ -1137,6 +1229,39 @@ def plot_convection_regimes(Ra, eta, regime_grid, path=data_path_bullard, fig_pa
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
         fig.savefig(fig_path + fname, bbox_inches='tight')
+
+
+def plot_top_profile(case, savefig=True, fig_path=fig_path_bullard, path=data_path_bullard, verbose=True):
+    time, y, nsteps = read_evol(case, i=2, path=path)
+    snap = nsteps - 2  # honestly not sure why it's -2 but seems to work haha
+    x, h = read_topo_stats(case, snap)
+    # normalize to 0 mean
+    h_norm = trapznorm(h)
+    fig = plt.figure()
+    plt.plot(x, h_norm)
+    plt.xlabel('x')
+    plt.ylabel('dynamic topography')
+    plt.title(case)
+    if verbose:
+        print('mean:', trapzmean(h_norm))
+        print('max:', np.max(h_norm))
+        print('min:', np.min(h_norm))
+    if savefig:
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
+        fig.savefig(fig_path + case + '_h_' + '{:05}'.format(snap) + '.png')
+
+
+def plot_pd_steadystate(case, i, t1, path=data_path_bullard):
+    time, y, nsteps = read_evol(case, i, path=path)
+    x, h = read_topo_stats(case, nsteps - 2)
+    h_norm = trapznorm(h)
+    peak, rms = peak_and_rms(h_norm)
+    # what is the probability distribution of i from t1 to end?
+    i_time = np.nonzero(time > t1)
+    print('transience ends at timestep', i_time[0][0])
+    fig = plt.figure()
+    plt.gca().hist(y[i_time])
 
 
 def cmap_from_list(clist, n_bin=None, cmap_name=''):
