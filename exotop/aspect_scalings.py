@@ -498,7 +498,6 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
     delrow = []
     for ii, case in enumerate(cases):
         icol = 0
-        print('case', case)
         if (os.path.exists(data_path + 'output-' + case)):
             print('plotting summary for', case)
             if ii == ncases - 1:  # show x label in bottom row only
@@ -538,8 +537,8 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 icol = icol + 1
                 ax = axes[ii, icol]
 
-                T_dict = pickleio(case, suffix='_T_processed', postprocess_functions=[get_T_params], t1=t1[ii], load=loadT,
-                                    path=path, fig_path=fig_path, **kwargs)
+                T_dict = pickleio(case, suffix='_T_processed', postprocess_functions=[get_T_params], t1=t1[ii],
+                                  load=loadT, path=data_path, fig_path=fig_path, **kwargs)
 
                 fig, ax = plot_T_params(case, T_params=T_dict, path=data_path, savefig=False, setxlabel=setxlabel,
                                         setylabel=False, legend=False, fig_path=fig_path, fig=fig, ax=ax)
@@ -554,7 +553,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 icol = icol + 1
                 ax = axes[ii, icol]
                 h_dict = pickleio(case, suffix='_h_processed', postprocess_functions=[get_T_params], t1=t1[ii],
-                                  load=loadh, path=path, fig_path=fig_path, **kwargs)
+                                  load=loadh, path=data_path, fig_path=fig_path, **kwargs)
                 fig, ax = plot_h_pdf(case, h_dict['h_rms'], h_dict['h_peak'], path=data_path,
                                        fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
                                        legend=legend, labelsize=labelsize)
