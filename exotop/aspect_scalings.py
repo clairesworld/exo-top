@@ -8,7 +8,7 @@ from matplotlib.colors import LinearSegmentedColormap
 import pandas as pd
 import pickle as pkl
 from collections import Iterable
-from types import StringTypes
+from six import string_types
 from scipy.optimize import curve_fit
 from scipy import stats
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
@@ -78,10 +78,10 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat=None,
 
 def get_cases_list(Ra, eta):
     # either Ra or eta is iterable
-    if isinstance(Ra, Iterable) and not isinstance(Ra, StringTypes):
+    if isinstance(Ra, Iterable) and not isinstance(Ra, string_types):
         x_var = Ra
         cases = ['Ra' + r + '-eta' + eta + '-wide' for r in Ra]
-    elif (isinstance(eta, Iterable) and not isinstance(eta, StringTypes)):
+    elif (isinstance(eta, Iterable) and not isinstance(eta, string_types)):
         x_var = eta
         cases = ['Ra' + Ra + '-eta' + e + '-wide' for e in eta]
     else:
