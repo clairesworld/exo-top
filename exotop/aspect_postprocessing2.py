@@ -587,7 +587,7 @@ class Aspect_Data():
             delta_rh = self.ubl_thickness(n=n, T_l=T_l, T_i=T_i, **kwargs)
         delta_0 = self.delta_0(delta_rh=delta_rh, delta_L=delta_L)  # mechanical boundary layer MS95
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
-        self.T_params = {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_rh':delta_rh, 'd_m':d_m, 'delta_L':delta_L, 'T_l':T_l, 'T_i':T_i, 'delta_0':delta_0', T_av':T_av, 'y':y}
+        self.T_params = {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_rh':delta_rh, 'd_m':d_m, 'delta_L':delta_L, 'T_l':T_l, 'T_i':T_i, 'delta_0':delta_0, 'T_av':T_av, 'y':y}
         return self.T_params
     
     def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, u=None, **kwargs):
