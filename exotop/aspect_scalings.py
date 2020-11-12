@@ -149,10 +149,14 @@ def process_at_solutions(case, postprocess_functions, t1=0, path=data_path_bulla
     return dict_to_append
 
 
-def get_T_params(case=None, n=None, dict_to_append={}, dat=None, **kwargs):
+def get_T_params(case=None, n=None, dict_to_append={}, dat=None, path=data_path_bullard, **kwargs):
     T_params = dict_to_append
     if dat is None:
-        dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
+        try:
+            dat = T_params['dat']
+        except KeyError:
+            dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
+            T_params['dat'] = dat
     n = int(n)
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
@@ -171,7 +175,11 @@ def plot_T_params(case, T_params, n=-1,
                  fig_path=fig_path_bullard, fig=None, ax=None,
                  legend=True, labelsize=16, path=data_path_bullard, **kwargs):
     if dat is None:
-        dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
+        try:
+            dat = T_params['dat']
+        except KeyError:
+            dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False, read_statistics=True)
+            T_params['dat'] = dat
     dT_rh_f = T_params['dT_rh'][n]
     delta_rh_f = T_params['delta_rh'][n]
     D_l_f = T_params['delta_L'][n]
@@ -488,11 +496,11 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png', mark_used
 def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
                   fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard,
                   loadh='auto', loadT='auto', includegraphic=False,
-                  suptitle='', includepd=True, includeTz=True, **kwargs):
+                  suptitle='', includepdf=True, includeTz=True, **kwargs):
     # rows are cases, columns are v_rms, q, T(z), hist
     ncases = len(cases)
     ncols = 2
-    if includepd:
+    if includepdf:
         ncols = ncols + 1
     if includeTz:
         ncols = ncols + 1
@@ -505,7 +513,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
     delrow = []
     for ii, case in enumerate(cases):
         icol = 0
-        if (os.path.exists(data_path + 'output-' + case)):
+        if os.path.exists(data_path + 'output-' + case):
             print('plotting summary for', case)
             if ii == ncases - 1:  # show x label in bottom row only
                 setxlabel = True
@@ -556,10 +564,10 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 if setylabel:
                     ax.set_ylabel('depth', fontsize=labelsize)
 
-            if includepd:
+            if includepdf:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                h_dict = pickleio(case, suffix='_h_processed', postprocess_functions=[get_T_params], t1=t1[ii],
+                h_dict = pickleio(case, suffix='_h_processed', postprocess_functions=[get_h_params], t1=t1[ii],
                                   load=loadh, path=data_path, fig_path=fig_path, **kwargs)
                 fig, ax = plot_h_pdf(case, h_dict['h_rms'], h_dict['h_peak'], path=data_path,
                                        fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,

@@ -16,7 +16,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
         t1=t1[ii], save=True, loadh='auto', loadT='auto',
         includeTz=True,
         fname='all-eta' + eta + '.png', suptitle='$\Delta \eta$=' + eta,
-        includepd=True,  # turn on once you know where steady state starts
+        includepdf=True,  # turn on once you know where steady state starts
         includegraphic=True,
     )
 
@@ -37,7 +37,7 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
         t1=t1.T[ii], save=True, loadh='auto', loadT='auto',
         includeTz=True,
         fname='all-Ra3e8.png', suptitle='Ra = 3e8',
-        includepd=True,  # turn on once you know where steady state starts
+        includepdf=True,  # turn on once you know where steady state starts
         includegraphic=True,
     )
 
