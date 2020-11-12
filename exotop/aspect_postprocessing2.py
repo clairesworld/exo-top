@@ -82,10 +82,15 @@ def max_slope(x,y, which='max', plot=False, tol=1):
         plt.legend(frameon=False)
     return m, i_max
 
-def horizontal_mean(A, x):
-    int_x = trapz(A, x = x, axis = 0)
+def horizontal_mean(A, x, axis=None):
+    if axis is None:
+        axis = np.argmax(np.shape(A))  # assume longest axis (probably box width)
+    int_x = trapz(A, x=x, axis=axis)
     int_x = int_x / ((max(x)-min(x)))
-    return int_x.T[0]
+    if A.ndim == 2:
+        return int_x.T
+    elif A.ndim == 3:
+        return int_x.T[0]
 
 class Aspect_Data():
     def __init__(self, directory, verbose=True):
@@ -419,28 +424,67 @@ class Aspect_Data():
         self.Nu = Nu
         return Nu
 
-    def ubl_thickness(self, n, T_l=None, T_i=None, k=1, **kwargs):
-        # get upper boundary layer thickness
+    def ubl_thickness(self, n=None, T_l=None, T_i=None, k=1, **kwargs):
+        # get upper boundary layer thickness required to produce surface heat flux (F=Nu) between T_i and T_l
+        # corresponds to rheological sublayer delta_rh in Moresi & Solomatov 2000
         if T_i is None:
-            T_i = self.internal_temperature(self, **kwargs)
+            T_i = self.internal_temperature(self, n=n, **kwargs)
         if T_l is None:
-            T_l = self.lid_base_temperature(self, **kwargs)
+            T_l = self.lid_base_temperature(self, n=n, **kwargs)
         ts = self.find_time_at_sol(n)
         F = self.stats_heatflux_top[ts]/self.parameters['Geometry model']['Box']['X extent']
         return k*(T_i - T_l)/F
 
-    def lid_thickness(self, u, v, tol=1, cut=False, plot=True, cutdiv=2, **kwargs): # 2D only
+    def delta_0(self, delta_rh=None, delta_L=None, **kwargs):
+        # total lithosphere thickness, from MS95
+        if delta_rh is None:
+            delta_rh = self.ubl_thickness(**kwargs)
+        if delta_L is None:
+            delta_L = self.lid_thickness(**kwargs)
+        return delta_rh + delta_L
+
+    def delta_Ti_MS95(self, n, Nu=None, T=None, tol=1e-5, **kwargs):
+        # corresponds to the stagnant lid thickness + rheological sublayer (upper tbl)
+        def delta_0(Ti, Nu):
+            return Ti/Nu
+        def delta_1(Ti, Nu):
+            return (1-Ti)/Nu
+        def T_i(d0, d1, T, x, z):  # area-averaged temperature between thermal boundary layers
+            Ix = trapz(T, x=x)
+            z_d0 = find_nearest_idx(z, 1 - d0)
+            z_d1 = find_nearest_idx(z, d1)
+            Iz = trapz(Ix[z_d0:z_d1], x=z[z_d0:z_d1])
+            return 1/(1 - d0 - d1)*Iz
+
         x = self.x
         y = self.y
+        if Nu is None:
+            Nu = self.Nu(**kwargs)
+        if T is None:
+            _, _, _, T = self.read_temperature(n, verbose=verbose)
+        Ti = np.mean(horizontal_mean(T, x))  # initial guess
+        diff = 10
+        while diff >= tol:
+            Ti_guess = Ti
+            d0 = delta_0(Ti_guess, Nu)
+            d1 = delta_1(Ti_guess, Nu)
+            Ti = T_i(d0, d1, T, x, z)
+            diff = abs(Ti - Ti_guess)
+        return Ti, d0
+
+    def lid_thickness(self, u=None, v=None, n=None, tol=1, cut=False, plot=False, cutdiv=2, **kwargs):
+        # stagnant lid thickness (mechanical boundary layer) from Moresi & Solomatov 2000
+        x = self.x
+        y = self.y
+        if (u is None) or (v is None):
+            _, _, _, u, v, _ = self.read_velocity(n, verbose=False)
         # get horizontal average of vertical velocity
         mag = np.sqrt(u**2 + v**2)
         mag_av = horizontal_mean(mag, x)
         if plot:
             self.plot_profile(mag, xlabel='velocity magnitude')
-        
         if not cut:
             cutdiv=1
-        
         b=1.1
         while b>1:
             # take upper half by defualt (cutdiv=2) but need to inspect each case individually
@@ -469,29 +513,36 @@ class Aspect_Data():
             if b>1: # if this doesn't work it's probably because lid base is below 50% depth, need to recut profile
                 print('\n recutting')
                 cutdiv = cutdiv+0.2
-        
         y_tan = m1*x_vel + b
-        if plot:
+        if plot:  # overplot
             plt.plot(x_vel, y_tan, c='g', ls='--', label='tangent to max gradient')
             plt.legend()
         return b
     
-    def lid_base_temperature(self, T, y_l=None, u=None, v=None, cut=False, plot=False, **kwargs):
+    def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, u=None, v=None, cut=False, plot=False,
+                             verbose=False, **kwargs):
         x = self.x
         y = self.y
-        T_av = horizontal_mean(T, x)
-        if (y_l is None) and (u is not None) and (v is not None):
-            y_l = self.lid_thickness(u=u, v=v, cut=cut, plot=plot)
-        # find T at y_L
-        T_l = T_av[find_nearest_idx(y, y_l)]
+        if T_av is None:
+            if T is None:
+                _, _, _, T = self.read_temperature(n, verbose=verbose, **kwargs)
+            T_av = horizontal_mean(T, x)
+        if (delta_L is None):
+            if (u is None) or (v is None):
+                _, _, _, u, v, _ = self.read_velocity(n, verbose=verbose, **kwargs)
+            delta_L = self.lid_thickness(u=u, v=v, cut=cut, plot=plot, **kwargs)
+        # find T at delta_L
+        T_l = T_av[find_nearest_idx(y, delta_L)]
         return T_l
         
-    def internal_temperature(self, T=None, T_av=None, plot=False, **kwargs):
+    def internal_temperature(self, n=None, T=None, T_av=None, plot=False, return_coords=False, **kwargs):
+        # almost-isothermal temperature of core of convecting cell
+        # note: MS2000 define this as the maximal horizontally-averaged temperature in the layer
         x = self.x
         y = self.y
-        if T is None:
-            _, _, _, T = self.read_temperature(n, verbose=verbose)
         if T_av is None:
+            if T is None:
+                _, _, _, T = self.read_temperature(n, verbose=verbose)
             T_av = horizontal_mean(T, x)
 
         # find inflection point for max core temperature
@@ -508,18 +559,21 @@ class Aspect_Data():
             ax.plot (y_infections, T_inflections, 'ro', ms = 5)
             ax.set_xlabel('depth')
             ax.set_ylabel('T')
-            
-        return T_inflections[-1], y_infections[-1]
+
+        if return_coords:
+            return T_inflections[-1], y_infections[-1]
+        else:
+            return T_inflections[-1]
         
     def dT_rh(self, T_l=None, T_i=None, **kwargs):
-        # rheological temperature scale
+        # rheological temperature scale (temperature drop in unstable part of lid), e.g. eq. (A7) in SM2000
         if T_i is None:
             T_i = self.internal_temperature(self, **kwargs)
         if T_l is None:
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
     
-    def T_components(self, n, T=None, T_i=None, T_l=None, delta_u=None, y_l=None, u=None, v=None, cut=False, plot=False, 
+    def T_components(self, n=None, T=None, T_i=None, T_l=None, delta_rh=None, delta_L=None, u=None, v=None, cut=False, plot=False,
                      verbose=False, **kwargs):
         # return RHS of h' \propto (dT_rh/dT_m)*(delta_u/d_m)
 
@@ -531,18 +585,32 @@ class Aspect_Data():
         p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
-        if y_l is None:
-            y_l = self.lid_thickness(u=u, v=v, cut=cut, plot=plot)
+        if delta_L is None:
+            delta_L = self.lid_thickness(u=u, v=v, cut=cut, plot=plot)
         if T_i is None:
-            T_i, y_i = self.internal_temperature(T_av=T_av, T=T, **kwargs)
+            T_i = self.internal_temperature(T_av=T_av, **kwargs)
         if T_l is None:
-            T_l = self.lid_base_temperature(T=T, y_l=y_l, cut=cut, **kwargs)
-        if delta_u is None:
-            delta_u = self.ubl_thickness(n, T_l=T_l, T_i=T_i, **kwargs)
+            T_l = self.lid_base_temperature(T_av=T_av, delta_L=delta_L, cut=cut, **kwargs)
+        if delta_rh is None:
+            delta_rh = self.ubl_thickness(n=n, T_l=T_l, T_i=T_i, **kwargs)
+        delta_0 = self.delta_0(delta_rh=delta_rh, delta_L=delta_L)  # mechanical boundary layer MS95
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
-       
-        return {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_u':delta_u, 'd_m':d_m, 'y_l':y_l, 'T_l':T_l, 'T_i':T_i, 'T_av':T_av, 'y':y}
+        self.T_params = {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_rh':delta_rh, 'd_m':d_m, 'delta_L':delta_L, 'T_l':T_l, 'T_i':T_i, 'delta_0':delta_0', T_av':T_av, 'y':y}
+        return self.T_params
     
+    def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, u=None, **kwargs):
+        # stagnant lid criterion S <<1 from Moresi & Solomatov 2000
+        if u is None:
+            _, _, _, u, v, _ = self.read_velocity(n, verbose=False)
+        u_0 = horizontal_mean(u, self.x)[-1]
+        if delta_0 is None:
+            if delta_rh is None:
+                delta_rh = ubl_thickness(self, n=n, **kwargs)
+            if delta_l is None:
+                delta_l = lid_thickness(self, n=n, u=u, **kwargs)
+            delta_0 = delta_rh + delta_l
+        return delta_0**2 * u_0
+
     def vbcs(self):
         # Determine velocity boundary conditions from the input parameters
         try:

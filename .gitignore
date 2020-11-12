@@ -1,4 +1,7 @@
-*.pdf
+**/*.pdf
 *.ipynb_checkpoints
 **/*.pyc
-/figs/
+figs/
+venv/
+.idea/
+.ipynb_checkpoints/
