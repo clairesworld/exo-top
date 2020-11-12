@@ -170,7 +170,7 @@ def get_T_params(case=None, n=None, dict_to_append={}, dat=None, path=data_path_
     return T_params, dat
 
 
-def plot_T_params(case, T_params, n=-1,
+def plot_T_params(case, T_params, n=-1, dat=None,
                  setylabel=True, setxlabel=True, savefig=True,
                  fig_path=fig_path_bullard, fig=None, ax=None,
                  legend=True, labelsize=16, path=data_path_bullard, **kwargs):
@@ -292,6 +292,7 @@ def get_T_params_old(case, t1=0, path=data_path_bullard, pickleto=None, picklefr
 def get_h(case=None, dict_to_append={}, ts=None, hscale=1, **kwargs):
     h_params = dict_to_append
     try:
+        h_params_n = {}
         x, h = read_topo_stats(case, ts)
         h_norm = trapznorm(h)
         peak, rms = peak_and_rms(h_norm)
@@ -311,54 +312,54 @@ def get_h(case=None, dict_to_append={}, ts=None, hscale=1, **kwargs):
     return h_params
 
 
-def get_h_old(case, t1=0, path=data_path_bullard, dict_to_append={}, dat=None,
-          fig_path=fig_path_bullard, hscale=1, **kwargs):
-    flag = False
-    if (picklefrom is not None) and (os.path.exists(fig_path + 'data/' + picklefrom)):
-        try:
-            peak_list, rms_list = pkl.load(open(fig_path + 'data/' + picklefrom, "rb"))
-            print('loaded h for case', case)
-        except ValueError:
-            peak_list, rms_list = pkl.load(open(fig_path + 'data/' + picklefrom, "rb"), protocol=2)
-            print('loaded h for case', case)
-        if (not peak_list) or (not rms_list):  # if stored stuff is empty
-            flag = True
-            pickleto = picklefrom
-    else:
-        flag = True
-        if picklefrom is not None:  # save if tried to load but failed
-            pickleto = picklefrom
-            print(picklefrom, 'not found or empty, re-calculating')
-
-    if flag:  # load
-        time, v_rms, nsteps = read_evol(case, i=11, path=path)
-        # what is the probability distribution of i from t1 to end?
-        i_time = np.argmax(time > t1)
-        rms_list = []
-        peak_list = []
-        t_used = []
-        if t1 != 1:
-            print('building distribution of h for case', case, ', n =', len(range(i_time, len(time))))
-            for ii in range(i_time, len(time)):
-                try:
-                    x, h = read_topo_stats(case, ii)
-                    h_norm = trapznorm(h)
-                    peak, rms = peak_and_rms(h_norm)
-                    rms_list.append(rms)
-                    peak_list.append(peak)
-                    t_used.append(ii)
-                except FileNotFoundError as e:
-                    print('file not found:', e)
-
-    try:
-        if pickleto is not None:
-            pkl.dump((peak_list, rms_list), open(fig_path + 'data/' + pickleto, "wb"))
-
-        peak_list_scaled = [a * hscale for a in peak_list]
-        rms_list_scaled = [a * hscale for a in rms_list]
-        return peak_list_scaled, rms_list_scaled
-    except:
-        return [np.nan], [np.nan]
+# def get_h_old(case, t1=0, path=data_path_bullard, dict_to_append={}, dat=None,
+#           fig_path=fig_path_bullard, hscale=1, **kwargs):
+#     flag = False
+#     if (picklefrom is not None) and (os.path.exists(fig_path + 'data/' + picklefrom)):
+#         try:
+#             peak_list, rms_list = pkl.load(open(fig_path + 'data/' + picklefrom, "rb"))
+#             print('loaded h for case', case)
+#         except ValueError:
+#             peak_list, rms_list = pkl.load(open(fig_path + 'data/' + picklefrom, "rb"), protocol=2)
+#             print('loaded h for case', case)
+#         if (not peak_list) or (not rms_list):  # if stored stuff is empty
+#             flag = True
+#             pickleto = picklefrom
+#     else:
+#         flag = True
+#         if picklefrom is not None:  # save if tried to load but failed
+#             pickleto = picklefrom
+#             print(picklefrom, 'not found or empty, re-calculating')
+#
+#     if flag:  # load
+#         time, v_rms, nsteps = read_evol(case, i=11, path=path)
+#         # what is the probability distribution of i from t1 to end?
+#         i_time = np.argmax(time > t1)
+#         rms_list = []
+#         peak_list = []
+#         t_used = []
+#         if t1 != 1:
+#             print('building distribution of h for case', case, ', n =', len(range(i_time, len(time))))
+#             for ii in range(i_time, len(time)):
+#                 try:
+#                     x, h = read_topo_stats(case, ii)
+#                     h_norm = trapznorm(h)
+#                     peak, rms = peak_and_rms(h_norm)
+#                     rms_list.append(rms)
+#                     peak_list.append(peak)
+#                     t_used.append(ii)
+#                 except FileNotFoundError as e:
+#                     print('file not found:', e)
+#
+#     try:
+#         if pickleto is not None:
+#             pkl.dump((peak_list, rms_list), open(fig_path + 'data/' + pickleto, "wb"))
+#
+#         peak_list_scaled = [a * hscale for a in peak_list]
+#         rms_list_scaled = [a * hscale for a in rms_list]
+#         return peak_list_scaled, rms_list_scaled
+#     except:
+#         return [np.nan], [np.nan]
 
 
 # def pd_top(case, t1=0, path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
@@ -410,55 +411,55 @@ def plot_h_pdf(case, rms_list, peak_list, fig_path=fig_path_bullard, fig=None, a
         fig.savefig(fig_path + case + '_h_hist'+fend, bbox_inches='tight')
     return fig, ax
 
-def pd_h_components(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
-                    pickleto=None, picklefrom=None, plotTz=False, savefig=False,
-                    settitle=True, setxlabel=True, c='xkcd:pale purple', params_list=None,
-                    legend=True, plotpd=False, labelsize=16, fig=None, ax=None, alpha=None):
-    # probability distribution of h' = f(x) for single case
-    if sigma == 2:
-        qs = [2.5, 50, 97.5]
-    elif sigma == 1:
-        qs = [16, 50, 84]
-
-    if params_list is None:
-        T_params, fig, ax = get_T_params(case, t1=t1, path=data_path,
-                                         setxlabel=setxlabel,
-                                         pickleto=pickleto, picklefrom=picklefrom,
-                                         savefig=savefig, fig=fig, ax=ax,
-                                         plotTz=plotTz, fig_path=fig_path)
-    else:
-        T_params = params_list
-
-    if alpha is None:
-        dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False)
-        alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
-
-    x_list = alpha * (np.array(T_params['dT_rh']) / np.array(T_params['dT_m'])) * (
-            np.array(T_params['delta_rh']) / np.array(T_params['d_m']))
-    if plotpd and (not plotTz):
-        if ax is None:
-            fig = plt.figure()
-            ax = plt.gca()
-        ax.hist(x_list, color=c, histtype='step')
-        ax.axvline(x=np.median(x_list), color='k', ls='--', label='median')
-        ax.axvline(x=np.mean(x_list), color='k', ls='-', lw=1, label='mean')
-        ax.yaxis.set_ticks([])
-        ax.text(0.95, 0.95, 'n = {:d}'.format(len(x_list)), ha='right', va='top', transform=ax.transAxes)
-        if legend:
-            ax.legend(frameon=False, fontsize=labelsize - 2)
-        if setxlabel:
-            ax.set_xlabel(r'$\Delta T_{rh}/\Delta T_m \; \delta/d_m$', fontsize=labelsize)
-        if settitle:
-            ax.set_title(case, fontsize=labelsize)
-        if savefig:
-            if not os.path.exists(fig_path):
-                os.makedirs(fig_path)
-            fig.savefig(fig_path + case + '_x_hist.png')
-
-    if (not T_params['dT_rh']):  # empty
-        print(case, '- T list is empty')
-        return np.array([np.nan, np.nan, np.nan]), fig, ax
-    return np.percentile(x_list, qs), fig, ax
+# def pd_h_components(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
+#                     pickleto=None, picklefrom=None, plotTz=False, savefig=False,
+#                     settitle=True, setxlabel=True, c='xkcd:pale purple', params_list=None,
+#                     legend=True, plotpd=False, labelsize=16, fig=None, ax=None, alpha=None):
+#     # probability distribution of h' = f(x) for single case
+#     if sigma == 2:
+#         qs = [2.5, 50, 97.5]
+#     elif sigma == 1:
+#         qs = [16, 50, 84]
+#
+#     if params_list is None:
+#         T_params, fig, ax = get_T_params(case, t1=t1, path=data_path,
+#                                          setxlabel=setxlabel,
+#                                          pickleto=pickleto, picklefrom=picklefrom,
+#                                          savefig=savefig, fig=fig, ax=ax,
+#                                          plotTz=plotTz, fig_path=fig_path)
+#     else:
+#         T_params = params_list
+#
+#     if alpha is None:
+#         dat = post.Aspect_Data(directory=path + 'output-' + case + '/', verbose=False)
+#         alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
+#
+#     x_list = alpha * (np.array(T_params['dT_rh']) / np.array(T_params['dT_m'])) * (
+#             np.array(T_params['delta_rh']) / np.array(T_params['d_m']))
+#     if plotpd and (not plotTz):
+#         if ax is None:
+#             fig = plt.figure()
+#             ax = plt.gca()
+#         ax.hist(x_list, color=c, histtype='step')
+#         ax.axvline(x=np.median(x_list), color='k', ls='--', label='median')
+#         ax.axvline(x=np.mean(x_list), color='k', ls='-', lw=1, label='mean')
+#         ax.yaxis.set_ticks([])
+#         ax.text(0.95, 0.95, 'n = {:d}'.format(len(x_list)), ha='right', va='top', transform=ax.transAxes)
+#         if legend:
+#             ax.legend(frameon=False, fontsize=labelsize - 2)
+#         if setxlabel:
+#             ax.set_xlabel(r'$\Delta T_{rh}/\Delta T_m \; \delta/d_m$', fontsize=labelsize)
+#         if settitle:
+#             ax.set_title(case, fontsize=labelsize)
+#         if savefig:
+#             if not os.path.exists(fig_path):
+#                 os.makedirs(fig_path)
+#             fig.savefig(fig_path + case + '_x_hist.png')
+#
+#     if (not T_params['dT_rh']):  # empty
+#         print(case, '- T list is empty')
+#         return np.array([np.nan, np.nan, np.nan]), fig, ax
+#     return np.percentile(x_list, qs), fig, ax
 
 
 def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png', mark_used=True, t1=0,
@@ -567,7 +568,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             if includepdf:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                h_dict = pickleio(case, suffix='_h_processed', postprocess_functions=[get_h_params], t1=t1[ii],
+                h_dict = pickleio(case, suffix='_h_processed', postprocess_functions=[get_h], t1=t1[ii],
                                   load=loadh, path=data_path, fig_path=fig_path, **kwargs)
                 fig, ax = plot_h_pdf(case, h_dict['h_rms'], h_dict['h_peak'], path=data_path,
                                        fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
@@ -645,7 +646,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, path=data_path_bullard, fig_path=fi
                                     hscale=hscale)
 
         try:
-            h_peak[ii, :], h_rms[ii, :], _, _ = pd_top(case, plot=False,
+            h_peak[ii, :], h_rms[ii, :], _, _ = pdf_top(case, plot=False,
                                                        peak_list=peak_list, rms_list=rms_list)
         except Exception as e:
             print('aspect_scalings.py:', e, '\n setting h all nan for case', case)
