@@ -497,9 +497,8 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
     numplotted = 0
     delrow = []
     for ii, case in enumerate(cases):
-        run_dict = {}
         icol = 0
-        print('path', data_path + 'output-' + case)
+        print('case', case)
         if (os.path.exists(data_path + 'output-' + case)):
             print('plotting summary for', case)
             if ii == ncases - 1:  # show x label in bottom row only
