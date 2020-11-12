@@ -1,7 +1,20 @@
 **/*.pdf
-*.ipynb_checkpoints
+**/figs/
+
+# python cache
+**/.ipynb_checkpoints/
+**/__pycache__/
 **/*.pyc
-figs/
+
+# pycharm shit
 venv/
 .idea/
-.ipynb_checkpoints/
+
+# latex cache
+latex/**/*.aux
+latex/**/*.log
+latex/**/*.blg
+latex/**/*.out
+latex/**/*.dvi
+latex/**/*.lof
+latex/**/*.toc

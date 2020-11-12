@@ -101,7 +101,7 @@ def build_solarsystem(run_args=None, ident_list=['Moon1', 'Mercury1', 'Mars1', '
 def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, verbose=False,
                 compare_dir=None, fig_path='figs/', labelpad=None,labelsize=15, legsize=10, fname=None,
                 line_args=None, cmp_line_args=None, annotate_colour='xkcd:bright purple',
-                print_tf=False, colorbar=False, legend=True, hidex=False, fformat='.pdf',
+                print_tf=False, colorbar=False, legend=True, hidex=False, fformat='.png',
                 ident=None, fig=None, axes=None, label=None, cmp_label=None,  ticksize=12,
                 fontname=None, suptitlepad=1.04, legax=0, **kwargs):
      # names: y param
@@ -218,7 +218,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, ve
         print('q_sfc(t=0)', '%.2f'%(pl.q_sfc[0]*1e3), 'mW m^-3')
     return fig, axes
 
-def snaps(pl, plot_snapshots=None, fig_path=None, plots_save=False, ident=None, **kwargs):
+def snaps(pl, plot_snapshots=None, fig_path=None, plots_save=False, fformat='.png', ident=None, **kwargs):
     if ident is None:
         ident = pl.ident
     
@@ -236,7 +236,7 @@ def snaps(pl, plot_snapshots=None, fig_path=None, plots_save=False, ident=None, 
                        k_m=pl.k_m, legsize=10, **kwargs)
     plt.tight_layout()
     if plots_save:
-        fig2.savefig(fig_path+pl.ident+'_profiles.pdf', bbox_inches='tight') 
+        fig2.savefig(fig_path+pl.ident+'_profiles'+fformat, bbox_inches='tight') 
     return fig2, axes2
 
 def plot_structure(ax=None, t=None, T_m=None, T_c=None, R_p=None, R_l=None, R_c=None, T_l=None, 
@@ -291,7 +291,7 @@ def interp_benchmark(path, yscale=1):
     times = df['time'] # in Gyr 
     return np.array(times), f
 
-def plot_qsfc_error(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, ident=None, **kwargs):
+def plot_qsfc_error(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, ident=None, fformat='.png', **kwargs):
     """ sanity check on q_sfc """
     if ident is None:
         ident = pl.ident
@@ -340,10 +340,10 @@ def plot_qsfc_error(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=Fa
                   fontsize=14)
     plt.tight_layout()
     if plots_save:
-        fig3.savefig(fig_path+pl.ident+'_test_qsfc.pdf')
-        fig0.savefig(fig_path+pl.ident+'_q_error.pdf')
+        fig3.savefig(fig_path+pl.ident+'_test_qsfc'+fformat)
+        fig0.savefig(fig_path+pl.ident+'_q_error'+fformat)
 
-def plot_Tavg(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, ident=None, **kwargs):
+def plot_Tavg(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, ident=None, fformat='.png', **kwargs):
     """ sanity check on T_avg """
     if ident is None:
         ident = pl.ident
@@ -377,7 +377,7 @@ def plot_Tavg(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, i
     
     plt.tight_layout()
     if plots_save:
-        fig3.savefig(fig_path+pl.ident+'_test_Tavg.pdf')
+        fig3.savefig(fig_path+pl.ident+'_test_Tavg'+fformat)
         
 def plot_one(ax, x, y, xlabel, ylabel, labelsize=15, legsize=16, ticksize=12, line_args=None,
              text=None, xticks=True, ylim=None, label=None,labelpad=None, fontname=None, **kwargs):
@@ -475,7 +475,7 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
 def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=None, fig=None, axes=None,
               labels=False, labelsize=15, legsize=12, alpha=1, legend=False, snap=4.5,labelpad=None,
               plots_save=False, s=30, ls='-', lw=1, cmap='rainbow', marker='o', legtitle=None, legendtop=False,
-              colorbar=False, c='k', ylabel=True, ymin=None, ymax=None, set_ylim=True, set_xlim=False,
+              colorbar=False, c='k', ylabel=True, ymin=None, ymax=None, set_ylim=True, set_xlim=False, fformat='.png',
               zorder_l=None, zorder_sc=None, label_l=None, fname=None, ticksize=12, xmin=None, xmax=None, **kwargs):
         # for a list of planets, plot some parameter on the y axis vs. parameter x
     if (c is None) and (scplanets is not None):
@@ -583,5 +583,5 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
     if plots_save:
         if fname is None:
             fname = 'scatter_'+xparam
-        plt.savefig(fig_path+fname+'.pdf', bbox_inches='tight') 
+        plt.savefig(fig_path+fname+fformat, bbox_inches='tight') 
     return fig, axes
