@@ -8,8 +8,9 @@ from setup_postprocessing import Ra_ls, eta_ls, t1, end
 # plot summaries
 
 for ii, eta in enumerate(eta_ls):  # across eta_ls
-    cases_ii = ['Ra' + Ra + '-eta' + eta + end for Ra, e in zip(Ra_ls, end)]
+    cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end)]
     labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
+    print('cases_ii', cases_ii)
     fig, ax = sc.case_subplots(
         cases_ii,
         labels=labels_ii,
@@ -28,11 +29,9 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
 #     includepd=True, # turn on once you know where steady state starts
 #    )
 
-end_3e8 = ['', '', '-ascii', '-ascii']
 for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
-    cases_ii = ['Ra' + Ra + '-eta' + eta + end for eta, e in zip(eta_ls, end)]
+    cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end)]
     labels_ii = [r'$\Delta \eta$=' + eta for eta, e in zip(eta_ls, end)]
-    print('cases_ii', cases_ii)
     fig, ax = sc.case_subplots(
         cases_ii,
         labels=labels_ii,
