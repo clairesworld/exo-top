@@ -32,6 +32,7 @@ end_3e8 = ['', '', '-ascii', '-ascii']
 for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
     cases_ii = ['Ra' + Ra + '-eta' + eta + end for eta, e in zip(eta_ls, end)]
     labels_ii = [r'$\Delta \eta$=' + eta for eta, e in zip(eta_ls, end)]
+    print('cases_ii', cases_ii)
     fig, ax = sc.case_subplots(
         cases_ii,
         labels=labels_ii,
