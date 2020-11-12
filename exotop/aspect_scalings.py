@@ -481,7 +481,7 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png', mark_used
 def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
                   fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard,
                   loadh='auto', loadT='auto', includegraphic=False,
-                  suptitle='', includepd=True, includeTz=True, loadpicklex=False):
+                  suptitle='', includepd=True, includeTz=True, **kwargs):
     # rows are cases, columns are v_rms, q, T(z), hist
     ncases = len(cases)
     ncols = 2
