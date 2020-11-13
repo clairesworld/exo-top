@@ -566,7 +566,7 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
     
-    def T_components(self, n=None, T=None, T_i=None, T_l=None, delta_rh=None, delta_L=None, u=None, v=None, cut=False, plot=False,
+    def T_components(self, n, T=None, T_i=None, T_l=None, delta_rh=None, delta_L=None, u=None, v=None, cut=False, plot=False,
                      verbose=False, **kwargs):
         if n is None:
             n = self.final_step()
@@ -581,6 +581,9 @@ class Aspect_Data():
             _, _, _, T = self.read_temperature(n, verbose=verbose)
         T_av = horizontal_mean(T, x)
         try:
+            p = self.parameters
+        except:
+            self.read_parameters(verbose=verbose)
             p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
