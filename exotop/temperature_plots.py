@@ -5,7 +5,7 @@ from exotop import aspect_postprocessing2 as asp
 from exotop import aspect_scalings as sc
 from setup_postprocessing import Ra_ls, eta_ls, t1, end
 
-# plot just T(z) at final timestep, and extract all temperature params
+### plot just T(z) at final timestep, and extract all temperature params
 
 for ii, eta in enumerate(eta_ls):  # eta_ls
     for jj, Ra in enumerate(Ra_ls):
@@ -23,3 +23,11 @@ for ii, eta in enumerate(eta_ls):  # eta_ls
 # sc.get_T_params(case, t1=0.045,
 #                 picklefrom=case+'_pdx.pkl', plotTz=True,
 #                 xlabel='temperature', ylabel='depth', savefig=True)
+
+### look at distribution of T parameters over time
+
+# case = 'Ra3e7-eta1e5-wide'
+# _ = sc.pdf_h_components(case, t1=0, data_path=data_path, fig_path=fig_path, sigma=2,
+#                     picklefrom=case+'_pdx.pkl', plotTz=False, savefig=True,
+#                     settitle=True, setxlabel=True, c='xkcd:pale purple', params_list=None,
+#                     legend=True, plotpd=True, labelsize=16)

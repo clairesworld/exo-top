@@ -9,3 +9,8 @@ t1 = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 0.05],  # eta 1e5
 end = np.empty_like(t1, dtype=object)
 end[:] = "-wide"
 end[2:, 5] = "-wide-ascii"  # which runs use ascii initialisation
+
+data_path_bullard = '/raid1/cmg76/aspect/model-output/'
+fig_path_bullard = '/raid1/cmg76/aspect/figs/'
+data_path = data_path_bullard
+fig_path = fig_path_bullard

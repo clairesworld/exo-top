@@ -3,7 +3,7 @@ sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 import numpy as np
 from exotop import aspect_postprocessing2 as asp
 from exotop import aspect_scalings as sc
-from setup_postprocessing import Ra_ls, eta_ls, t1, end
+from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path
 
 # plot summaries
 
@@ -17,13 +17,13 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
         includeTz=True,
         fname='all-eta' + eta + '.png', suptitle='$\Delta \eta$=' + eta,
         includepdf=True,  # turn on once you know where steady state starts
-        includegraphic=True,
+        includegraphic=True, data_path=data_path, fig_path=fig_path,
     )
 
 # compare 64 and 129 resolution for Ra=3e7
 # fig, ax = sc.case_subplots(
 #     ['Ra3e7-eta1e5-wide', 'Ra3e7-eta1e5-wide-128'],
-#         ['64', '128'], 
+#         ['64', '128'], data_path=data_path, fig_path=fig_path,
 #     t1=[0.25, 0.25], loadpickle=True, dumppickle=dump, fname='all-Ra3e7-res.png', suptitle='$\Delta \eta$=1e5, Ra=3e7',
 #     includepd=True, # turn on once you know where steady state starts
 #    )
@@ -38,7 +38,7 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
         includeTz=True,
         fname='all-Ra3e8.png', suptitle='Ra = 3e8',
         includepdf=True,  # turn on once you know where steady state starts
-        includegraphic=True,
+        includegraphic=True, data_path=data_path, fig_path=fig_path,
     )
 
 print('summary plots complete')
