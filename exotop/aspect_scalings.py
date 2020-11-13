@@ -154,9 +154,10 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
             n = int(n)
             ts = n_indices[ii]  # timestep at this solution
             for fn in postprocess_functions:
-                df_to_extend = fn(case, n=n, dict_to_append=df_to_extend, ts=ts, dat=dat, **kwargs)
+                df_to_extend = fn(case, n=n, df=df_to_extend, ts=ts, dat=dat, **kwargs)
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
+        print('df', df_to_extend)
         # always store time tags and AspectData object
         df_to_extend['sol'].extend(n_quasi)
         df_to_extend['time'].extend(time[n_indices])
@@ -169,8 +170,10 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
     return df_to_extend
 
 
-def get_h(case=None, df_to_extend={}, ts=None, hscale=1, **kwargs):
-    p_dict = df_to_extend
+def get_h(case=None, df=None, ts=None, hscale=1, **kwargs):
+    if df is None:
+        df = pd.DataFrame()
+    p_dict = df.copy()
     try:
         h_params_n = {}
         x, h = read_topo_stats(case, ts)
@@ -194,8 +197,10 @@ def get_h(case=None, df_to_extend={}, ts=None, hscale=1, **kwargs):
     return p_dict
 
 
-def get_T_params(case, n, df_to_append={}, dat=None, data_path=data_path_bullard, **kwargs):
-    T_params = df_to_append
+def get_T_params(case, n, df=None, dat=None, data_path=data_path_bullard, **kwargs):
+    if df is None:
+        df = pd.DataFrame()
+    T_params = df.copy()
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                read_statistics=True, read_parameters=True)
