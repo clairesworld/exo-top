@@ -33,7 +33,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     # do pickling strategy
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
-    run_dict = {}
+    df = pd.DataFrame()
     dump_flag = False
     reprocess_flag = False
 
@@ -43,19 +43,19 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
             if os.path.exists(case_path + 'pickle/' + fname):
                 # open pickled file
                 try:
-                    run_dict = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
+                    df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
                 except ValueError:  # python 2?
-                    run_dict = pkl.load(open(case_path + 'pickle/' + fname, "rb"), protocol=2)
+                    df = pkl.load(open(case_path + 'pickle/' + fname, "rb"), protocol=2)
                 print('Found', fname)
 
                 if load == 'auto':  # check for additional timesteps
                     print('Checking for new solutions')
-                    time_old = run_dict['time']  # should all be after t1
+                    time_old = df['time']
                     if dat_new is None:
                         dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                                        read_statistics=True, read_parameters=False)
                     time_new = dat_new.stats_time
-                    t1_new = np.argmax(time_new > time_old[-1])
+                    t1_new = time_new[np.argmin(time_new > time_old[-1])]
                     print('t1_new', t1_new, 't1', t1, 'time_old[-1]', time_old[-1])
                     if (t1_new > 0):  # new timesteps
                         reprocess_flag = True
@@ -74,15 +74,15 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
         if reprocess_flag and (t1 != 1):
             sol_files_new = dat_new.read_stats_sol_files()
-            run_dict = process_at_solutions(case, postprocess_functions=postprocess_functions, t1=np.maximum(t1, t1_new),
-                                            data_path=data_path, dat=dat_new, dict_to_extend=run_dict,
-                                            sol_files=sol_files_new, **kwargs)
+            df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
+                                      t1=np.maximum(t1, t1_new), data_path=data_path, sol_files=sol_files_new,
+                                      df_to_extend=df, **kwargs)
             dump_flag = True  # always save if you did something
 
         if dump_flag:
-            pkl.dump(run_dict, open(case_path + 'pickle/' + fname, "wb"))
+            pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
 
-    return run_dict  # will returning None break?
+    return df  # will returning None break?
 
 
 def get_cases_list(Ra, eta):
@@ -112,25 +112,30 @@ def peak_and_rms(h):
     return np.max(h), np.sqrt(trapzmean(h ** 2))
 
 
-def read_evol(case, i, path=data_path_bullard, skiprows=None):
-    # e.g. return time, column i, nsteps (from statistics file)
-    df = pd.read_csv(path + 'output-' + case + '/statistics', header=None,
-                     skiprows=skiprows,
-                     index_col=False, delimiter=r"\s+", engine='python', comment='#')
-    return np.array(df.iloc[:, 1]), np.array(df.iloc[:, i - 1]), len(df.index)
+def read_evol(case, col, dat=None, data_path=data_path_bullard):
+    # return time, column i, (from statistics file)
+    if dat is None:
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=True, verbose=False)
+    return dat.stats_time, eval('dat.stats_'+col)
+# def read_evol_old(case, i, data_path=data_path_bullard, skiprows=None):
+#     # e.g. return time, column i, nsteps (from statistics file)
+#     df = pd.read_csv(data_path + 'output-' + case + '/statistics', header=None,
+#                      skiprows=skiprows,
+#                      index_col=False, delimiter=r"\s+", engine='python', comment='#')
+#     return np.array(df.iloc[:, 1]), np.array(df.iloc[:, i - 1]), len(df.index)
 
 
 def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
-                         dict_to_extend=None, sol_files=None, **kwargs):
-    if dict_to_extend is None:
-        dict_to_extend = {}
+                         df_to_extend=None, sol_files=None, **kwargs):
+    if df_to_extend is None:
+        df_to_extend = pd.DataFrame()
     try:
-        dict_to_extend['sol'].extend([])
+        df_to_extend['time'].extend([])
     except KeyError:  # haven't processed time stamps yet
-        dict_to_extend['sol'] = []
-        dict_to_extend['time'] = []
-        dict_to_extend['timestep'] = []
-        dict_to_extend['nsols'] = 0
+        df_to_extend['sol'] = []
+        df_to_extend['time'] = []
+        df_to_extend['timestep'] = []
+        df_to_extend['nsols'] = 0
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=False)
@@ -148,23 +153,23 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
             n = int(n)
             ts = n_indices[ii]  # timestep at this solution
             for fn in postprocess_functions:
-                dict_to_extend = fn(case, n=n, dict_to_append=dict_to_extend, ts=ts, dat=dat, **kwargs)
+                df_to_extend = fn(case, n=n, dict_to_append=df_to_extend, ts=ts, dat=dat, **kwargs)
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
         # always store time tags and AspectData object
-        dict_to_extend['sol'].extend(n_quasi)
-        dict_to_extend['time'].extend(time[n_indices])
-        dict_to_extend['timestep'].extend(n_indices)
-        dict_to_extend['nsols'] = dict_to_extend['nsols'] + len(n_quasi)
+        df_to_extend['sol'].extend(n_quasi)
+        df_to_extend['time'].extend(time[n_indices])
+        df_to_extend['timestep'].extend(n_indices)
+        df_to_extend['nsols'] = df_to_extend['nsols'] + len(n_quasi)
 
     else:
         times_at_sols = dat.find_time_at_sol(sol_files=sol_files, return_indices=False)
         print('    No quasi-steady state solutions up to', times_at_sols[-1])
-    return dict_to_extend
+    return df_to_extend
 
 
-def get_h(case=None, dict_to_extend={}, ts=None, hscale=1, **kwargs):
-    p_dict = dict_to_extend
+def get_h(case=None, df_to_extend={}, ts=None, hscale=1, **kwargs):
+    p_dict = df_to_extend
     try:
         h_params_n = {}
         x, h = read_topo_stats(case, ts)
@@ -188,8 +193,8 @@ def get_h(case=None, dict_to_extend={}, ts=None, hscale=1, **kwargs):
     return p_dict
 
 
-def get_T_params(case, n, dict_to_append={}, dat=None, data_path=data_path_bullard, **kwargs):
-    T_params = dict_to_append
+def get_T_params(case, n, df_to_append={}, dat=None, data_path=data_path_bullard, **kwargs):
+    T_params = df_to_append
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                read_statistics=True, read_parameters=True)
@@ -210,11 +215,7 @@ def plot_T_params(case, T_params, n=-1, dat=None,
                   fig_path=fig_path_bullard, fig=None, ax=None,
                   legend=True, labelsize=16, data_path=data_path_bullard, **kwargs):
     if dat is None:
-        try:
-            dat = T_params['dat']
-        except KeyError:
-            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
-            T_params['dat'] = dat
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
     dT_rh_f = T_params['dT_rh'][n]
     delta_rh_f = T_params['delta_rh'][n]
     D_l_f = T_params['delta_L'][n]
@@ -328,7 +329,7 @@ def plot_T_params(case, T_params, n=-1, dat=None,
 
 
 
-# def get_h_old(case, t1=0, data_path=data_path_bullard, dict_to_extend={}, dat=None,
+# def get_h_old(case, t1=0, data_path=data_path_bullard, df_to_extend={}, dat=None,
 #           fig_path=fig_path_bullard, hscale=1, **kwargs):
 #     flag = False
 #     if (picklefrom is not None) and (os.data_path.exists(fig_path + 'data/' + picklefrom)):
@@ -513,7 +514,7 @@ def plot_pdf(case, p_dict=None, keys=None, fig_path=fig_path_bullard, fig=None, 
 #     return np.percentile(x_list, qs), fig, ax
 
 
-def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png', mark_used=True, t1=0,
+def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f.png', mark_used=True, t1=0, dat=None,
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,
               setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path=fig_path_bullard):
     if not setxlabel:
@@ -523,7 +524,7 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png', mark_used
     if ax is None:
         fig = plt.figure()
         ax = plt.gca()
-    time, y, nsteps = read_evol(case, i=i)
+    time, y = read_evol(case, col, dat=dat)
     ax.plot(time, y * yscale, c=c, lw=0.5, label=label)
     ax.set_xlim(0, ax.get_xlim()[1])
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
@@ -547,7 +548,7 @@ def plot_evol(case, i, fig=None, ax=None, savefig=True, fend='_f.png', mark_used
 
 def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
                   fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard,
-                  loadh='auto', loadT='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
+                  load='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
                   suptitle='', includepdf=True, includeTz=True, **kwargs):
     # rows are cases, columns are v_rms, q, T(z), hist
     ncases = len(cases)
@@ -567,6 +568,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
         icol = 0
         if os.path.exists(data_path + 'output-' + case):
             print('Plotting summary for', case)
+            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
             if ii == ncases - 1:  # show x label in bottom row only
                 setxlabel = True
             else:
@@ -577,7 +579,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 legend = True
 
             ax = axes[ii, icol]
-            fig, ax = plot_evol(case, i=11, fig=fig, ax=ax, savefig=False, ylabel='rms velocity',
+            fig, ax = plot_evol(case, 'rms_velocity', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='rms velocity',
                                 c='k', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
                                 labelsize=labelsize, labelpad=labelpad, legend=False, mark_used=True, t1=t1[ii])
 
@@ -586,10 +588,10 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
 
             icol = icol + 1
             ax = axes[ii, icol]
-            fig, ax = plot_evol(case, i=20, fig=fig, ax=ax, savefig=False, ylabel='heat flux',
+            fig, ax = plot_evol(case, 'heatflux_top', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux',
                                 c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
                                 labelsize=labelsize, labelpad=labelpad, label='top', mark_used=True, t1=t1[ii])
-            fig, ax = plot_evol(case, i=19, fig=fig, ax=ax, savefig=False, ylabel='heat flux', yscale=-1,
+            fig, ax = plot_evol(case, 'heatflux_bottom', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux', yscale=-1,
                                 c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
                                 labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend, mark_used=False)
 
@@ -597,10 +599,10 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 icol = icol + 1
                 ax = axes[ii, icol]
 
-                run_dict = pickleio(case, suffix='_parameters', postprocess_functions=[get_T_params], t1=t1[ii],
-                                    load=loadT, data_path=data_path, fig_path=fig_path, **kwargs)
+                sol_df = pickleio(case, suffix='_T', postprocess_functions=[get_T_params], t1=t1[ii],
+                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
-                fig, ax = plot_T_params(case, T_params=run_dict, data_path=data_path, n=-1, savefig=False,
+                fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, savefig=False,
                                         setxlabel=setxlabel,
                                         setylabel=False, legend=False, fig_path=fig_path, fig=fig, ax=ax)
                 if legend:
@@ -613,12 +615,9 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             if includepdf:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                try:
-                    run_dict['h_rms']
-                except:
-                    run_dict = pickleio(case, suffix='_parameters', postprocess_functions=[get_h], t1=t1[ii],
-                                        load=loadh, data_path=data_path, fig_path=fig_path, **kwargs)
-                fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], p_dict=run_dict, path=data_path,
+                sol_df = pickleio(case, suffix='_h', postprocess_functions=[get_h], t1=t1[ii],
+                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+                fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], p_dict=sol_df, path=data_path,
                                    fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
                                    legend=legend, labelsize=labelsize, c_list=[c_rms, c_peak])
                 ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison
@@ -681,7 +680,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     for ii, case in enumerate(cases):
         run_dict = pickleio(case, suffix='_parameters', postprocess_functions=['get_h'], t1=0, load=load, dat_new=None,
                             datsuffix='_dat', data_path=data_path_bullard, fend='.pkl', **kwargs)
-        p_dict = get_h(case, t1=t1[ii], data_path=data_path, hscale=hscale, dict_to_extend=run_dict,)
+        p_dict = get_h(case, t1=t1[ii], data_path=data_path, hscale=hscale, df_to_extend=run_dict, )
         h_peak = p_dict['h_peak']
         h_rms = p_dict['h_rms']
 

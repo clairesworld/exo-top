@@ -13,7 +13,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
     fig, ax = sc.case_subplots(
         cases_ii,
         labels=labels_ii,
-        t1=t1[ii], save=True, loadh='auto', loadT='auto',
+        t1=t1[ii], save=True, load='auto',
         includeTz=True,
         fname='all-eta' + eta + '.png', suptitle='$\Delta \eta$=' + eta,
         includepdf=True,  # turn on once you know where steady state starts
@@ -34,7 +34,7 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
     fig, ax = sc.case_subplots(
         cases_ii,
         labels=labels_ii,
-        t1=t1.T[ii], save=True, loadh='auto', loadT='auto',
+        t1=t1.T[ii], save=True, load='auto',
         includeTz=True,
         fname='all-Ra3e8.png', suptitle='Ra = 3e8',
         includepdf=True,  # turn on once you know where steady state starts
