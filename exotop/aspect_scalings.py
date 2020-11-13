@@ -78,6 +78,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
             df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                       t1=np.maximum(t1, t1_new), data_path=data_path, sol_files=sol_files_new,
                                       df_to_extend=df, **kwargs)
+            print('df', df)
             dump_flag = True  # always save if you did something
 
         if dump_flag:
@@ -128,7 +129,6 @@ def read_evol(case, col, dat=None, data_path=data_path_bullard):
 
 def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
                          df_to_extend=None, sol_files=None, **kwargs):
-    print('t1', t1)
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
     if dat is None:
@@ -201,12 +201,15 @@ def plot_T_params(case, T_params, n=-1, dat=None,
                   legend=True, labelsize=16, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
-    dT_rh_f = T_params['dT_rh'][n]
-    delta_rh_f = T_params['delta_rh'][n]
-    D_l_f = T_params['delta_L'][n]
-    T_l_f = T_params['T_l'][n]
-    T_f = T_params['T_av'][n]
-    fig, ax = dat.plot_profile(T_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
+    # take nth row
+    T_params = T_params.iloc[[n]]
+    dT_rh_f = T_params['dT_rh']
+    delta_rh_f = T_params['delta_rh']
+    D_l_f = T_params['delta_L']
+    T_l_f = T_params['T_l']
+    T_f = T_params['T_av']
+    y_f = T_params['y']
+    fig, ax = dat.plot_profile(T_f, y=y_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
     ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
     ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
     ax.text(0, D_l_f - delta_rh_f, r'$\delta = $' + '{:04.2f}'.format(delta_rh_f), ha='left', va='top',

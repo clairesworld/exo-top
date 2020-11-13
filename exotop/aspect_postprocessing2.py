@@ -659,17 +659,19 @@ class Aspect_Data():
         
         return xu, yu, topo
     
-    def plot_profile(self, s, n=None, xlabel='', ylabel='depth', fig=None, ax=None, **plotkwargs):
+    def plot_profile(self, s, n=None, y=None, xlabel='', ylabel='depth', fig=None, ax=None, **plotkwargs):
         # s is a 2D or 1D array
         try:
             x = self.x
-            y = self.y
+            if y is None:
+                y = self.y
         except AttributeError:
             if n is None:
                 n = self.final_step()
             self.read_mesh(n=n, verbose=False)
             x = self.x
-            y = self.y
+            if y is None:
+                y = self.y
         if fig is None:
             fig, ax = plt.subplots(figsize=(4,4))
         if s.ndim == 2:  # s is not horizontally- averaged yet
