@@ -36,6 +36,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     df = pd.DataFrame()
     dump_flag = False
     reprocess_flag = False
+    t1_new = 0
 
     if os.path.exists(case_path):  # do nothing if case doesn't exist
         os.makedirs(case_path + 'pickle/', exist_ok=True)
