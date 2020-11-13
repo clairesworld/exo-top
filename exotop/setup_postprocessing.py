@@ -14,3 +14,6 @@ data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 data_path = data_path_bullard
 fig_path = fig_path_bullard
+
+c_rms='xkcd:forest green'
+c_peak='xkcd:periwinkle'

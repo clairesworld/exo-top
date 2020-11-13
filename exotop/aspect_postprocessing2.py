@@ -304,13 +304,14 @@ class Aspect_Data():
         filename = self.directory + "statistics"
         all_data = np.genfromtxt(filename, skip_header=skip_header, dtype=None)
         last = 0
-        files = np.zeros(len(all_data))
+        files = np.zeros(len(all_data), dtype=np.int8)
         #  find last instance that's not ""
         for n, d in enumerate(all_data):
             s = d[col_vis][-14:]
             if not s.decode()=='""':
                 last = int(re.search(r'\d+', s.decode()).group(0))
             files[n] = last
+        self.sol_files = files
         return files
 
     def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, i_vis=20, skip_header=26):
