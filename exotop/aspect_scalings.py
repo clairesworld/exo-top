@@ -20,11 +20,9 @@ data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 
 
-def read_topo_stats(case, ts, path='model-output/'):
-    df = pd.read_csv(path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
-                     names=['x', 'y', 'h'],
-                     skiprows=1,
-                     index_col=False, delimiter=r"\s+", engine='python')
+def read_topo_stats(case, ts, data_path=data_path_bullard):
+    df = pd.read_csv(data_path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
+                     names=['x', 'y', 'h'], skiprows=1, index_col=False, delimiter=r"\s+", engine='python')
     return df['x'], df['h']
 
 
@@ -208,7 +206,6 @@ def plot_T_params(case, T_params, n=-1, dat=None,
     y_f = np.array(T_params['y'].tolist())
     if fig is None:
         fig, ax = plt.subplots(figsize=(4, 4))
-    print('T_f', T_f, 'y_f', y_f, 'D_l_f', D_l_f)
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
     ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
