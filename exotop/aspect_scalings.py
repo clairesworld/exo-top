@@ -155,7 +155,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 df_to_extend = pd.concat([df_to_extend, new_params])
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
-        new_timestamps = pd.DataFrame({'sol':n_quasi, 'time': time[n_ts]}, index=[n_ts])
+        new_timestamps = pd.DataFrame({'sol':n_quasi.astype(int), 'time': time[n_ts]}, index=[n_ts.astype(int)])
         df_to_extend = pd.concat([df_to_extend, new_timestamps])
         print('df', df_to_extend)
         print('n_ts', n_ts)
