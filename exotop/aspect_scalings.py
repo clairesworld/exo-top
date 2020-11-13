@@ -202,12 +202,12 @@ def plot_T_params(case, T_params, n=-1, dat=None,
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
     # take nth row
     T_params = T_params.iloc[[n]]
-    dT_rh_f = T_params['dT_rh'].to_numpy()
-    delta_rh_f = T_params['delta_rh'].to_numpy()
-    D_l_f = T_params['delta_L'].to_numpy()
-    T_l_f = T_params['T_l'].to_numpy()
-    T_f = T_params['T_av'].to_numpy()
-    y_f = T_params['y'].to_numpy()
+    dT_rh_f = T_params['dT_rh']
+    delta_rh_f = T_params['delta_rh']
+    D_l_f = T_params['delta_L']
+    T_l_f = T_params['T_l']
+    T_f = T_params['T_av'].tolist()
+    y_f = T_params['y'].tolist()
     fig, ax = dat.plot_profile(T_f, y=y_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
     ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
     ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
