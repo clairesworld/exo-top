@@ -75,7 +75,6 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
             df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                       t1=np.maximum(t1, t1_new), data_path=data_path, sol_files=sol_files_new,
                                       df_to_extend=df, **kwargs)
-            print('df', df)
             dump_flag = True  # always save if you did something
 
         if dump_flag:
