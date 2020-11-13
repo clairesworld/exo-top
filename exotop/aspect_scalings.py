@@ -130,13 +130,6 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                          df_to_extend=None, sol_files=None, **kwargs):
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
-    try:
-        df_to_extend['time'].extend([])
-    except KeyError:  # haven't processed time stamps yet
-        df_to_extend['sol'] = []
-        df_to_extend['time'] = []
-        df_to_extend['timestep'] = []
-        df_to_extend['nsols'] = 0
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=False)
@@ -153,16 +146,16 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         for ii, n in enumerate(n_quasi):
             n = int(n)
             ts = n_indices[ii]  # timestep at this solution
+            print('ts', ts)
             for fn in postprocess_functions:
-                df_to_extend = fn(case, n=n, df=df_to_extend, ts=ts, dat=dat, **kwargs)
+                new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
+                new_params = pd.DataFrame(new_params_dict, index=[ts])
+                df_to_extend = pd.concat([df_to_extend, new_params])
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
+        new_timestamps = pd.DataFrame({'sol':n_quasi, 'time': time[n_indices]}, index=[n_indices])
+        df_to_extend = pd.concat([df_to_extend, new_timestamps])
         print('df', df_to_extend)
-        # always store time tags and AspectData object
-        df_to_extend['sol'].extend(n_quasi)
-        df_to_extend['time'].extend(time[n_indices])
-        df_to_extend['timestep'].extend(n_indices)
-        df_to_extend['nsols'] = df_to_extend['nsols'] + len(n_quasi)
 
     else:
         times_at_sols = dat.find_time_at_sol(sol_files=sol_files, return_indices=False)
@@ -170,12 +163,9 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
     return df_to_extend
 
 
-def get_h(case=None, df=None, ts=None, hscale=1, **kwargs):
-    if df is None:
-        df = pd.DataFrame()
-    p_dict = df.copy()
+def h_at_sol(case, ts=None, hscale=1, **kwargs):
+    h_params_n = {}
     try:
-        h_params_n = {}
         x, h = read_topo_stats(case, ts)
         h_norm = trapznorm(h)
         peak, rms = peak_and_rms(h_norm)
@@ -188,32 +178,17 @@ def get_h(case=None, df=None, ts=None, hscale=1, **kwargs):
         h_params_n['h_peak'] = None
         h_params_n['h_rms'] = None
 
-    for key in h_params_n.keys():
-        try:
-            p_dict[key].append(h_params_n[key])
-        except KeyError:  # key does not exist yet
-            p_dict[key] = []
-            p_dict[key].append(h_params_n[key])
-    return p_dict
+    return h_params_n
 
 
-def get_T_params(case, n, df=None, dat=None, data_path=data_path_bullard, **kwargs):
-    if df is None:
-        df = pd.DataFrame()
-    T_params = df.copy()
+def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                read_statistics=True, read_parameters=True)
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
     T_params_n = dat.T_components(n, T=T, u=u, v=v, cut=True)
-    for key in T_params_n.keys():
-        try:
-            T_params[key].append(T_params_n[key])
-        except KeyError:  # key does not exist yet
-            T_params[key] = []
-            T_params[key].append(T_params_n[key])
-    return T_params
+    return T_params_n
 
 
 def plot_T_params(case, T_params, n=-1, dat=None,
@@ -407,29 +382,29 @@ def plot_T_params(case, T_params, n=-1, dat=None,
 #
 #     return np.percentile(peak_list, qs), np.percentile(rms_list, qs)
 
-def parameter_percentiles(case, p_dict=None, keys=None, t1=0, plot=False, sigma=2, **kwargs):
-    # probability distribution for a number of parameters with p_dict containing time evolutions
+def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwargs):
+    # probability distribution for a number of parameters with df containing time evolutions
     if sigma == 2:
         qs = [2.5, 50, 97.5]
     elif sigma == 1:
         qs = [16, 50, 84]
-    pdf_dict = {}
+    qdict = {}
     for key in keys:
         try:
-            pdf_dict[key] = np.percentile(p_dict[key], qs)
+            qdict[key] = np.percentile(df[key], qs)
         except KeyError as e:
             raise (key, 'not processed yet for', case)
         except Exception as e:
             raise (e)
-            pdf_dict[key] = np.array([np.nan] * len(qs))
+            qdict[key] = np.array([np.nan] * len(qs))
 
     if plot:
-        fig, ax = plot_pdf(case, p_dict=p_dict, keys=keys, **kwargs)
-        return pdf_dict, fig, ax
-    return pdf_dict
+        fig, ax = plot_pdf(case, df=df, keys=keys, **kwargs)
+        return qdict, fig, ax
+    return qdict
 
 
-def plot_pdf(case, p_dict=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, savefig=True, settitle=True,
+def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, savefig=True, settitle=True,
              setxlabel=True, legend=True, labelsize=16, fend='.png', c_list=None, labels=None, fname='h_hist',
              **kwargs):
     if c_list is None:
@@ -443,7 +418,7 @@ def plot_pdf(case, p_dict=None, keys=None, fig_path=fig_path_bullard, fig=None, 
         ax = plt.gca()
 
     for ii, key in enumerate(keys):
-        x = p_dict[key]
+        x = df[key]
         c = c_list[ii]
         ax.hist(x, color=c, histtype='step', label=labels[ii])
         extralabel = ''
@@ -605,7 +580,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 icol = icol + 1
                 ax = axes[ii, icol]
 
-                sol_df = pickleio(case, suffix='_T', postprocess_functions=[get_T_params], t1=t1[ii],
+                sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
                 fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, savefig=False,
@@ -621,7 +596,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             if includepdf:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                sol_df = pickleio(case, suffix='_h', postprocess_functions=[get_h], t1=t1[ii],
+                sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_sol], t1=t1[ii],
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
                 fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], p_dict=sol_df, path=data_path,
                                    fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
@@ -684,16 +659,15 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     rms_all = []
 
     for ii, case in enumerate(cases):
-        run_dict = pickleio(case, suffix='_parameters', postprocess_functions=['get_h'], t1=0, load=load, dat_new=None,
-                            datsuffix='_dat', data_path=data_path_bullard, fend='.pkl', **kwargs)
-        p_dict = get_h(case, t1=t1[ii], data_path=data_path, hscale=hscale, df_to_extend=run_dict, )
-        h_peak = p_dict['h_peak']
-        h_rms = p_dict['h_rms']
-
-        quants_h_peak[ii, :], quants_h_rms[ii, :], _, _ = parameter_percentiles(case, p_dict=run_dict, sigma=sigma,
-                                                                                keys=['h_peak', 'h_rms'], plot=False)
+        df = pickleio(case, suffix='_h', postprocess_functions=['h_at_sol'], t1=t1[ii], load=load, dat_new=None,
+                            data_path=data_path, hscale=hscale, **kwargs)
+        qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms'], plot=False)
+        quants_h_peak[ii, :] = qdict['h_peak']
+        quants_h_rms[ii, :] = qdict['h_rms']
 
         x[ii, :] = float(x_var[ii])
+        h_peak = df['h_peak']
+        h_rms = df['h_rms']
         peak_all.append((h_peak, x[ii, :] ))
         rms_all.append((h_rms, x[ii, :] ))
 
@@ -722,9 +696,9 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         else:
             print('not enough points to fit -- Ra', Ra, 'eta', eta)
 
-    ax.errorbar(x[:, 1], h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
+    ax.errorbar(x[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
                 fmt='^', c=c_peak, alpha=0.9, capsize=5)
-    ax.errorbar(x[:, 1], h_rms[:, 1], yerr=yerr_rms, xerr=xerr,
+    ax.errorbar(x[:, 1], quants_h_rms[:, 1], yerr=yerr_rms, xerr=xerr,
                 fmt='o', c=c_rms, alpha=0.9, capsize=5)
 
     if logx:
