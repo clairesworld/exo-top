@@ -182,6 +182,8 @@ def h_at_sol(case, ts=None, hscale=1, **kwargs):
         h_params_n['h_peak'] = None
         h_params_n['h_rms'] = None
 
+    for key in h_params_n.keys():
+        h_params_n[key] = [h_params_n[key]]
     return h_params_n
 
 
@@ -193,7 +195,7 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
     x, y, z, T = dat.read_temperature(n, verbose=False)
     T_params_n = dat.T_components(n, T=T, u=u, v=v, cut=True)
     for key in T_params_n.keys():
-        T_params_n[key] = list(T_params_n[key])
+        T_params_n[key] = [T_params_n[key]]
     return T_params_n
 
 
