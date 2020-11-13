@@ -51,13 +51,12 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
                 if load == 'auto':  # check for additional timesteps
                     print('Checking for new solutions')
-                    time_old = df['time']
+                    time_f_old = df.time.iat[-1]
                     if dat_new is None:
                         dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                                        read_statistics=True, read_parameters=False)
                     time_new = dat_new.stats_time
-                    t1_new = time_new[np.argmin(time_new > time_old[-1])]
-                    print('t1_new', t1_new, 't1', t1, 'time_old[-1]', time_old[-1])
+                    t1_new = time_new[np.argmin(time_new > time_f_old)]
                     if (t1_new > 0):  # new timesteps
                         reprocess_flag = True
                         print('Updating', fname)
