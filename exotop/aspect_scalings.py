@@ -199,7 +199,7 @@ def plot_T_params(case, T_params, n=-1, dat=None,
                   fig_path=fig_path_bullard, fig=None, ax=None,
                   legend=True, labelsize=16, data_path=data_path_bullard, **kwargs):
     # take nth row
-    T_params = T_params.iloc[[n]]
+    T_params = T_params.iloc[n]
     dT_rh_f = T_params['dT_rh']
     delta_rh_f = T_params['delta_rh']
     D_l_f = T_params['delta_L']
@@ -208,7 +208,7 @@ def plot_T_params(case, T_params, n=-1, dat=None,
     y_f = np.array(T_params['y'].tolist())
     if fig is None:
         fig, ax = plt.subplots(figsize=(4, 4))
-
+    print('T_f', T_f, 'y_f', y_f, 'D_l_f', D_l_f)
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
     ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
