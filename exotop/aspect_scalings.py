@@ -152,7 +152,6 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 print('new params dict', new_params_dict.keys(), 'len', len(new_params_dict))
-                print('len dT_rh in new params dict', len(new_params_dict['dT_rh']))
                 new_params = pd.DataFrame(new_params_dict, index=[ts])
                 df_to_extend = pd.concat([df_to_extend, new_params])
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
