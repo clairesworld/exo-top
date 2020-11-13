@@ -211,12 +211,12 @@ class Aspect_Data():
         return times, snames
 
     def final_step(self):
-        str_f = self.get_solution_filenames()[1][-1]
+        str_f = self.get_solution_filenames(verbose=False)[1][-1]
         return int(re.search(r'\d+', str_f).group(0))
         
     def read_temperature(self, n, verbose=True):
         if not(hasattr(self, 'snames')):
-            self.get_solution_filenames()
+            self.get_solution_filenames(verbose=verbose)
             
         if self.mesh_file != self.mnames[n]:
             self.read_mesh(n, verbose=verbose)
@@ -246,7 +246,7 @@ class Aspect_Data():
 
     def read_velocity(self, n, verbose=True):
         if not(hasattr(self, 'snames')):
-            self.get_solution_filenames()
+            self.get_solution_filenames(verbose=verbose)
             
         if self.mesh_file != self.mnames[n]:
             self.read_mesh(n, verbose=verbose)
