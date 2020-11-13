@@ -152,6 +152,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 print('new params dict', new_params_dict.keys(), 'len', len(new_params_dict))
+                print(new_params_dict)
                 new_params = pd.DataFrame(new_params_dict, index=[ts])
                 df_to_extend = pd.concat([df_to_extend, new_params])
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
@@ -191,6 +192,8 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
     T_params_n = dat.T_components(n, T=T, u=u, v=v, cut=True)
+    for key in T_params_n.keys():
+        T_params_n[key] = list(T_params_n[key])
     return T_params_n
 
 
