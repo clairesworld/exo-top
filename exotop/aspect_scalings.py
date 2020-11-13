@@ -206,8 +206,8 @@ def plot_T_params(case, T_params, n=-1, dat=None,
     delta_rh_f = T_params['delta_rh']
     D_l_f = T_params['delta_L']
     T_l_f = T_params['T_l']
-    T_f = T_params['T_av'].tolist()
-    y_f = T_params['y'].tolist()
+    T_f = np.array(T_params['T_av'].tolist())
+    y_f = np.array(T_params['y'].tolist())
     fig, ax = dat.plot_profile(T_f, y=y_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
     ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
     ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
