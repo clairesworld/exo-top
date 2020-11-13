@@ -411,7 +411,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
                  load='auto', showallscatter=False,
-                 save=True, fname='h_vs_Ra.png', sigma=2,
+                 save=True, fname='h_vs_Ra.png', sigma=2, fig_fmt='.png',
                  labelsize=16, xlabel='', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
                  fit=False, fitRa=None, fitfn='line', cases=None, x_var=None, logx=True, logy=True,
@@ -493,7 +493,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
 
 def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                 loadpickle=False, dumppickle=False, loadpicklex=False,
+                 load='auto',  fig_fmt='.png',
                  save=True, fname='h_T.png', plotpd=False, sigma=2, showallscatter=False,
                  labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
@@ -645,7 +645,7 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
 def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppickle=False, save=True,
                   sigma=2, t1=None, fit=False, loadpicklex=False, nrows=2, ncols=2, x_components=False,
-                  data_path=data_path_bullard, fig_path=fig_path_bullard, fname='h_Ra_all.png',
+                  data_path=data_path_bullard, fig_path=fig_path_bullard, fname='h_Ra_all.png',  fig_fmt='.png',
                   ylim=(6e-3, 7e-2), labelsize=14, xlim=None, xlabel='Ra', ylabel='dynamic topography',
                   logx=True, logy=True, showallscatter=False, xlabelpad=12, ylabelpad=2, hscale=1):
     # subplots for different eta
@@ -767,7 +767,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppi
 
 def scales_with_Ra(Ra_data=None, y_data=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard,
                    save=True, fname='claire.png', sigma=2, showallscatter=False,
-                   labelsize=16, ylabel='', xlabel='Ra', title='',
+                   labelsize=16, ylabel='', xlabel='Ra', title='',  fig_fmt='.png',
                    c_scatter='xkcd:forest green', legend=True,
                    fit=False, cases=None, x_var=None, logx=True, logy=True,
                    fig=None, ax=None, ylim=None, xlim=None, **kwargs):
@@ -820,7 +820,7 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, data_path=data_path_bullard, 
                        labelsize=16, ylabel=[r'$\delta$', 'Nu'], xlabel='Ra', title='',
                        c_scatter='xkcd:forest green', legend=True, cmap='magma', compare_pub=None, compare_label=None,
                        fitdelta=False, fitNu=False, x_var=None, logx=True, logy=True, vmin=4, vmax=9,
-                       fig=None, axes=None, ylim=None, xlim=None, **kwargs):
+                       fig=None, axes=None, ylim=None, xlim=None,  fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
     if sigma == 2:
@@ -944,7 +944,7 @@ def moresi95(Ra=None, d_eta=None, T_params=None, case=None,
 
 
 def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
-                  fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard,
+                  fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard,  fig_fmt='.png',
                   load='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
                   suptitle='', includepdf=True, includeTz=True, **kwargs):
     # rows are cases, columns are v_rms, q, T(z), hist
@@ -1055,7 +1055,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
 
 
 def plot_convection_regimes(Ra, eta, regime_grid, path=data_path_bullard, fig_path=fig_path_bullard, loadpickle=False,
-                            dumppickle=False, save=True, fname='regimes.png', labelsize=16, sigma=2,
+                            dumppickle=False, save=True, fname='regimes.png', labelsize=16, sigma=2,  fig_fmt='.png',
                             overploth=False, nlevels=10, clist=None, cmap_contours='spring', **kwargs):
     # Ra and eta are lists of strings
     if clist is None:
@@ -1121,7 +1121,7 @@ def plot_convection_regimes(Ra, eta, regime_grid, path=data_path_bullard, fig_pa
 
 def plot_T_params(case, T_params, n=-1, dat=None,
                   setylabel=True, setxlabel=True, savefig=True,
-                  fig_path=fig_path_bullard, fig=None, ax=None,
+                  fig_path=fig_path_bullard, fig=None, ax=None,  fig_fmt='.png',
                   legend=True, labelsize=16, data_path=data_path_bullard, **kwargs):
     # take nth row
     T_params = T_params.iloc[n]
@@ -1152,7 +1152,7 @@ def plot_T_params(case, T_params, n=-1, dat=None,
     return fig, ax
 
 def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, savefig=True, settitle=True,
-             setxlabel=True, legend=True, labelsize=16, fend='.png', c_list=None, labels=None, fname='h_hist',
+             setxlabel=True, legend=True, labelsize=16, fend='.png', c_list=None, labels=None, fname='h_hist',  fig_fmt='.png',
              **kwargs):
     if c_list is None:
         c_list = ['xkcd:forest green', 'xkcd:periwinkle']
@@ -1178,8 +1178,8 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
                 extralabel = 'median'
             ax.axvline(x=np.median(x), color='k', ls='--', label=extralabel)
         except ValueError as e:
-            raise(e)
             print('x', x)
+            print(e)
 
     ax.yaxis.set_ticks([])
     ax.text(0.05, 0.05, 'n={:d}'.format(len(x)), ha='left', va='bottom', transform=ax.transAxes)
@@ -1248,7 +1248,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 
 
 def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f.png', mark_used=True, t1=0, dat=None,
-              ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,
+              ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,  fig_fmt='.png',
               setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path=fig_path_bullard):
     if not setxlabel:
         xlabel = ''
@@ -1280,8 +1280,8 @@ def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f.png', mark_us
 
 
 
-def plot_top_profile(case, savefig=True, fig_path=fig_path_bullard, path=data_path_bullard, verbose=True):
-    time, y, nsteps = read_evol(case, i=2, path=path)
+def plot_top_profile(case, savefig=True, fig_path=fig_path_bullard, data_path=data_path_bullard, verbose=True, fig_fmt= '.png',):
+    time, y, nsteps = read_evol(case, i=2, data_path=data_path)
     snap = nsteps - 2  # honestly not sure why it's -2 but seems to work haha
     x, h = read_topo_stats(case, snap)
     # normalize to 0 mean

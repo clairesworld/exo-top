@@ -17,7 +17,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
         includeTz=True,
         fname='all-eta' + eta + '.png', suptitle='$\Delta \eta$=' + eta,
         includepdf=True,  # turn on once you know where steady state starts
-        includegraphic=True, data_path=data_path, fig_path=fig_path,
+        includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt
     )
 
 # compare 64 and 129 resolution for Ra=3e7
@@ -38,7 +38,7 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
         includeTz=True,
         fname='all-Ra3e8.png', suptitle='Ra = 3e8',
         includepdf=True,  # turn on once you know where steady state starts
-        includegraphic=True, data_path=data_path, fig_path=fig_path,
+        includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt
     )
 
 print('Summary plots complete')

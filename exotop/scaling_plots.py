@@ -31,7 +31,7 @@ for ii, eta in enumerate(eta_ls):
                   save=True, fname='h_T_'+eta+'.png', sigma=2,
                   labelsize=16, xlabel=r'$\delta_u \Delta T_{rh}$', title='',
                   c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',legend=True,
-                  fit=False, logx=True, logy=True,
+                  fit=False, logx=True, logy=True, fig_fmt=fig_fmt,
                   xlim=None, data_path=data_path, fig_path=fig_path)
 
 fig, ax = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, x_components=True,
@@ -40,7 +40,7 @@ fig, ax = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_r
                            save=True, fname='h_T_all.png', showallscatter=True,
                            labelsize=14, xlabel=r'$\alpha \delta_u \Delta T_{rh}$', ylabel='dynamic topography',
                            fit=True, logx=True, logy=True, ylim=(3e-3,7e-2), xlim=(3e-8, 7e-7),
-                           xlabelpad=8, ylabelpad=0, data_path=data_path, fig_path=fig_path)
+                           xlabelpad=8, ylabelpad=0, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt)
     
         
 # for ii, eta in enumerate(eta_ls):
