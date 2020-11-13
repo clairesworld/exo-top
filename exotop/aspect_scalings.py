@@ -172,8 +172,8 @@ def h_at_sol(case, ts=None, hscale=1, **kwargs):
     except FileNotFoundError as e:
         print('    file not found:', e)
         print('    ts =', ts)
-        h_params_n['h_peak'] = None
-        h_params_n['h_rms'] = None
+        h_params_n['h_peak'] = np.nan
+        h_params_n['h_rms'] = np.nan
 
     for key in h_params_n.keys():
         h_params_n[key] = [h_params_n[key]]
@@ -602,7 +602,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 ax = axes[ii, icol]
                 sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_sol], t1=t1[ii],
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
-                fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], p_dict=sol_df, path=data_path,
+                fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], df=sol_df, path=data_path,
                                    fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
                                    legend=legend, labelsize=labelsize, c_list=[c_rms, c_peak])
                 ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison
