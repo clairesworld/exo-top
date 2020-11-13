@@ -2,7 +2,7 @@ import sys
 sys.path.insert(0,'/home/cmg76/Works/exo-top/')
 import numpy as np
 from exotop import aspect_scalings as sc
-from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path
+from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt
 
 # Ra from 1e6 to 3e8
 regime_grid = np.array([['steady', 'steady' , 'steady', 'chaotic', 'sluggish', 'not converged'], # eta 1e5

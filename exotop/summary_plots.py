@@ -3,7 +3,7 @@ sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 import numpy as np
 from exotop import aspect_postprocessing2 as asp
 from exotop import aspect_scalings as sc
-from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak
+from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt
 
 # plot summaries
 

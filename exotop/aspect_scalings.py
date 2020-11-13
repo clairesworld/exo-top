@@ -170,7 +170,6 @@ def h_at_sol(case, ts=None, hscale=1, **kwargs):
 
     except FileNotFoundError as e:
         print('    file not found:', e)
-        print('    ts =', ts)
         h_params_n['h_peak'] = np.nan
         h_params_n['h_rms'] = np.nan
 
@@ -191,37 +190,7 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
     return T_params_n
 
 
-def plot_T_params(case, T_params, n=-1, dat=None,
-                  setylabel=True, setxlabel=True, savefig=True,
-                  fig_path=fig_path_bullard, fig=None, ax=None,
-                  legend=True, labelsize=16, data_path=data_path_bullard, **kwargs):
-    # take nth row
-    T_params = T_params.iloc[n]
-    dT_rh_f = T_params['dT_rh']
-    delta_rh_f = T_params['delta_rh']
-    D_l_f = T_params['delta_L']
-    T_l_f = T_params['T_l']
-    T_f = np.array(T_params['T_av'].tolist())
-    y_f = np.array(T_params['y'].tolist())
-    if fig is None:
-        fig, ax = plt.subplots(figsize=(4, 4))
-    ax.plot(T_f, y_f, c='k', lw=1)
-    ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
-    ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
-    ax.text(0, D_l_f - delta_rh_f, r'$\delta = $' + '{:04.2f}'.format(delta_rh_f), ha='left', va='top',
-            color='xkcd:red orange', fontsize=labelsize - 2)
-    ax.plot([T_l_f, T_l_f], [0, D_l_f], ls='--', alpha=0.5, lw=0.5, c='xkcd:tangerine')
-    ax.plot([T_l_f + dT_rh_f, T_l_f + dT_rh_f], [0, D_l_f - delta_rh_f], ls='--', alpha=0.5, lw=0.5,
-            c='xkcd:red orange')
-    if legend:
-        ax.legend(frameon=False, fontsize=labelsize - 2)
-    if setxlabel:
-        ax.set_xlabel('temperature', fontsize=labelsize)
-    if setylabel:
-        ax.set_ylabel('depth', fontsize=labelsize)
-    if savefig:
-        fig.savefig(fig_path + case + '-T_z.png', bbox_inches='tight')
-    return fig, ax
+
 
 
 # def get_T_params_old(case, t1=0, data_path=data_path_bullard, pickleto=None, picklefrom=None, plotTz=False,
@@ -407,242 +376,42 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
     return qdict
 
 
-def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, savefig=True, settitle=True,
-             setxlabel=True, legend=True, labelsize=16, fend='.png', c_list=None, labels=None, fname='h_hist',
-             **kwargs):
-    if c_list is None:
-        c_list = ['xkcd:forest green', 'xkcd:periwinkle']
-    if labels is None:
-        labels = ['rms', 'peak']
-    if keys is None:
-        keys = ['h_rms', 'h_peak']
-    if ax is None:
-        fig = plt.figure()
-        ax = plt.gca()
-
-    for ii, key in enumerate(keys):
-        x = df[key]
-        c = c_list[ii]
-        ax.hist(x, color=c, histtype='step', label=labels[ii])
-        extralabel = ''
-        if ii == 0:
-            extralabel = 'mean'
-        ax.axvline(x=np.mean(x), color='k', ls='-', lw=1, label=extralabel)
-        if ii == 0:
-            extralabel = 'median'
-        ax.axvline(x=np.median(x), color='k', ls='--', label=extralabel)
-
-    ax.yaxis.set_ticks([])
-    ax.text(0.05, 0.05, 'n={:d}'.format(len(x)), ha='left', va='bottom', transform=ax.transAxes)
-    if legend:
-        ax.legend(frameon=False, fontsize=labelsize - 2)
-    if setxlabel:
-        ax.set_xlabel('dynamic topography', fontsize=labelsize)
-    if settitle:
-        ax.set_title(case, fontsize=labelsize)
-    if savefig:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + case + fname + fend, bbox_inches='tight')
-    return fig, ax
+def fit_log(x, h, plot=True):
+    x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
+    h1 = np.log10(np.array(h))
+    try:
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
+    except ValueError:
+        print('error | x', np.shape(x1), 'h', np.shape(h1))
+    return slope, 10 ** intercept
 
 
-# def pd_h_components(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
-#                     pickleto=None, picklefrom=None, plotTz=False, savefig=False,
-#                     settitle=True, setxlabel=True, c='xkcd:pale purple', params_list=None,
-#                     legend=True, plotpd=False, labelsize=16, fig=None, ax=None, alpha=None):
-#     # probability distribution of h' = f(x) for single case
-#     if sigma == 2:
-#         qs = [2.5, 50, 97.5]
-#     elif sigma == 1:
-#         qs = [16, 50, 84]
-#
-#     if params_list is None:
-#         T_params, fig, ax = get_T_params(case, t1=t1, data_path=data_path,
-#                                          setxlabel=setxlabel,
-#                                          pickleto=pickleto, picklefrom=picklefrom,
-#                                          savefig=savefig, fig=fig, ax=ax,
-#                                          plotTz=plotTz, fig_path=fig_path)
-#     else:
-#         T_params = params_list
-#
-#     if alpha is None:
-#         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False)
-#         alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
-#
-#     x_list = alpha * (np.array(T_params['dT_rh']) / np.array(T_params['dT_m'])) * (
-#             np.array(T_params['delta_rh']) / np.array(T_params['d_m']))
-#     if plotpd and (not plotTz):
-#         if ax is None:
-#             fig = plt.figure()
-#             ax = plt.gca()
-#         ax.hist(x_list, color=c, histtype='step')
-#         ax.axvline(x=np.median(x_list), color='k', ls='--', label='median')
-#         ax.axvline(x=np.mean(x_list), color='k', ls='-', lw=1, label='mean')
-#         ax.yaxis.set_ticks([])
-#         ax.text(0.95, 0.95, 'n = {:d}'.format(len(x_list)), ha='right', va='top', transform=ax.transAxes)
-#         if legend:
-#             ax.legend(frameon=False, fontsize=labelsize - 2)
-#         if setxlabel:
-#             ax.set_xlabel(r'$\Delta T_{rh}/\Delta T_m \; \delta/d_m$', fontsize=labelsize)
-#         if settitle:
-#             ax.set_title(case, fontsize=labelsize)
-#         if savefig:
-#             if not os.data_path.exists(fig_path):
-#                 os.makedirs(fig_path)
-#             fig.savefig(fig_path + case + '_x_hist.png')
-#
-#     if (not T_params['dT_rh']):  # empty
-#         print(case, '- T list is empty')
-#         return np.array([np.nan, np.nan, np.nan]), fig, ax
-#     return np.percentile(x_list, qs), fig, ax
+def fit_h_sigma(x, h, h_err=None, fn='line'):
+    def line(x, a, b):
+        return a * x + b
+
+    #     def expon(x, C, n):
+    #         return C * x**n
+
+    idx = np.nonzero(np.isnan(x) == False)[0]
+    x_fit = np.log10(x[idx])
+    h_fit = np.log10(h[idx])
+    if h_err is not None:
+        h_err = np.log10(h_err[idx])
+    print('fitting x =', x_fit, 'h =', h_fit)
+    if fn == 'line':
+        popt, pcov = curve_fit(line, x_fit, h_fit, sigma=h_err)
+        print('slope:', popt[0], 'intercept:', popt[1])
+
+    return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
-def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f.png', mark_used=True, t1=0, dat=None,
-              ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,
-              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path=fig_path_bullard):
-    if not setxlabel:
-        xlabel = ''
-    if not setylabel:
-        ylabel = ''
-    if ax is None:
-        fig = plt.figure()
-        ax = plt.gca()
-    time, y = read_evol(case, col, dat=dat)
-    ax.plot(time, y * yscale, c=c, lw=0.5, label=label)
-    ax.set_xlim(0, ax.get_xlim()[1])
-    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
-    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=labelpad)
-    if settitle:
-        ax.set_title(case, fontsize=labelsize)
-    if legend:
-        ax.legend(frameon=False, fontsize=labelsize - 2)
-    if mark_used:
-        # Create a Rectangle patch to mark "transient" times
-        rect = patches.Rectangle((ax.get_xlim()[0], ax.get_ylim()[0]), t1,
-                                 ax.get_ylim()[1] - ax.get_ylim()[0],
-                                 edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
-        ax.add_patch(rect)
-    if savefig:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + case + fend)
-    return fig, ax
 
-
-def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
-                  fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard,
-                  load='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
-                  suptitle='', includepdf=True, includeTz=True, **kwargs):
-    # rows are cases, columns are v_rms, q, T(z), hist
-    ncases = len(cases)
-    ncols = 2
-    if includepdf:
-        ncols = ncols + 1
-    if includeTz:
-        ncols = ncols + 1
-    if includegraphic:
-        ncols = ncols + 1
-    fig, axes = plt.subplots(ncases, ncols, figsize=(17, ncases * 2.5))
-    if t1 is None:
-        t1 = [0] * ncases
-    numplotted = 0
-    delrow = []
-    for ii, case in enumerate(cases):
-        icol = 0
-        if os.path.exists(data_path + 'output-' + case):
-            print('Plotting summary for', case)
-            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
-            if ii == ncases - 1:  # show x label in bottom row only
-                setxlabel = True
-            else:
-                setxlabel = False
-            setylabel = True
-            legend = False
-            if numplotted == 0:
-                legend = True
-
-            ax = axes[ii, icol]
-            fig, ax = plot_evol(case, 'rms_velocity', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='rms velocity',
-                                c='k', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, legend=False, mark_used=True, t1=t1[ii])
-
-            ax.text(0.01, 0.95, labels[ii], horizontalalignment='left', verticalalignment='top',
-                        transform=ax.transAxes, fontsize=labelsize)
-
-            icol = icol + 1
-            ax = axes[ii, icol]
-            fig, ax = plot_evol(case, 'heatflux_top', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux',
-                                c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='top', mark_used=True, t1=t1[ii])
-            fig, ax = plot_evol(case, 'heatflux_bottom', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux', yscale=-1,
-                                c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend, mark_used=False)
-
-            if includeTz:  # final timestep only
-                icol = icol + 1
-                ax = axes[ii, icol]
-
-                sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
-                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
-
-                fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, savefig=False,
-                                        setxlabel=setxlabel,
-                                        setylabel=False, legend=False, fig_path=fig_path, fig=fig, ax=ax)
-                if legend:
-                    ax.legend(frameon=False)
-                if setxlabel:
-                    ax.set_xlabel('temperature', fontsize=labelsize)
-                if setylabel:
-                    ax.set_ylabel('depth', fontsize=labelsize)
-
-            if includepdf:
-                icol = icol + 1
-                ax = axes[ii, icol]
-                sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_sol], t1=t1[ii],
-                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
-                fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], df=sol_df, path=data_path,
-                                   fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
-                                   legend=legend, labelsize=labelsize, c_list=[c_rms, c_peak])
-                ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison
-
-            if includegraphic:
-                icol = icol + 1
-                ax = axes[ii, icol]
-                try:
-                    img = mpimg.imread(fig_path + 'graphical/' + case + '.png')
-                    ax.imshow(img)
-                    print('plotting graphical output for', case)
-                except FileNotFoundError:
-                    print('file graphical/', case, '.png not found')
-                    fig.delaxes(ax)
-
-            numplotted += 1
-        else:
-            print(case, 'not found')
-            ax = axes[ii, 0]
-            ax.text(0.01, 0.95, labels[ii] + '\n\nno stagnant lid convection',
-                    horizontalalignment='left', verticalalignment='top',
-                    transform=ax.transAxes, fontsize=labelsize)
-            delrow.append(ii)
-    #     for mm in delrow: # delete unused subplot rows
-    #         for nn in range(icol+1):
-    #             try:
-    #                 fig.delaxes(axes[mm][nn])
-    #             except:
-    #                 print('could not delete axis', mm, nn)
-    plt.suptitle(suptitle, fontsize=labelsize * 2, y=1.02)
-    fig.tight_layout()
-    if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + fname, bbox_inches='tight')
-    return fig, axes
 
 
 def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
                  load='auto', showallscatter=False,
-                 save=True, fname='h.png', sigma=2,
+                 save=True, fname='h_vs_Ra.png', sigma=2,
                  labelsize=16, xlabel='', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
                  fit=False, fitRa=None, fitfn='line', cases=None, x_var=None, logx=True, logy=True,
@@ -873,35 +642,6 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     return fig, ax
 
 
-def fit_log(x, h, plot=True):
-    x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
-    h1 = np.log10(np.array(h))
-    try:
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
-    except ValueError:
-        print('error | x', np.shape(x1), 'h', np.shape(h1))
-    return slope, 10 ** intercept
-
-
-def fit_h_sigma(x, h, h_err=None, fn='line'):
-    def line(x, a, b):
-        return a * x + b
-
-    #     def expon(x, C, n):
-    #         return C * x**n
-
-    idx = np.nonzero(np.isnan(x) == False)[0]
-    x_fit = np.log10(x[idx])
-    h_fit = np.log10(h[idx])
-    if h_err is not None:
-        h_err = np.log10(h_err[idx])
-    print('fitting x =', x_fit, 'h =', h_fit)
-    if fn == 'line':
-        popt, pcov = curve_fit(line, x_fit, h_fit, sigma=h_err)
-        print('slope:', popt[0], 'intercept:', popt[1])
-
-    return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
-
 
 def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppickle=False, save=True,
                   sigma=2, t1=None, fit=False, loadpicklex=False, nrows=2, ncols=2, x_components=False,
@@ -1025,12 +765,12 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppi
     return fig, axes
 
 
-def Ra_scaling(Ra_data=None, y_data=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard,
-               save=True, fname='claire.png', sigma=2, showallscatter=False,
-               labelsize=16, ylabel='', xlabel='Ra', title='',
-               c_scatter='xkcd:forest green', legend=True,
-               fit=False, cases=None, x_var=None, logx=True, logy=True,
-               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
+def scales_with_Ra(Ra_data=None, y_data=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard,
+                   save=True, fname='claire.png', sigma=2, showallscatter=False,
+                   labelsize=16, ylabel='', xlabel='Ra', title='',
+                   c_scatter='xkcd:forest green', legend=True,
+                   fit=False, cases=None, x_var=None, logx=True, logy=True,
+                   fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     if fig is None:
         fig = plt.figure()
         ax = plt.gca()
@@ -1139,18 +879,18 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, data_path=data_path_bullard, 
                 axes[0].plot(Ra_i, delta_cmp, '^', alpha=0.7, c=c_scatter, label=cmplabel)
                 axes[1].plot(Ra_i, Nu_cmp, '^', alpha=0.7, c=c_scatter, label=cmplabel)
 
-        fig, axes[0] = Ra_scaling(Ra_data=Ra_plot, y_data=delta_0_plot, t1=t1,
-                                  path=data_path, fig_path=fig_path,
-                                  save=False, sigma=sigma, showallscatter=False,
-                                  labelsize=labelsize, ylabel=ylabel[0], xlabel='Ra',
-                                  c_scatter=c_scatter, fit=fitdelta, logx=logx, logy=logy,
-                                  fig=fig, ax=axes[0], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
-        fig, axes[1] = Ra_scaling(Ra_data=Ra_plot, y_data=Nu_plot, t1=t1,
-                                  path=data_path, fig_path=fig_path,
-                                  save=False, sigma=sigma, showallscatter=False,
-                                  labelsize=labelsize, ylabel=ylabel[1], xlabel='Ra',
-                                  c_scatter=c_scatter, fit=fitNu, logx=logx, logy=logy,
-                                  fig=fig, ax=axes[1], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
+        fig, axes[0] = scales_with_Ra(Ra_data=Ra_plot, y_data=delta_0_plot, t1=t1,
+                                      path=data_path, fig_path=fig_path,
+                                      save=False, sigma=sigma, showallscatter=False,
+                                      labelsize=labelsize, ylabel=ylabel[0], xlabel='Ra',
+                                      c_scatter=c_scatter, fit=fitdelta, logx=logx, logy=logy,
+                                      fig=fig, ax=axes[0], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
+        fig, axes[1] = scales_with_Ra(Ra_data=Ra_plot, y_data=Nu_plot, t1=t1,
+                                      path=data_path, fig_path=fig_path,
+                                      save=False, sigma=sigma, showallscatter=False,
+                                      labelsize=labelsize, ylabel=ylabel[1], xlabel='Ra',
+                                      c_scatter=c_scatter, fit=fitNu, logx=logx, logy=logy,
+                                      fig=fig, ax=axes[1], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
 
     scat = axes[1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
                            vmin=vmin, vmax=vmax)  # dummy
@@ -1199,6 +939,119 @@ def moresi95(Ra=None, d_eta=None, T_params=None, case=None,
     T_i_scaling = 1 - (1.1 * p ** -0.73 * Ra_i ** -0.04)
     delta_0 = T_i_scaling / Nu
     return {'Ra_i': Ra_i, 'delta_0': delta_0, 'Nu': Nu, 'T_i': T_i_scaling, 'delta_1': delta_1}
+
+
+
+
+def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
+                  fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard,
+                  load='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
+                  suptitle='', includepdf=True, includeTz=True, **kwargs):
+    # rows are cases, columns are v_rms, q, T(z), hist
+    ncases = len(cases)
+    ncols = 2
+    if includepdf:
+        ncols = ncols + 1
+    if includeTz:
+        ncols = ncols + 1
+    if includegraphic:
+        ncols = ncols + 1
+    fig, axes = plt.subplots(ncases, ncols, figsize=(17, ncases * 2.5))
+    if t1 is None:
+        t1 = [0] * ncases
+    numplotted = 0
+    delrow = []
+    for ii, case in enumerate(cases):
+        icol = 0
+        if os.path.exists(data_path + 'output-' + case):
+            print('Plotting summary for', case)
+            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+            if ii == ncases - 1:  # show x label in bottom row only
+                setxlabel = True
+            else:
+                setxlabel = False
+            setylabel = True
+            legend = False
+            if numplotted == 0:
+                legend = True
+
+            ax = axes[ii, icol]
+            fig, ax = plot_evol(case, 'rms_velocity', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='rms velocity',
+                                c='k', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
+                                labelsize=labelsize, labelpad=labelpad, legend=False, mark_used=True, t1=t1[ii])
+
+            ax.text(0.01, 0.95, labels[ii], horizontalalignment='left', verticalalignment='top',
+                        transform=ax.transAxes, fontsize=labelsize)
+
+            icol = icol + 1
+            ax = axes[ii, icol]
+            fig, ax = plot_evol(case, 'heatflux_top', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux',
+                                c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
+                                labelsize=labelsize, labelpad=labelpad, label='top', mark_used=True, t1=t1[ii])
+            fig, ax = plot_evol(case, 'heatflux_bottom', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux', yscale=-1,
+                                c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
+                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend, mark_used=False)
+
+            if includeTz:  # final timestep only
+                icol = icol + 1
+                ax = axes[ii, icol]
+
+                sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
+                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+
+                fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, savefig=False,
+                                        setxlabel=setxlabel,
+                                        setylabel=False, legend=False, fig_path=fig_path, fig=fig, ax=ax)
+                if legend:
+                    ax.legend(frameon=False)
+                if setxlabel:
+                    ax.set_xlabel('temperature', fontsize=labelsize)
+                if setylabel:
+                    ax.set_ylabel('depth', fontsize=labelsize)
+
+            if includepdf:
+                icol = icol + 1
+                ax = axes[ii, icol]
+                sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_sol], t1=t1[ii],
+                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+
+                fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], df=sol_df, path=data_path,
+                                   fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
+                                   legend=legend, labelsize=labelsize, c_list=[c_rms, c_peak])
+                ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison
+
+            if includegraphic:
+                icol = icol + 1
+                ax = axes[ii, icol]
+                try:
+                    img = mpimg.imread(fig_path + 'graphical/' + case + '.png')
+                    ax.imshow(img)
+                    print('Plotting graphical output for', case)
+                except FileNotFoundError:
+                    print('file graphical/', case, '.png not found')
+                    fig.delaxes(ax)
+
+            numplotted += 1
+        else:
+            print(case, 'not found')
+            ax = axes[ii, 0]
+            ax.text(0.01, 0.95, labels[ii] + '\n\nno stagnant lid convection',
+                    horizontalalignment='left', verticalalignment='top',
+                    transform=ax.transAxes, fontsize=labelsize)
+            delrow.append(ii)
+    #     for mm in delrow: # delete unused subplot rows
+    #         for nn in range(icol+1):
+    #             try:
+    #                 fig.delaxes(axes[mm][nn])
+    #             except:
+    #                 print('could not delete axis', mm, nn)
+    plt.suptitle(suptitle, fontsize=labelsize * 2, y=1.02)
+    fig.tight_layout()
+    if save:
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
+        fig.savefig(fig_path + fname, bbox_inches='tight')
+    return fig, axes
 
 
 def plot_convection_regimes(Ra, eta, regime_grid, path=data_path_bullard, fig_path=fig_path_bullard, loadpickle=False,
@@ -1263,6 +1116,168 @@ def plot_convection_regimes(Ra, eta, regime_grid, path=data_path_bullard, fig_pa
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
         fig.savefig(fig_path + fname, bbox_inches='tight')
+
+
+
+def plot_T_params(case, T_params, n=-1, dat=None,
+                  setylabel=True, setxlabel=True, savefig=True,
+                  fig_path=fig_path_bullard, fig=None, ax=None,
+                  legend=True, labelsize=16, data_path=data_path_bullard, **kwargs):
+    # take nth row
+    T_params = T_params.iloc[n]
+    dT_rh_f = T_params['dT_rh']
+    delta_rh_f = T_params['delta_rh']
+    D_l_f = T_params['delta_L']
+    T_l_f = T_params['T_l']
+    T_f = np.array(T_params['T_av'].tolist())
+    y_f = np.array(T_params['y'].tolist())
+    if fig is None:
+        fig, ax = plt.subplots(figsize=(4, 4))
+    ax.plot(T_f, y_f, c='k', lw=1)
+    ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
+    ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
+    ax.text(0, D_l_f - delta_rh_f, r'$\delta = $' + '{:04.2f}'.format(delta_rh_f), ha='left', va='top',
+            color='xkcd:red orange', fontsize=labelsize - 2)
+    ax.plot([T_l_f, T_l_f], [0, D_l_f], ls='--', alpha=0.5, lw=0.5, c='xkcd:tangerine')
+    ax.plot([T_l_f + dT_rh_f, T_l_f + dT_rh_f], [0, D_l_f - delta_rh_f], ls='--', alpha=0.5, lw=0.5,
+            c='xkcd:red orange')
+    if legend:
+        ax.legend(frameon=False, fontsize=labelsize - 2)
+    if setxlabel:
+        ax.set_xlabel('temperature', fontsize=labelsize)
+    if setylabel:
+        ax.set_ylabel('depth', fontsize=labelsize)
+    if savefig:
+        fig.savefig(fig_path + case + '-T_z.png', bbox_inches='tight')
+    return fig, ax
+
+def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, savefig=True, settitle=True,
+             setxlabel=True, legend=True, labelsize=16, fend='.png', c_list=None, labels=None, fname='h_hist',
+             **kwargs):
+    if c_list is None:
+        c_list = ['xkcd:forest green', 'xkcd:periwinkle']
+    if labels is None:
+        labels = ['rms', 'peak']
+    if keys is None:
+        keys = ['h_rms', 'h_peak']
+    if ax is None:
+        fig = plt.figure()
+        ax = plt.gca()
+
+    for ii, key in enumerate(keys):
+        x = df[key]
+        c = c_list[ii]
+
+        try:
+            ax.hist(x, color=c, histtype='step', label=labels[ii])
+            extralabel = ''
+            if ii == 0:
+                extralabel = 'mean'
+            ax.axvline(x=np.mean(x), color='k', ls='-', lw=1, label=extralabel)
+            if ii == 0:
+                extralabel = 'median'
+            ax.axvline(x=np.median(x), color='k', ls='--', label=extralabel)
+        except ValueError as e:
+            raise(e)
+            print('x', x)
+
+    ax.yaxis.set_ticks([])
+    ax.text(0.05, 0.05, 'n={:d}'.format(len(x)), ha='left', va='bottom', transform=ax.transAxes)
+    if legend:
+        ax.legend(frameon=False, fontsize=labelsize - 2)
+    if setxlabel:
+        ax.set_xlabel('dynamic topography', fontsize=labelsize)
+    if settitle:
+        ax.set_title(case, fontsize=labelsize)
+    if savefig:
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
+        fig.savefig(fig_path + case + fname + fend, bbox_inches='tight')
+    return fig, ax
+
+
+# def pd_h_components(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
+#                     pickleto=None, picklefrom=None, plotTz=False, savefig=False,
+#                     settitle=True, setxlabel=True, c='xkcd:pale purple', params_list=None,
+#                     legend=True, plotpd=False, labelsize=16, fig=None, ax=None, alpha=None):
+#     # probability distribution of h' = f(x) for single case
+#     if sigma == 2:
+#         qs = [2.5, 50, 97.5]
+#     elif sigma == 1:
+#         qs = [16, 50, 84]
+#
+#     if params_list is None:
+#         T_params, fig, ax = get_T_params(case, t1=t1, data_path=data_path,
+#                                          setxlabel=setxlabel,
+#                                          pickleto=pickleto, picklefrom=picklefrom,
+#                                          savefig=savefig, fig=fig, ax=ax,
+#                                          plotTz=plotTz, fig_path=fig_path)
+#     else:
+#         T_params = params_list
+#
+#     if alpha is None:
+#         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False)
+#         alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
+#
+#     x_list = alpha * (np.array(T_params['dT_rh']) / np.array(T_params['dT_m'])) * (
+#             np.array(T_params['delta_rh']) / np.array(T_params['d_m']))
+#     if plotpd and (not plotTz):
+#         if ax is None:
+#             fig = plt.figure()
+#             ax = plt.gca()
+#         ax.hist(x_list, color=c, histtype='step')
+#         ax.axvline(x=np.median(x_list), color='k', ls='--', label='median')
+#         ax.axvline(x=np.mean(x_list), color='k', ls='-', lw=1, label='mean')
+#         ax.yaxis.set_ticks([])
+#         ax.text(0.95, 0.95, 'n = {:d}'.format(len(x_list)), ha='right', va='top', transform=ax.transAxes)
+#         if legend:
+#             ax.legend(frameon=False, fontsize=labelsize - 2)
+#         if setxlabel:
+#             ax.set_xlabel(r'$\Delta T_{rh}/\Delta T_m \; \delta/d_m$', fontsize=labelsize)
+#         if settitle:
+#             ax.set_title(case, fontsize=labelsize)
+#         if savefig:
+#             if not os.data_path.exists(fig_path):
+#                 os.makedirs(fig_path)
+#             fig.savefig(fig_path + case + '_x_hist.png')
+#
+#     if (not T_params['dT_rh']):  # empty
+#         print(case, '- T list is empty')
+#         return np.array([np.nan, np.nan, np.nan]), fig, ax
+#     return np.percentile(x_list, qs), fig, ax
+
+
+def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f.png', mark_used=True, t1=0, dat=None,
+              ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,
+              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path=fig_path_bullard):
+    if not setxlabel:
+        xlabel = ''
+    if not setylabel:
+        ylabel = ''
+    if ax is None:
+        fig = plt.figure()
+        ax = plt.gca()
+    time, y = read_evol(case, col, dat=dat)
+    ax.plot(time, y * yscale, c=c, lw=0.5, label=label)
+    ax.set_xlim(0, ax.get_xlim()[1])
+    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=labelpad)
+    if settitle:
+        ax.set_title(case, fontsize=labelsize)
+    if legend:
+        ax.legend(frameon=False, fontsize=labelsize - 2)
+    if mark_used:
+        # Create a Rectangle patch to mark "transient" times
+        rect = patches.Rectangle((ax.get_xlim()[0], ax.get_ylim()[0]), t1,
+                                 ax.get_ylim()[1] - ax.get_ylim()[0],
+                                 edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
+        ax.add_patch(rect)
+    if savefig:
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
+        fig.savefig(fig_path + case + fend)
+    return fig, ax
+
 
 
 def plot_top_profile(case, savefig=True, fig_path=fig_path_bullard, path=data_path_bullard, verbose=True):
