@@ -50,6 +50,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 print('Found', fname)
 
                 if load == 'auto':  # check for additional timesteps
+                    print('Checking for new solutions')
                     time_old = run_dict['time']  # should all be after t1
                     if dat_new is None:
                         try:
@@ -69,6 +70,8 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
             elif load == 'auto':  # pkl file not found
                 reprocess_flag = True
+                dat_new = post.Aspect_Data(directory=case_path, verbose=False,
+                                           read_statistics=True, read_parameters=False)
                 print(fname, 'not found, processing...')
 
         else:  # load is False so automatically calculate shit
@@ -140,7 +143,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         dict_to_extend['timestep'] = []
         dict_to_extend['nsols'] = 0
     if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
+                               read_parameters=False)
     time = dat.stats_time
     if sol_files is None:
         try:
@@ -156,7 +160,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
             ts = n_indices[ii]  # timestep at this solution
             for fn in postprocess_functions:
                 dict_to_extend = fn(case, n=n, dict_to_append=dict_to_extend, ts=ts, dat=dat, **kwargs)
-                print('    calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
+                print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
         # always store time tags and AspectData object
         dict_to_extend['sol'].extend(n_quasi)
@@ -166,7 +170,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
 
     else:
         times_at_sols = dat.find_time_at_sol(sol_files=sol_files, return_indices=False)
-        print('no quasi-steady state solutions up to', times_at_sols[-1])
+        print('    No quasi-steady state solutions up to', times_at_sols[-1])
     return dict_to_extend
 
 
@@ -577,7 +581,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
     for ii, case in enumerate(cases):
         icol = 0
         if os.path.exists(data_path + 'output-' + case):
-            print('plotting summary for', case)
+            print('Plotting summary for', case)
             if ii == ncases - 1:  # show x label in bottom row only
                 setxlabel = True
             else:
