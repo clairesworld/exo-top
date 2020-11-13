@@ -41,4 +41,4 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
         includegraphic=True, data_path=data_path, fig_path=fig_path,
     )
 
-print('summary plots complete')
+print('Summary plots complete')

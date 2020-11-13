@@ -28,7 +28,7 @@ def read_topo_stats(case, ts, path='model-output/'):
     return df['x'], df['h']
 
 
-def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None, datsuffix='_dat',
+def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None,
              data_path=data_path_bullard, fend='.pkl', **kwargs):
     # do pickling strategy
     case_path = data_path + 'output-' + case + '/'
@@ -53,16 +53,9 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                     print('Checking for new solutions')
                     time_old = run_dict['time']  # should all be after t1
                     if dat_new is None:
-                        try:
-                            dat_new = pkl.load(open(case_path + 'pickle/' + datsuffix + fend, "rb"))
-                        except FileNotFoundError:
-                            dat_new = post.Aspect_Data(directory=case_path, verbose=False,
+                        dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                                        read_statistics=True, read_parameters=False)
-                            pkl.dump(dat_new, open(case_path + 'pickle/' + datsuffix + fend, "wb"))
-                    try:
-                        time_new = dat_new.stats_time
-                    except AttributeError:
-                        dat_new.read_statistics()
+                    time_new = dat_new.stats_time
                     t1_new = np.argmax(time_new > time_old[-1])
                     if t1_new > 0:  # new timesteps
                         reprocess_flag = True
@@ -80,18 +73,14 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                                        read_statistics=True, read_parameters=False)
 
         if reprocess_flag and (t1 != 1):
-            try:
-                sol_files = dat_new.sol_files
-            except AttributeError:
-                sol_files = dat_new.read_stats_sol_files()
+            sol_files_new = dat_new.read_stats_sol_files()
             run_dict = process_at_solutions(case, postprocess_functions=postprocess_functions, t1=t1_new,
                                             data_path=data_path, dat=dat_new, dict_to_extend=run_dict,
-                                            sol_files=sol_files, **kwargs)
+                                            sol_files=sol_files_new, **kwargs)
             dump_flag = True  # always save if you did something
 
         if dump_flag:
             pkl.dump(run_dict, open(case_path + 'pickle/' + fname, "wb"))
-            pkl.dump(dat_new, open(case_path + 'pickle/' + datsuffix + fend, "wb"))
 
     return run_dict  # will returning None break?
 
@@ -199,15 +188,11 @@ def get_h(case=None, dict_to_extend={}, ts=None, hscale=1, **kwargs):
     return p_dict
 
 
-def get_T_params(case=None, n=None, dict_to_append={}, dat=None, data_path=data_path_bullard, **kwargs):
+def get_T_params(case, n, dict_to_append={}, dat=None, data_path=data_path_bullard, **kwargs):
     T_params = dict_to_append
     if dat is None:
-        try:
-            dat = T_params['dat']
-        except KeyError:
-            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
-            T_params['dat'] = dat
-    n = int(n)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
+                               read_statistics=True, read_parameters=True)
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
     T_params_n = dat.T_components(n, T=T, u=u, v=v, cut=True)
@@ -217,7 +202,7 @@ def get_T_params(case=None, n=None, dict_to_append={}, dat=None, data_path=data_
         except KeyError:  # key does not exist yet
             T_params[key] = []
             T_params[key].append(T_params_n[key])
-    return T_params, dat
+    return T_params
 
 
 def plot_T_params(case, T_params, n=-1, dat=None,
@@ -615,7 +600,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 run_dict = pickleio(case, suffix='_parameters', postprocess_functions=[get_T_params], t1=t1[ii],
                                     load=loadT, data_path=data_path, fig_path=fig_path, **kwargs)
 
-                fig, ax = plot_T_params(case, T_params=run_dict, data_path=data_path, savefig=False,
+                fig, ax = plot_T_params(case, T_params=run_dict, data_path=data_path, n=-1, savefig=False,
                                         setxlabel=setxlabel,
                                         setylabel=False, legend=False, fig_path=fig_path, fig=fig, ax=ax)
                 if legend:

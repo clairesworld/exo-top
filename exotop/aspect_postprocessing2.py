@@ -568,14 +568,20 @@ class Aspect_Data():
     
     def T_components(self, n=None, T=None, T_i=None, T_l=None, delta_rh=None, delta_L=None, u=None, v=None, cut=False, plot=False,
                      verbose=False, **kwargs):
-        # return RHS of h' \propto (dT_rh/dT_m)*(delta_u/d_m)
-
-        x = self.x
-        y = self.y
+        if n is None:
+            n = self.final_step()
+        try:
+            x = self.x
+            y = self.y
+        except:
+            self.read_mesh(n)  # mesh should be the same for all timesteps in steady state?
+            x = self.x
+            y = self.y
         if T is None:
             _, _, _, T = self.read_temperature(n, verbose=verbose)
         T_av = horizontal_mean(T, x)
-        p = self.parameters
+        try:
+            p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
         if delta_L is None:
