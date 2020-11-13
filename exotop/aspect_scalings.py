@@ -147,13 +147,10 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         n_quasi = n_quasi.astype(int)
         n_indices = n_indices.astype(int)
         n_ts = n_indices + i_time  # TODO: not off by 1 ?
-        print('n_ts', n_ts)
         for ii, n in enumerate(n_quasi):
             ts = n_ts[ii]  # timestep at this solution
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
-                print('new params dict', new_params_dict.keys(), 'len', len(new_params_dict))
-                print(new_params_dict)
                 new_params = pd.DataFrame(new_params_dict, index=[ts])
                 df_to_extend = pd.concat([df_to_extend, new_params])
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
@@ -161,6 +158,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         new_timestamps = pd.DataFrame({'sol':n_quasi, 'time': time[n_ts]}, index=[n_ts])
         df_to_extend = pd.concat([df_to_extend, new_timestamps])
         print('df', df_to_extend)
+        print('n_ts', n_ts)
 
     else:
         times_at_sols = dat.find_time_at_sol(sol_files=sol_files, return_indices=False)
