@@ -36,7 +36,6 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     run_dict = {}
     dump_flag = False
     reprocess_flag = False
-    t1_new = t1
 
     if os.path.exists(case_path):  # do nothing if case doesn't exist
         os.makedirs(case_path + 'pickle/', exist_ok=True)
@@ -57,7 +56,8 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                                                        read_statistics=True, read_parameters=False)
                     time_new = dat_new.stats_time
                     t1_new = np.argmax(time_new > time_old[-1])
-                    if t1_new > 0:  # new timesteps
+                    print('t1_new', t1_new, 't1', t1, 'time_old[-1]', time_old[-1])
+                    if (t1_new > 0):  # new timesteps
                         reprocess_flag = True
                         print('Updating', fname)
 
@@ -74,7 +74,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
         if reprocess_flag and (t1 != 1):
             sol_files_new = dat_new.read_stats_sol_files()
-            run_dict = process_at_solutions(case, postprocess_functions=postprocess_functions, t1=t1_new,
+            run_dict = process_at_solutions(case, postprocess_functions=postprocess_functions, t1=np.maximum(t1, t1_new),
                                             data_path=data_path, dat=dat_new, dict_to_extend=run_dict,
                                             sol_files=sol_files_new, **kwargs)
             dump_flag = True  # always save if you did something
@@ -135,13 +135,13 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=False)
     time = dat.stats_time
-    if sol_files is None:
-        try:
-            sol_files = dat.sol_files
-        except AttributeError:
-            sol_files = dat.read_stats_sol_files()
     i_time = np.argmax(time > t1)  # index of first timestep to process
     if i_time > 0:  # probably don't want to process every timestep
+        if sol_files is None:
+            try:
+                sol_files = dat.sol_files
+            except AttributeError:
+                sol_files = dat.read_stats_sol_files()
         sols_in_time = sol_files[i_time:]
         n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
         for ii, n in enumerate(n_quasi):
