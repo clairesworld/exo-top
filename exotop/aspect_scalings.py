@@ -198,8 +198,6 @@ def plot_T_params(case, T_params, n=-1, dat=None,
                   setylabel=True, setxlabel=True, savefig=True,
                   fig_path=fig_path_bullard, fig=None, ax=None,
                   legend=True, labelsize=16, data_path=data_path_bullard, **kwargs):
-    if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
     # take nth row
     T_params = T_params.iloc[[n]]
     dT_rh_f = T_params['dT_rh']
@@ -208,7 +206,10 @@ def plot_T_params(case, T_params, n=-1, dat=None,
     T_l_f = T_params['T_l']
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
-    fig, ax = dat.plot_profile(T_f, y=y_f, fig=fig, ax=ax, xlabel='', ylabel='', c='k', lw=1)
+    if fig is None:
+        fig, ax = plt.subplots(figsize=(4, 4))
+
+    ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
     ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
     ax.text(0, D_l_f - delta_rh_f, r'$\delta = $' + '{:04.2f}'.format(delta_rh_f), ha='left', va='top',
