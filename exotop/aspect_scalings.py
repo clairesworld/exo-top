@@ -130,7 +130,6 @@ def process_at_solutions(case, postprocess_functions, t1=0, data_path=data_path_
     if i_time > 0:  # probably don't want to process every timestep
         sols_in_time = snaps[i_time:]
         n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
-        print('n_quasi', n_quasi, 'n_indices', n_indices)
         for ii, n in enumerate(n_quasi):
             n = int(n)
             ts = time[n_indices[ii]]
@@ -138,6 +137,7 @@ def process_at_solutions(case, postprocess_functions, t1=0, data_path=data_path_
                 dict_to_append = fn(case, n=n, dict_to_append=dict_to_append, ts=ts, dat=dat, **kwargs)
                 print('    read', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
+        print('n_quasi', n_quasi, 'n_indices', n_indices)
         dict_to_append['sol'].extend(n_quasi)
         dict_to_append['time'].extend(time[n_indices])
         dict_to_append['timestep'].extend(n_indices)
@@ -301,13 +301,15 @@ def get_h(case=None, dict_to_append={}, ts=None, hscale=1, **kwargs):
         h_params_n['h_rms'] = rms*hscale
 
     except FileNotFoundError as e:
-        print('file not found:', e)
-        return None
+        print('    file not found:', e)
+        print('    ts =', ts)
+        h_params_n['h_peak'] = None
+        h_params_n['h_rms'] = None
 
     for key in h_params_n.keys():
         try:
             h_params[key].append(h_params_n[key])
-        except:  # key does not exist yet
+        except KeyError:  # key does not exist yet
             h_params[key] = []
             h_params[key].append(h_params_n[key])
     return h_params
