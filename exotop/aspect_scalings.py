@@ -140,10 +140,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 sol_files = dat.read_stats_sol_files()
         sols_in_time = sol_files[i_time:]
         n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
-        n_quasi = n_quasi.astype(int)
-        n_indices = n_indices.astype(int)
         n_ts = n_indices + i_time  # TODO: not off by 1 ?
-        for ii, n in enumerate(n_quasi):
+        for ii, n in enumerate(n_quasi.astype(int)):
             ts = n_ts[ii]  # timestep at this solution
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
@@ -152,6 +150,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 new_params = pd.DataFrame(new_params_dict, index=[ts])
                 df_to_extend = pd.concat([df_to_extend, new_params])
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
+                if n < 0:
+                    print('n_quasi', n_quasi, 'n_indices', n_indices, 'i_time', i_time)
 
     else:
         times_at_sols = dat.find_time_at_sol(sol_files=sol_files, return_indices=False)
@@ -282,54 +282,49 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
 
 
 
-# def get_h_old(case, t1=0, data_path=data_path_bullard, df_to_extend={}, dat=None,
-#           fig_path=fig_path_bullard, hscale=1, **kwargs):
-#     flag = False
-#     if (picklefrom is not None) and (os.data_path.exists(fig_path + 'data/' + picklefrom)):
-#         try:
-#             peak_list, rms_list = pkl.load(open(fig_path + 'data/' + picklefrom, "rb"))
-#             print('loaded h for case', case)
-#         except ValueError:
-#             peak_list, rms_list = pkl.load(open(fig_path + 'data/' + picklefrom, "rb"), protocol=2)
-#             print('loaded h for case', case)
-#         if (not peak_list) or (not rms_list):  # if stored stuff is empty
-#             flag = True
-#             pickleto = picklefrom
-#     else:
-#         flag = True
-#         if picklefrom is not None:  # save if tried to load but failed
-#             pickleto = picklefrom
-#             print(picklefrom, 'not found or empty, re-calculating')
-#
-#     if flag:  # load
-#         time, v_rms, nsteps = read_evol(case, i=11, data_path=data_path)
-#         # what is the probability distribution of i from t1 to end?
-#         i_time = np.argmax(time > t1)
-#         rms_list = []
-#         peak_list = []
-#         t_used = []
-#         if t1 != 1:
-#             print('building distribution of h for case', case, ', n =', len(range(i_time, len(time))))
-#             for ii in range(i_time, len(time)):
-#                 try:
-#                     x, h = read_topo_stats(case, ii)
-#                     h_norm = trapznorm(h)
-#                     peak, rms = peak_and_rms(h_norm)
-#                     rms_list.append(rms)
-#                     peak_list.append(peak)
-#                     t_used.append(ii)
-#                 except FileNotFoundError as e:
-#                     print('file not found:', e)
-#
-#     try:
-#         if pickleto is not None:
-#             pkl.dump((peak_list, rms_list), open(fig_path + 'data/' + pickleto, "wb"))
-#
-#         peak_list_scaled = [a * hscale for a in peak_list]
-#         rms_list_scaled = [a * hscale for a in rms_list]
-#         return peak_list_scaled, rms_list_scaled
-#     except:
-#         return [np.nan], [np.nan]
+def get_h_all(case, t1=0, data_path=data_path_bullard, dat=None, load=True,
+             fig_path=fig_path_bullard, hscale=1, fend='_pdtop.pkl', **kwargs):
+    flag = False
+    pfile = fig_path + 'data/' + case + fend
+    if load and (os.data_path.exists(pfile)):
+        try:
+            peak_list, rms_list = pkl.load(open(pfile, "rb"))
+            print('loaded h for case', case)
+        except ValueError:
+            peak_list, rms_list = pkl.load(open(pfile, "rb"), protocol=2)
+            print('loaded h for case', case)
+        if (not peak_list) or (not rms_list):  # if stored stuff is empty
+            flag = True
+    else:
+        flag = True
+
+    if flag:  # load
+        if dat is None:
+            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
+                                   read_parameters=False)
+        time = dat.stats_time
+        i_time = np.argmax(time > t1)
+        rms_list = []
+        peak_list = []
+        t_used = []
+        if t1 != 1:
+            print('building distribution of h for case', case, ', n =', len(range(i_time, len(time))))
+            for ii in range(i_time, len(time)):
+                try:
+                    x, h = read_topo_stats(case, ts=ii)
+                    h_norm = trapznorm(h)
+                    peak, rms = peak_and_rms(h_norm)
+                    rms_list.append(rms)
+                    peak_list.append(peak)
+                    t_used.append(ii)
+                except FileNotFoundError as e:
+                    print('file not found:', e)
+
+        pkl.dump((peak_list, rms_list), open(pfile, "wb"))
+
+    peak_list_scaled = [a * hscale for a in peak_list]
+    rms_list_scaled = [a * hscale for a in rms_list]
+    return peak_list_scaled, rms_list_scaled
 
 
 # def pd_top(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
@@ -367,8 +362,9 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
         except KeyError as e:
             raise (key, 'not processed yet for', case)
         except Exception as e:
-            raise (e)
             qdict[key] = np.array([np.nan] * len(qs))
+            raise (e)
+
 
     if plot:
         fig, ax = plot_pdf(case, df=df, keys=keys, **kwargs)
@@ -411,7 +407,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
                  load='auto', showallscatter=False,
-                 save=True, fname='h_vs_Ra.png', sigma=2, fig_fmt='.png',
+                 save=True, fname='h_vs_Ra', sigma=2, fig_fmt='.png',
                  labelsize=16, xlabel='', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
                  fit=False, fitRa=None, fitfn='line', cases=None, x_var=None, logx=True, logy=True,
@@ -459,7 +455,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
             flatfith = [item for sublist in fith for item in sublist]
             expon, const = fit_log(flatfitx, flatfith)
             xprime = [a[1] for a in rms_all]
-            hprime = const * xprime ** expon
+            hprime = const * np.array(xprime) ** expon
             h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
                           label='{:.2e} Ra^{:.3f}'.format(const, expon))
             ax.legend(
@@ -488,16 +484,16 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + fname, bbox_inches='tight')
+        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
     return fig, ax
 
 
 def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
                  load='auto',  fig_fmt='.png',
-                 save=True, fname='h_T.png', plotpd=False, sigma=2, showallscatter=False,
+                 save=True, fname='h_T', plotpd=False, sigma=2, showallscatter=False,
                  labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
-                 fit=False, fitRa=None, fitfn='line', cases=None, x_var=None, logx=True, logy=True,
+                 fit=False, fitRa=None, cases=None, x_var=None, logx=True, logy=True,
                  fig=None, ax=None, dt_ylim=(3e-3, 7e-2), xlim=None, hscale=1, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
@@ -509,80 +505,54 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     if fitRa is None:
         fitRa = Ra
 
-    h_peak = np.zeros((len(x_var), 3))
-    h_rms = np.zeros((len(x_var), 3))
+    quants_h_peak = np.zeros((len(x_var), 3))
+    quants_h_rms = np.zeros((len(x_var), 3))
+    quants_h_components = np.zeros((len(x_var), 3))
     x = np.zeros((len(x_var), 3))
     peak_all = []
     rms_all = []
 
     for ii, case in enumerate(cases):
-        t1_ii = t1[ii]
-        # load h
-        picklefile = case + '_pdtop.pkl'
-        if loadpickle:
-            picklefrom = picklefile
-        else:
-            picklefrom = None
-        if dumppickle:
-            pickleto = picklefile
-        else:
-            pickleto = None
-        # assume time-dependent convection (if steady state then shouldn't matter)
-        peak_list, rms_list = get_h(case, t1=t1_ii, path=data_path, pickleto=pickleto, picklefrom=picklefrom,
-                                    fig_path=fig_path, hscale=hscale)
-
-        try:
-            h_peak[ii, :], h_rms[ii, :], _, _ = pdf_h(case, plot=False, t1=t1_ii, path=data_path, fig_path=fig_path,
-                                                      peak_list=peak_list, rms_list=rms_list)
-        except Exception as e:
-            print('aspect_scalings.py:', e, '\n setting h all nan for case', case)
-            h_peak[ii, :], h_rms[ii, :] = ([np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan])
-
-            # load T components
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False)
-        picklefile = case + '_pdx.pkl'
-        if loadpicklex:
-            picklefrom = picklefile
-        else:
-            picklefrom = None
-        if dumppickle:
-            pickleto = picklefile
-        else:
-            pickleto = None
-        # assume time-dependent convection (if steady state then shouldn't matter)
-        T_params, _, _ = get_T_params(case, t1=t1_ii, data_path=data_path,
-                                      pickleto=pickleto, picklefrom=picklefrom, plotTz=False,
-                                      fig_path=fig_path)
+
+        # load h and T
+        df1 = pickleio(case, suffix='_h', postprocess_functions=['h_at_sol'], t1=t1[ii], load=load, dat_new=dat,
+                      data_path=data_path, hscale=hscale, **kwargs)
+        df2 = pickleio(case, suffix='_T', postprocess_functions=['T_parameters_at_sol'], t1=t1[ii], load=load, dat_new=dat,
+                      data_path=data_path, hscale=hscale, **kwargs)
+        df = pd.concat([df1, df2])
+
         alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
-        x_list = alpha * (np.array(T_params['dT_rh']) / np.array(T_params['dT_m'])) * (
-                np.array(T_params['delta_rh']) / np.array(T_params['d_m']))
+        h_components = alpha * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
+                np.array(df['delta_rh']) / np.array(df['d_m']))
+        df['h_components'] = h_components
 
-        try:
-            x[ii, :], _, _ = pdf_h_components(case, t1=t1_ii, data_path=data_path, sigma=sigma,
-                                              pickleto=pickleto,
-                                              picklefrom=picklefrom, fig_path=fig_path, plotTz=False,
-                                              params_list=T_params, alpha=alpha)
-        except Exception as e:
-            x[ii, :] = (np.nan, np.nan, np.nan)
+        qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms', 'h_components'], plot=False)
+        quants_h_peak[ii, :] = qdict['h_peak']
+        quants_h_rms[ii, :] = qdict['h_rms']
+        quants_h_components[ii, :] = qdict['h_components']
 
-        #         if fit:
-        # extract timesteps in h where you have T snapshot - excluding initial transient
+        h_peak = df['h_peak']
+        h_rms = df['h_rms']
+
+        ## TODO: stopped here 13/11
+
 
         dat.read_statistics(verbose=False)
-        t1_idx = np.argmax(dat.stats_time > t1_ii)  # timestep corresponding to t1
+        t1_idx = np.argmax(dat.stats_time > t1[ii])  # timestep corresponding to t1
         sol_idx = dat.find_time_at_sol()
         sol_idx = np.array(sol_idx[sol_idx >= t1_idx])  # cut any values of idx below t1_idx
         # account for the stored peak_list and rms_list starting at t1 for indexing 
-        if np.shape(sol_idx) != np.shape(x_list):
-            print('inconsistent times: sol_idx', np.shape(sol_idx), 'delta', np.shape(T_params['delta_rh']))
+        if np.shape(sol_idx) != np.shape(h_components):
+            print('inconsistent times: sol_idx', np.shape(sol_idx), 'delta', np.shape(df['delta_rh']))
         try:
             peak_list = [peak_list[j - t1_idx] for j in sol_idx]
             rms_list = [rms_list[j - t1_idx] for j in sol_idx]
         except IndexError:
             print('sol_idx - t1_idx', [j - t1_idx for j in sol_idx])
 
-        peak_all.append((peak_list, x_list))
-        rms_all.append((rms_list, x_list))
+        peak_all.append((peak_list, h_components))
+        rms_all.append((rms_list, h_components))
 
     yerr_peak = [h_peak[:, 1] - h_peak[:, 0], h_peak[:, 2] - h_peak[:, 1]]
     yerr_rms = [h_rms[:, 1] - h_rms[:, 0], h_rms[:, 2] - h_rms[:, 1]]
@@ -638,14 +608,14 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + fname, bbox_inches='tight')
+        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
     return fig, ax
 
 
 
 def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppickle=False, save=True,
                   sigma=2, t1=None, fit=False, loadpicklex=False, nrows=2, ncols=2, x_components=False,
-                  data_path=data_path_bullard, fig_path=fig_path_bullard, fname='h_Ra_all.png',  fig_fmt='.png',
+                  data_path=data_path_bullard, fig_path=fig_path_bullard, fname='h_Ra_all',  fig_fmt='.png',
                   ylim=(6e-3, 7e-2), labelsize=14, xlim=None, xlabel='Ra', ylabel='dynamic topography',
                   logx=True, logy=True, showallscatter=False, xlabelpad=12, ylabelpad=2, hscale=1):
     # subplots for different eta
@@ -760,13 +730,13 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppi
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + fname,  # bbox_inches='tight',
+        fig.savefig(fig_path + fname + fig_fmt,  # bbox_inches='tight',
                     bbox_extra_artists=(outer_legend,))
     return fig, axes
 
 
 def scales_with_Ra(Ra_data=None, y_data=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard,
-                   save=True, fname='claire.png', sigma=2, showallscatter=False,
+                   save=True, fname='claire', sigma=2, showallscatter=False,
                    labelsize=16, ylabel='', xlabel='Ra', title='',  fig_fmt='.png',
                    c_scatter='xkcd:forest green', legend=True,
                    fit=False, cases=None, x_var=None, logx=True, logy=True,
@@ -811,12 +781,12 @@ def scales_with_Ra(Ra_data=None, y_data=None, t1=None, path=data_path_bullard, f
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + fname, bbox_inches='tight')
+        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
     return fig, ax
 
 
 def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                       loadpicklex=False, save=True, fname='bl-Nu.png', sigma=2, showallscatter=False,
+                       load='auto', save=True, fname='bl-Nu', sigma=2, showallscatter=False,
                        labelsize=16, ylabel=[r'$\delta$', 'Nu'], xlabel='Ra', title='',
                        c_scatter='xkcd:forest green', legend=True, cmap='magma', compare_pub=None, compare_label=None,
                        fitdelta=False, fitNu=False, x_var=None, logx=True, logy=True, vmin=4, vmax=9,
@@ -852,16 +822,9 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, data_path=data_path_bullard, 
 
                 # load T components  
                 dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False)
-                picklefile = case + '_pdx.pkl'
-                if loadpicklex:
-                    picklefrom = picklefile
-                else:
-                    picklefrom = None
-
-                # assume time-dependent convection (if steady state then shouldn't matter)
-                T_params, _, _ = get_T_params(case, t1=t1_ii, data_path=data_path,
-                                              pickleto=None, picklefrom=picklefrom, plotTz=False,
-                                              fig_path=fig_path)
+                df = pickleio(case, suffix='_T', postprocess_functions=['T_parameters_at_sol'], t1=t1[ii],
+                              load=load, dat_new=dat,
+                              data_path=data_path,  **kwargs)
 
                 # extract Nu
                 dat.read_statistics(verbose=False)
@@ -869,13 +832,13 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, data_path=data_path_bullard, 
                 t1_idx = np.argmax(dat.stats_time > t1_ii)  # timestep corresponding to t1
                 Nu = Nu[t1_idx:]
                 Nu_plot.append(np.median(Nu))
-                delta_0_plot.append(np.median(T_params['delta_0']))  # compare delta_0 and MS95
+                delta_0_plot.append(np.median(df['delta_0']))  # compare delta_0 and MS95
 
             if compare_pub is not None:
                 cmplabel = compare_label
                 if (jj > 0) and (ii > 0):
                     cmplabel = None
-                Ra_i, delta_cmp, Nu_cmp = compare_pub(Ra=Ra_plot[ii], d_eta=float(eta_str), T_params=T_params)
+                Ra_i, delta_cmp, Nu_cmp = compare_pub(case, Ra=Ra_plot[ii], d_eta=float(eta_str), df=df)
                 axes[0].plot(Ra_i, delta_cmp, '^', alpha=0.7, c=c_scatter, label=cmplabel)
                 axes[1].plot(Ra_i, Nu_cmp, '^', alpha=0.7, c=c_scatter, label=cmplabel)
 
@@ -900,17 +863,17 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, data_path=data_path_bullard, 
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + fname, bbox_inches='tight')
+        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
     return fig, axes
 
 
-def solomatov95(Ra=None, d_eta=None, T_params=None, case=None,
-                path=data_path_bullard, fig_path=fig_path_bullard, picklefrom=None):
-    if T_params is None:
-        T_params, _, _ = get_T_params(case=case, data_path=path, fig_path=fig_path, picklefrom=picklefrom)
+def solomatov95(Ra=None, d_eta=None, df=None, case=None,
+                data_path=data_path_bullard, load='auto'):
+    if df is None:
+        df = pickleio(case=case, suffix='_T', data_path=data_path, load=load)
     T0 = 1
     dT = 1
-    T_i = np.median(T_params['T_i'])
+    T_i = np.median(df['T_i'])
     gamma = np.log(d_eta)  # gamma for this delta eta
     p = gamma * dT
     eta_0 = np.exp(-gamma * T0)
@@ -919,16 +882,16 @@ def solomatov95(Ra=None, d_eta=None, T_params=None, case=None,
     delta_0 = 1.85 * p ** 1.3185 * Ra_i ** -0.3185
     delta_1 = p ** -1 * delta_0
     Nu = (delta_0 + delta_1) ** -1
-    return Ra_i, delta_0, Nu
+    return {'Ra_i':Ra_i, 'delta_0':delta_0, 'Nu':Nu}
 
 
-def moresi95(Ra=None, d_eta=None, T_params=None, case=None,
-             data_path=data_path_bullard, fig_path=fig_path_bullard, picklefrom=None):
-    if T_params is None:
-        T_params, _, _ = get_T_params(case=case, data_path=data_path, fig_path=fig_path, picklefrom=picklefrom)
+def moresi95(Ra=None, d_eta=None, df=None, case=None,
+             data_path=data_path_bullard, load='auto'):
+    if df is None:
+        df = pickleio(case=case, suffix='_T', data_path=data_path, load=load)
     T0 = 1
     dT = 1
-    T_i = np.median(T_params['T_i'])
+    T_i = np.median(df['T_i'])
     gamma = np.log(d_eta)  # gamma for this delta eta
     p = gamma * dT
     eta_0 = np.exp(-gamma * T0)
@@ -944,7 +907,7 @@ def moresi95(Ra=None, d_eta=None, T_params=None, case=None,
 
 
 def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
-                  fname='cases.png', data_path=data_path_bullard, fig_path=fig_path_bullard,  fig_fmt='.png',
+                  fname='cases', data_path=data_path_bullard, fig_path=fig_path_bullard,  fig_fmt='.png',
                   load='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
                   suptitle='', includepdf=True, includeTz=True, **kwargs):
     # rows are cases, columns are v_rms, q, T(z), hist
@@ -987,10 +950,10 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             ax = axes[ii, icol]
             fig, ax = plot_evol(case, 'heatflux_top', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux',
                                 c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='top', mark_used=True, t1=t1[ii])
+                                labelsize=labelsize, labelpad=labelpad, label='top', mark_used=False, t1=t1[ii])
             fig, ax = plot_evol(case, 'heatflux_bottom', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux', yscale=-1,
                                 c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend, mark_used=False)
+                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend, mark_used=True)
 
             if includeTz:  # final timestep only
                 icol = icol + 1
@@ -1050,14 +1013,16 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + fname, bbox_inches='tight')
+        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
     return fig, axes
 
 
-def plot_convection_regimes(Ra, eta, regime_grid, path=data_path_bullard, fig_path=fig_path_bullard, loadpickle=False,
-                            dumppickle=False, save=True, fname='regimes.png', labelsize=16, sigma=2,  fig_fmt='.png',
+def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
+                            save=True, fname='regimes', labelsize=16, fig_fmt='.png', t1=None,
                             overploth=False, nlevels=10, clist=None, cmap_contours='spring', **kwargs):
     # Ra and eta are lists of strings
+    if t1 is None:
+        t1 = np.zeros((len(eta),len(Ra)))
     if clist is None:
         cmap = plt.cm.get_cmap('jet', 3)
     else:
@@ -1105,9 +1070,10 @@ def plot_convection_regimes(Ra, eta, regime_grid, path=data_path_bullard, fig_pa
                 if not np.isnan(plot_grid[y, x]):
                     #                 if plot_grid[y,x] == iir:
                     case = 'Ra' + Raval + '-eta' + etaval + '-wide'
-                    peak, rms, _, _ = pdf_h(case, path=path, fig_path=fig_path,
-                                            sigma=sigma, plot=False, picklefrom=case + '_pdtop.pkl')
-                    h_grid[y, x] = rms[1]
+                    sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_sol], t1=t1[y,x],
+                                      load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+                    rms = np.median(sol_df['h_rms'])
+                    h_grid[y, x] = rms
         CS = ax.contour(h_grid, nlevels, cmap=cmap_contours)
         ax.clabel(CS, inline=1, fontsize=10)
 
@@ -1115,7 +1081,7 @@ def plot_convection_regimes(Ra, eta, regime_grid, path=data_path_bullard, fig_pa
     if save:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + fname, bbox_inches='tight')
+        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
 
 
 
@@ -1148,11 +1114,11 @@ def plot_T_params(case, T_params, n=-1, dat=None,
     if setylabel:
         ax.set_ylabel('depth', fontsize=labelsize)
     if savefig:
-        fig.savefig(fig_path + case + '-T_z.png', bbox_inches='tight')
+        fig.savefig(fig_path + case + '-T_z' + fig_fmt, bbox_inches='tight')
     return fig, ax
 
 def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, savefig=True, settitle=True,
-             setxlabel=True, legend=True, labelsize=16, fend='.png', c_list=None, labels=None, fname='h_hist',  fig_fmt='.png',
+             setxlabel=True, legend=True, labelsize=16, c_list=None, labels=None, fname='h_hist',  fig_fmt='.png',
              **kwargs):
     if c_list is None:
         c_list = ['xkcd:forest green', 'xkcd:periwinkle']
@@ -1192,7 +1158,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
     if savefig:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + case + fname + fend, bbox_inches='tight')
+        fig.savefig(fig_path + case + fname + fig_fmt, bbox_inches='tight')
     return fig, ax
 
 
@@ -1247,7 +1213,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 #     return np.percentile(x_list, qs), fig, ax
 
 
-def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f.png', mark_used=True, t1=0, dat=None,
+def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f', mark_used=True, t1=0, dat=None,
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,  fig_fmt='.png',
               setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path=fig_path_bullard):
     if not setxlabel:
@@ -1275,15 +1241,13 @@ def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f.png', mark_us
     if savefig:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + case + fend)
+        fig.savefig(fig_path + case + fend + fig_fmt, bbox_inches='tight')
     return fig, ax
 
 
 
-def plot_top_profile(case, savefig=True, fig_path=fig_path_bullard, data_path=data_path_bullard, verbose=True, fig_fmt= '.png',):
-    time, y, nsteps = read_evol(case, i=2, data_path=data_path)
-    snap = nsteps - 2  # honestly not sure why it's -2 but seems to work haha
-    x, h = read_topo_stats(case, snap)
+def plot_top_profile(case, ts, savefig=True, fig_path=fig_path_bullard, data_path=data_path_bullard, verbose=True, fig_fmt= '.png',):
+    x, h = read_topo_stats(case, ts, data_path=data_path)
     # normalize to 0 mean
     h_norm = trapznorm(h)
     fig = plt.figure()
@@ -1298,19 +1262,8 @@ def plot_top_profile(case, savefig=True, fig_path=fig_path_bullard, data_path=da
     if savefig:
         if not os.path.exists(fig_path):
             os.makedirs(fig_path)
-        fig.savefig(fig_path + case + '_h_' + '{:05}'.format(snap) + '.png')
+        fig.savefig(fig_path + case + '_h_' + '{:05}'.format(ts) + fig_fmt)
 
-
-def plot_pd_steadystate(case, i, t1, path=data_path_bullard):
-    time, y, nsteps = read_evol(case, i, path=path)
-    x, h = read_topo_stats(case, nsteps - 2)
-    h_norm = trapznorm(h)
-    peak, rms = peak_and_rms(h_norm)
-    # what is the probability distribution of i from t1 to end?
-    i_time = np.nonzero(time > t1)
-    print('transience ends at timestep', i_time[0][0])
-    fig = plt.figure()
-    plt.gca().hist(y[i_time])
 
 
 def cmap_from_list(clist, n_bin=None, cmap_name=''):
