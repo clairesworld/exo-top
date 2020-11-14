@@ -176,7 +176,7 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
     i_time = np.argmax(time > t1)  # index of first timestep to process
 
     if (t1 != 1) and (i_time > 0):
-        print('    Processing', fn, 'for ', case, ', ', len(range(i_time, len(time))), 'timesteps')
+        print('    Processing', postprocess_functions, 'for ', case, ', ', len(range(i_time, len(time))), 'timesteps')
         for ii in range(i_time, len(time)):
             ts = ii  # timestep at this solution
             for fn in postprocess_functions:
@@ -903,7 +903,7 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
 
 
 def solomatov95(Ra=None, d_eta=None, df=None, case=None, dat=None,
-                data_path=data_path_bullard, load='auto'):
+                data_path=data_path_bullard, load='auto', **kwargs):
     if df is None:
         df = pickleio(case, postprocess_functions=[T_parameters_at_sol], suffix='_T', dat_new=dat, data_path=data_path, load=load)
     T0 = 1
@@ -920,8 +920,8 @@ def solomatov95(Ra=None, d_eta=None, df=None, case=None, dat=None,
     return {'Ra_i':Ra_i, 'delta_0':delta_0, 'Nu':Nu}
 
 
-def moresi95(Ra=None, d_eta=None, df=None, case=None,
-             data_path=data_path_bullard, load='auto'):
+def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None,
+             data_path=data_path_bullard, load='auto', **kwargs):
     if df is None:
         df = pickleio(case, postprocess_functions=[T_parameters_at_sol], suffix='_T', dat_new=dat, data_path=data_path, load=load)
     T0 = 1
@@ -1132,7 +1132,7 @@ def plot_T_params(case, T_params, n=-1, dat=None,
     try:
         T_params = T_params.iloc[n]
     except IndexError:
-        print('No T parameterisation found')
+        print('No T parameterisation found at n =', n)
         return fig, ax
 
     dT_rh_f = T_params['dT_rh']
