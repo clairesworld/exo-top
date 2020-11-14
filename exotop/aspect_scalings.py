@@ -513,7 +513,7 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     rms_all = []
 
     for ii, case in enumerate(cases):
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
         # load h and T
         df1 = pickleio(case, suffix='_h', postprocess_functions=['h_at_sol'], t1=t1[ii], load=load, dat_new=dat,
@@ -536,23 +536,21 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         h_rms = df['h_rms']
 
         ## TODO: stopped here 13/11
+        # old way of accounting for loading all h instead of just at sols
+        # t1_idx = np.argmax(dat.stats_time > t1[ii])  # timestep corresponding to t1
+        # sol_idx = dat.find_time_at_sol()
+        # sol_idx = np.array(sol_idx[sol_idx >= t1_idx])  # cut any values of idx below t1_idx
+        # # account for the stored peak_list and rms_list starting at t1 for indexing
+        # if np.shape(sol_idx) != np.shape(h_components):
+        #     print('inconsistent times: sol_idx', np.shape(sol_idx), 'delta', np.shape(df['delta_rh']))
+        # try:
+        #     peak_list = [peak_list[j - t1_idx] for j in sol_idx]
+        #     rms_list = [rms_list[j - t1_idx] for j in sol_idx]
+        # except IndexError:
+        #     print('sol_idx - t1_idx', [j - t1_idx for j in sol_idx])
 
-
-        dat.read_statistics(verbose=False)
-        t1_idx = np.argmax(dat.stats_time > t1[ii])  # timestep corresponding to t1
-        sol_idx = dat.find_time_at_sol()
-        sol_idx = np.array(sol_idx[sol_idx >= t1_idx])  # cut any values of idx below t1_idx
-        # account for the stored peak_list and rms_list starting at t1 for indexing 
-        if np.shape(sol_idx) != np.shape(h_components):
-            print('inconsistent times: sol_idx', np.shape(sol_idx), 'delta', np.shape(df['delta_rh']))
-        try:
-            peak_list = [peak_list[j - t1_idx] for j in sol_idx]
-            rms_list = [rms_list[j - t1_idx] for j in sol_idx]
-        except IndexError:
-            print('sol_idx - t1_idx', [j - t1_idx for j in sol_idx])
-
-        peak_all.append((peak_list, h_components))
-        rms_all.append((rms_list, h_components))
+        peak_all.append((h_peak, h_components))
+        rms_all.append((h_rms, h_components))
 
     yerr_peak = [h_peak[:, 1] - h_peak[:, 0], h_peak[:, 2] - h_peak[:, 1]]
     yerr_rms = [h_rms[:, 1] - h_rms[:, 0], h_rms[:, 2] - h_rms[:, 1]]
@@ -572,7 +570,7 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     if fit:
         #         fitx = x_var # todo: only fit subset?
         #         fitidx = np.where(np.intersect1d(x[:,1], fitx))[0]
-        if (len(x_var) > 1):  # can only fit if at least 2 data
+        if len(x_var) > 1:  # can only fit if at least 2 data
             expon, const = fit_log(flatfitx, flatfith_rms)
             xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
             hprime = const * xprime ** expon
