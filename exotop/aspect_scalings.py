@@ -146,7 +146,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         sols_in_time = sol_files[i_time:]
         n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
         n_ts = n_indices + i_time  # TODO: not off by 1 ?
-        for ii, n in enumerate(n_quasi.astype(int)):
+        for ii, n in enumerate(n_quasi):
             ts = n_ts[ii]  # timestep at this solution
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)

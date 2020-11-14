@@ -304,7 +304,7 @@ class Aspect_Data():
         filename = self.directory + "statistics"
         all_data = np.genfromtxt(filename, skip_header=skip_header, dtype=None)
         last = 0
-        files = np.zeros(len(all_data), dtype=np.int8)
+        files = np.zeros(len(all_data), dtype=np.int64)
         #  find last instance that's not ""
         for n, d in enumerate(all_data):
             s = d[col_vis][-14:]
