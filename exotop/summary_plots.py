@@ -15,7 +15,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
         labels=labels_ii,
         t1=t1[ii], save=True, load='auto',
         includeTz=False,#True,
-        fname='all-eta' + eta + '-quick.png', suptitle='$\Delta \eta$=' + eta,
+        fname='all-eta' + eta + '-quick', suptitle='$\Delta \eta$=' + eta,
         includepdf=False, #True,  # turn on once you know where steady state starts
         includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt
     )
@@ -36,7 +36,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
 #         labels=labels_ii,
 #         t1=t1.T[ii], save=True, load='auto',
 #         includeTz=True,
-#         fname='all-Ra3e8.png', suptitle='Ra = 3e8',
+#         fname='all-Ra-' + Ra, suptitle='Ra = 3e8',
 #         includepdf=True,  # turn on once you know where steady state starts
 #         includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt
 #     )

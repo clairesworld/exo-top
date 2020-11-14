@@ -823,7 +823,7 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
                        load='auto', save=True, fname='bl-Nu', sigma=2, showallscatter=False,
                        labelsize=16, ylabel=[r'$\delta$', 'Nu'], xlabel='Ra', title='',
                        c_scatter='xkcd:forest green', legend=True, cmap='magma', compare_pub=None, compare_label=None,
-                       fit=False, x_var=None, logx=True, logy=True, vmin=4, vmax=9,
+                       fit=False,  logx=True, logy=True, vmin=4, vmax=9,
                        fig=None, axes=None, ylim=None, xlim=None,  fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
@@ -884,7 +884,7 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
             fig, axes[0] = scales_with_Ra(Ra_data=plot_data['Ra'], y_data=plot_data[key],
                                       fig_path=fig_path,
                                       save=False, sigma=sigma, showallscatter=showallscatter,
-                                      labelsize=labelsize, ylabel=ylabel[k], xlabel='Ra',
+                                      labelsize=labelsize, ylabel=ylabel[k], xlabel=xlabel,
                                       c_scatter=c_scatter, fit=fit, logx=logx, logy=logy,
                                       fig=fig, ax=axes[k], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
 
