@@ -151,7 +151,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 df_to_extend = pd.concat([df_to_extend, new_params])
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
                 if n < 0:
-                    print('n_quasi', n_quasi, 'n_indices', n_indices, 'i_time', i_time)
+                    raise(case, 'n_quasi', n_quasi, 'n_indices', n_indices, 'i_time', i_time, 'sols_in_time', sols_in_time)
 
     else:
         times_at_sols = dat.find_time_at_sol(sol_files=sol_files, return_indices=False)
@@ -611,15 +611,15 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
 
 
-def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppickle=False, save=True,
-                  sigma=2, t1=None, fit=False, loadpicklex=False, nrows=2, ncols=2, x_components=False,
+def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
+                  sigma=2, t1=None, fit=False,  nrows=2, ncols=2, T_components=False,
                   data_path=data_path_bullard, fig_path=fig_path_bullard, fname='h_Ra_all',  fig_fmt='.png',
                   ylim=(6e-3, 7e-2), labelsize=14, xlim=None, xlabel='Ra', ylabel='dynamic topography',
                   logx=True, logy=True, showallscatter=False, xlabelpad=12, ylabelpad=2, hscale=1):
     # subplots for different eta
     #     fig, axes = plt.subplots(2,2, figsize=(7,7))
     #     flaxes = axes.flatten()
-    if x_components:
+    if T_components:
         plot_fn = plot_h_vs_Td
     else:
         plot_fn = plot_h_vs_Ra
@@ -664,9 +664,9 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppi
             fig, ax = plot_fn(Ra=Ra_steady, eta=eta, t1=t1[ii, Ra_steady_idx], sigma=sigma, fig=fig, ax=ax,
                               data_path=data_path,
                               c_rms=c_regimes[0], c_peak=c_regimes[0], dt_ylim=ylim, legend=legend,
-                              loadpickle=loadpickle, dumppickle=dumppickle, plotpd=False, xlim=xlim,
+                              load=load,  plotpd=False, xlim=xlim,
                               save=False, fit=True, ylabel='', xlabel='', labelsize=labelsize,
-                              fig_path=fig_path, loadpicklex=loadpicklex, logx=logx, logy=logy,
+                              fig_path=fig_path, logx=logx, logy=logy,
                               showallscatter=showallscatter, hscale=hscale,
                               )
         # trans
@@ -674,9 +674,9 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppi
             fig, ax = plot_fn(Ra=Ra_trans, eta=eta, t1=t1[ii, Ra_trans_idx], sigma=sigma, fig=fig, ax=ax,
                               data_path=data_path,
                               c_rms=c_regimes[1], c_peak=c_regimes[1], dt_ylim=ylim, legend=legend,
-                              loadpickle=loadpickle, dumppickle=dumppickle, plotpd=False, xlim=xlim,
+                              load=load, plotpd=False, xlim=xlim,
                               save=False, fit=True, ylabel='', xlabel='', labelsize=labelsize,
-                              fig_path=fig_path, loadpicklex=loadpicklex, logx=logx, logy=logy,
+                              fig_path=fig_path, logx=logx, logy=logy,
                               showallscatter=showallscatter, hscale=hscale,
                               )
             # chaotic
@@ -684,9 +684,9 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, loadpickle=True, dumppi
             fig, ax = plot_fn(Ra=Ra_chaos, eta=eta, t1=t1[ii, Ra_chaos_idx], sigma=sigma, fig=fig, ax=ax,
                               data_path=data_path,
                               c_rms=c_regimes[2], c_peak=c_regimes[2], dt_ylim=ylim, legend=legend,
-                              loadpickle=loadpickle, dumppickle=dumppickle, plotpd=False, xlim=xlim,
+                              load=load, plotpd=False, xlim=xlim,
                               save=False, fit=True, xlabel='', ylabel='', labelsize=labelsize,
-                              fig_path=fig_path, loadpicklex=loadpicklex, logx=logx, logy=logy,
+                              fig_path=fig_path, logx=logx, logy=logy,
                               showallscatter=showallscatter, hscale=hscale,
                               )
         ax.text(0.5, 0.95, '$\Delta \eta$=' + eta, fontsize=labelsize, ha='center', va='top',

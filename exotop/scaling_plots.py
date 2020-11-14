@@ -34,13 +34,12 @@ for ii, eta in enumerate(eta_ls):
                   fit=False, logx=True, logy=True, fig_fmt=fig_fmt,
                   xlim=None, data_path=data_path, fig_path=fig_path)
 
-fig, ax = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, x_components=True,
-                           t1=t1, data_path='model-output/', fig_path='/raid1/cmg76/aspect/figs/',
-                           loadpickle=True, dumppickle=False, loadpicklex=True,
-                           save=True, fname='h_T_all.png', showallscatter=True,
-                           labelsize=14, xlabel=r'$\alpha \delta_u \Delta T_{rh}$', ylabel='dynamic topography',
-                           fit=True, logx=True, logy=True, ylim=(3e-3,7e-2), xlim=(3e-8, 7e-7),
-                           xlabelpad=8, ylabelpad=0, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt)
+fig, ax = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, load=True, save=True, t1=t1,
+                           fit=True, loadpicklex=True, T_components=True, data_path='model-output/',
+                           fig_path='/raid1/cmg76/aspect/figs/', fname='h_T_all.png', fig_fmt=fig_fmt,
+                           ylim=(3e-3, 7e-2), labelsize=14, xlim=(3e-8, 7e-7),
+                           xlabel=r'$\alpha \delta_u \Delta T_{rh}$', ylabel='dynamic topography', logx=True, logy=True,
+                           showallscatter=True, xlabelpad=8, ylabelpad=0)
     
         
 # for ii, eta in enumerate(eta_ls):
