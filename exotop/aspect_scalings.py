@@ -26,7 +26,7 @@ def read_topo_stats(case, ts, data_path=data_path_bullard):
     return df['x'], df['h']
 
 
-def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None,
+def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None, at_sol=True,
              data_path=data_path_bullard, fend='.pkl', **kwargs):
     # do pickling strategy
     case_path = data_path + 'output-' + case + '/'
@@ -72,9 +72,14 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
         if reprocess_flag and (t1 != 1):
             sol_files_new = dat_new.read_stats_sol_files()
-            df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
+            if at_sol:
+                df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                       t1=np.maximum(t1, t1_new), data_path=data_path, sol_files=sol_files_new,
                                       df_to_extend=df, **kwargs)
+            else:
+                df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
+                                          t1=np.maximum(t1, t1_new), data_path=data_path,
+                                          df_to_extend=df, **kwargs)
             dump_flag = True  # always save if you did something
 
         if dump_flag:
@@ -151,7 +156,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 df_to_extend = pd.concat([df_to_extend, new_params])
                 print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
                 if n < 0:
-                    raise(case, 'n_quasi', n_quasi, 'n_indices', n_indices, 'i_time', i_time, 'sols_in_time', sols_in_time)
+                    print(case, 'n_quasi', n_quasi, 'n_indices', n_indices, 'i_time', i_time, 'sols_in_time', sols_in_time)
+                    raise()
 
     else:
         times_at_sols = dat.find_time_at_sol(sol_files=sol_files, return_indices=False)
@@ -159,7 +165,32 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
     return df_to_extend
 
 
-def h_at_sol(case, ts=None, hscale=1, **kwargs):
+def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
+                         df_to_extend=None, **kwargs):
+    if df_to_extend is None:
+        df_to_extend = pd.DataFrame()
+    if dat is None:
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
+                               read_parameters=False)
+    time = dat.stats_time
+    i_time = np.argmax(time > t1)  # index of first timestep to process
+
+    if (t1 != 1) and (i_time > 0):
+        print('building distribution of h for case', case, ', n =', len(range(i_time, len(time))))
+        for ii in range(i_time, len(time)):
+            ts = ii  # timestep at this solution
+            for fn in postprocess_functions:
+                new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
+                new_params_dict['time'] = time[ts]
+                new_params = pd.DataFrame(new_params_dict, index=[ts])
+                df_to_extend = pd.concat([df_to_extend, new_params])
+
+    else:
+        print('    No quasi-steady state timesteps up to t =', time[-1])
+    return df_to_extend
+
+
+def h_at_ts(case, ts=None, hscale=1, **kwargs):
     h_params_n = {}
     try:
         x, h = read_topo_stats(case, ts)
@@ -410,7 +441,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
                  save=True, fname='h_vs_Ra', sigma=2, fig_fmt='.png',
                  labelsize=16, xlabel='', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
-                 fit=False, fitRa=None, fitfn='line', cases=None, x_var=None, logx=True, logy=True,
+                 fit=False, fitRa=None, cases=None, x_var=None, logx=True, logy=True,
                  fig=None, ax=None, dt_ylim=(3e-3, 7e-2), xlim=None, hscale=1, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     if cases is None:
@@ -427,8 +458,8 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     rms_all = []
 
     for ii, case in enumerate(cases):
-        df = pickleio(case, suffix='_h', postprocess_functions=['h_at_sol'], t1=t1[ii], load=load, dat_new=None,
-                            data_path=data_path, hscale=hscale, **kwargs)
+        df = pickleio(case, suffix='_h_all', postprocess_functions=['h_at_ts'], t1=t1[ii], load=load, dat_new=None,
+                            data_path=data_path, hscale=hscale, at_sol=False, **kwargs)
         qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms'], plot=False)
         quants_h_peak[ii, :] = qdict['h_peak']
         quants_h_rms[ii, :] = qdict['h_rms']
@@ -973,8 +1004,9 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             if includepdf:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_sol], t1=t1[ii],
-                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+                sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_ts], t1=t1[ii],
+                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path,
+                                  at_sol=True, **kwargs)
 
                 fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], df=sol_df, path=data_path,
                                    fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
@@ -1068,7 +1100,7 @@ def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, f
                 if not np.isnan(plot_grid[y, x]):
                     #                 if plot_grid[y,x] == iir:
                     case = 'Ra' + Raval + '-eta' + etaval + '-wide'
-                    sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_sol], t1=t1[y,x],
+                    sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_ts], t1=t1[y, x],
                                       load=load, data_path=data_path, fig_path=fig_path, **kwargs)
                     rms = np.median(sol_df['h_rms'])
                     h_grid[y, x] = rms
