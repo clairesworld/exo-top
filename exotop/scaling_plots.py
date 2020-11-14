@@ -63,6 +63,6 @@ fig, ax = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_r
 
 ### make bl scaling plot
 
-sc.plot_bl_Nu_scaling(Ra_ls, eta_ls, loadpicklex=True, save=True, compare_pub='S95',
-                      fname='bl-Nu.png', t1=t1, fitdelta=False, fitNu=True)
+sc.plot_multi_scaling(Ra_ls, eta_ls, keys=['Nu', 'delta_0', 'T_i'], save=True, compare_pub=solomatov95,
+                      fname='bl-Nu.png', t1=t1, fit=True)
 

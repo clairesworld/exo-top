@@ -176,10 +176,10 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
     i_time = np.argmax(time > t1)  # index of first timestep to process
 
     if (t1 != 1) and (i_time > 0):
-        print('building distribution of h for case', case, ', n =', len(range(i_time, len(time))))
         for ii in range(i_time, len(time)):
             ts = ii  # timestep at this solution
             for fn in postprocess_functions:
+                print('    Processing', fn, 'for ', case, ', ', len(range(i_time, len(time))), 'timesteps')
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 new_params_dict['time'] = time[ts]
                 new_params = pd.DataFrame(new_params_dict, index=[ts])
@@ -208,6 +208,11 @@ def h_at_ts(case, ts=None, hscale=1, **kwargs):
         h_params_n[key] = [h_params_n[key]]
     return h_params_n
 
+def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
+    if dat is None:
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+    Nu = dat.Nu(k=1)
+    return {'Nu':Nu[ts]}
 
 def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
@@ -409,7 +414,7 @@ def fit_log(x, h, plot=True):
     try:
         slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
     except ValueError:
-        print('error | x', np.shape(x1), 'h', np.shape(h1))
+        raise('error | x', np.shape(x1), 'h', np.shape(h1))
     return slope, 10 ** intercept
 
 
@@ -764,8 +769,8 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
     return fig, axes
 
 
-def scales_with_Ra(Ra_data=None, y_data=None, t1=None, path=data_path_bullard, fig_path=fig_path_bullard,
-                   save=True, fname='claire', sigma=2, showallscatter=False,
+def scales_with_Ra(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
+                   save=True, fname='claire', showallscatter=False,
                    labelsize=16, ylabel='', xlabel='Ra', title='',  fig_fmt='.png',
                    c_scatter='xkcd:forest green', legend=True,
                    fit=False, cases=None, x_var=None, logx=True, logy=True,
@@ -814,11 +819,11 @@ def scales_with_Ra(Ra_data=None, y_data=None, t1=None, path=data_path_bullard, f
     return fig, ax
 
 
-def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
+def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
                        load='auto', save=True, fname='bl-Nu', sigma=2, showallscatter=False,
                        labelsize=16, ylabel=[r'$\delta$', 'Nu'], xlabel='Ra', title='',
                        c_scatter='xkcd:forest green', legend=True, cmap='magma', compare_pub=None, compare_label=None,
-                       fitdelta=False, fitNu=False, x_var=None, logx=True, logy=True, vmin=4, vmax=9,
+                       fit=False, x_var=None, logx=True, logy=True, vmin=4, vmax=9,
                        fig=None, axes=None, ylim=None, xlim=None,  fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
@@ -839,52 +844,51 @@ def plot_bl_Nu_scaling(Ra=None, eta=None, t1=None, data_path=data_path_bullard, 
             t1_eta = t1[jj]
         c_scatter = c_list[jj]
 
-        Ra_plot = []
-        Nu_plot = []
-        delta_0_plot = []
+        plot_data = {'Ra': []}
+        for key in keys:
+            plot_data[key] = []
 
         for ii, case in enumerate(cases):
             t1_ii = t1_eta[ii]
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
-                Ra_plot.append(float(Ra_var[ii]))
+                plot_data[Ra].append(float(Ra_var[ii]))
 
                 # load T components  
-                dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False)
-                df = pickleio(case, suffix='_T', postprocess_functions=['T_parameters_at_sol'], t1=t1[ii],
+                dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+                df1 = pickleio(case, suffix='_T', postprocess_functions=['T_parameters_at_sol'], t1=t1[ii],
                               load=load, dat_new=dat,
                               data_path=data_path,  **kwargs)
 
                 # extract Nu
-                dat.read_statistics(verbose=False)
-                Nu = dat.Nu(k=1)
-                t1_idx = np.argmax(dat.stats_time > t1_ii)  # timestep corresponding to t1
-                Nu = Nu[t1_idx:]
-                Nu_plot.append(np.median(Nu))
-                delta_0_plot.append(np.median(df['delta_0']))  # compare delta_0 and MS95
+                df2 = pickleio(case, suffix='_Nu', postprocess_functions=['Nu_at_ts'], t1=t1[ii],
+                              load=load, dat_new=dat,
+                              data_path=data_path,  **kwargs)
+                df = pd.concat([df1, df2])
+
+                for key in keys:
+                    plot_data[key].append(np.median(df[key]))
 
             if compare_pub is not None:
                 cmplabel = compare_label
                 if (jj > 0) and (ii > 0):
                     cmplabel = None
-                Ra_i, delta_cmp, Nu_cmp = compare_pub(case, Ra=Ra_plot[ii], d_eta=float(eta_str), df=df)
-                axes[0].plot(Ra_i, delta_cmp, '^', alpha=0.7, c=c_scatter, label=cmplabel)
-                axes[1].plot(Ra_i, Nu_cmp, '^', alpha=0.7, c=c_scatter, label=cmplabel)
+                d_compare = compare_pub(case, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df)
+                for k, key in enumerate(keys):
+                    try:
+                        axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', alpha=0.7, c=c_scatter, label=cmplabel)
+                    except KeyError:
+                        print('Key', key, 'not returned by', compare_pub)
 
-        fig, axes[0] = scales_with_Ra(Ra_data=Ra_plot, y_data=delta_0_plot, t1=t1,
-                                      path=data_path, fig_path=fig_path,
-                                      save=False, sigma=sigma, showallscatter=False,
-                                      labelsize=labelsize, ylabel=ylabel[0], xlabel='Ra',
-                                      c_scatter=c_scatter, fit=fitdelta, logx=logx, logy=logy,
-                                      fig=fig, ax=axes[0], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
-        fig, axes[1] = scales_with_Ra(Ra_data=Ra_plot, y_data=Nu_plot, t1=t1,
-                                      path=data_path, fig_path=fig_path,
-                                      save=False, sigma=sigma, showallscatter=False,
-                                      labelsize=labelsize, ylabel=ylabel[1], xlabel='Ra',
-                                      c_scatter=c_scatter, fit=fitNu, logx=logx, logy=logy,
-                                      fig=fig, ax=axes[1], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
+        for k, key in enumerate(keys):
+            fig, axes[0] = scales_with_Ra(Ra_data=plot_data['Ra'], y_data=plot_data[key],
+                                      fig_path=fig_path,
+                                      save=False, sigma=sigma, showallscatter=showallscatter,
+                                      labelsize=labelsize, ylabel=ylabel[k], xlabel='Ra',
+                                      c_scatter=c_scatter, fit=fit, logx=logx, logy=logy,
+                                      fig=fig, ax=axes[k], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
 
-    scat = axes[1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
+    scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
                            vmin=vmin, vmax=vmax)  # dummy
     cbar = fig.colorbar(scat, ax=[axes[0], axes[1]])
     cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=18)
@@ -1004,9 +1008,9 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             if includepdf:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                sol_df = pickleio(case, suffix='_h', postprocess_functions=[h_at_ts], t1=t1[ii],
+                sol_df = pickleio(case, suffix='_h_all', postprocess_functions=[h_at_ts], t1=t1[ii],
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path,
-                                  at_sol=True, **kwargs)
+                                  at_sol=False, **kwargs)
 
                 fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], df=sol_df, path=data_path,
                                    fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
@@ -1016,12 +1020,13 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
             if includegraphic:
                 icol = icol + 1
                 ax = axes[ii, icol]
+                fgraph = fig_path + 'graphical/' + case + '.png'
                 try:
-                    img = mpimg.imread(fig_path + 'graphical/' + case + '.png')
+                    img = mpimg.imread(fgraph)
                     ax.imshow(img)
                     print('Plotting graphical output for', case)
                 except FileNotFoundError:
-                    print('file graphical/', case, '.png not found')
+                    print('Graphical output not found:', fgraph)
                     fig.delaxes(ax)
 
             numplotted += 1
