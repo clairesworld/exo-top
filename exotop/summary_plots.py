@@ -14,9 +14,9 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
         cases_ii,
         labels=labels_ii,
         t1=t1[ii], save=True, load='auto',
-        includeTz=True,
+        includeTz=False,#True,
         fname='all-eta' + eta + '.png', suptitle='$\Delta \eta$=' + eta,
-        includepdf=True,  # turn on once you know where steady state starts
+        includepdf=False, #True,  # turn on once you know where steady state starts
         includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt
     )
 
