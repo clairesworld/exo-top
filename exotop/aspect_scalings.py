@@ -48,7 +48,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 print('Found', fname)
 
                 if load == 'auto':  # check for additional timesteps
-                    print('Checking for new solutions')
+                    print('Checking for new timesteps')
                     time_f_old = df.time.iat[-1]
                     if dat_new is None:
                         dat_new = post.Aspect_Data(directory=case_path, verbose=False,
@@ -71,8 +71,8 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                                        read_statistics=True, read_parameters=False)
 
         if reprocess_flag and (t1 != 1):
-            sol_files_new = dat_new.read_stats_sol_files()
             if at_sol:
+                sol_files_new = dat_new.read_stats_sol_files()
                 df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                       t1=np.maximum(t1, t1_new), data_path=data_path, sol_files=sol_files_new,
                                       df_to_extend=df, **kwargs)
@@ -176,10 +176,10 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
     i_time = np.argmax(time > t1)  # index of first timestep to process
 
     if (t1 != 1) and (i_time > 0):
+        print('    Processing', fn, 'for ', case, ', ', len(range(i_time, len(time))), 'timesteps')
         for ii in range(i_time, len(time)):
             ts = ii  # timestep at this solution
             for fn in postprocess_functions:
-                print('    Processing', fn, 'for ', case, ', ', len(range(i_time, len(time))), 'timesteps')
                 new_params_dict = fn(case, n=None, ts=ts, dat=dat, **kwargs)
                 new_params_dict['time'] = time[ts]
                 new_params = pd.DataFrame(new_params_dict, index=[ts])
