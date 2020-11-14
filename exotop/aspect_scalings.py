@@ -180,7 +180,7 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
             ts = ii  # timestep at this solution
             for fn in postprocess_functions:
                 print('    Processing', fn, 'for ', case, ', ', len(range(i_time, len(time))), 'timesteps')
-                new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
+                new_params_dict = fn(case, n=None, ts=ts, dat=dat, **kwargs)
                 new_params_dict['time'] = time[ts]
                 new_params = pd.DataFrame(new_params_dict, index=[ts])
                 df_to_extend = pd.concat([df_to_extend, new_params])
@@ -318,7 +318,7 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
 
 
 
-def get_h_all(case, t1=0, data_path=data_path_bullard, dat=None, load=True,
+def get_h(case, t1=0, data_path=data_path_bullard, dat=None, load=True,
              fig_path=fig_path_bullard, hscale=1, fend='_pdtop.pkl', **kwargs):
     flag = False
     pfile = fig_path + 'data/' + case + fend
@@ -820,13 +820,15 @@ def scales_with_Ra(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
 
 def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                       load='auto', save=True, fname='bl-Nu', sigma=2, showallscatter=False,
-                       labelsize=16, ylabel=[r'$\delta$', 'Nu'], xlabel='Ra', title='',
-                       c_scatter='xkcd:forest green', legend=True, cmap='magma', compare_pub=None, compare_label=None,
-                       fit=False,  logx=True, logy=True, vmin=4, vmax=9,
-                       fig=None, axes=None, ylim=None, xlim=None,  fig_fmt='.png', **kwargs):
+                          load='auto', save=True, fname='bl-Nu', sigma=2, showallscatter=False,
+                          labelsize=16, ylabel=None, xlabel='Ra', title='',
+                          c_scatter='xkcd:forest green', legend=True, cmap='magma', compare_pub=None, compare_label=None,
+                          fit=False, logx=True, logy=True, vmin=4, vmax=9,
+                          fig=None, axes=None, ylim=None, xlim=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
+    if ylabel is None:
+        ylabel = [r'$\delta$', 'Nu']
     if sigma == 2:
         qs = [2.5, 50, 97.5]
     elif sigma == 1:
@@ -873,7 +875,7 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
                 cmplabel = compare_label
                 if (jj > 0) and (ii > 0):
                     cmplabel = None
-                d_compare = compare_pub(case, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df)
+                d_compare = compare_pub(case, dat=dat, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df, load=load)
                 for k, key in enumerate(keys):
                     try:
                         axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', alpha=0.7, c=c_scatter, label=cmplabel)
@@ -900,10 +902,10 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
     return fig, axes
 
 
-def solomatov95(Ra=None, d_eta=None, df=None, case=None,
+def solomatov95(Ra=None, d_eta=None, df=None, case=None, dat=None,
                 data_path=data_path_bullard, load='auto'):
     if df is None:
-        df = pickleio(case=case, suffix='_T', data_path=data_path, load=load)
+        df = pickleio(case, postprocess_functions=[T_parameters_at_sol], suffix='_T', dat_new=dat, data_path=data_path, load=load)
     T0 = 1
     dT = 1
     T_i = np.median(df['T_i'])
@@ -921,7 +923,7 @@ def solomatov95(Ra=None, d_eta=None, df=None, case=None,
 def moresi95(Ra=None, d_eta=None, df=None, case=None,
              data_path=data_path_bullard, load='auto'):
     if df is None:
-        df = pickleio(case=case, suffix='_T', data_path=data_path, load=load)
+        df = pickleio(case, postprocess_functions=[T_parameters_at_sol], suffix='_T', dat_new=dat, data_path=data_path, load=load)
     T0 = 1
     dT = 1
     T_i = np.median(df['T_i'])
@@ -1125,15 +1127,21 @@ def plot_T_params(case, T_params, n=-1, dat=None,
                   fig_path=fig_path_bullard, fig=None, ax=None,  fig_fmt='.png',
                   legend=True, labelsize=16, data_path=data_path_bullard, **kwargs):
     # take nth row
-    T_params = T_params.iloc[n]
+    if fig is None:
+        fig, ax = plt.subplots(figsize=(4, 4))
+    try:
+        T_params = T_params.iloc[n]
+    except IndexError:
+        print('No T parameterisation found')
+        return fig, ax
+
     dT_rh_f = T_params['dT_rh']
     delta_rh_f = T_params['delta_rh']
     D_l_f = T_params['delta_L']
     T_l_f = T_params['T_l']
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
-    if fig is None:
-        fig, ax = plt.subplots(figsize=(4, 4))
+
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
     ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)

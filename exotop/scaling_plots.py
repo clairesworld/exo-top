@@ -1,14 +1,9 @@
 import sys
 sys.path.insert(0,'/home/cmg76/Works/exo-top/')
-import numpy as np
+# import numpy as np
 from exotop import aspect_scalings as sc
-from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt
+from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid
 
-# Ra from 1e6 to 3e8
-regime_grid = np.array([['steady', 'steady' , 'steady', 'chaotic', 'sluggish', 'not converged'], # eta 1e5
-               ['steady', 'steady', 'steady', 'transitional', 'chaotic', 'not converged'],  # eta 1e6 - 
-               ['no convection', 'steady', 'steady', 'transitional', 'chaotic', 'not converged'], # eta 1e7
-               ['no convection', 'no convection', 'steady', 'transitional', 'not converged', 'not converged']])  # eta 1e8
 #c_regimes = [(0.2208, 0.5455, 0.2338), (0.984, 0.925, 0.365), (0.6882, 0.1059, 0.2059)] # ['#112a12',  '#fbec5d', '#EA2446']
 c_regimes = ['xkcd:sage green', 'xkcd:blood red' , 'xkcd:dark violet']
 
