@@ -527,9 +527,10 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
     if fit:
         if len(x_var) > 1:
+            print('rms_all', np.shape(rms_all), 'rms_all[0]', np.shape(rms_all[0]))
             fitx = [[a[1]] * len(a[0]) for a in rms_all]
             fith = [a[0] for a in rms_all]
-            print('fitx', np.shape(fitx), 'fith', np.shape(fith))
+            print('fitx[1]', np.shape(fitx[1]), 'fith[1]', np.shape(fith[1]))
             flatfitx = [item for sublist in fitx for item in sublist]
             flatfith = [item for sublist in fith for item in sublist]
             print('flatfitx', np.shape(flatfitx), 'flatfith', np.shape(flatfith))
