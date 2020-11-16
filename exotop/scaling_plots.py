@@ -13,7 +13,7 @@ print('assuming you have properly saved h values for the right time period')
 fig, axes = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, fit=True, t1=t1,
                              load='auto', xlim=(8e5,1.3e8), ylim=None, fig_fmt=fig_fmt,
                              save=True, fname='h_Ra_all', xlabel='Ra', hscale=2e-5*2700*2890,
-                            ylabel='dynamic topography (km)', data_path=data_path, fig_path=fig_path)
+                             ylabel='dynamic topography (km)', data_path=data_path, fig_path=fig_path)
 
 # print('Ra scaling complete')
 
@@ -24,7 +24,7 @@ fig, ax = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_r
                            fit=True, load='auto', T_components=True, data_path=data_path,
                            fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt,
                            ylim=(3e-3, 7e-2), labelsize=14, xlim=(3e-8, 7e-7),
-                           xlabel=r'$\alpha \delta_u \Delta T_{rh}$', ylabel='dynamic topography', logx=True, logy=True,
+                           xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', logx=True, logy=True,
                            showallscatter=True, xlabelpad=8, ylabelpad=0)
 
 
@@ -36,6 +36,6 @@ fig, ax = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_r
 
 ### make bl scaling plot
 
-sc.plot_multi_Ra_scaling(Ra_ls, eta_ls, keys=['Nu', 'delta_0', 'T_i'], save=True, compare_pub='solomatov95',
-                      fname='bl-Nu', t1=t1, fit=True, fig_fmt=fig_fmt, data_path=data_path, fig_path=fig_path,)
+sc.plot_multi_Ra_scaling(Ra_ls, eta_ls, keys=['Nu', 'delta_0', 'T_i'], save=True, compare_pub=sc.solomatov95,
+                         fname='bl-Nu', t1=t1, fit=True, fig_fmt=fig_fmt, data_path=data_path, fig_path=fig_path,)
 

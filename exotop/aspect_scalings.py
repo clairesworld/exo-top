@@ -263,10 +263,14 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
                                read_statistics=True, read_parameters=True)
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
-    T_params_n = dat.T_components(n, T=T, u=u, v=v, cut=True)
-    for key in T_params_n.keys():
-        T_params_n[key] = [T_params_n[key]]
-    return T_params_n
+    df_n = dat.T_components(n, T=T, u=u, v=v, cut=True)
+
+    alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
+    df_n['h_components'] = alpha * (np.array(df_n['dT_rh']) / np.array(df_n['dT_m'])) * (np.array(df_n['delta_rh']) / np.array(df_n['d_m']))
+
+    for key in df_n.keys():
+        df_n[key] = [df_n[key]]  # ensure iterable for some reason (so you can do list extension later)
+    return df_n
 
 
 # def get_T_params_old(case, t1=0, data_path=data_path_bullard, pickleto=None, picklefrom=None, plotTz=False,
@@ -587,10 +591,13 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
                        data_path=data_path, hscale=hscale, **kwargs)
         df = pd.concat([df1, df2])
 
-        alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
-        h_components = alpha * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
-                np.array(df['delta_rh']) / np.array(df['d_m']))
-        df['h_components'] = h_components
+        try:
+            h_components = df['h_components']
+        except KeyError:
+            alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
+            h_components = alpha * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
+                    np.array(df['delta_rh']) / np.array(df['d_m']))
+            df['h_components'] = h_components
 
         qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms', 'h_components'], plot=False)
         quants_h_peak[ii, :] = qdict['h_peak']
@@ -1037,9 +1044,9 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path,
                                   at_sol=False, **kwargs)
 
-                fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], df=sol_df, path=data_path,
-                                   fig=fig, ax=ax, save=False, settitle=False, setxlabel=setxlabel,
-                                   legend=legend, labelsize=labelsize, c_list=[c_rms, c_peak])
+                fig, ax = plot_pdf(case, df=sol_df, keys=['h_rms', 'h_peak'], fig=fig, ax=ax, save=False,
+                                   settitle=False, setxlabel=setxlabel, legend=legend, labelsize=labelsize,
+                                   c_list=[c_rms, c_peak], path=data_path)
                 ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison
 
             if includegraphic:
@@ -1133,24 +1140,25 @@ def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, f
         savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
 
 
-def plot_T_params(case, T_params, n=-1, dat=None, data_path=data_path_bullard, t1=0, sol_files=None,
+def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bullard, t1=0,
                   setylabel=True, setxlabel=True, save=True,
-                  fig_path=fig_path_bullard, fig=None, ax=None, fname='_T-z', fig_fmt='.png',
+                  fig_path=fig_path_bullard, fig=None, ax=None, fend='_T-z', fig_fmt='.png',
                   legend=True, labelsize=16,  **kwargs):
-    # take nth row
+    if T_params is None:
+        T_params = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1,
+                            dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
     if fig is None:
         fig, ax = plt.subplots(figsize=(4, 4))
 
-    if n == 'mean':  # avg of all steady state sols TODO
+    if n == 'mean':  # avg of all steady state sols
         T_params = T_params.mean(axis=0)  # T params df already only contains steady state values
     else:
         try:
-            T_params = T_params.iloc[n]
+            T_params = T_params.iloc[n]  # take nth row
         except IndexError:
             print('No T parameterisation found for solution n =', n)
             return fig, ax
 
-    dT_rh_n = T_params['dT_rh']
     delta_rh_n = T_params['delta_rh']
     D_l_n = T_params['delta_L']
     T_l_n = T_params['T_l']
@@ -1173,13 +1181,13 @@ def plot_T_params(case, T_params, n=-1, dat=None, data_path=data_path_bullard, t
     if setylabel:
         ax.set_ylabel('depth', fontsize=labelsize)
     if save:
-        savefig(fig, case+fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        savefig(fig, case+fend, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
 def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, save=True, settitle=True,
-             setxlabel=True, legend=True, labelsize=16, c_list=None, labels=None, fname='h_hist', fig_fmt='.png',
-             **kwargs):
+             setxlabel=True, legend=True, labelsize=16, c_list=None, labels=None, fend='h_hist', fig_fmt='.png',
+             xlabel='dynamic topography', **kwargs):
     if c_list is None:
         c_list = ['xkcd:forest green', 'xkcd:periwinkle']
     if labels is None:
@@ -1217,11 +1225,11 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
     if legend:
         ax.legend(frameon=False, fontsize=labelsize - 4)
     if setxlabel:
-        ax.set_xlabel('dynamic topography', fontsize=labelsize)
+        ax.set_xlabel(xlabel, fontsize=labelsize)
     if settitle:
         ax.set_title(case, fontsize=labelsize)
     if save:
-        savefig(fig, case + fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        savefig(fig, case + fend, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
@@ -1305,7 +1313,6 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
     if show_sols and sol_df is not None:
         # find steady state sols
         sol_times = np.array(sol_df['time'])
-        print(sol_df['sol'], sol_df['time'])
         for t in sol_times:
             ax.axvline(x=t, c='k', lw=0.5, ls='-', alpha=0.6, zorder=0)
     if save:
