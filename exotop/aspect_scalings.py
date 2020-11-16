@@ -62,7 +62,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                         sol_f_old = df.sol.iat[-1]
                         sol_new = dat_new.read_stats_sol_files()
                         sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
-                        t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new)
+                        t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
                     else:
                         print('      Checking for new timesteps...')
                         time_f_old = df.time.iat[-1]
@@ -591,9 +591,9 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
         # load h and T
-        df1 = pickleio(case, suffix='_h', postprocess_functions=['h_at_sol'], t1=t1[ii], load=load, dat_new=dat,
+        df1 = pickleio(case, suffix='_h', postprocess_functions=[h_at_sol], t1=t1[ii], load=load, dat_new=dat,
                        data_path=data_path, hscale=hscale, **kwargs)
-        df2 = pickleio(case, suffix='_T', postprocess_functions=['T_parameters_at_sol'], t1=t1[ii], load=load,
+        df2 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii], load=load,
                        dat_new=dat,
                        data_path=data_path, hscale=hscale, **kwargs)
         df = pd.concat([df1, df2])
