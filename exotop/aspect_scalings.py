@@ -165,6 +165,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                                read_parameters=False)
     time = dat.stats_time
     i_time = np.argmax(time > t1)  # index of first timestep to process
+    # print('ts @ t1:', i_time, 'time @ t1:', time[i_time], 't1:', t1)
+
     if i_time > 0:
         if sol_files is None:
             try:
@@ -187,7 +189,10 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
     else:
         new_params = pd.DataFrame({'sol':[None], 'time':[0]})
         df_to_extend = pd.concat([df_to_extend, new_params])
-        print('    No timesteps after t = {:.2f} (tf = "{:.2f})'.format(time[i_time], time[-1]))
+        if t1 < 1:
+            print('    No timesteps after t = {:.2f} (tf = {:.2f})'.format(time[i_time], time[-1]))
+        else:
+            print('    Skipping case with t1 > 1')
         # print('    No solutions after t =', time[i_time], '(tf =', time[-1], ')')
     return df_to_extend
 
@@ -196,12 +201,13 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
                         df_to_extend=None, **kwargs):
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
+
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=False)
     time = dat.stats_time
     i_time = np.argmax(time > t1)  # index of first timestep to process (because argmax returns 1st occurrence of 1)
-    print('ts @ t1:', i_time, 'time @ t1:', time[i_time], 't1:', t1)
+    # print('ts @ t1:', i_time, 'time @ t1:', time[i_time], 't1:', t1)
 
     if i_time > 0:
         print('        Processing', postprocess_functions, 'for ', case, ', from timestep', i_time, 'to', len(time))
@@ -216,7 +222,10 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
     else:
         new_params = pd.DataFrame({'time':[0]})
         df_to_extend = pd.concat([df_to_extend, new_params])
-        print('    No timesteps after t =', time[i_time], '(tf =', time[-1], ')')
+        if t1 < 1:
+            print('    No timesteps after t = {:.2f} (tf = {:.2f})'.format(time[i_time], time[-1]))
+        else:
+            print('    Skipping case with t1 > 1')
     return df_to_extend
 
 
@@ -1152,7 +1161,7 @@ def plot_T_params(case, T_params, n=-1,
     ax.plot([T_i_f, T_i_f], [0, D_l_f - delta_rh_f], ls='--', alpha=0.5, lw=0.5,
             label=r'$T_i$', c='xkcd:red orange')
     if legend:
-        ax.legend(frameon=False, fontsize=labelsize)
+        ax.legend(frameon=False, fontsize=labelsize, ncol=2)
     if setxlabel:
         ax.set_xlabel('temperature', fontsize=labelsize)
     if setylabel:
@@ -1282,16 +1291,16 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
     if legend:
         ax.legend(frameon=False, fontsize=labelsize - 2)
     if mark_used:
-        # Create a Rectangle patch to mark "transient" times
+        # Create a Rectangle patch to overlie "transient" times
         rect = patches.Rectangle((ax.get_xlim()[0], ax.get_ylim()[0]), t1,
                                  ax.get_ylim()[1] - ax.get_ylim()[0],
-                                 edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
+                                 edgecolor='None', facecolor='k', alpha=0.2, zorder=100)
         ax.add_patch(rect)
     if show_sols and sol_df is not None:
         # find steady state sols
         sol_times = np.array(sol_df['time'])
         for t in sol_times:
-            ax.axvline(x=t, lw=0.5, ls='--', alpha=0.5, zorder=0)
+            ax.axvline(x=t, lw=0.5, ls='-', alpha=0.5, zorder=0)
     if save:
         savefig(fig, case + fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
