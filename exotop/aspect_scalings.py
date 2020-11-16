@@ -1001,7 +1001,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                 sol_df=sol_df)
 
             ax.text(0.01, 0.95, labels[ii], horizontalalignment='left', verticalalignment='top',
-                    transform=ax.transAxes, fontsize=labelsize)
+                    transform=ax.transAxes, fontsize=labelsize, zorder=4)
 
             icol = icol + 1
             ax = axes[ii, icol]
@@ -1133,37 +1133,41 @@ def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, f
         savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
 
 
-def plot_T_params(case, T_params, n=-1,
+def plot_T_params(case, T_params, n=-1, dat=None, data_path=data_path_bullard, t1=0, sol_files=None,
                   setylabel=True, setxlabel=True, save=True,
                   fig_path=fig_path_bullard, fig=None, ax=None, fname='_T-z', fig_fmt='.png',
                   legend=True, labelsize=16,  **kwargs):
     # take nth row
     if fig is None:
         fig, ax = plt.subplots(figsize=(4, 4))
-    try:
-        T_params = T_params.iloc[n]
-    except IndexError:
-        print('No T parameterisation found for solution n =', n)
-        return fig, ax
 
-    dT_rh_f = T_params['dT_rh']
-    delta_rh_f = T_params['delta_rh']
-    D_l_f = T_params['delta_L']
-    T_l_f = T_params['T_l']
-    T_i_f = T_params['T_i']
+    if n == 'mean':  # avg of all steady state sols TODO
+        T_params = T_params.mean(axis=0)  # T params df already only contains steady state values
+    else:
+        try:
+            T_params = T_params.iloc[n]
+        except IndexError:
+            print('No T parameterisation found for solution n =', n)
+            return fig, ax
+
+    dT_rh_n = T_params['dT_rh']
+    delta_rh_n = T_params['delta_rh']
+    D_l_n = T_params['delta_L']
+    T_l_n = T_params['T_l']
+    T_i_n = T_params['T_i']
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
 
     ax.plot(T_f, y_f, c='k', lw=1)
-    ax.axhline(D_l_f, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
-    ax.axhline(D_l_f - delta_rh_f, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
-    ax.text(0, D_l_f - delta_rh_f, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_f), ha='left', va='top',
+    ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
+    ax.axhline(D_l_n - delta_rh_n, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
+    ax.text(0, D_l_n - delta_rh_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n), ha='left', va='top',
             color='xkcd:red orange', fontsize=labelsize - 2)
-    ax.plot([T_l_f, T_l_f], [0, D_l_f], ls='--', alpha=0.5, lw=0.5, label=r'$T_L$', c='xkcd:tangerine')
-    ax.plot([T_i_f, T_i_f], [0, D_l_f - delta_rh_f], ls='--', alpha=0.5, lw=0.5,
+    ax.plot([T_l_n, T_l_n], [0, D_l_n], ls='--', alpha=0.5, lw=0.5, label=r'$T_L$', c='xkcd:tangerine')
+    ax.plot([T_i_n, T_i_n], [0, D_l_n - delta_rh_n], ls='--', alpha=0.5, lw=0.5,
             label=r'$T_i$', c='xkcd:red orange')
     if legend:
-        ax.legend(frameon=False, fontsize=labelsize-2, ncol=2)
+        ax.legend(frameon=True, fontsize=labelsize-4, ncol=2)
     if setxlabel:
         ax.set_xlabel('temperature', fontsize=labelsize)
     if setylabel:
@@ -1205,7 +1209,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
                 print(e)
             if ii == 0:
                 ax.text(0.05, 0.05, 'n={:d}/{:d}'.format(len(x), df.index[-1]), ha='left', va='bottom',
-                        transform=ax.transAxes, color='b')
+                        transform=ax.transAxes, color='xkcd:tangerine')
         except KeyError:
             print('Key', key, 'not found in', case)
 
@@ -1291,19 +1295,19 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
     if settitle:
         ax.set_title(case, fontsize=labelsize)
     if legend:
-        ax.legend(frameon=False, fontsize=labelsize - 2)
+        ax.legend(frameon=False, fontsize=labelsize - 4)
     if mark_used:
         # Create a Rectangle patch to overlie "transient" times
         rect = patches.Rectangle((ax.get_xlim()[0], ax.get_ylim()[0]), t1,
                                  ax.get_ylim()[1] - ax.get_ylim()[0],
-                                 edgecolor='None', facecolor='xkcd:buff', alpha=0.5, zorder=100)
+                                 edgecolor='None', facecolor='xkcd:pale olive green', alpha=0.6, zorder=3)
         ax.add_patch(rect)
     if show_sols and sol_df is not None:
         # find steady state sols
         sol_times = np.array(sol_df['time'])
         print(sol_df['sol'], sol_df['time'])
         for t in sol_times:
-            ax.axvline(x=t, lw=0.5, ls='-', alpha=0.5, zorder=0)
+            ax.axvline(x=t, c='k', lw=0.5, ls='-', alpha=0.6, zorder=0)
     if save:
         savefig(fig, case + fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
