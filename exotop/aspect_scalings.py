@@ -529,8 +529,10 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         if len(x_var) > 1:
             fitx = [[a[1]] * len(a[0]) for a in rms_all]
             fith = [a[0] for a in rms_all]
+            print('fitx', np.shape(fitx), 'fith', np.shape(fith))
             flatfitx = [item for sublist in fitx for item in sublist]
             flatfith = [item for sublist in fith for item in sublist]
+            print('flatfitx', np.shape(flatfitx), 'flatfith', np.shape(flatfith))
             expon, const = fit_log(flatfitx, flatfith)
             xprime = [a[1] for a in rms_all]
             hprime = const * np.array(xprime) ** expon
