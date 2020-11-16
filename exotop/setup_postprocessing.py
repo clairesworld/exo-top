@@ -19,6 +19,7 @@ regime_grid = np.array([['steady', 'steady', 'steady', 'chaotic', 'sluggish', 'n
 end = np.empty_like(t1, dtype=object)
 end[:] = "-wide"
 end[2:, 5] = "-wide-ascii"  # which runs use ascii initialisation
+end[3, 4] = "-wide-ascii"  # which runs use ascii initialisation
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
