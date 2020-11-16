@@ -54,7 +54,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 print('    Found', fname)
 
                 if load == 'auto':  # check for additional timesteps
-                    print('      Checking for new timesteps')
+                    print('      Checking for new timesteps...')
                     time_f_old = df.time.iat[-1]
                     if dat_new is None:
                         dat_new = post.Aspect_Data(directory=case_path, verbose=False,
@@ -76,7 +76,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
             dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                        read_statistics=True, read_parameters=False)
 
-        if reprocess_flag and (t1 != 1):
+        if reprocess_flag:
             if at_sol:
                 sol_files_new = dat_new.read_stats_sol_files()
                 df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
@@ -91,7 +91,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
         if dump_flag:
             pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
 
-    return df  # will returning None break?
+    return df
 
 
 def concat_pickles(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):
@@ -165,7 +165,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                                read_parameters=False)
     time = dat.stats_time
     i_time = np.argmax(time > t1)  # index of first timestep to process
-    if i_time > 0:  # probably don't want to process every timestep
+    if i_time > 0:
         if sol_files is None:
             try:
                 sol_files = dat.sol_files
@@ -185,8 +185,10 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
     else:
-        times_at_sols = dat.find_time_at_sol(sol_files=sol_files, return_indices=False)
-        print('    No quasi-steady state solutions up to', times_at_sols[-1])
+        new_params = pd.DataFrame({'sol':[], 'time':[]})
+        df_to_extend = pd.concat([df_to_extend, new_params])
+        print('    No timesteps after t =', time[i_time], '(tf =', time[-1], ')')
+        # print('    No solutions after t =', time[i_time], '(tf =', time[-1], ')')
     return df_to_extend
 
 
@@ -211,7 +213,9 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
                 df_to_extend = pd.concat([df_to_extend, new_params])
 
     else:
-        print('    No timesteps after t =', time[i_time], '(last time @ t =', time[-1], ')')
+        new_params = pd.DataFrame({'sol':[], 'time':[]})
+        df_to_extend = pd.concat([df_to_extend, new_params])
+        print('    No timesteps after t =', time[i_time], '(tf =', time[-1], ')')
     return df_to_extend
 
 
@@ -994,7 +998,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                 labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend,
                                 show_sols=show_sols, df=sol_df, yscale=-1, t1=t1[ii], mark_used=True)
 
-            if includeTz:  # final timestep only
+            if includeTz and t1[ii] < 1:  # final timestep only
                 icol = icol + 1
                 ax = axes[ii, icol]
 
@@ -1012,7 +1016,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 if setylabel:
                     ax.set_ylabel('depth', fontsize=labelsize)
 
-            if includepdf:
+            if includepdf and t1[ii] < 1:
                 icol = icol + 1
                 ax = axes[ii, icol]
                 sol_df = pickleio(case, suffix='_h_all', postprocess_functions=[h_at_ts], t1=t1[ii],
