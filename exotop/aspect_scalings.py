@@ -1303,7 +1303,7 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
     if show_sols and sol_df is not None:
         # find steady state sols
         sol_times = np.array(sol_df['time'])
-        print('sol_df', sol_df['sol', 'time'])
+        print('sol_df', sol_df['sol'], sol_df['time'])
         for t in sol_times:
             ax.axvline(x=t, lw=0.5, ls='-', alpha=0.5, zorder=0)
     if save:
