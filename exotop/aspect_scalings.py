@@ -455,8 +455,9 @@ def fit_log(x, h):
     h1 = np.log10(np.array(h))
     try:
         slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
-    except ValueError:
-        raise ('error | x', np.shape(x1), 'h', np.shape(h1))
+    except ValueError as e:
+        print('x', np.shape(x1), 'h', np.shape(h1))
+        raise(e)
     return slope, 10 ** intercept
 
 
@@ -1141,7 +1142,7 @@ def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, f
 
 
 def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bullard, t1=0,
-                  setylabel=True, setxlabel=True, save=True,
+                  setylabel=True, setxlabel=True, save=True, load='auto',
                   fig_path=fig_path_bullard, fig=None, ax=None, fend='_T-z', fig_fmt='.png',
                   legend=True, labelsize=16,  **kwargs):
     if T_params is None:
@@ -1311,8 +1312,8 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
                                  edgecolor='None', facecolor='xkcd:pale olive green', alpha=0.6, zorder=3)
         ax.add_patch(rect)
     if show_sols and sol_df is not None:
-        # find steady state sols
-        sol_times = np.array(sol_df['time'])
+        sol_times = np.array(sol_df['time'])  # steady state sols
+        print('sol times', sol_times)
         for t in sol_times:
             ax.axvline(x=t, c='k', lw=0.5, ls='-', alpha=0.6, zorder=0)
     if save:

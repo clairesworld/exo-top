@@ -9,7 +9,7 @@ c_regimes = ['xkcd:sage green', 'xkcd:blood red' , 'xkcd:dark violet']
 
 ### plot h scalings with Ra
 
-print('assuming you have properly saved h values for the right time period')
+print('\nAssuming you have properly saved h values for the right time period\n')
 fig, axes = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, fit=True, t1=t1,
                              load='auto', xlim=(8e5,1.3e8), ylim=None, fig_fmt=fig_fmt,
                              save=True, fname='h_Ra_all', xlabel='Ra', hscale=2e-5*2700*2890,
