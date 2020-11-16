@@ -1187,7 +1187,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
                 print('x', x)
                 print(e)
             ax.text(0.05, 0.05, 'n={:d}/{:d}'.format(len(x), df.index[-1]), ha='left', va='bottom',
-                    transform=ax.transAxes, c='b')
+                    transform=ax.transAxes, color='b')
         except KeyError:
             print('Key', key, 'not found in', case)
 
