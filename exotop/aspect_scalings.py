@@ -442,10 +442,8 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
     for key in keys:
         try:
             qdict[key] = np.percentile(df[key], qs)
-        except KeyError:
-            raise (key, 'not processed yet for', case)
-        except Exception as e:
-            qdict[key] = np.array([np.nan] * len(qs))
+        except KeyError as e:
+            print (key, 'not processed yet for', case)
             raise e
 
     if plot:
@@ -527,16 +525,10 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
     if fit:
         if len(x_var) > 1:
-            print('rms_all', np.shape(rms_all), 'rms_all[0]', np.shape(rms_all[0]))
-            print('rms_all[0][0]', np.shape(rms_all[0][0]), '- h_rms at each timestep for one case')
-            print('rms_all[0][1]', np.shape(rms_all[0][1]), '- Ra for one case')
-
             fitx = [[a[1]] * len(a[0]) for a in rms_all]
             fith = [a[0] for a in rms_all]
-            print('fitx[1]', np.shape(fitx[1]), 'fith[1]', np.shape(fith[1]))
             flatfitx = [item for sublist in fitx for item in sublist]
             flatfith = [item for sublist in fith for item in sublist]
-            print('flatfitx', np.shape(flatfitx), 'flatfith', np.shape(flatfith))
             expon, const = fit_log(flatfitx, flatfith)
             xprime = [a[1] for a in rms_all]
             hprime = const * np.array(xprime) ** expon
@@ -610,14 +602,8 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
                     np.array(df['delta_rh']) / np.array(df['d_m']))
             df['h_components'] = h_components
 
-        qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms', 'h_components'], plot=False)
-        quants_h_peak[ii, :] = qdict['h_peak']
-        quants_h_rms[ii, :] = qdict['h_rms']
-        quants_h_components[ii, :] = qdict['h_components']
-
         h_peak = df['h_peak']
         h_rms = df['h_rms']
-
         # old way of accounting for loading all h instead of just at sols
         # t1_idx = np.argmax(dat.stats_time > t1[ii])  # timestep corresponding to t1
         # sol_idx = dat.find_time_at_sol()
@@ -630,9 +616,13 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         #     rms_list = [rms_list[j - t1_idx] for j in sol_idx]
         # except IndexError:
         #     print('sol_idx - t1_idx', [j - t1_idx for j in sol_idx])
-
         peak_all.append((h_peak, h_components))
         rms_all.append((h_rms, h_components))
+
+        qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms', 'h_components'], plot=False)
+        quants_h_peak[ii, :] = qdict['h_peak']
+        quants_h_rms[ii, :] = qdict['h_rms']
+        quants_h_components[ii, :] = qdict['h_components']
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
     yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
