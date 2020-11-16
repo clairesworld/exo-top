@@ -74,12 +74,16 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
             elif load == 'auto':  # pkl file not found
                 reprocess_flag = True
+                if at_sol:
+                    sol_new = dat_new.read_stats_sol_files()
                 dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                            read_statistics=True, read_parameters=False)
                 print('    File', fname, 'not found, processing...')
 
         else:  # load is False so automatically calculate shit
             reprocess_flag = True
+            if at_sol:
+                sol_new = dat_new.read_stats_sol_files()
             dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                        read_statistics=True, read_parameters=False)
 
@@ -742,7 +746,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
                               fig_path=fig_path, logx=logx, logy=logy,
                               showallscatter=showallscatter, hscale=hscale, **kwargs
                               )
-            print('Finished', len(Ra_steady), 'steady-state cases')
+            print('Finished', len(Ra_steady), 'steady-state case(s)')
         # trans
         if not (not Ra_trans):
             fig, ax = plot_fn(Ra=Ra_trans, eta=eta, t1=t1[ii, Ra_trans_idx], sigma=sigma, fig=fig, ax=ax,
@@ -753,7 +757,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
                               fig_path=fig_path, logx=logx, logy=logy,
                               showallscatter=showallscatter, hscale=hscale, **kwargs
                               )
-            print('Finished', len(Ra_trans), 'transitional cases')
+            print('Finished', len(Ra_trans), 'transitional case(s)')
             # chaotic
         if not (not Ra_chaos):
             fig, ax = plot_fn(Ra=Ra_chaos, eta=eta, t1=t1[ii, Ra_chaos_idx], sigma=sigma, fig=fig, ax=ax,
@@ -764,7 +768,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
                               fig_path=fig_path, logx=logx, logy=logy,
                               showallscatter=showallscatter, hscale=hscale, **kwargs
                               )
-            print('Finished', len(Ra_chaos), 'chaotic cases')
+            print('Finished', len(Ra_chaos), 'chaotic case(s)')
         ax.text(0.5, 0.95, '$\Delta \eta$=' + eta, fontsize=labelsize, ha='center', va='top',
                 transform=ax.transAxes)
         if ii % ncols != 0:
