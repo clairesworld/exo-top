@@ -40,7 +40,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     df = pd.DataFrame()
     dump_flag = False
     reprocess_flag = False
-    t1_new = 0
+    t1_new = t1
 
     if os.path.exists(case_path):  # do nothing if case doesn't exist
         os.makedirs(case_path + 'pickle/', exist_ok=True)
@@ -62,7 +62,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                         dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                                    read_statistics=True, read_parameters=False)
                     time_new = dat_new.stats_time
-                    t1_new = time_new[np.argmin(time_new > time_f_old)]
+                    t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
                     if t1_new > 0:  # new timesteps
                         reprocess_flag = True
                         print('      Updating', fname)
@@ -82,12 +82,12 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
             if at_sol:
                 sol_files_new = dat_new.read_stats_sol_files()
                 df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
-                                          t1=np.maximum(t1, t1_new), data_path=data_path, sol_files=sol_files_new,
-                                          df_to_extend=df, **kwargs)
+                                          t1=np.maximum(t1, t1_new),  # whichever comes later in time
+                                          data_path=data_path, sol_files=sol_files_new, df_to_extend=df, **kwargs)
             else:
                 df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
-                                         t1=np.maximum(t1, t1_new), data_path=data_path,
-                                         df_to_extend=df, **kwargs)
+                                         t1=np.maximum(t1, t1_new),
+                                         data_path=data_path,  df_to_extend=df, **kwargs)
             dump_flag = True  # always save if you did something
 
         if dump_flag:
@@ -1024,9 +1024,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
                 fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, save=False,
                                         setxlabel=setxlabel, setylabel=False, legend=False, fig_path=fig_path, fig=fig,
-                                        ax=ax)
-                if legend:
-                    ax.legend(frameon=False)
+                                        ax=ax, legend=legend, labelsize=labelsize)
                 if setxlabel:
                     ax.set_xlabel('temperature', fontsize=labelsize)
                 if setylabel:
@@ -1165,7 +1163,7 @@ def plot_T_params(case, T_params, n=-1,
     ax.plot([T_i_f, T_i_f], [0, D_l_f - delta_rh_f], ls='--', alpha=0.5, lw=0.5,
             label=r'$T_i$', c='xkcd:red orange')
     if legend:
-        ax.legend(frameon=False, fontsize=labelsize, ncol=2)
+        ax.legend(frameon=False, fontsize=labelsize-2, ncol=2)
     if setxlabel:
         ax.set_xlabel('temperature', fontsize=labelsize)
     if setylabel:
@@ -1213,7 +1211,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 
     ax.yaxis.set_ticks([])
     if legend:
-        ax.legend(frameon=False, fontsize=labelsize - 2)
+        ax.legend(frameon=False, fontsize=labelsize - 4)
     if setxlabel:
         ax.set_xlabel('dynamic topography', fontsize=labelsize)
     if settitle:
@@ -1298,7 +1296,7 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
         # Create a Rectangle patch to overlie "transient" times
         rect = patches.Rectangle((ax.get_xlim()[0], ax.get_ylim()[0]), t1,
                                  ax.get_ylim()[1] - ax.get_ylim()[0],
-                                 edgecolor='None', facecolor='k', alpha=0.2, zorder=100)
+                                 edgecolor='None', facecolor='xkcd:buff', alpha=0.5, zorder=100)
         ax.add_patch(rect)
     if show_sols and sol_df is not None:
         # find steady state sols
