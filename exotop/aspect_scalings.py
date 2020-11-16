@@ -19,6 +19,12 @@ from exotop.mpl_tools import colorize
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 
+def savefig(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', **kwargs):
+    path = fig_path + fname + fig_fmt
+    directory = os.path.dirname(path)
+    os.makedirs(directory, exist_ok=True)
+    fig.savefig(path, bbox_inches=bbox_inches, **kwargs)
+    print('Saved to ', path, '!')
 
 def read_topo_stats(case, ts, data_path=data_path_bullard):
     df = pd.read_csv(data_path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
@@ -38,26 +44,26 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
     if os.path.exists(case_path):  # do nothing if case doesn't exist
         os.makedirs(case_path + 'pickle/', exist_ok=True)
-        if (load == 'auto' or load is True):
+        if load == 'auto' or load is True:
             if os.path.exists(case_path + 'pickle/' + fname):
                 # open pickled file
                 try:
                     df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
                 except ValueError:  # python 2?
                     df = pkl.load(open(case_path + 'pickle/' + fname, "rb"), protocol=2)
-                print('Found', fname)
+                print('    Found', fname)
 
                 if load == 'auto':  # check for additional timesteps
-                    print('Checking for new timesteps')
+                    print('    Checking for new timesteps')
                     time_f_old = df.time.iat[-1]
                     if dat_new is None:
                         dat_new = post.Aspect_Data(directory=case_path, verbose=False,
-                                                       read_statistics=True, read_parameters=False)
+                                                   read_statistics=True, read_parameters=False)
                     time_new = dat_new.stats_time
                     t1_new = time_new[np.argmin(time_new > time_f_old)]
-                    if (t1_new > 0):  # new timesteps
+                    if t1_new > 0:  # new timesteps
                         reprocess_flag = True
-                        print('Updating', fname)
+                        print('    Updating', fname)
 
             elif load == 'auto':  # pkl file not found
                 reprocess_flag = True
@@ -74,12 +80,12 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
             if at_sol:
                 sol_files_new = dat_new.read_stats_sol_files()
                 df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
-                                      t1=np.maximum(t1, t1_new), data_path=data_path, sol_files=sol_files_new,
-                                      df_to_extend=df, **kwargs)
+                                          t1=np.maximum(t1, t1_new), data_path=data_path, sol_files=sol_files_new,
+                                          df_to_extend=df, **kwargs)
             else:
                 df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
-                                          t1=np.maximum(t1, t1_new), data_path=data_path,
-                                          df_to_extend=df, **kwargs)
+                                         t1=np.maximum(t1, t1_new), data_path=data_path,
+                                         df_to_extend=df, **kwargs)
             dump_flag = True  # always save if you did something
 
         if dump_flag:
@@ -88,12 +94,32 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     return df  # will returning None break?
 
 
+def concat_pickles(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):
+    case_path = data_path + 'output-' + case + '/'
+    dfs = []
+    for suffix in suffixes:
+        fname = case + suffix + fend
+        if os.path.exists(case_path + 'pickle/' + fname):
+            df_new = pd.DataFrame()
+            df_loaded = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
+            for key in keys:
+                if key in df_loaded.columns:
+                    df_new[key] = df_loaded[key]  # add this column to new df
+                    print('Copied column', key, 'from', fname)
+            dfs.append(df_new)
+        else:
+            print('File', fname, 'does not exist')
+    pkl.dump(pd.concat(dfs), open(case_path + 'pickle/' + case + new_suffix + fend, "wb"))
+
+
+
+
 def get_cases_list(Ra, eta):
     # either Ra or eta is iterable
     if isinstance(Ra, Iterable) and not isinstance(Ra, string_types):
         x_var = Ra
         cases = ['Ra' + r + '-eta' + eta + '-wide' for r in Ra]
-    elif (isinstance(eta, Iterable) and not isinstance(eta, string_types)):
+    elif isinstance(eta, Iterable) and not isinstance(eta, string_types):
         x_var = eta
         cases = ['Ra' + Ra + '-eta' + e + '-wide' for e in eta]
     else:
@@ -119,7 +145,9 @@ def read_evol(case, col, dat=None, data_path=data_path_bullard):
     # return time, column i, (from statistics file)
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=True, verbose=False)
-    return dat.stats_time, eval('dat.stats_'+col)
+    return dat.stats_time, eval('dat.stats_' + col)
+
+
 # def read_evol_old(case, i, data_path=data_path_bullard, skiprows=None):
 #     # e.g. return time, column i, nsteps (from statistics file)
 #     df = pd.read_csv(data_path + 'output-' + case + '/statistics', header=None,
@@ -154,10 +182,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 new_params_dict['time'] = time[ts]
                 new_params = pd.DataFrame(new_params_dict, index=[ts])
                 df_to_extend = pd.concat([df_to_extend, new_params])
-                print('    Calculated', fn, 'for solution', n, '/', int(n_quasi[-1]))
-                if n < 0:
-                    print(case, 'n_quasi', n_quasi, 'n_indices', n_indices, 'i_time', i_time, 'sols_in_time', sols_in_time)
-                    raise()
+                print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
     else:
         times_at_sols = dat.find_time_at_sol(sol_files=sol_files, return_indices=False)
@@ -166,7 +191,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
 
 
 def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
-                         df_to_extend=None, **kwargs):
+                        df_to_extend=None, **kwargs):
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
     if dat is None:
@@ -176,7 +201,8 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
     i_time = np.argmax(time > t1)  # index of first timestep to process
 
     if (t1 != 1) and (i_time > 0):
-        print('    Processing', postprocess_functions, 'for ', case, ', ', len(range(i_time, len(time))), 'timesteps')
+        print('        Processing', postprocess_functions, 'for ', case, ', ', len(range(i_time, len(time))),
+              'timesteps')
         for ii in range(i_time, len(time)):
             ts = ii  # timestep at this solution
             for fn in postprocess_functions:
@@ -208,11 +234,13 @@ def h_at_ts(case, ts=None, hscale=1, **kwargs):
         h_params_n[key] = [h_params_n[key]]
     return h_params_n
 
+
 def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
     Nu = dat.Nu(k=1)
-    return {'Nu':Nu[ts]}
+    return {'Nu': Nu[ts]}
+
 
 def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
@@ -224,9 +252,6 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
     for key in T_params_n.keys():
         T_params_n[key] = [T_params_n[key]]
     return T_params_n
-
-
-
 
 
 # def get_T_params_old(case, t1=0, data_path=data_path_bullard, pickleto=None, picklefrom=None, plotTz=False,
@@ -315,52 +340,49 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
 #         return {}, fig, ax
 
 
-
-
-
-def get_h(case, t1=0, data_path=data_path_bullard, dat=None, load=True,
-             fig_path=fig_path_bullard, hscale=1, fend='_pdtop.pkl', **kwargs):
-    flag = False
-    pfile = fig_path + 'data/' + case + fend
-    if load and (os.data_path.exists(pfile)):
-        try:
-            peak_list, rms_list = pkl.load(open(pfile, "rb"))
-            print('loaded h for case', case)
-        except ValueError:
-            peak_list, rms_list = pkl.load(open(pfile, "rb"), protocol=2)
-            print('loaded h for case', case)
-        if (not peak_list) or (not rms_list):  # if stored stuff is empty
-            flag = True
-    else:
-        flag = True
-
-    if flag:  # load
-        if dat is None:
-            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
-                                   read_parameters=False)
-        time = dat.stats_time
-        i_time = np.argmax(time > t1)
-        rms_list = []
-        peak_list = []
-        t_used = []
-        if t1 != 1:
-            print('building distribution of h for case', case, ', n =', len(range(i_time, len(time))))
-            for ii in range(i_time, len(time)):
-                try:
-                    x, h = read_topo_stats(case, ts=ii)
-                    h_norm = trapznorm(h)
-                    peak, rms = peak_and_rms(h_norm)
-                    rms_list.append(rms)
-                    peak_list.append(peak)
-                    t_used.append(ii)
-                except FileNotFoundError as e:
-                    print('file not found:', e)
-
-        pkl.dump((peak_list, rms_list), open(pfile, "wb"))
-
-    peak_list_scaled = [a * hscale for a in peak_list]
-    rms_list_scaled = [a * hscale for a in rms_list]
-    return peak_list_scaled, rms_list_scaled
+# def get_h(case, t1=0, data_path=data_path_bullard, dat=None, load=True,
+#              fig_path=fig_path_bullard, hscale=1, fend='_pdtop.pkl', **kwargs):
+#     flag = False
+#     pfile = fig_path + 'data/' + case + fend
+#     if load and (os.data_path.exists(pfile)):
+#         try:
+#             peak_list, rms_list = pkl.load(open(pfile, "rb"))
+#             print('loaded h for case', case)
+#         except ValueError:
+#             peak_list, rms_list = pkl.load(open(pfile, "rb"), protocol=2)
+#             print('loaded h for case', case)
+#         if (not peak_list) or (not rms_list):  # if stored stuff is empty
+#             flag = True
+#     else:
+#         flag = True
+#
+#     if flag:  # load
+#         if dat is None:
+#             dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
+#                                    read_parameters=False)
+#         time = dat.stats_time
+#         i_time = np.argmax(time > t1)
+#         rms_list = []
+#         peak_list = []
+#         t_used = []
+#         if t1 != 1:
+#             print('building distribution of h for case', case, ', n =', len(range(i_time, len(time))))
+#             for ii in range(i_time, len(time)):
+#                 try:
+#                     x, h = read_topo_stats(case, ts=ii)
+#                     h_norm = trapznorm(h)
+#                     peak, rms = peak_and_rms(h_norm)
+#                     rms_list.append(rms)
+#                     peak_list.append(peak)
+#                     t_used.append(ii)
+#                 except FileNotFoundError as e:
+#                     print('file not found:', e)
+#
+#         pkl.dump((peak_list, rms_list), open(pfile, "wb"))
+#
+#     peak_list_scaled = [a * hscale for a in peak_list]
+#     rms_list_scaled = [a * hscale for a in rms_list]
+#     return peak_list_scaled, rms_list_scaled
 
 
 # def pd_top(case, t1=0, data_path=data_path_bullard, fig_path=fig_path_bullard, sigma=2,
@@ -391,16 +413,17 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
         qs = [2.5, 50, 97.5]
     elif sigma == 1:
         qs = [16, 50, 84]
+    else:
+        print('Unrecognized sigma value')
     qdict = {}
     for key in keys:
         try:
             qdict[key] = np.percentile(df[key], qs)
-        except KeyError as e:
+        except KeyError:
             raise (key, 'not processed yet for', case)
         except Exception as e:
             qdict[key] = np.array([np.nan] * len(qs))
-            raise (e)
-
+            raise e
 
     if plot:
         fig, ax = plot_pdf(case, df=df, keys=keys, **kwargs)
@@ -408,13 +431,13 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
     return qdict
 
 
-def fit_log(x, h, plot=True):
+def fit_log(x, h):
     x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
     h1 = np.log10(np.array(h))
     try:
         slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
     except ValueError:
-        raise('error | x', np.shape(x1), 'h', np.shape(h1))
+        raise ('error | x', np.shape(x1), 'h', np.shape(h1))
     return slope, 10 ** intercept
 
 
@@ -425,7 +448,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     #     def expon(x, C, n):
     #         return C * x**n
 
-    idx = np.nonzero(np.isnan(x) == False)[0]
+    idx = np.nonzero(np.isnan(x) is False)[0]
     x_fit = np.log10(x[idx])
     h_fit = np.log10(h[idx])
     if h_err is not None:
@@ -438,23 +461,18 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
-
-
-
 def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
                  load='auto', showallscatter=False,
                  save=True, fname='h_vs_Ra', sigma=2, fig_fmt='.png',
                  labelsize=16, xlabel='', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
-                 fit=False, fitRa=None, cases=None, x_var=None, logx=True, logy=True,
+                 fit=False, cases=None, x_var=None, logx=True, logy=True,
                  fig=None, ax=None, dt_ylim=(3e-3, 7e-2), xlim=None, hscale=1, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     if cases is None:
         cases, x_var = get_cases_list(Ra, eta)
     if t1 is None:
         t1 = [0] * len(x_var)
-    if fitRa is None:
-        fitRa = Ra
 
     quants_h_peak = np.zeros((len(x_var), 3))
     quants_h_rms = np.zeros((len(x_var), 3))
@@ -464,7 +482,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
     for ii, case in enumerate(cases):
         df = pickleio(case, suffix='_h_all', postprocess_functions=['h_at_ts'], t1=t1[ii], load=load, dat_new=None,
-                            data_path=data_path, hscale=hscale, at_sol=False, **kwargs)
+                      data_path=data_path, hscale=hscale, at_sol=False, **kwargs)
         qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms'], plot=False)
         quants_h_peak[ii, :] = qdict['h_peak']
         quants_h_rms[ii, :] = qdict['h_rms']
@@ -472,8 +490,8 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         x[ii, :] = float(x_var[ii])
         h_peak = df['h_peak']
         h_rms = df['h_rms']
-        peak_all.append((h_peak, x[ii, :] ))
-        rms_all.append((h_rms, x[ii, :] ))
+        peak_all.append((h_peak, x[ii, :]))
+        rms_all.append((h_rms, x[ii, :]))
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
     yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
@@ -484,7 +502,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         ax = plt.gca()
 
     if fit:
-        if (len(x_var) > 1):
+        if len(x_var) > 1:
             fitx = [[a[1]] * len(a[0]) for a in rms_all]
             fith = [a[0] for a in rms_all]
             flatfitx = [item for sublist in fitx for item in sublist]
@@ -518,18 +536,16 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     ax.set_title(title, fontsize=labelsize)
 
     if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
+        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
 def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                 load='auto',  fig_fmt='.png',
-                 save=True, fname='h_T', plotpd=False, sigma=2, showallscatter=False,
+                 load='auto', fig_fmt='.png',
+                 save=True, fname='h_T', sigma=2, showallscatter=False,
                  labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
-                 fit=False, fitRa=None, cases=None, x_var=None, logx=True, logy=True,
+                 fit=False, cases=None, x_var=None, logx=True, logy=True,
                  fig=None, ax=None, dt_ylim=(3e-3, 7e-2), xlim=None, hscale=1, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
@@ -538,13 +554,10 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         cases, x_var = get_cases_list(Ra, eta)
     if t1 is None:
         t1 = [0] * len(cases)
-    if fitRa is None:
-        fitRa = Ra
 
     quants_h_peak = np.zeros((len(x_var), 3))
     quants_h_rms = np.zeros((len(x_var), 3))
     quants_h_components = np.zeros((len(x_var), 3))
-    x = np.zeros((len(x_var), 3))
     peak_all = []
     rms_all = []
 
@@ -553,9 +566,10 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
         # load h and T
         df1 = pickleio(case, suffix='_h', postprocess_functions=['h_at_sol'], t1=t1[ii], load=load, dat_new=dat,
-                      data_path=data_path, hscale=hscale, **kwargs)
-        df2 = pickleio(case, suffix='_T', postprocess_functions=['T_parameters_at_sol'], t1=t1[ii], load=load, dat_new=dat,
-                      data_path=data_path, hscale=hscale, **kwargs)
+                       data_path=data_path, hscale=hscale, **kwargs)
+        df2 = pickleio(case, suffix='_T', postprocess_functions=['T_parameters_at_sol'], t1=t1[ii], load=load,
+                       dat_new=dat,
+                       data_path=data_path, hscale=hscale, **kwargs)
         df = pd.concat([df1, df2])
 
         alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
@@ -571,7 +585,6 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         h_peak = df['h_peak']
         h_rms = df['h_rms']
 
-        ## TODO: stopped here 13/11
         # old way of accounting for loading all h instead of just at sols
         # t1_idx = np.argmax(dat.stats_time > t1[ii])  # timestep corresponding to t1
         # sol_idx = dat.find_time_at_sol()
@@ -588,9 +601,10 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         peak_all.append((h_peak, h_components))
         rms_all.append((h_rms, h_components))
 
-    yerr_peak = [h_peak[:, 1] - h_peak[:, 0], h_peak[:, 2] - h_peak[:, 1]]
-    yerr_rms = [h_rms[:, 1] - h_rms[:, 0], h_rms[:, 2] - h_rms[:, 1]]
-    xerr = [x[:, 1] - x[:, 0], x[:, 2] - x[:, 1]]
+    yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
+    yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
+    xerr = [quants_h_components[:, 1] - quants_h_components[:, 0],
+            quants_h_components[:, 2] - quants_h_components[:, 1]]
 
     if ax is None:
         fig = plt.figure()
@@ -618,9 +632,9 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         else:
             print('not enough points to fit -- Ra', Ra, 'eta', eta)
 
-    ax.errorbar(x[:, 1], h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
+    ax.errorbar(quants_h_components[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
                 fmt='^', c=c_peak, alpha=0.9, capsize=5)
-    ax.errorbar(x[:, 1], h_rms[:, 1], yerr=yerr_rms, xerr=xerr,
+    ax.errorbar(quants_h_components[:, 1], quants_h_rms[:, 1], yerr=yerr_rms, xerr=xerr,
                 fmt='o', c=c_rms, alpha=0.9, capsize=5)
 
     if showallscatter:
@@ -640,18 +654,15 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     ax.set_title(title, fontsize=labelsize)
 
     if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
+        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
-
 def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
-                  sigma=2, t1=None, fit=False,  nrows=2, ncols=2, T_components=False,
-                  data_path=data_path_bullard, fig_path=fig_path_bullard, fname='h_Ra_all',  fig_fmt='.png',
+                  sigma=2, t1=None, fit=False, nrows=2, ncols=2, T_components=False,
+                  data_path=data_path_bullard, fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png',
                   ylim=(6e-3, 7e-2), labelsize=14, xlim=None, xlabel='Ra', ylabel='dynamic topography',
-                  logx=True, logy=True, showallscatter=False, xlabelpad=12, ylabelpad=2, hscale=1):
+                  logx=True, logy=True, showallscatter=False, xlabelpad=12, ylabelpad=2, hscale=1, **kwargs):
     # subplots for different eta
     #     fig, axes = plt.subplots(2,2, figsize=(7,7))
     #     flaxes = axes.flatten()
@@ -700,10 +711,10 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
             fig, ax = plot_fn(Ra=Ra_steady, eta=eta, t1=t1[ii, Ra_steady_idx], sigma=sigma, fig=fig, ax=ax,
                               data_path=data_path,
                               c_rms=c_regimes[0], c_peak=c_regimes[0], dt_ylim=ylim, legend=legend,
-                              load=load,  plotpd=False, xlim=xlim,
+                              load=load, plotpd=False, xlim=xlim,
                               save=False, fit=True, ylabel='', xlabel='', labelsize=labelsize,
                               fig_path=fig_path, logx=logx, logy=logy,
-                              showallscatter=showallscatter, hscale=hscale,
+                              showallscatter=showallscatter, hscale=hscale, **kwargs
                               )
         # trans
         if not (not Ra_trans):
@@ -713,7 +724,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
                               load=load, plotpd=False, xlim=xlim,
                               save=False, fit=True, ylabel='', xlabel='', labelsize=labelsize,
                               fig_path=fig_path, logx=logx, logy=logy,
-                              showallscatter=showallscatter, hscale=hscale,
+                              showallscatter=showallscatter, hscale=hscale, **kwargs
                               )
             # chaotic
         if not (not Ra_chaos):
@@ -723,7 +734,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
                               load=load, plotpd=False, xlim=xlim,
                               save=False, fit=True, xlabel='', ylabel='', labelsize=labelsize,
                               fig_path=fig_path, logx=logx, logy=logy,
-                              showallscatter=showallscatter, hscale=hscale,
+                              showallscatter=showallscatter, hscale=hscale, **kwargs
                               )
         ax.text(0.5, 0.95, '$\Delta \eta$=' + eta, fontsize=labelsize, ha='center', va='top',
                 transform=ax.transAxes)
@@ -762,18 +773,15 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
     #     fig.tight_layout()
     fig.subplots_adjust(wspace=0.05, hspace=0.15)
     if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + fname + fig_fmt,  # bbox_inches='tight',
-                    bbox_extra_artists=(outer_legend,))
+        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None, bbox_extra_artists=(outer_legend,))
     return fig, axes
 
 
 def scales_with_Ra(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
                    save=True, fname='claire', showallscatter=False,
-                   labelsize=16, ylabel='', xlabel='Ra', title='',  fig_fmt='.png',
+                   labelsize=16, ylabel='', xlabel='Ra', title='', fig_fmt='.png',
                    c_scatter='xkcd:forest green', legend=True,
-                   fit=False, cases=None, x_var=None, logx=True, logy=True,
+                   fit=False, logx=True, logy=True,
                    fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     if fig is None:
         fig = plt.figure()
@@ -813,26 +821,18 @@ def scales_with_Ra(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
     ax.set_ylabel(ylabel, fontsize=labelsize)
 
     if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
+        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
 def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                          load='auto', save=True, fname='bl-Nu', sigma=2, showallscatter=False,
-                          labelsize=16, ylabel=None, xlabel='Ra', title='',
-                          c_scatter='xkcd:forest green', legend=True, cmap='magma', compare_pub=None, compare_label=None,
-                          fit=False, logx=True, logy=True, vmin=4, vmax=9,
-                          fig=None, axes=None, ylim=None, xlim=None, fig_fmt='.png', **kwargs):
+                          load='auto', save=True, fname='bl-Nu', labelsize=16, ylabel=None, title='',
+                          legend=True, cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
+                          fig=None, axes=None,fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
     if ylabel is None:
         ylabel = [r'$\delta$', 'Nu']
-    if sigma == 2:
-        qs = [2.5, 50, 97.5]
-    elif sigma == 1:
-        qs = [16, 50, 84]
     if fig is None:
         fig, axes = plt.subplots(2, 1)
     logeta_fl = [np.log10(float(a)) for a in eta]
@@ -841,7 +841,7 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
     for jj, eta_str in enumerate(eta):
         cases, Ra_var = get_cases_list(Ra, eta_str)
         if t1 is None:
-            t1 = [0] * len(cases)
+            t1_eta = [0] * len(cases)
         else:
             t1_eta = t1[jj]
         c_scatter = c_list[jj]
@@ -857,55 +857,53 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
                 plot_data[Ra].append(float(Ra_var[ii]))
 
                 # load T components  
-                dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+                dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
+                                       read_statistics=True)
                 df1 = pickleio(case, suffix='_T', postprocess_functions=['T_parameters_at_sol'], t1=t1[ii],
-                              load=load, dat_new=dat,
-                              data_path=data_path,  **kwargs)
+                               load=load, dat_new=dat,
+                               data_path=data_path, **kwargs)
 
                 # extract Nu
                 df2 = pickleio(case, suffix='_Nu', postprocess_functions=['Nu_at_ts'], t1=t1[ii],
-                              load=load, dat_new=dat,
-                              data_path=data_path,  **kwargs)
+                               load=load, dat_new=dat,
+                               data_path=data_path, **kwargs)
                 df = pd.concat([df1, df2])
 
                 for key in keys:
                     plot_data[key].append(np.median(df[key]))
 
-            if compare_pub is not None:
-                cmplabel = compare_label
-                if (jj > 0) and (ii > 0):
-                    cmplabel = None
-                d_compare = compare_pub(case, dat=dat, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df, load=load)
-                for k, key in enumerate(keys):
-                    try:
-                        axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', alpha=0.7, c=c_scatter, label=cmplabel)
-                    except KeyError:
-                        print('Key', key, 'not returned by', compare_pub)
+                if compare_pub is not None:
+                    cmplabel = compare_label
+                    if (jj > 0) and (ii > 0):
+                        cmplabel = None
+                    d_compare = compare_pub(case, dat=dat, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df,
+                                            load=load)
+                    for k, key in enumerate(keys):
+                        try:
+                            axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', alpha=0.7, c=c_scatter, label=cmplabel)
+                        except KeyError:
+                            print('Key', key, 'not returned by', compare_pub)
 
         for k, key in enumerate(keys):
             fig, axes[0] = scales_with_Ra(Ra_data=plot_data['Ra'], y_data=plot_data[key],
-                                      fig_path=fig_path,
-                                      save=False, sigma=sigma, showallscatter=showallscatter,
-                                      labelsize=labelsize, ylabel=ylabel[k], xlabel=xlabel,
-                                      c_scatter=c_scatter, fit=fit, logx=logx, logy=logy,
-                                      fig=fig, ax=axes[k], ylim=ylim, xlim=xlim, vmin=vmin, vmax=vmax)
+                                          fig_path=fig_path, save=False, labelsize=labelsize, ylabel=ylabel[k],
+                                          c_scatter=c_scatter, fig=fig, ax=axes[k], **kwargs)
 
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
-                           vmin=vmin, vmax=vmax)  # dummy
+                            vmin=vmin, vmax=vmax)  # dummy
     cbar = fig.colorbar(scat, ax=[axes[0], axes[1]])
     cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=18)
 
     if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
+        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, axes
 
 
 def solomatov95(Ra=None, d_eta=None, df=None, case=None, dat=None,
                 data_path=data_path_bullard, load='auto', **kwargs):
     if df is None:
-        df = pickleio(case, postprocess_functions=[T_parameters_at_sol], suffix='_T', dat_new=dat, data_path=data_path, load=load)
+        df = pickleio(case, postprocess_functions=[T_parameters_at_sol], suffix='_T', dat_new=dat, data_path=data_path,
+                      load=load)
     T0 = 1
     dT = 1
     T_i = np.median(df['T_i'])
@@ -917,13 +915,14 @@ def solomatov95(Ra=None, d_eta=None, df=None, case=None, dat=None,
     delta_0 = 1.85 * p ** 1.3185 * Ra_i ** -0.3185
     delta_1 = p ** -1 * delta_0
     Nu = (delta_0 + delta_1) ** -1
-    return {'Ra_i':Ra_i, 'delta_0':delta_0, 'Nu':Nu}
+    return {'Ra_i': Ra_i, 'delta_0': delta_0, 'Nu': Nu}
 
 
 def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None,
              data_path=data_path_bullard, load='auto', **kwargs):
     if df is None:
-        df = pickleio(case, postprocess_functions=[T_parameters_at_sol], suffix='_T', dat_new=dat, data_path=data_path, load=load)
+        df = pickleio(case, postprocess_functions=[T_parameters_at_sol], suffix='_T', dat_new=dat, data_path=data_path,
+                      load=load)
     T0 = 1
     dT = 1
     T_i = np.median(df['T_i'])
@@ -939,15 +938,15 @@ def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None,
     return {'Ra_i': Ra_i, 'delta_0': delta_0, 'Nu': Nu, 'T_i': T_i_scaling, 'delta_1': delta_1}
 
 
-
-
-def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
-                  fname='cases', data_path=data_path_bullard, fig_path=fig_path_bullard,  fig_fmt='.png',
-                  load='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
-                  suptitle='', includepdf=True, includeTz=True, **kwargs):
+def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
+                   fname='cases', data_path=data_path_bullard, fig_path=fig_path_bullard, fig_fmt='.png',
+                   load='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
+                   suptitle='', includepdf=True, includeTz=True, regime_grid=None, **kwargs):
     # rows are cases, columns are v_rms, q, T(z), hist
     ncases = len(cases)
     ncols = 2
+    if regime_grid is None:
+        regime_grid = [None]*len(cases)
     if includepdf:
         ncols = ncols + 1
     if includeTz:
@@ -974,19 +973,20 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 legend = True
 
             ax = axes[ii, icol]
-            fig, ax = plot_evol(case, 'rms_velocity', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='rms velocity',
+            fig, ax = plot_evol(case, 'rms_velocity', dat=dat, fig=fig, ax=ax, save=False, ylabel='rms velocity',
                                 c='k', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
                                 labelsize=labelsize, labelpad=labelpad, legend=False, mark_used=True, t1=t1[ii])
 
             ax.text(0.01, 0.95, labels[ii], horizontalalignment='left', verticalalignment='top',
-                        transform=ax.transAxes, fontsize=labelsize)
+                    transform=ax.transAxes, fontsize=labelsize)
 
             icol = icol + 1
             ax = axes[ii, icol]
-            fig, ax = plot_evol(case, 'heatflux_top', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux',
+            fig, ax = plot_evol(case, 'heatflux_top', dat=dat, fig=fig, ax=ax, save=False, ylabel='heat flux',
                                 c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
                                 labelsize=labelsize, labelpad=labelpad, label='top', mark_used=False, t1=t1[ii])
-            fig, ax = plot_evol(case, 'heatflux_bottom', dat=dat, fig=fig, ax=ax, savefig=False, ylabel='heat flux', yscale=-1,
+            fig, ax = plot_evol(case, 'heatflux_bottom', dat=dat, fig=fig, ax=ax, save=False, ylabel='heat flux',
+                                yscale=-1,
                                 c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
                                 labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend, mark_used=True)
 
@@ -997,7 +997,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                 sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
-                fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, savefig=False,
+                fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, save=False,
                                         setxlabel=setxlabel,
                                         setylabel=False, legend=False, fig_path=fig_path, fig=fig, ax=ax)
                 if legend:
@@ -1015,7 +1015,7 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
                                   at_sol=False, **kwargs)
 
                 fig, ax = plot_pdf(case, keys=['h_rms', 'h_peak'], df=sol_df, path=data_path,
-                                   fig=fig, ax=ax, savefig=False, settitle=False, setxlabel=setxlabel,
+                                   fig=fig, ax=ax, save=False, settitle=False, setxlabel=setxlabel,
                                    legend=legend, labelsize=labelsize, c_list=[c_rms, c_peak])
                 ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison
 
@@ -1033,24 +1033,15 @@ def case_subplots(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=Tr
 
             numplotted += 1
         else:
-            print(case, 'not found')
+            print('Case', case, 'not found')
             ax = axes[ii, 0]
-            ax.text(0.01, 0.95, labels[ii] + '\n\nno stagnant lid convection',
+            ax.text(0.01, 0.95, labels[ii] + '\n\n' + str(regime_grid[ii]),
                     horizontalalignment='left', verticalalignment='top',
                     transform=ax.transAxes, fontsize=labelsize)
-            delrow.append(ii)
-    #     for mm in delrow: # delete unused subplot rows
-    #         for nn in range(icol+1):
-    #             try:
-    #                 fig.delaxes(axes[mm][nn])
-    #             except:
-    #                 print('could not delete axis', mm, nn)
     plt.suptitle(suptitle, fontsize=labelsize * 2, y=1.02)
-    fig.tight_layout()
     if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
+        fig.tight_layout()
+        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, axes
 
 
@@ -1059,7 +1050,7 @@ def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, f
                             overploth=False, nlevels=10, clist=None, cmap_contours='spring', **kwargs):
     # Ra and eta are lists of strings
     if t1 is None:
-        t1 = np.zeros((len(eta),len(Ra)))
+        t1 = np.zeros((len(eta), len(Ra)))
     if clist is None:
         cmap = plt.cm.get_cmap('jet', 3)
     else:
@@ -1114,18 +1105,15 @@ def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, f
         CS = ax.contour(h_grid, nlevels, cmap=cmap_contours)
         ax.clabel(CS, inline=1, fontsize=10)
 
-    fig.tight_layout()
     if save:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + fname + fig_fmt, bbox_inches='tight')
+        fig.tight_layout()
+        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
 
 
-
-def plot_T_params(case, T_params, n=-1, dat=None,
-                  setylabel=True, setxlabel=True, savefig=True,
-                  fig_path=fig_path_bullard, fig=None, ax=None,  fig_fmt='.png',
-                  legend=True, labelsize=16, data_path=data_path_bullard, **kwargs):
+def plot_T_params(case, T_params, n=-1,
+                  setylabel=True, setxlabel=True, save=True,
+                  fig_path=fig_path_bullard, fig=None, ax=None, fname='_T-z', fig_fmt='.png',
+                  legend=True, labelsize=16,  **kwargs):
     # take nth row
     if fig is None:
         fig, ax = plt.subplots(figsize=(4, 4))
@@ -1156,12 +1144,13 @@ def plot_T_params(case, T_params, n=-1, dat=None,
         ax.set_xlabel('temperature', fontsize=labelsize)
     if setylabel:
         ax.set_ylabel('depth', fontsize=labelsize)
-    if savefig:
-        fig.savefig(fig_path + case + '-T_z' + fig_fmt, bbox_inches='tight')
+    if save:
+        savefig(fig, case+fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
-def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, savefig=True, settitle=True,
-             setxlabel=True, legend=True, labelsize=16, c_list=None, labels=None, fname='h_hist',  fig_fmt='.png',
+
+def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, save=True, settitle=True,
+             setxlabel=True, legend=True, labelsize=16, c_list=None, labels=None, fname='h_hist', fig_fmt='.png',
              **kwargs):
     if c_list is None:
         c_list = ['xkcd:forest green', 'xkcd:periwinkle']
@@ -1174,34 +1163,34 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
         ax = plt.gca()
 
     for ii, key in enumerate(keys):
-        x = df[key]
-        c = c_list[ii]
-
         try:
-            ax.hist(x, color=c, histtype='step', label=labels[ii])
-            extralabel = ''
-            if ii == 0:
-                extralabel = 'mean'
-            ax.axvline(x=np.mean(x), color='k', ls='-', lw=1, label=extralabel)
-            if ii == 0:
-                extralabel = 'median'
-            ax.axvline(x=np.median(x), color='k', ls='--', label=extralabel)
-        except ValueError as e:
-            print('x', x)
-            print(e)
+            x = df[key]
+            c = c_list[ii]
+            try:
+                ax.hist(x, color=c, histtype='step', label=labels[ii])
+                extralabel = ''
+                if ii == 0:
+                    extralabel = 'mean'
+                ax.axvline(x=np.mean(x), color='k', ls='-', lw=1, label=extralabel)
+                if ii == 0:
+                    extralabel = 'median'
+                ax.axvline(x=np.median(x), color='k', ls='--', label=extralabel)
+            except ValueError as e:
+                print('x', x)
+                print(e)
+            ax.text(0.05, 0.05, 'n={:d}'.format(len(x)), ha='left', va='bottom', transform=ax.transAxes)
+        except KeyError:
+            print('Key', key, 'not found in', case)
 
     ax.yaxis.set_ticks([])
-    ax.text(0.05, 0.05, 'n={:d}'.format(len(x)), ha='left', va='bottom', transform=ax.transAxes)
     if legend:
         ax.legend(frameon=False, fontsize=labelsize - 2)
     if setxlabel:
         ax.set_xlabel('dynamic topography', fontsize=labelsize)
     if settitle:
         ax.set_title(case, fontsize=labelsize)
-    if savefig:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + case + fname + fig_fmt, bbox_inches='tight')
+    if save:
+        savefig(fig, case + fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
@@ -1256,8 +1245,8 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 #     return np.percentile(x_list, qs), fig, ax
 
 
-def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f', mark_used=True, t1=0, dat=None,
-              ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True,  fig_fmt='.png',
+def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=True, t1=0, dat=None,
+              ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True, fig_fmt='.png',
               setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path=fig_path_bullard):
     if not setxlabel:
         xlabel = ''
@@ -1281,15 +1270,13 @@ def plot_evol(case, col, fig=None, ax=None, savefig=True, fend='_f', mark_used=T
                                  ax.get_ylim()[1] - ax.get_ylim()[0],
                                  edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
         ax.add_patch(rect)
-    if savefig:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + case + fend + fig_fmt, bbox_inches='tight')
+    if save:
+        savefig(fig, case + fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
-
-def plot_top_profile(case, ts, savefig=True, fig_path=fig_path_bullard, data_path=data_path_bullard, verbose=True, fig_fmt= '.png',):
+def plot_top_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=data_path_bullard, verbose=True,
+                     fig_fmt='.png', ):
     x, h = read_topo_stats(case, ts, data_path=data_path)
     # normalize to 0 mean
     h_norm = trapznorm(h)
@@ -1302,11 +1289,8 @@ def plot_top_profile(case, ts, savefig=True, fig_path=fig_path_bullard, data_pat
         print('mean:', trapzmean(h_norm))
         print('max:', np.max(h_norm))
         print('min:', np.min(h_norm))
-    if savefig:
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        fig.savefig(fig_path + case + '_h_' + '{:05}'.format(ts) + fig_fmt)
-
+    if save:
+        savefig(fig, case + '_h_' + '{:05}'.format(ts), fig_path=fig_path, fig_fmt=fig_fmt)
 
 
 def cmap_from_list(clist, n_bin=None, cmap_name=''):
