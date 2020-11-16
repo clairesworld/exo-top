@@ -229,7 +229,7 @@ def h_at_ts(case, ts=None, hscale=1, **kwargs):
         h_params_n['h_rms'] = rms * hscale
 
     except FileNotFoundError as e:
-        print('    file not found:', e)
+        print('    No dynamic topography found at ts =', ts)
         h_params_n['h_peak'] = np.nan
         h_params_n['h_rms'] = np.nan
 
@@ -1174,6 +1174,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
     for ii, key in enumerate(keys):
         try:
             x = df[key]
+            x = x[~np.isnan(x)]  # get rid of nan
             c = c_list[ii]
             try:
                 ax.hist(x, color=c, histtype='step', label=labels[ii])
