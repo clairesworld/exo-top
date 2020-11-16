@@ -10,15 +10,13 @@ from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_
 # i_plot = list(range(len(eta_ls))
 # for ii, eta in enumerate(eta_ls[i_plot]):  # across eta_ls
 #     if ii in i_plot:
-#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end[i_plot, ii])]
+#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end[ii])]
 #         labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
 #         fig, ax = sc.subplots_cases(
-#             cases_ii,
-#             labels=labels_ii,
-#             t1=t1[i_plot, ii], save=True, load='auto',
+#             cases_ii, labels=labels_ii, t1=t1[ii], save=True, load='auto',
 #             fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta,
 #             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid[i_plot, ii],
+#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid[ii],
 #         )
 
 # compare 64 and 129 resolution for Ra=3e7
@@ -38,7 +36,7 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
             cases_ii, labels=labels_ii, t1=t1.T[ii], save=True, load='auto',
             fname='all-Ra-' + Ra, suptitle='Ra = 3e8',
             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid.T[i_plot, ii],
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid.T[ii],
         )
 
 print('Summary plots complete')
