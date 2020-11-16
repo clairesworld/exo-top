@@ -1313,7 +1313,7 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
         ax.add_patch(rect)
     if show_sols and sol_df is not None:
         sol_times = np.array(sol_df['time'])  # steady state sols
-        print('sol times', sol_times)
+        # print('sol times', sol_times)
         for t in sol_times:
             ax.axvline(x=t, c='k', lw=0.5, ls='-', alpha=0.6, zorder=0)
     if save:
