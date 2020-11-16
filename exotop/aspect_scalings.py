@@ -65,7 +65,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                     t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
                     if t1_new > 0:  # new timesteps
                         reprocess_flag = True
-                        print('      Updating', fname)
+                        print('      Updating', fname, 'from t = {:4f} (tf_old = {:4f})'.format(t1_new, time_f_old))
 
             elif load == 'auto':  # pkl file not found
                 reprocess_flag = True
