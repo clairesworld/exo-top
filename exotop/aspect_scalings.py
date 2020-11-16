@@ -1256,7 +1256,8 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 
 def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=True, t1=0, dat=None, show_sols=False,
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True, fig_fmt='.png',
-              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, df=None, fig_path=fig_path_bullard):
+              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, df_sols=None,
+              fig_path=fig_path_bullard):
     if not setxlabel:
         xlabel = ''
     if not setylabel:
@@ -1279,12 +1280,11 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
                                  ax.get_ylim()[1] - ax.get_ylim()[0],
                                  edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
         ax.add_patch(rect)
-    if show_sols and df is not None:
+    if show_sols and df_sols is not None:
         # find steady state sols
-        sols = np.array(df['sol'])
-        print('sols', sols)
-        for n in sols:
-            ax.axvline(x=n, lw=0.5, ls='--', alpha=0.5, zorder=0)
+        sol_times = np.array(df_sols['time'])
+        for t in sol_times:
+            ax.axvline(x=t, lw=0.5, ls='--', alpha=0.5, zorder=0)
     if save:
         savefig(fig, case + fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
