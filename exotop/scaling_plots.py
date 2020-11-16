@@ -11,7 +11,7 @@ c_regimes = ['xkcd:sage green', 'xkcd:blood red' , 'xkcd:dark violet']
 
 print('\nAssuming you have properly saved h values for the right time period\n')
 fig, axes = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, fit=True, t1=t1,
-                             load='auto', xlim=(8e5,1.3e8), ylim=None, fig_fmt=fig_fmt,
+                             load=True, xlim=(8e5,1.3e8), ylim=None, fig_fmt=fig_fmt,
                              save=True, fname='h_Ra_all', xlabel='Ra', hscale=2e-5*2700*2890,
                              ylabel='dynamic topography (km)', data_path=data_path, fig_path=fig_path)
 
@@ -21,7 +21,7 @@ fig, axes = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, fit=True, t1
 ### plot h scalings - with dT_m*delta*d_m
 
 fig, ax = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, save=True, t1=t1,
-                           fit=True, load='auto', T_components=True, data_path=data_path,
+                           fit=True, load=True, T_components=True, data_path=data_path,
                            fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt,
                            ylim=(3e-3, 7e-2), labelsize=14, xlim=(3e-8, 7e-7),
                            xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', logx=True, logy=True,
