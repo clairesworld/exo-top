@@ -28,7 +28,7 @@ from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_
 #     includepd=True, # turn on once you know where steady state starts
 #    )
 
-i_plot = list(range(4,6))  # range(len(Ra_ls))
+i_plot = list(range(5,6))  # range(len(Ra_ls))
 for ii, Ra in enumerate(Ra_ls[i_plot]):  # across Ra_ls
     cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end.T[i_plot, ii])]
     labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
