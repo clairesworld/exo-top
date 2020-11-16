@@ -24,7 +24,7 @@ def savefig(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='
     directory = os.path.dirname(path)
     os.makedirs(directory, exist_ok=True)
     fig.savefig(path, bbox_inches=bbox_inches, **kwargs)
-    print('>>>>>>>>>>>>>>>>>>>>>>>  saved to ', path, '!')
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  saved to ', path, '!')
 
 def read_topo_stats(case, ts, data_path=data_path_bullard):
     df = pd.read_csv(data_path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
@@ -187,7 +187,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
     else:
         new_params = pd.DataFrame({'sol':[None], 'time':[0]})
         df_to_extend = pd.concat([df_to_extend, new_params])
-        print('    No timesteps after t =', time[i_time], '(tf =', time[-1], ')')
+        print('    No timesteps after t = {:.2f} (tf = "{:.2f})'.format(time[i_time], time[-1]))
         # print('    No solutions after t =', time[i_time], '(tf =', time[-1], ')')
     return df_to_extend
 
@@ -200,9 +200,10 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=False)
     time = dat.stats_time
-    i_time = np.argmax(time > t1)  # index of first timestep to process
+    i_time = np.argmax(time > t1)  # index of first timestep to process (because argmax returns 1st occurrence of 1)
+    print('ts @ t1:', i_time, 'time @ t1:', time[i_time], 't1:', t1)
 
-    if (t1 != 1) and (i_time > 0):
+    if i_time > 0:
         print('        Processing', postprocess_functions, 'for ', case, ', from timestep', i_time, 'to', len(time))
         for ii in range(i_time, len(time)):
             ts = ii  # timestep at this solution
@@ -1138,6 +1139,7 @@ def plot_T_params(case, T_params, n=-1,
     delta_rh_f = T_params['delta_rh']
     D_l_f = T_params['delta_L']
     T_l_f = T_params['T_l']
+    T_i_f = T_params['T_i']
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
 
@@ -1146,11 +1148,11 @@ def plot_T_params(case, T_params, n=-1,
     ax.axhline(D_l_f - delta_rh_f, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
     ax.text(0, D_l_f - delta_rh_f, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_f), ha='left', va='top',
             color='xkcd:red orange', fontsize=labelsize - 2)
-    ax.plot([T_l_f, T_l_f], [0, D_l_f], ls='--', alpha=0.5, lw=0.5, c='xkcd:tangerine')
-    ax.plot([T_l_f + dT_rh_f, T_l_f + dT_rh_f], [0, D_l_f - delta_rh_f], ls='--', alpha=0.5, lw=0.5,
-            c='xkcd:red orange')
+    ax.plot([T_l_f, T_l_f], [0, D_l_f], ls='--', alpha=0.5, lw=0.5, label=r'$T_L$', c='xkcd:tangerine')
+    ax.plot([T_i_f, T_i_f], [0, D_l_f - delta_rh_f], ls='--', alpha=0.5, lw=0.5,
+            label=r'$T_i$', c='xkcd:red orange')
     if legend:
-        ax.legend(frameon=False, fontsize=labelsize - 2)
+        ax.legend(frameon=False, fontsize=labelsize)
     if setxlabel:
         ax.set_xlabel('temperature', fontsize=labelsize)
     if setylabel:
