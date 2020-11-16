@@ -1023,7 +1023,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
                 fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, save=False,
-                                        setxlabel=setxlabel, setylabel=False, legend=False, fig_path=fig_path, fig=fig,
+                                        setxlabel=setxlabel, setylabel=False, fig_path=fig_path, fig=fig,
                                         ax=ax, legend=legend, labelsize=labelsize)
                 if setxlabel:
                     ax.set_xlabel('temperature', fontsize=labelsize)
