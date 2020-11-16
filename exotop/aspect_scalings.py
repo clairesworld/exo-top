@@ -960,7 +960,6 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
     if t1 is None:
         t1 = [0] * ncases
     numplotted = 0
-    delrow = []
     for ii, case in enumerate(cases):
         icol = 0
         if os.path.exists(data_path + 'output-' + case):
@@ -1188,7 +1187,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
                 print('x', x)
                 print(e)
             ax.text(0.05, 0.05, 'n={:d}/{:d}'.format(len(x), df.index[-1]), ha='left', va='bottom',
-                    transform=ax.transAxes)
+                    transform=ax.transAxes, c='b')
         except KeyError:
             print('Key', key, 'not found in', case)
 
@@ -1283,6 +1282,7 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
     if show_sols and df is not None:
         # find steady state sols
         sols = np.array(df['sol'])
+        print('sols', sols)
         for n in sols:
             ax.axvline(x=n, lw=0.5, ls='--', alpha=0.5, zorder=0)
     if save:
