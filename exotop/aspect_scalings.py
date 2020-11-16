@@ -24,7 +24,7 @@ def savefig(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='
     directory = os.path.dirname(path)
     os.makedirs(directory, exist_ok=True)
     fig.savefig(path, bbox_inches=bbox_inches, **kwargs)
-    print('Saved to ', path, '!')
+    print('>>>>>>>>>>>>>>>>>>>>>>>  saved to ', path, '!')
 
 def read_topo_stats(case, ts, data_path=data_path_bullard):
     df = pd.read_csv(data_path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
@@ -977,6 +977,8 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             if show_sols:  # load df
                 sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+            else:
+                sol_df = None
 
             ax = axes[ii, icol]
             fig, ax = plot_evol(case, 'rms_velocity', fig=fig, ax=ax, save=False, mark_used=True, t1=t1[ii], dat=dat,
@@ -1188,8 +1190,9 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
             except ValueError as e:
                 print('x', x)
                 print(e)
-            ax.text(0.05, 0.05, 'n={:d}/{:d}'.format(len(x), df.index[-1]), ha='left', va='bottom',
-                    transform=ax.transAxes, color='b')
+            if ii == 0:
+                ax.text(0.05, 0.05, 'n={:d}/{:d}'.format(len(x), df.index[-1]), ha='left', va='bottom',
+                        transform=ax.transAxes, color='b')
         except KeyError:
             print('Key', key, 'not found in', case)
 
