@@ -54,18 +54,23 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 print('    Found', fname)
 
                 if load == 'auto':  # check for additional timesteps
-                    print('      Checking for new timesteps...')
-                    time_f_old = df.time.iat[-1]
-                    if time_f_old is None:  # e.g. didn't do any processing
-                        time_f_old = 0
                     if dat_new is None:
                         dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                                    read_statistics=True, read_parameters=False)
-                    time_new = dat_new.stats_time
-                    t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
+                    if at_sol:
+                        print('      Checking for new solutions...')
+                        sol_f_old = df.sol.iat[-1]
+                        sol_new = dat_new.read_stats_sol_files()
+                        sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
+                        t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new)
+                    else:
+                        print('      Checking for new timesteps...')
+                        time_f_old = df.time.iat[-1]
+                        time_new = dat_new.stats_time
+                        t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
                     if t1_new > 0:  # new timesteps
                         reprocess_flag = True
-                        print('      Updating', fname, 'from t = {:4f} (tf_old = {:4f})'.format(t1_new, time_f_old))
+                        print('      Updating', fname, 'from t = {:4f}'.format(t1_new))
 
             elif load == 'auto':  # pkl file not found
                 reprocess_flag = True
@@ -80,10 +85,9 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
         if reprocess_flag:
             if at_sol:
-                sol_files_new = dat_new.read_stats_sol_files()
                 df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                           t1=np.maximum(t1, t1_new),  # whichever comes later in time
-                                          data_path=data_path, sol_files=sol_files_new, df_to_extend=df, **kwargs)
+                                          data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
             else:
                 df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                          t1=np.maximum(t1, t1_new),
