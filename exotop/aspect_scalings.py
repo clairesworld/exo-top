@@ -538,7 +538,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
                 # handles=[h3], labels=[],
                 loc='lower left')  # always show what fit is
         else:
-            print('not enough points to fit -- Ra', Ra, 'eta', eta)
+            print('    Not enough points to fit')
 
     ax.errorbar(x[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
                 fmt='^', c=c_peak, alpha=0.9, capsize=5)
@@ -653,7 +653,7 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
                 # handles=[h3], labels=[],
                 loc='lower left')  # always show what fit is
         else:
-            print('not enough points to fit -- Ra', Ra, 'eta', eta)
+            print('    Not enough points to fit')
 
     ax.errorbar(quants_h_components[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
                 fmt='^', c=c_peak, alpha=0.9, capsize=5)
@@ -690,8 +690,10 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
     #     fig, axes = plt.subplots(2,2, figsize=(7,7))
     #     flaxes = axes.flatten()
     if T_components:
+        print(r'Plotting h vs. $\alpha \Delta T \delta$')
         plot_fn = plot_h_vs_Td
     else:
+        print(r'Plotting h vs. Ra')
         plot_fn = plot_h_vs_Ra
 
     if t1 is None:
@@ -707,6 +709,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
     bigax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     legend = False
     for ii, eta in enumerate(eta_ls):
+        print('eta level', ii, '/', len(eta_ls))
         z = int(str(nrows) + str(ncols) + str(ii + 1))
         ax = fig.add_subplot(z)
         #         ax = flaxes[ii]
@@ -739,6 +742,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
                               fig_path=fig_path, logx=logx, logy=logy,
                               showallscatter=showallscatter, hscale=hscale, **kwargs
                               )
+            print('Finished', len(Ra_steady), 'steady-state cases')
         # trans
         if not (not Ra_trans):
             fig, ax = plot_fn(Ra=Ra_trans, eta=eta, t1=t1[ii, Ra_trans_idx], sigma=sigma, fig=fig, ax=ax,
@@ -749,6 +753,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
                               fig_path=fig_path, logx=logx, logy=logy,
                               showallscatter=showallscatter, hscale=hscale, **kwargs
                               )
+            print('Finished', len(Ra_trans), 'transitional cases')
             # chaotic
         if not (not Ra_chaos):
             fig, ax = plot_fn(Ra=Ra_chaos, eta=eta, t1=t1[ii, Ra_chaos_idx], sigma=sigma, fig=fig, ax=ax,
@@ -759,6 +764,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
                               fig_path=fig_path, logx=logx, logy=logy,
                               showallscatter=showallscatter, hscale=hscale, **kwargs
                               )
+            print('Finished', len(Ra_chaos), 'chaotic cases')
         ax.text(0.5, 0.95, '$\Delta \eta$=' + eta, fontsize=labelsize, ha='center', va='top',
                 transform=ax.transAxes)
         if ii % ncols != 0:
@@ -825,7 +831,7 @@ def scales_with_Ra(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
                 # loc='lower left'
             )  # always show what fit is
         else:
-            print('not enough points to fit -- Ra', Ra_data)
+            print('    Not enough points to fit')
 
     #     if showallscatter:
     #         ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.1, s=20)
