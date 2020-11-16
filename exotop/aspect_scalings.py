@@ -185,7 +185,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
     else:
-        new_params = pd.DataFrame({'sol':[], 'time':[]})
+        new_params = pd.DataFrame({'sol':[None], 'time':[0]})
         df_to_extend = pd.concat([df_to_extend, new_params])
         print('    No timesteps after t =', time[i_time], '(tf =', time[-1], ')')
         # print('    No solutions after t =', time[i_time], '(tf =', time[-1], ')')
@@ -213,7 +213,7 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
                 df_to_extend = pd.concat([df_to_extend, new_params])
 
     else:
-        new_params = pd.DataFrame({'sol':[], 'time':[]})
+        new_params = pd.DataFrame({'time':[0]})
         df_to_extend = pd.concat([df_to_extend, new_params])
         print('    No timesteps after t =', time[i_time], '(tf =', time[-1], ')')
     return df_to_extend
