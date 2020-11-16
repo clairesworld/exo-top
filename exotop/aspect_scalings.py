@@ -979,23 +979,24 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
             ax = axes[ii, icol]
-            fig, ax = plot_evol(case, 'rms_velocity', dat=dat, fig=fig, ax=ax, save=False, ylabel='rms velocity',
-                                c='k', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, legend=False,
-                                show_sols=show_sols, df=sol_df, mark_used=True, t1=t1[ii])
+            fig, ax = plot_evol(case, 'rms_velocity', fig=fig, ax=ax, save=False, mark_used=True, t1=t1[ii], dat=dat,
+                                show_sols=show_sols, ylabel='rms velocity', c='k', settitle=False, setxlabel=setxlabel,
+                                setylabel=setylabel, legend=False, labelsize=labelsize, labelpad=labelpad,
+                                sol_df=sol_df)
 
             ax.text(0.01, 0.95, labels[ii], horizontalalignment='left', verticalalignment='top',
                     transform=ax.transAxes, fontsize=labelsize)
 
             icol = icol + 1
             ax = axes[ii, icol]
-            fig, ax = plot_evol(case, 'heatflux_top', dat=dat, fig=fig, ax=ax, save=False, ylabel='heat flux',
-                                c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='top', mark_used=False, show_sols=False)
-            fig, ax = plot_evol(case, 'heatflux_bottom', dat=dat, fig=fig, ax=ax, save=False, ylabel='heat flux',
-                                c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend,
-                                show_sols=show_sols, df=sol_df, yscale=-1, t1=t1[ii], mark_used=True)
+            fig, ax = plot_evol(case, 'heatflux_top', fig=fig, ax=ax, save=False, mark_used=False, dat=dat,
+                                show_sols=False, ylabel='heat flux', c='xkcd:light red', settitle=False,
+                                setxlabel=setxlabel, setylabel=setylabel, labelsize=labelsize, labelpad=labelpad,
+                                label='top')
+            fig, ax = plot_evol(case, 'heatflux_bottom', fig=fig, ax=ax, save=False, mark_used=True, t1=t1[ii], dat=dat,
+                                show_sols=show_sols, ylabel='heat flux', yscale=-1, c='xkcd:purple blue',
+                                settitle=False, setxlabel=setxlabel, setylabel=setylabel, legend=legend,
+                                labelsize=labelsize, labelpad=labelpad, label='bottom', sol_df=sol_df)
 
             if includeTz and t1[ii] < 1:  # final timestep only
                 icol = icol + 1
@@ -1256,7 +1257,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 
 def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=True, t1=0, dat=None, show_sols=False,
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True, fig_fmt='.png',
-              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, df_sols=None,
+              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, sol_df=None,
               fig_path=fig_path_bullard):
     if not setxlabel:
         xlabel = ''
@@ -1280,9 +1281,9 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
                                  ax.get_ylim()[1] - ax.get_ylim()[0],
                                  edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
         ax.add_patch(rect)
-    if show_sols and df_sols is not None:
+    if show_sols and sol_df is not None:
         # find steady state sols
-        sol_times = np.array(df_sols['time'])
+        sol_times = np.array(sol_df['time'])
         for t in sol_times:
             ax.axvline(x=t, lw=0.5, ls='--', alpha=0.5, zorder=0)
     if save:
