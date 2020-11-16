@@ -510,8 +510,8 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         x[ii, :] = float(x_var[ii])
         h_peak = df['h_peak']
         h_rms = df['h_rms']
-        peak_all.append((h_peak, x[ii, :]))
-        rms_all.append((h_rms, x[ii, :]))
+        peak_all.append((h_peak, x[ii, 1]))
+        rms_all.append((h_rms, x[ii, 1]))
 
         qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms'], plot=False)
         quants_h_peak[ii, :] = qdict['h_peak']
@@ -528,7 +528,8 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     if fit:
         if len(x_var) > 1:
             print('rms_all', np.shape(rms_all), 'rms_all[0]', np.shape(rms_all[0]))
-            print('[a[1]] * len(a[0])', np.shape([rms_all[0][1]] * len(rms_all[0][0])))
+            print('rms_all[0][0]', np.shape(rms_all[0][0]), '- h_rms at each timestep for one case')
+            print('rms_all[0][1]', np.shape(rms_all[0][1]), '- Ra for one case')
 
             fitx = [[a[1]] * len(a[0]) for a in rms_all]
             fith = [a[0] for a in rms_all]
