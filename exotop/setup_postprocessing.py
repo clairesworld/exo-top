@@ -1,7 +1,7 @@
 import numpy as np
 
-Ra_ls = ['1e6', '3e6', '1e7', '3e7', '1e8', '3e8']  # 3e5 no convection
-eta_ls = ['1e5', '1e6', '1e7', '1e8']
+Ra_ls = np.array(['1e6', '3e6', '1e7', '3e7', '1e8', '3e8'])  # 3e5 no convection
+eta_ls = np.array(['1e5', '1e6', '1e7', '1e8'])
 
 # Ra from 1e6 to 3e8
 t1 = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 0.055],  # eta 1e5
