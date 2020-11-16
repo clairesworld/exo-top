@@ -56,6 +56,8 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 if load == 'auto':  # check for additional timesteps
                     print('      Checking for new timesteps...')
                     time_f_old = df.time.iat[-1]
+                    if time_f_old is None:  # e.g. didn't do any processing
+                        time_f_old = 0
                     if dat_new is None:
                         dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                                    read_statistics=True, read_parameters=False)
@@ -187,8 +189,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
     else:
-        new_params = pd.DataFrame({'sol':[None], 'time':[0]})
-        df_to_extend = pd.concat([df_to_extend, new_params])
+        # new_params = pd.DataFrame({'sol':[None], 'time':[None]}, index=[0])
+        # df_to_extend = df_to_extend.combine_first(new_params)
         if t1 < 1:
             print('    No timesteps after t = {:.2f} (tf = {:.2f})'.format(time[i_time], time[-1]))
         else:
@@ -220,8 +222,8 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
                 df_to_extend = pd.concat([df_to_extend, new_params])
 
     else:
-        new_params = pd.DataFrame({'time':[0]})
-        df_to_extend = pd.concat([df_to_extend, new_params])
+        # new_params = pd.DataFrame({'sol':[None], 'time':[None]}, index=[0])
+        # df_to_extend = df_to_extend.combine_first(new_params)
         if t1 < 1:
             print('    No timesteps after t = {:.2f} (tf = {:.2f})'.format(time[i_time], time[-1]))
         else:
@@ -984,11 +986,13 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             if numplotted == 0:
                 legend = True
 
+            sol_df = None
             if show_sols:  # load df
-                sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
-                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
-            else:
-                sol_df = None
+                if t1[ii] < 1:
+                    sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
+                                    dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+                else:
+                    show_sols = False  # automatically override processing
 
             ax = axes[ii, icol]
             fig, ax = plot_evol(case, 'rms_velocity', fig=fig, ax=ax, save=False, mark_used=True, t1=t1[ii], dat=dat,
