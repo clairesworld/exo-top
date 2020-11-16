@@ -54,7 +54,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 print('    Found', fname)
 
                 if load == 'auto':  # check for additional timesteps
-                    print('    Checking for new timesteps')
+                    print('      Checking for new timesteps')
                     time_f_old = df.time.iat[-1]
                     if dat_new is None:
                         dat_new = post.Aspect_Data(directory=case_path, verbose=False,
@@ -63,13 +63,13 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                     t1_new = time_new[np.argmin(time_new > time_f_old)]
                     if t1_new > 0:  # new timesteps
                         reprocess_flag = True
-                        print('    Updating', fname)
+                        print('      Updating', fname)
 
             elif load == 'auto':  # pkl file not found
                 reprocess_flag = True
                 dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                            read_statistics=True, read_parameters=False)
-                print(fname, 'not found, processing...')
+                print('    File', fname, 'not found, processing...')
 
         else:  # load is False so automatically calculate shit
             reprocess_flag = True
@@ -201,8 +201,7 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
     i_time = np.argmax(time > t1)  # index of first timestep to process
 
     if (t1 != 1) and (i_time > 0):
-        print('        Processing', postprocess_functions, 'for ', case, ', ', len(range(i_time, len(time))),
-              'timesteps')
+        print('        Processing', postprocess_functions, 'for ', case, ', from timestep', i_time, 'to', len(time))
         for ii in range(i_time, len(time)):
             ts = ii  # timestep at this solution
             for fn in postprocess_functions:
@@ -212,7 +211,7 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
                 df_to_extend = pd.concat([df_to_extend, new_params])
 
     else:
-        print('    No quasi-steady state timesteps up to t =', time[-1])
+        print('    No timesteps after t =', time[i_time], '(last time @ t =', time[-1], ')')
     return df_to_extend
 
 
@@ -941,7 +940,7 @@ def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None,
 def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
                    fname='cases', data_path=data_path_bullard, fig_path=fig_path_bullard, fig_fmt='.png',
                    load='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
-                   suptitle='', includepdf=True, includeTz=True, regime_grid=None, **kwargs):
+                   suptitle='', includepdf=True, includeTz=True, regime_grid=None, show_sols=False, **kwargs):
     # rows are cases, columns are v_rms, q, T(z), hist
     ncases = len(cases)
     ncols = 2
@@ -972,10 +971,15 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             if numplotted == 0:
                 legend = True
 
+            if show_sols:  # load df
+                sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
+                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+
             ax = axes[ii, icol]
             fig, ax = plot_evol(case, 'rms_velocity', dat=dat, fig=fig, ax=ax, save=False, ylabel='rms velocity',
                                 c='k', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, legend=False, mark_used=True, t1=t1[ii])
+                                labelsize=labelsize, labelpad=labelpad, legend=False,
+                                show_sols=show_sols, df=sol_df, mark_used=True, t1=t1[ii])
 
             ax.text(0.01, 0.95, labels[ii], horizontalalignment='left', verticalalignment='top',
                     transform=ax.transAxes, fontsize=labelsize)
@@ -984,22 +988,23 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             ax = axes[ii, icol]
             fig, ax = plot_evol(case, 'heatflux_top', dat=dat, fig=fig, ax=ax, save=False, ylabel='heat flux',
                                 c='xkcd:light red', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='top', mark_used=False, t1=t1[ii])
+                                labelsize=labelsize, labelpad=labelpad, label='top', mark_used=False, show_sols=False)
             fig, ax = plot_evol(case, 'heatflux_bottom', dat=dat, fig=fig, ax=ax, save=False, ylabel='heat flux',
-                                yscale=-1,
                                 c='xkcd:purple blue', settitle=False, setxlabel=setxlabel, setylabel=setylabel,
-                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend, mark_used=True)
+                                labelsize=labelsize, labelpad=labelpad, label='bottom', legend=legend,
+                                show_sols=show_sols, df=sol_df, yscale=-1, t1=t1[ii], mark_used=True)
 
             if includeTz:  # final timestep only
                 icol = icol + 1
                 ax = axes[ii, icol]
 
-                sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
+                if not show_sols:
+                    sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
                 fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, save=False,
-                                        setxlabel=setxlabel,
-                                        setylabel=False, legend=False, fig_path=fig_path, fig=fig, ax=ax)
+                                        setxlabel=setxlabel, setylabel=False, legend=False, fig_path=fig_path, fig=fig,
+                                        ax=ax)
                 if legend:
                     ax.legend(frameon=False)
                 if setxlabel:
@@ -1029,7 +1034,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                     print('Plotting graphical output for', case)
                 except FileNotFoundError:
                     print('Graphical output not found:', fgraph)
-                    fig.delaxes(ax)
+                    # fig.delaxes(ax)
 
             numplotted += 1
         else:
@@ -1120,7 +1125,7 @@ def plot_T_params(case, T_params, n=-1,
     try:
         T_params = T_params.iloc[n]
     except IndexError:
-        print('No T parameterisation found at n =', n)
+        print('No T parameterisation found for solution n =', n)
         return fig, ax
 
     dT_rh_f = T_params['dT_rh']
@@ -1131,9 +1136,9 @@ def plot_T_params(case, T_params, n=-1,
     y_f = np.array(T_params['y'].tolist())
 
     ax.plot(T_f, y_f, c='k', lw=1)
-    ax.axhline(D_l_f, label='$z_{lid}$', c='xkcd:tangerine', lw=0.5)
-    ax.axhline(D_l_f - delta_rh_f, label=r'$z_\delta$', c='xkcd:red orange', lw=0.5)
-    ax.text(0, D_l_f - delta_rh_f, r'$\delta = $' + '{:04.2f}'.format(delta_rh_f), ha='left', va='top',
+    ax.axhline(D_l_f, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
+    ax.axhline(D_l_f - delta_rh_f, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
+    ax.text(0, D_l_f - delta_rh_f, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_f), ha='left', va='top',
             color='xkcd:red orange', fontsize=labelsize - 2)
     ax.plot([T_l_f, T_l_f], [0, D_l_f], ls='--', alpha=0.5, lw=0.5, c='xkcd:tangerine')
     ax.plot([T_l_f + dT_rh_f, T_l_f + dT_rh_f], [0, D_l_f - delta_rh_f], ls='--', alpha=0.5, lw=0.5,
@@ -1178,7 +1183,8 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
             except ValueError as e:
                 print('x', x)
                 print(e)
-            ax.text(0.05, 0.05, 'n={:d}'.format(len(x)), ha='left', va='bottom', transform=ax.transAxes)
+            ax.text(0.05, 0.05, 'n={:d}/{:d}'.format(len(x), df.index[-1]), ha='left', va='bottom',
+                    transform=ax.transAxes)
         except KeyError:
             print('Key', key, 'not found in', case)
 
@@ -1245,9 +1251,9 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 #     return np.percentile(x_list, qs), fig, ax
 
 
-def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=True, t1=0, dat=None,
+def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=True, t1=0, dat=None, show_sols=False,
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True, fig_fmt='.png',
-              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, fig_path=fig_path_bullard):
+              setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, df=None, fig_path=fig_path_bullard):
     if not setxlabel:
         xlabel = ''
     if not setylabel:
@@ -1270,6 +1276,11 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
                                  ax.get_ylim()[1] - ax.get_ylim()[0],
                                  edgecolor='None', facecolor='k', alpha=0.2, zorder=0)
         ax.add_patch(rect)
+    if show_sols and df is not None:
+        # find steady state sols
+        sols = np.array(df['sol'])
+        for n in sols:
+            ax.axvline(x=n, lw=0.5, ls='--', alpha=0.5, zorder=0)
     if save:
         savefig(fig, case + fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
