@@ -26,13 +26,13 @@ fig, ax = sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_r
                            showallscatter=True, xlabelpad=8, ylabelpad=0)
 
 
-# say what convective regimes are after looking at temperature fields
-# example of transitional is Ra3e7 eta1e6 - still even cells
+## Show convective regimes in parameter space
+## example of transitional is Ra3e7 eta1e6 - still has regular cells
 # sc.plot_convection_regimes(Ra_ls, eta_ls, regime_grid, fname='regimes', data_path=data_path, fig_path=fig_path,
 #                            loadpickle=True, dumppickle=False, save=True,
 #                            overploth=True, nlevels=14, clist=c_regimes, cmap_contours='autumn')
 
-### make bl scaling plot
+### plot scalings of other output parameters with Ra
 
 sc.plot_multi_Ra_scaling(Ra_ls, eta_ls, keys=['Nu', 'delta_0', 'T_i'], save=True, compare_pub=sc.moresi95,
                          fname='delta-Nu-Ti', t1=t1, fit=True, fig_fmt=fig_fmt, data_path=data_path, fig_path=fig_path,)
