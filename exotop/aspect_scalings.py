@@ -566,7 +566,7 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     return fig, ax
 
 
-def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
+def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
                  load='auto', fig_fmt='.png',
                  save=True, fname='h_T', sigma=2, showallscatter=False,
                  labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
@@ -591,7 +591,7 @@ def plot_h_vs_Td(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
         # load h and T
-        df1 = pickleio(case, suffix='_h', postprocess_functions=[h_at_sol], t1=t1[ii], load=load, dat_new=dat,
+        df1 = pickleio(case, suffix='_h', postprocess_functions=[h_at_ts], t1=t1[ii], load=load, dat_new=dat,
                        data_path=data_path, hscale=hscale, **kwargs)
         df2 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii], load=load,
                        dat_new=dat,
@@ -695,7 +695,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
     #     flaxes = axes.flatten()
     if T_components:
         print(r'Plotting h vs. $\alpha \Delta T \delta$')
-        plot_fn = plot_h_vs_Td
+        plot_fn = plot_h_vs_components
     else:
         print(r'Plotting h vs. Ra')
         plot_fn = plot_h_vs_Ra
