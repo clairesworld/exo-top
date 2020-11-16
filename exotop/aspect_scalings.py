@@ -507,15 +507,15 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     for ii, case in enumerate(cases):
         df = pickleio(case, suffix='_h_all', postprocess_functions=['h_at_ts'], t1=t1[ii], load=load, dat_new=None,
                       data_path=data_path, hscale=hscale, at_sol=False, **kwargs)
-        qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms'], plot=False)
-        quants_h_peak[ii, :] = qdict['h_peak']
-        quants_h_rms[ii, :] = qdict['h_rms']
-
         x[ii, :] = float(x_var[ii])
         h_peak = df['h_peak']
         h_rms = df['h_rms']
         peak_all.append((h_peak, x[ii, :]))
         rms_all.append((h_rms, x[ii, :]))
+
+        qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms'], plot=False)
+        quants_h_peak[ii, :] = qdict['h_peak']
+        quants_h_rms[ii, :] = qdict['h_rms']
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
     yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
@@ -527,7 +527,9 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
     if fit:
         if len(x_var) > 1:
-            print('rms_all', np.shape(rms_all), 'rms_all[0]', np.shape(rms_all[0]))
+            print('rms_all', np.shape(rms_all), 'rms_all[0]', rms_all[0])
+            print('[a[1]] * len(a[0])', [rms_all[0][1]] * len(rms_all[0][0]))
+
             fitx = [[a[1]] * len(a[0]) for a in rms_all]
             fith = [a[0] for a in rms_all]
             print('fitx[1]', np.shape(fitx[1]), 'fith[1]', np.shape(fith[1]))
