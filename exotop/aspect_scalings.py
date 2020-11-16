@@ -975,7 +975,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
     for ii, case in enumerate(cases):
         icol = 0
         if os.path.exists(data_path + 'output-' + case):
-            print('Plotting summary for', case, 'using t1 =', t1)
+            print('Plotting summary for', case, 'using t1 =', t1[ii])
             dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
             if ii == ncases - 1:  # show x label in bottom row only
                 setxlabel = True
