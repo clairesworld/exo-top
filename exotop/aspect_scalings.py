@@ -514,7 +514,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 
 def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-              fig_fmt='.png',
+              fig_fmt='.png', which_x='components',
               save=True, fname='h_T', showallscatter=False,
               labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
@@ -761,6 +761,7 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
             # print('\n\ndf2', df2)
             print('\ndf1', df1['sol'])
             print('\ndf2', df2['sol'])
+            print(case)
             raise e
 
         try:
