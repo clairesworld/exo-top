@@ -1375,8 +1375,7 @@ def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bulla
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
 
-    print('D_l_n', D_l_n)
-    print('delta_rh_n', delta_rh_n)
+    print('delta_rh_n', delta_rh_n, type(delta_rh_n))
 
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
