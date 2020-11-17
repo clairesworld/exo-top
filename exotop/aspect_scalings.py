@@ -516,7 +516,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
               fig_fmt='.png', which_x='components',
               save=True, fname='h', showallscatter=False,
-              labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
+              labelsize=16, ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
               fit=False, cases=None, x_var=None, logx=True, logy=True,
               fig=None, ax=None, ylim=(6e-3, 7e-2), xlim=None, **kwargs):
@@ -527,7 +527,12 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         cases, x_var = get_cases_list(Ra, eta)
     if t1 is None:
         t1 = [0] * len(cases)
-    if which_x
+    if which_x.equals('components'):
+        xlabel = r'$\delta_rh \Delta T_{rh}$'
+    elif which_x.equals('Ra'):
+        xlabel = 'Ra'
+    else:
+        raise Exception('plot_h_vs(): Invalid variable for x-axis')
 
     quants_h_peak = np.zeros((len(x_var), 3))
     quants_h_rms = np.zeros((len(x_var), 3))
