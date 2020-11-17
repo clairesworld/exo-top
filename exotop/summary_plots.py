@@ -5,6 +5,9 @@ sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_scalings as sc
 from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid
 
+case = 'Ra3e8-eta1e5-wide'
+pickle_remove_duplicate_row(case, suffix='_T', which='sol', data_path=data_path)
+
 ## plot summaries across delta eta
 
 # i_plot = list(range(len(eta_ls)))
@@ -29,21 +32,21 @@ from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_
 
 ## plot summaries across Ra
 
-# i_plot = list(range(len(Ra_ls)))  # range(4,5)
-# for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
-#     if ii in i_plot:
-#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end.T[ii])]
-#         labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
-#         fig, ax = sc.subplots_cases(
-#             cases_ii, labels=labels_ii, t1=t1.T[ii], save=True, load='auto',
-#             fname='all-Ra-' + Ra, suptitle='Ra = '+Ra,
-#             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid.T[ii],
-#         )
+i_plot = range(3,4) # list(range(len(Ra_ls)))  # range(4,5)
+for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
+    if ii in i_plot:
+        cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end.T[ii])]
+        labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
+        fig, ax = sc.subplots_cases(
+            cases_ii, labels=labels_ii, t1=t1.T[ii], save=True, load='auto',
+            fname='all-Ra-' + Ra, suptitle='Ra = '+Ra,
+            includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid.T[ii],
+        )
 
 ## look at individual case data
 
-case = 'Ra3e8-eta1e5-wide'
-sc.print_solution_data(case, suffix='_T', keys=['sol', 'time'], data_path=data_path)
+# case = 'Ra3e8-eta1e5-wide'
+# sc.print_solution_data(case, suffix='_T', keys=['sol', 'time'], data_path=data_path)
 
 print('Summary plots complete')

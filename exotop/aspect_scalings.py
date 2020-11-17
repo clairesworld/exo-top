@@ -106,7 +106,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     return df
 
 
-def pickle_remove_duplicate(case, suffix, which='sol', fend='.pkl', data_path=data_path_bullard):
+def pickle_remove_duplicate_row(case, suffix, which='sol', fend='.pkl', data_path=data_path_bullard):
     # remove duplicate rows (e.g. for solution or timestep) - for when you fucked up storing
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
@@ -246,7 +246,12 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 new_params_dict['sol'] = n
                 new_params_dict['time'] = time[ts]
-                new_params = pd.DataFrame(new_params_dict, index=[ts])
+                try:
+                    new_params = pd.DataFrame(new_params_dict, index=[ts])
+                except ValueError as e:
+                    print('ts', ts)
+                    print('new_params_dict', new_params_dict)
+                    raise e
                 df_to_extend = pd.concat([df_to_extend, new_params])
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
@@ -597,8 +602,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
     yx_rms_all = []
 
     for ii, case in enumerate(cases):
+        pickle_remove_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
         pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
-        pickle_remove_duplicate(case, suffix=psuffix, which='sol', data_path=data_path)
 
         # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
