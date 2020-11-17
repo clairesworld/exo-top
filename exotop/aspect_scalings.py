@@ -623,7 +623,12 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
                        data_path=data_path, hscale=hscale, at_sol=True, **kwargs)
         df2 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii], load=load,
                        dat_new=dat, data_path=data_path, hscale=hscale, at_sol=True, **kwargs)
-        df = pd.concat([df1, df2], axis=1)  # concatenate along columns
+        try:
+            df = pd.concat([df1, df2], axis=1)  # concatenate along columns
+        except IndexError as e:
+            print('\n\ndf1', df1)
+            print('\n\ndf2', df2)
+            raise e
 
         try:
             h_components = df['h_components']
