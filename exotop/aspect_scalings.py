@@ -114,7 +114,7 @@ def pickle_remove_duplicate(case, suffix, which='sol', fend='.pkl', data_path=da
         df = pkl.load(open(case_path + 'pickle/' + fname, 'rb'))
         print('\n\ndf', df)
         series = df[which]
-        unique = series.duplicated()  # boolean array of duplicates
+        unique = ~series.duplicated()  # boolean array of duplicates
         df_new = df[unique]
         print('\n\ndf_new', df_new)
         # pkl.dump(df_new, open(case_path + 'pickle/' + fname, "wb"))
