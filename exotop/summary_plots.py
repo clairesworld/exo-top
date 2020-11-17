@@ -44,10 +44,11 @@ from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_
 #             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid.T[ii],
 #         )
 
+
 ## look at individual case data
 
-case = 'Ra3e8-eta1e5-wide'
-sc.print_solution_data(case, suffix='_T', keys=['sol', 'time', 'delta_rh'], data_path=data_path)
-sc.print_solution_data(case, suffix='_h_all', keys=['time', 'h_rms'], data_path=data_path)
+# case = 'Ra3e8-eta1e5-wide'
+# sc.print_solution_data(case, suffix='_T', keys=['sol', 'time', 'delta_rh'], data_path=data_path)
+# sc.print_solution_data(case, suffix='_h_all', keys=['time', 'h_rms'], data_path=data_path)
 
 print('Summary plots complete')

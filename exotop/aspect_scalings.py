@@ -246,13 +246,11 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 new_params_dict['sol'] = n
                 new_params_dict['time'] = time[ts]
-                try:
-                    new_params = pd.DataFrame({k: np.array(v) for k, v in new_params_dict.items()}, index=[ts])
+                try:  # need to do this bullshit because adding array to single row breaks df init
+                    new_params = pd.DataFrame(new_params_dict, index=[ts])
                 except ValueError as e:
-                    print('ts', ts)
-                    print('new_params_dict', new_params_dict)
-                    raise e
-                df_to_extend = pd.concat([df_to_extend, new_params])
+                    new_params = pd.DataFrame({k: [v] for k, v in new_params_dict.items()}, index=[ts])
+                df_to_extend = pd.concat([df_to_extend, new_params])  # concat row axis (may causepdf duplicate index)
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
 
     else:
@@ -1368,17 +1366,21 @@ def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bulla
             print('No T parameterisation found for solution n =', n)
             return fig, ax
 
-    delta_rh_n = np.asscalar(np.array(T_params['delta_rh']))
-    D_l_n = np.asscalar(np.array(T_params['delta_L']))
-    T_l_n = np.asscalar(np.array(T_params['T_l']))
-    T_i_n = np.asscalar(np.array(T_params['T_i']))
+    delta_rh_n = np.array(T_params['delta_rh'])  # ensure not list
+    D_l_n = np.array(T_params['delta_L'])
+    T_l_n = np.array(T_params['T_l'])
+    T_i_n = np.array(T_params['T_i'])
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
 
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
     ax.axhline(D_l_n - delta_rh_n, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
-    ax.text(0, D_l_n - delta_rh_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n), ha='left', va='top',
+    try:
+        ax.text(0, D_l_n - delta_rh_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n), ha='left', va='top',
+            color='xkcd:red orange', fontsize=labelsize - 2)
+    except TypeError:
+        ax.text(0, D_l_n - delta_rh_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n.item()), ha='left', va='top',
             color='xkcd:red orange', fontsize=labelsize - 2)
     ax.plot([T_l_n, T_l_n], [0, D_l_n], ls='--', alpha=0.5, lw=0.5, label=r'$T_L$', c='xkcd:tangerine')
     ax.plot([T_i_n, T_i_n], [0, D_l_n - delta_rh_n], ls='--', alpha=0.5, lw=0.5,
