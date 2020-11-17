@@ -1,5 +1,8 @@
 import os
 import sys
+sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+from exotop import aspect_postprocessing2 as post
+from exotop.mpl_tools import colorize
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -12,12 +15,9 @@ from six import string_types
 from scipy.optimize import curve_fit
 from scipy import stats
 
-sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop import aspect_postprocessing2 as post
-from exotop.mpl_tools import colorize
-
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
+
 
 def savefig(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', **kwargs):
     path = fig_path + fname + fig_fmt
@@ -25,6 +25,7 @@ def savefig(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='
     os.makedirs(directory, exist_ok=True)
     fig.savefig(path, bbox_inches=bbox_inches, **kwargs)
     print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  saved to ', path, '!')
+
 
 def read_topo_stats(case, ts, data_path=data_path_bullard):
     df = pd.read_csv(data_path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
@@ -95,7 +96,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
             else:
                 df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                          t1=np.maximum(t1, t1_new),
-                                         data_path=data_path,  df_to_extend=df, **kwargs)
+                                         data_path=data_path, df_to_extend=df, **kwargs)
             dump_flag = True  # always save if you did something
 
         if dump_flag:
@@ -120,8 +121,6 @@ def concat_pickles(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl',
         else:
             print('File', fname, 'does not exist')
     pkl.dump(pd.concat(dfs), open(case_path + 'pickle/' + case + new_suffix + fend, "wb"))
-
-
 
 
 def get_cases_list(Ra, eta):
@@ -248,7 +247,7 @@ def h_at_ts(case, ts=None, hscale=1, **kwargs):
         h_params_n['h_peak'] = peak * hscale
         h_params_n['h_rms'] = rms * hscale
 
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         print('    No dynamic topography found at ts =', ts)
         h_params_n['h_peak'] = np.nan
         h_params_n['h_rms'] = np.nan
@@ -274,7 +273,8 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
     df_n = dat.T_components(n, T=T, u=u, v=v, cut=True)
 
     alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
-    df_n['h_components'] = alpha * (np.array(df_n['dT_rh']) / np.array(df_n['dT_m'])) * (np.array(df_n['delta_rh']) / np.array(df_n['d_m']))
+    df_n['h_components'] = alpha * (np.array(df_n['dT_rh']) / np.array(df_n['dT_m'])) * (
+            np.array(df_n['delta_rh']) / np.array(df_n['d_m']))
 
     for key in df_n.keys():
         df_n[key] = [df_n[key]]  # ensure iterable for some reason (so you can do list extension later)
@@ -447,7 +447,7 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
         try:
             qdict[key] = np.percentile(df[key], qs)
         except KeyError as e:
-            print (key, 'not processed yet for', case)
+            print(key, 'not processed yet for', case)
             raise e
 
     if plot:
@@ -463,7 +463,7 @@ def fit_log(x, h):
         slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
     except ValueError as e:
         print('x', np.shape(x1), 'h', np.shape(h1))
-        raise(e)
+        raise e
     return slope, 10 ** intercept
 
 
@@ -492,8 +492,8 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
                  save=True, fname='h_vs_Ra', sigma=2, fig_fmt='.png',
                  labelsize=16, xlabel='', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
-                 fit=False, cases=None, x_var=None, logx=True, logy=True,
-                 fig=None, ax=None, dt_ylim=(3e-3, 7e-2), xlim=None, hscale=1, **kwargs):
+                 fit=False, cases=None, x_var=None, logx=True, logy=True, legend=True,
+                 fig=None, ax=None, ylim=(6e-3, 7e-2), xlim=None, hscale=1, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     if cases is None:
         cases, x_var = get_cases_list(Ra, eta)
@@ -538,9 +538,10 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
             hprime = const * np.array(xprime) ** expon
             h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
                           label='{:.2e} Ra^{:.3f}'.format(const, expon))
-            ax.legend(
-                # handles=[h3], labels=[],
-                loc='lower left')  # always show what fit is
+            if legend:
+                ax.legend(
+                    # handles=[h3], labels=[],
+                    loc='lower left')  # always show what fit is
         else:
             print('    Not enough points to fit')
 
@@ -553,8 +554,8 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
         ax.set_xscale('log')
     if logy:
         ax.set_yscale('log')
-    if dt_ylim is not None:
-        ax.set_ylim(dt_ylim[0], dt_ylim[1])  # for fair comparison
+    if ylim is not None:
+        ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
     if xlim is not None:
         ax.set_xlim(xlim)
     ax.set_ylabel(ylabel, fontsize=labelsize)
@@ -567,12 +568,12 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
 
 def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                 load='auto', fig_fmt='.png',
-                 save=True, fname='h_T', sigma=2, showallscatter=False,
-                 labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
-                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
-                 fit=False, cases=None, x_var=None, logx=True, logy=True,
-                 fig=None, ax=None, dt_ylim=(3e-3, 7e-2), xlim=None, hscale=1, **kwargs):
+                         load='auto', fig_fmt='.png',
+                         save=True, fname='h_T', sigma=2, showallscatter=False,
+                         labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
+                         c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
+                         fit=False, cases=None, x_var=None, logx=True, logy=True,
+                         fig=None, ax=None, ylim=(6e-3, 7e-2), xlim=None, hscale=1, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
 
@@ -657,9 +658,10 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
-            ax.legend(
-                # handles=[h3], labels=[],
-                loc='lower left')  # always show what fit is
+            if legend:
+                ax.legend(
+                    # handles=[h3], labels=[],
+                    loc='lower left')
         else:
             print('    Not enough points to fit')
 
@@ -676,8 +678,8 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
         ax.set_xscale('log')
     if logy:
         ax.set_yscale('log')
-    if dt_ylim is not None:
-        ax.set_ylim(dt_ylim[0], dt_ylim[1])  # for fair comparison
+    if ylim is not None:
+        ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
     if xlim is not None:
         ax.set_xlim(xlim)
     ax.set_ylabel(ylabel, fontsize=labelsize)
@@ -689,11 +691,9 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
     return fig, ax
 
 
-def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
-                  sigma=2, t1=None, fit=False, nrows=2, ncols=2, T_components=False,
-                  data_path=data_path_bullard, fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png',
-                  ylim=(6e-3, 7e-2), labelsize=14, xlim=None, xlabel='Ra', ylabel='dynamic topography',
-                  logx=True, logy=True, showallscatter=False, xlabelpad=12, ylabelpad=2, hscale=1, **kwargs):
+def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, save=True, t1=None, nrows=2, ncols=2, T_components=False,
+                  fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png',
+                  labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
     # subplots for different eta
     #     fig, axes = plt.subplots(2,2, figsize=(7,7))
     #     flaxes = axes.flatten()
@@ -703,9 +703,9 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
     else:
         print(r'Plotting h vs. Ra')
         plot_fn = plot_h_vs_Ra
-
     if t1 is None:
         t1 = np.zeros(len(eta_ls), len(Ra_ls))
+
     fig = plt.figure(figsize=(7, 7))
     bigax = fig.add_subplot(111)  # The big subplot
     bigax.spines['top'].set_color('none')
@@ -715,9 +715,9 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
     bigax.tick_params(labelcolor='w', which='both', bottom=False, left=False, right=False, top=False)
     bigax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
     bigax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
-    legend = False
+
     for ii, eta in enumerate(eta_ls):
-        print('eta level', ii, '/', len(eta_ls)-1)
+        print('eta level', ii, '/', len(eta_ls) - 1)
         z = int(str(nrows) + str(ncols) + str(ii + 1))
         ax = fig.add_subplot(z)
         #         ax = flaxes[ii]
@@ -742,38 +742,26 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
 
         # steady
         if not (not Ra_steady):
-            fig, ax = plot_fn(Ra=Ra_steady, eta=eta, t1=t1[ii, Ra_steady_idx], sigma=sigma, fig=fig, ax=ax,
-                              data_path=data_path,
-                              c_rms=c_regimes[0], c_peak=c_regimes[0], dt_ylim=ylim, legend=legend,
-                              load=load, plotpd=False, xlim=xlim,
-                              save=False, fit=True, ylabel='', xlabel='', labelsize=labelsize,
-                              fig_path=fig_path, logx=logx, logy=logy,
-                              showallscatter=showallscatter, hscale=hscale, **kwargs
+            fig, ax = plot_fn(Ra=Ra_steady, eta=eta, t1=t1[ii, Ra_steady_idx], fig=fig, ax=ax,
+                              c_rms=c_regimes[0], c_peak=c_regimes[0],
+                              save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs
                               )
             print('Finished', len(Ra_steady), 'steady-state case(s)')
         # trans
         if not (not Ra_trans):
-            fig, ax = plot_fn(Ra=Ra_trans, eta=eta, t1=t1[ii, Ra_trans_idx], sigma=sigma, fig=fig, ax=ax,
-                              data_path=data_path,
-                              c_rms=c_regimes[1], c_peak=c_regimes[1], dt_ylim=ylim, legend=legend,
-                              load=load, plotpd=False, xlim=xlim,
-                              save=False, fit=True, ylabel='', xlabel='', labelsize=labelsize,
-                              fig_path=fig_path, logx=logx, logy=logy,
-                              showallscatter=showallscatter, hscale=hscale, **kwargs
+            fig, ax = plot_fn(Ra=Ra_trans, eta=eta, t1=t1[ii, Ra_trans_idx], fig=fig, ax=ax,
+                              c_rms=c_regimes[1], c_peak=c_regimes[1],
+                              save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs
                               )
             print('Finished', len(Ra_trans), 'transitional case(s)')
             # chaotic
         if not (not Ra_chaos):
-            fig, ax = plot_fn(Ra=Ra_chaos, eta=eta, t1=t1[ii, Ra_chaos_idx], sigma=sigma, fig=fig, ax=ax,
-                              data_path=data_path,
-                              c_rms=c_regimes[2], c_peak=c_regimes[2], dt_ylim=ylim, legend=legend,
-                              load=load, plotpd=False, xlim=xlim,
-                              save=False, fit=True, xlabel='', ylabel='', labelsize=labelsize,
-                              fig_path=fig_path, logx=logx, logy=logy,
-                              showallscatter=showallscatter, hscale=hscale, **kwargs
+            fig, ax = plot_fn(Ra=Ra_chaos, eta=eta, t1=t1[ii, Ra_chaos_idx], fig=fig, ax=ax,
+                              c_rms=c_regimes[2], c_peak=c_regimes[2],
+                              save=False, xlabel='', ylabel='', labelsize=labelsize, **kwargs
                               )
             print('Finished', len(Ra_chaos), 'chaotic case(s)')
-        ax.text(0.5, 0.95, '$\Delta \eta$=' + eta, fontsize=labelsize, ha='center', va='top',
+        ax.text(0.5, 0.95, r'$\Delta \eta$=' + eta, fontsize=labelsize, ha='center', va='top',
                 transform=ax.transAxes)
         if ii % ncols != 0:
             ax.yaxis.tick_right()
@@ -814,7 +802,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
     return fig, axes
 
 
-def scales_with_Ra(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
+def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
                    save=True, fname='claire', showallscatter=False,
                    labelsize=16, ylabel='', xlabel='Ra', title='', fig_fmt='.png',
                    c_scatter='xkcd:forest green', legend=True,
@@ -834,10 +822,11 @@ def scales_with_Ra(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
             yprime = const * xprime ** expon
             h3, = ax.plot(xprime, yprime, c=c_scatter, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
-            ax.legend(
-                # handles=[h3], labels=[],
-                # loc='lower left'
-            )  # always show what fit is
+            if legend:
+                ax.legend(
+                    # handles=[h3], labels=[],
+                    # loc='lower left'
+                )
         else:
             print('    Not enough points to fit')
 
@@ -862,10 +851,10 @@ def scales_with_Ra(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
     return fig, ax
 
 
-def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                          load='auto', save=True, fname='bl-Nu', labelsize=16, ylabel=None, title='',
-                          legend=True, cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
-                          fig=None, axes=None,fig_fmt='.png', **kwargs):
+def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
+                   save=True, fname='bl-Nu', labelsize=16, ylabel=None, title='',
+                   cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
+                   fig=None, axes=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
     if ylabel is None:
@@ -896,14 +885,12 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
                 # load T components  
                 dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                        read_statistics=True)
-                df1 = pickleio(case, suffix='_T', postprocess_functions=['T_parameters_at_sol'], t1=t1[ii],
-                               load=load, dat_new=dat,
-                               data_path=data_path, **kwargs)
+                df1 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
+                               dat_new=dat, data_path=data_path, **kwargs)
 
                 # extract Nu
-                df2 = pickleio(case, suffix='_Nu', postprocess_functions=['Nu_at_ts'], t1=t1[ii],
-                               load=load, dat_new=dat,
-                               data_path=data_path, **kwargs)
+                df2 = pickleio(case, suffix='_Nu', postprocess_functions=[Nu_at_ts], t1=t1[ii],
+                               dat_new=dat, data_path=data_path, **kwargs)
                 df = pd.concat([df1, df2])
 
                 for key in keys:
@@ -913,8 +900,7 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
                     cmplabel = compare_label
                     if (jj > 0) and (ii > 0):
                         cmplabel = None
-                    d_compare = compare_pub(case, dat=dat, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df,
-                                            load=load)
+                    d_compare = compare_pub(case, dat=dat, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df, **kwargs)
                     for k, key in enumerate(keys):
                         try:
                             axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', alpha=0.7, c=c_scatter, label=cmplabel)
@@ -922,9 +908,9 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
                             print('Key', key, 'not returned by', compare_pub)
 
         for k, key in enumerate(keys):
-            fig, axes[0] = scales_with_Ra(Ra_data=plot_data['Ra'], y_data=plot_data[key],
-                                          fig_path=fig_path, save=False, labelsize=labelsize, ylabel=ylabel[k],
-                                          c_scatter=c_scatter, fig=fig, ax=axes[k], **kwargs)
+            fig, axes[0] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key],
+                                           save=False, labelsize=labelsize, ylabel=ylabel[k], c_scatter=c_scatter,
+                                           fig=fig, ax=axes[k], **kwargs)
 
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
                             vmin=vmin, vmax=vmax)  # dummy
@@ -983,7 +969,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
     ncases = len(cases)
     ncols = 2
     if regime_grid is None:
-        regime_grid = [None]*len(cases)
+        regime_grid = [None] * len(cases)
     if includepdf:
         ncols = ncols + 1
     if includeTz:
@@ -1012,7 +998,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             if show_sols:  # load df
                 if t1[ii] < 1:
                     sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
-                                    dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+                                      dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
                 else:
                     show_sols = False  # automatically override processing
 
@@ -1042,7 +1028,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
                 if not show_sols:
                     sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
-                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+                                      dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
                 fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, save=False,
                                         setxlabel=setxlabel, setylabel=False, fig_path=fig_path, fig=fig,
@@ -1158,7 +1144,7 @@ def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, f
 def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bullard, t1=0,
                   setylabel=True, setxlabel=True, save=True, load='auto',
                   fig_path=fig_path_bullard, fig=None, ax=None, fend='_T-z', fig_fmt='.png',
-                  legend=True, labelsize=16,  **kwargs):
+                  legend=True, labelsize=16, **kwargs):
     if T_params is None:
         T_params = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1,
                             dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
@@ -1190,13 +1176,13 @@ def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bulla
     ax.plot([T_i_n, T_i_n], [0, D_l_n - delta_rh_n], ls='--', alpha=0.5, lw=0.5,
             label=r'$T_i$', c='xkcd:red orange')
     if legend:
-        ax.legend(frameon=True, fontsize=labelsize-4, ncol=2)
+        ax.legend(frameon=True, fontsize=labelsize - 4, ncol=2)
     if setxlabel:
         ax.set_xlabel('temperature', fontsize=labelsize)
     if setylabel:
         ax.set_ylabel('depth', fontsize=labelsize)
     if save:
-        savefig(fig, case+fend, fig_path=fig_path, fig_fmt=fig_fmt)
+        savefig(fig, case + fend, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
