@@ -625,7 +625,7 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
                        dat_new=dat, data_path=data_path, at_sol=True, **kwargs)
         try:
             df = pd.concat([df1, df2], axis=1)  # concatenate along columns
-        except IndexError as e:
+        except ValueError as e:
             print('\n\ndf1', df1)
             print('\n\ndf2', df2)
             raise e
