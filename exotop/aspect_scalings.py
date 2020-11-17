@@ -1,5 +1,6 @@
 import os
 import sys
+
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_postprocessing2 as post
 from exotop.mpl_tools import colorize
@@ -142,7 +143,8 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
         for i, col in enumerate(df_new.columns[df_new.columns.duplicated(keep=False)]):
             df_dups = df_new.loc[:, col]
             if ~df_dups.eq(df_dups.iloc[:, 0], axis=0).all(1).any():  # if any rows do not all match first col
-                raise Exception('Attempting to delete duplicate columns which do not match in '+case_path+', '+suffixes)
+                raise Exception(
+                    'Attempting to delete duplicate columns which do not match in ' + case_path + ', ' + suffixes)
         df_new = df_new.loc[:, ~is_dup_col]  # remove duplicate cols if any
     pkl.dump(df_new, open(case_path + 'pickle/' + case + new_suffix + fend, "wb"))
 
@@ -511,6 +513,133 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
+def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
+              fig_fmt='.png',
+              save=True, fname='h_T', showallscatter=False,
+              labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
+              fit=False, cases=None, x_var=None, logx=True, logy=True,
+              fig=None, ax=None, ylim=(6e-3, 7e-2), xlim=None, **kwargs):
+    # Ra or eta is list of strings, t1 is a list of numbers the same length
+    # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
+
+    if cases is None:
+        cases, x_var = get_cases_list(Ra, eta)
+    if t1 is None:
+        t1 = [0] * len(cases)
+
+    quants_h_peak = np.zeros((len(x_var), 3))
+    quants_h_rms = np.zeros((len(x_var), 3))
+    quants_h_components = np.zeros((len(x_var), 3))
+    peak_all = []
+    rms_all = []
+
+    for ii, case in enumerate(cases):
+
+        pickle_remove_duplicate(case, suffix='_T', which='sol', data_path=data_path)
+
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+
+        # load h and T
+        df1 = pickleio(case, suffix='_h', postprocess_functions=[h_at_ts], t1=t1[ii], dat_new=dat,
+                       data_path=data_path, at_sol=True, **kwargs)
+        df2 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
+                       dat_new=dat, data_path=data_path, at_sol=True, **kwargs)
+        try:
+            df = pd.concat([df1, df2], axis=1)  # concatenate along columns
+        except ValueError as e:
+            print('\n\ndf1', df1)
+            print('\n\ndf2', df2)
+            raise e
+
+        try:
+            h_components = df['h_components']
+        except KeyError:
+            alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
+            h_components = alpha * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
+                    np.array(df['delta_rh']) / np.array(df['d_m']))
+            df['h_components'] = h_components
+
+        h_peak = df['h_peak']
+        h_rms = df['h_rms']
+        # old way of accounting for loading all h instead of just at sols
+        # t1_idx = np.argmax(dat.stats_time > t1[ii])  # timestep corresponding to t1
+        # sol_idx = dat.find_time_at_sol()
+        # sol_idx = np.array(sol_idx[sol_idx >= t1_idx])  # cut any values of idx below t1_idx
+        # # account for the stored peak_list and rms_list starting at t1 for indexing
+        # if np.shape(sol_idx) != np.shape(h_components):
+        #     print('inconsistent times: sol_idx', np.shape(sol_idx), 'delta', np.shape(df['delta_rh']))
+        # try:
+        #     peak_list = [peak_list[j - t1_idx] for j in sol_idx]
+        #     rms_list = [rms_list[j - t1_idx] for j in sol_idx]
+        # except IndexError:
+        #     print('sol_idx - t1_idx', [j - t1_idx for j in sol_idx])
+        peak_all.append((h_peak, h_components))
+        rms_all.append((h_rms, h_components))
+
+        qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', 'h_components'], plot=False)
+        quants_h_peak[ii, :] = qdict['h_peak']
+        quants_h_rms[ii, :] = qdict['h_rms']
+        quants_h_components[ii, :] = qdict['h_components']
+
+    yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
+    yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
+    xerr = [quants_h_components[:, 1] - quants_h_components[:, 0],
+            quants_h_components[:, 2] - quants_h_components[:, 1]]
+
+    if ax is None:
+        fig = plt.figure()
+        ax = plt.gca()
+
+    fitx = [a[1] for a in rms_all]
+    fith_rms = [a[0] for a in rms_all]
+    flatfitx = [item for sublist in fitx for item in sublist]
+    flatfith_rms = [item for sublist in fith_rms for item in sublist]
+    fith_peak = [a[0] for a in peak_all]
+    flatfith_peak = [item for sublist in fith_peak for item in sublist]
+
+    if fit:
+        #         fitx = x_var # todo: only fit subset?
+        #         fitidx = np.where(np.intersect1d(x[:,1], fitx))[0]
+        if len(x_var) > 1:  # can only fit if at least 2 data
+            expon, const = fit_log(flatfitx, flatfith_rms)
+            xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
+            hprime = const * xprime ** expon
+            h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
+                          label='{:.2e} x^{:.3f}'.format(const, expon))
+            if legend:
+                ax.legend(
+                    # handles=[h3], labels=[],
+                    loc='lower left')
+        else:
+            print('    Not enough points to fit')
+
+    ax.errorbar(quants_h_components[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
+                fmt='^', c=c_peak, alpha=0.9, capsize=5)
+    ax.errorbar(quants_h_components[:, 1], quants_h_rms[:, 1], yerr=yerr_rms, xerr=xerr,
+                fmt='o', c=c_rms, alpha=0.9, capsize=5)
+
+    if showallscatter:
+        ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.1, s=20)
+        ax.scatter(flatfitx, flatfith_peak, c=c_peak, alpha=0.1, s=20)
+
+    if logx:
+        ax.set_xscale('log')
+    if logy:
+        ax.set_yscale('log')
+    if ylim is not None:
+        ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    ax.set_ylabel(ylabel, fontsize=labelsize)
+    ax.set_xlabel(xlabel, fontsize=labelsize)
+    ax.set_title(title, fontsize=labelsize)
+
+    if save:
+        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+    return fig, ax
+
+
 def plot_h_vs_Ra(Ra=None, eta=None, t1=None, fig_path=fig_path_bullard,
                  showallscatter=False,
                  save=True, fname='h_vs_Ra', fig_fmt='.png',
@@ -623,11 +752,15 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
                        data_path=data_path, at_sol=True, **kwargs)
         df2 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
                        dat_new=dat, data_path=data_path, at_sol=True, **kwargs)
+
+
         try:
             df = pd.concat([df1, df2], axis=1)  # concatenate along columns
         except ValueError as e:
-            print('\n\ndf1', df1)
-            print('\n\ndf2', df2)
+            # print('\n\ndf1', df1)
+            # print('\n\ndf2', df2)
+            print('\ndf1', df1['sol'])
+            print('\ndf2', df2['sol'])
             raise e
 
         try:
@@ -830,11 +963,11 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, save=True, t1=None, nro
 
 
 def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
-                   save=True, fname='claire', showallscatter=False,
-                   labelsize=16, ylabel='', xlabel='Ra', title='', fig_fmt='.png',
-                   c_scatter='xkcd:forest green', legend=True,
-                   fit=False, logx=True, logy=True,
-                   fig=None, ax=None, ylim=None, xlim=None, **kwargs):
+                    save=True, fname='claire', showallscatter=False,
+                    labelsize=16, ylabel='', xlabel='Ra', title='', fig_fmt='.png',
+                    c_scatter='xkcd:forest green', legend=True,
+                    fit=False, logx=True, logy=True,
+                    fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     if fig is None:
         fig = plt.figure()
         ax = plt.gca()
@@ -927,7 +1060,8 @@ def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bu
                     cmplabel = compare_label
                     if (jj > 0) and (ii > 0):
                         cmplabel = None
-                    d_compare = compare_pub(case, dat=dat, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df, **kwargs)
+                    d_compare = compare_pub(case, dat=dat, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df,
+                                            **kwargs)
                     for k, key in enumerate(keys):
                         try:
                             axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', alpha=0.7, c=c_scatter, label=cmplabel)
