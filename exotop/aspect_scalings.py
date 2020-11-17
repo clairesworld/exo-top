@@ -607,10 +607,10 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
                     np.array(df['delta_rh']) / np.array(df['d_m']))
             df['h_components'] = h_components
 
-        print(df1)
-        print(df2)
+        print('df1', df1)
         print('\n\n')
-        print(df)
+        print('df2', df2)
+        print('\n\n')
         h_peak = df['h_peak']
         h_rms = df['h_rms']
         # old way of accounting for loading all h instead of just at sols
