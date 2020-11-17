@@ -147,8 +147,8 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
     df_new = pd.concat(dfs, axis=1)  # concatenate along col axis
     is_dup_col = df_new.columns.duplicated()
     if is_dup_col.any():  # check for duplicate cols
-        # raise error if duplicated columns do not match
         for i, col in enumerate(df_new.columns[df_new.columns.duplicated(keep=False)]):
+            # raise error if duplicated columns do not match
             df_dups = df_new.loc[:, col]
             if ~df_dups.eq(df_dups.iloc[:, 0], axis=0).all(1).any():  # if any rows do not all match first col
                 raise Exception(
@@ -272,14 +272,14 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
     return df_to_extend
 
 
-def h_at_ts(case, ts=None, hscale=1, **kwargs):
+def h_at_ts(case, ts=None, **kwargs):
     h_params_n = {}
     try:
         x, h = read_topo_stats(case, ts)
         h_norm = trapznorm(h)
         peak, rms = peak_and_rms(h_norm)
-        h_params_n['h_peak'] = peak * hscale
-        h_params_n['h_rms'] = rms * hscale
+        h_params_n['h_peak'] = peak
+        h_params_n['h_rms'] = rms
 
     except FileNotFoundError:
         print('    No dynamic topography found at ts =', ts)
@@ -549,8 +549,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
               save=True, fname='h', showallscatter=False,
               labelsize=16, ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
-              fit=False, cases=None, logx=True, logy=True,
-              fig=None, ax=None, ylim=(6e-3, 7e-2), xlim=None, **kwargs):
+              fit=False, cases=None, logx=True, logy=True, hscale=1,
+              fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     # either Ra or eta is list of strings (other is singular), t1 is a list of numbers the same length
 
     if cases is None:
@@ -587,15 +587,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         # load outputs
         df = pickleio(case, suffix=psuffix, postprocess_functions=postprocess_functions, t1=t1[ii],
                       data_path=data_path, at_sol=at_sol, **kwargs)
-        h_peak = df['h_peak']
-        h_rms = df['h_rms']
+        h_peak = df['h_peak']*hscale
+        h_rms = df['h_rms']*hscale
         if which_x == 'components':
             try:  # make sure alpha*delta*dT is calculated
                 h_components = df['h_components']
             except KeyError:
                 h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=True,
                                                  **kwargs)
-                df['h_components'] = h_components
             x_key = 'h_components'
             x = h_components
         elif which_x == 'Ra':
@@ -839,8 +838,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
 #     flatfith_peak = [item for sublist in fith_peak for item in sublist]
 #
 #     if fit:
-#         #         fitx = x_var # todo: only fit subset?
-#         #         fitidx = np.where(np.intersect1d(x[:,1], fitx))[0]
+#         #         fitx = x_var
+#         #         fitidx = np.where(np.intersect1d(x[:,1], fitx))[0] # only fit subset?
 #         if len(x_var) > 1:  # can only fit if at least 2 data
 #             expon, const = fit_log(flatfitx, flatfith_rms)
 #             xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))

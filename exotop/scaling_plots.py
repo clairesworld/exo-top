@@ -11,20 +11,18 @@ c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
 ### plot h scalings with Ra
 
 print('\nAssuming you have properly saved h values for the right time period\n')
-# sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, fit=True, t1=t1,
-#                              load=True, xlim=(8e5,1.3e8), ylim=None, fig_fmt=fig_fmt,
-#                              save=True, fname='h_Ra_all', xlabel='Ra', hscale=2e-5*2700*2890, ylabelpad=15,
-#                              ylabel='dynamic topography (km)', data_path=data_path, fig_path=fig_path)
-
+sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, save=True, fit=True, t1=t1, load=True,
+                 labelsize=14, xlim=None, ylim=None, xlabelpad=8, ylabelpad=15, logx=True, logy=True,
+                 fname='h_Ra_all', xlabel='Ra', hscale=2e-5 * 2700 * 2890, ylabel='dynamic topography (km)',
+                 data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,)
 
 ### plot h scalings - with dT_m*delta*d_m
 
-sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, save=True, t1=t1,
-                 fit=True, load='auto', T_components=True, data_path=data_path,
-                 fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt,
-                 ylim=(3e-3, 7e-2), labelsize=14, xlim=(3e-8, 7e-7),
-                 xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', logx=True, logy=True,
-                 showallscatter=True, xlabelpad=8, ylabelpad=0)
+sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, save=True, fit=True, t1=t1, load=True,
+                 labelsize=14, xlim=None, ylim=None, xlabelpad=8, ylabelpad=0, logx=True, logy=True,
+                 T_components=True,
+                 fname='h_T_all', xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
+                 showallscatter=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt)
 
 ### plot scalings of other output parameters with Ra
 
