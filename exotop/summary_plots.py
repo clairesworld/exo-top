@@ -47,8 +47,8 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
 
 ## look at individual case data
 
-# case = 'Ra3e8-eta1e5-wide'
+case = 'Ra3e8-eta1e5-wide'
 # sc.print_solution_data(case, suffix='_T', keys=['sol', 'time', 'delta_rh'], data_path=data_path)
-# sc.print_solution_data(case, suffix='_h_all', keys=['time', 'h_rms'], data_path=data_path)
+sc.print_solution_data(case, suffix='_h_all', keys=['time', 'h_rms', 'h_peak'], data_path=data_path)
 
 print('Summary plots complete')
