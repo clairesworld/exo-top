@@ -32,7 +32,7 @@ sc.pickle_remove_duplicate_row(case, suffix='_T', which='sol', data_path=data_pa
 
 ## plot summaries across Ra
 
-i_plot = range(3,4) # list(range(len(Ra_ls)))  # range(4,5)
+i_plot = range(4,6) # list(range(len(Ra_ls)))  # range(4,5)
 for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
     if ii in i_plot:
         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end.T[ii])]
