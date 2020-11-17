@@ -1249,11 +1249,11 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             if includepdf and t1[ii] < 1:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                sol_df = pickleio(case, suffix='_h_all', postprocess_functions=[h_at_ts], t1=t1[ii],
+                ts_df = pickleio(case, suffix='_h_all', postprocess_functions=[h_at_ts], t1=t1[ii],
                                   dat_new=dat, load=load, data_path=data_path, fig_path=fig_path,
                                   at_sol=False, **kwargs)
 
-                fig, ax = plot_pdf(case, df=sol_df, keys=['h_rms', 'h_peak'], fig=fig, ax=ax, save=False,
+                fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'], fig=fig, ax=ax, save=False,
                                    settitle=False, setxlabel=setxlabel, legend=legend, labelsize=labelsize,
                                    c_list=[c_rms, c_peak], path=data_path)
                 ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison

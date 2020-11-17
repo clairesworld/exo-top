@@ -47,6 +47,7 @@ from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_
 ## look at individual case data
 
 case = 'Ra3e8-eta1e5-wide'
-sc.print_solution_data(case, suffix='_h', keys=['sol', 'time', 'h_rms'], data_path=data_path)
+sc.print_solution_data(case, suffix='_T', keys=['sol', 'time', 'delta_rh'], data_path=data_path)
+sc.print_solution_data(case, suffix='_h_all', keys=['sol', 'time', 'delta_rh'], data_path=data_path)
 
 print('Summary plots complete')
