@@ -247,7 +247,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 new_params_dict['sol'] = n
                 new_params_dict['time'] = time[ts]
                 try:
-                    new_params = pd.DataFrame(new_params_dict, index=[ts])
+                    new_params = pd.DataFrame({k: [v] for k, v in new_params_dict.items()}, index=[ts])
                 except ValueError as e:
                     print('ts', ts)
                     print('new_params_dict', new_params_dict)

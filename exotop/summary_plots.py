@@ -5,8 +5,8 @@ sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_scalings as sc
 from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid
 
-case = 'Ra3e8-eta1e5-wide'
-sc.pickle_remove_duplicate_row(case, suffix='_T', which='sol', data_path=data_path)
+# case = 'Ra3e8-eta1e5-wide'
+# sc.pickle_remove_duplicate_row(case, suffix='_T', which='sol', data_path=data_path)
 
 ## plot summaries across delta eta
 
@@ -32,7 +32,7 @@ sc.pickle_remove_duplicate_row(case, suffix='_T', which='sol', data_path=data_pa
 
 ## plot summaries across Ra
 
-i_plot = range(4,6) # list(range(len(Ra_ls)))  # range(4,5)
+i_plot = range(4, 6)  # list(range(len(Ra_ls)))  # range(4,5)
 for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
     if ii in i_plot:
         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end.T[ii])]
