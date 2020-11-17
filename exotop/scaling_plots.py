@@ -20,7 +20,7 @@ print('\nAssuming you have properly saved h values for the right time period\n')
 ### plot h scalings - with dT_m*delta*d_m
 
 sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, save=True, t1=t1,
-                 fit=True, load='auto', T_components=True, data_path=data_path,
+                 fit=True, load=True, T_components=True, data_path=data_path,
                  fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt,
                  ylim=(3e-3, 7e-2), labelsize=14, xlim=(3e-8, 7e-7),
                  xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', logx=True, logy=True,
