@@ -113,10 +113,13 @@ def pickle_remove_duplicate_row(case, suffix, which='sol', fend='.pkl', data_pat
 
     if os.path.exists(case_path + 'pickle/' + fname):
         df = pkl.load(open(case_path + 'pickle/' + fname, 'rb'))
-        series = df[which]
-        unique = ~series.duplicated()  # boolean array of duplicates
-        df_new = df[unique]
-        pkl.dump(df_new, open(case_path + 'pickle/' + fname, 'wb'))
+        try:
+            series = df[which]
+            unique = ~series.duplicated()  # boolean array of duplicates
+            df_new = df[unique]
+            pkl.dump(df_new, open(case_path + 'pickle/' + fname, 'wb'))
+        except KeyError:
+            print('KeyError:', fname, 'does not contain', which)
     else:
         print('pickle_remove_duplicate(): File', fname, 'not found')
 
