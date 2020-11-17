@@ -11,24 +11,24 @@ c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
 ### plot h scalings with Ra
 
 print('\nAssuming you have properly saved h values for the right time period\n')
-sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, save=True, fit=True, t1=t1, load=True,
-                 labelsize=14, xlim=None, ylim=None, xlabelpad=8, ylabelpad=10, logx=True, logy=True,
+sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=True, fit=True,
+                 labelsize=14, xlim=(1e6, 3e8), ylim=(1, 9), xlabelpad=8, ylabelpad=10, logx=True, logy=True,
                  fname='h_Ra_all', xlabel='Ra', hscale=2e-5 * 2700 * 2890, ylabel='dynamic topography (km)',
-                 data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,)
+                 data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ### plot h scalings - with dT_m*delta*d_m
 
-sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, save=True, fit=True, t1=t1, load=True,
-                 labelsize=14, xlim=None, ylim=None, xlabelpad=8, ylabelpad=10, logx=True, logy=True,
+sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=True, fit=True,
+                 labelsize=14, xlim=(3e-8, 7e-7), ylim=(8e-3, 6e-2), xlabelpad=8, ylabelpad=12, logx=True, logy=True,
                  T_components=True,
                  fname='h_T_all', xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
-                 showallscatter=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt)
+                 showallscatter=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ### plot scalings of other output parameters with Ra
 
-sc.subplots_vs_Ra(Ra_ls, eta_ls, t1=t1, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path, fig_path=fig_path,
-                  save=True, load='auto', fname='delta-Nu-Ti', compare_pub=None, #sc.moresi95
-                  fig_fmt=fig_fmt, fit=True)
+sc.subplots_vs_Ra(Ra_ls, eta_ls, t1=t1, keys=['Nu', 'delta_0', 'T_i'], load=True, fit=True,
+                  fname='delta-Nu-Ti', compare_pub=None, #sc.moresi95
+                  data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ## Show convective regimes in parameter space
 ## example of transitional is Ra3e7 eta1e6 - still has regular cells

@@ -10,8 +10,8 @@ t1 = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 0.055],  # eta 1e5
                [0, 0, 0.6, 0.55, 1, 1]])  # eta 1e8
 
 # Ra from 1e6 to 3e8
-regime_grid = np.array([['steady', 'steady', 'steady', 'chaotic', 'sluggish', 'not converged'],  # eta 1e5
-               ['steady', 'steady', 'steady', 'transitional', 'chaotic', 'not converged'],  # eta 1e6 -
+regime_grid = np.array([['steady', 'steady', 'steady', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e5
+               ['steady', 'steady', 'steady', 'transitional', 'chaotic', 'chaotic'],  # eta 1e6 -
                ['no convection', 'steady', 'steady', 'transitional', 'chaotic', 'not converged'],  # eta 1e7
                ['no convection', 'no convection', 'steady', 'transitional', 'not converged', 'not converged']])  # eta 1e8
 

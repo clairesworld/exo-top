@@ -140,7 +140,7 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
             for key in keys:
                 if key in df_loaded.columns:
                     df_new[key] = df_loaded[key]  # add this column to new df
-                    print('Copied column', key, 'from', fname)
+                    # print('Copied column', key, 'from', fname)
             dfs.append(df_new)
         else:
             print('File', fname, 'does not exist')
@@ -547,7 +547,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
               fig_fmt='.png', which_x='components',
               save=True, fname='h', showallscatter=False,
-              labelsize=16, ylabel='dynamic topography', title='',
+              labelsize=16, xlabel='', ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
               fit=False, cases=None, logx=True, logy=True, hscale=1,
               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
@@ -558,13 +558,11 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
     if t1 is None:
         t1 = [0] * len(cases)
     if which_x == 'components':
-        xlabel = r'$\delta_rh \Delta T_{rh}$'
         psuffix = '_sol'
         at_sol = True
         postprocess_functions = [T_parameters_at_sol, h_at_ts]
 
     elif which_x == 'Ra':
-        xlabel = 'Ra'
         psuffix = '_h_all'
         at_sol = False
         postprocess_functions = [h_at_ts]
@@ -579,8 +577,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
 
     for ii, case in enumerate(cases):
 
-        # pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
-        # pickle_remove_duplicate(case, suffix=psuffix, which='sol', data_path=data_path)
+        pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
+        pickle_remove_duplicate(case, suffix=psuffix, which='sol', data_path=data_path)
 
         # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
@@ -876,12 +874,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
 #     return fig, ax
 
 
-def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, save=True, t1=None, nrows=2, ncols=2, T_components=False,
+def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes=None, save=True, t1=None, nrows=2, ncols=2, T_components=False,
                   fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png',
                   labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
     # subplots for different eta
     #     fig, axes = plt.subplots(2,2, figsize=(7,7))
     #     flaxes = axes.flatten()
+    if c_regimes is None:
+        c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
     if T_components:
         print(r'Plotting h vs. $\alpha \Delta T \delta$')
         which_x = 'components'
