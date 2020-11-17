@@ -135,7 +135,16 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
             dfs.append(df_new)
         else:
             print('File', fname, 'does not exist')
-    pkl.dump(pd.concat(dfs), open(case_path + 'pickle/' + case + new_suffix + fend, "wb"))
+    df_new = pd.concat(dfs, axis=1)  # concatenate along col axis
+    is_dup_col = df_new.columns.duplicated()
+    if is_dup_col.any():  # check for duplicate cols
+        # raise error if duplicated columns do not match
+        for i, col in enumerate(df_new.columns[df_new.columns.duplicated(keep=False)]):
+            df_dups = df_new.loc[:, col]
+            if ~df_dups.eq(df_dups.iloc[:, 0], axis=0).all(1).any():  # if any rows do not all match first col
+                raise Exception('Attempting to delete duplicate columns which do not match in '+case_path+', '+suffixes)
+        df_new = df_new.loc[:, ~is_dup_col]  # remove duplicate cols if any
+    pkl.dump(df_new, open(case_path + 'pickle/' + case + new_suffix + fend, "wb"))
 
 
 def get_cases_list(Ra, eta):
@@ -615,7 +624,7 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
                        data_path=data_path, hscale=hscale, at_sol=True, **kwargs)
         df2 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii], load=load,
                        dat_new=dat, data_path=data_path, hscale=hscale, at_sol=True, **kwargs)
-        df = pd.concat([df1, df2])
+        df = pd.concat([df1, df2], axis=1)  # concatenate along columns
 
         try:
             h_components = df['h_components']
@@ -625,12 +634,6 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
                     np.array(df['delta_rh']) / np.array(df['d_m']))
             df['h_components'] = h_components
 
-        print('df_h', df1.index)
-        print('\n\n')
-        print('df_T', df2.index)
-        print('\n\n')
-        print('df_h=df_T', df1.index==df2.index)
-        print('df', df.index)
         h_peak = df['h_peak']
         h_rms = df['h_rms']
         # old way of accounting for loading all h instead of just at sols
@@ -911,7 +914,7 @@ def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bu
                 # extract Nu
                 df2 = pickleio(case, suffix='_Nu', postprocess_functions=[Nu_at_ts], t1=t1[ii],
                                dat_new=dat, data_path=data_path, **kwargs)
-                df = pd.concat([df1, df2])
+                df = pd.concat([df1, df2], axis=1)
 
                 for key in keys:
                     plot_data[key].append(np.median(df[key]))
