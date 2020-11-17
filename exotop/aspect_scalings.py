@@ -765,8 +765,8 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
         except ValueError as e:
             # print('\n\ndf1', df1)
             # print('\n\ndf2', df2)
-            print('\ndf1', df1['sol'])
-            print('\ndf2', df2['sol'])
+            print('\ndf1 sol range', np.min(df1['sol']), np.max(df1['sol']))
+            print('\ndf2 sol range', np.min(df2['sol']), np.max(df2['sol']))
             print(case)
             raise e
 
