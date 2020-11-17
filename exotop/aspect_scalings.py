@@ -1368,14 +1368,14 @@ def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bulla
             print('No T parameterisation found for solution n =', n)
             return fig, ax
 
-    delta_rh_n = np.array(T_params['delta_rh'])
-    D_l_n = float(T_params['delta_L'])
-    T_l_n = float(T_params['T_l'])
-    T_i_n = float(T_params['T_i'])
+    delta_rh_n = np.asscalar(np.array(T_params['delta_rh']))
+    D_l_n = np.asscalar(np.array(T_params['delta_L']))
+    T_l_n = np.asscalar(np.array(T_params['T_l']))
+    T_i_n = np.asscalar(np.array(T_params['T_i']))
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
 
-    print('delta_rh_n', delta_rh_n, type(delta_rh_n), np.shape(delta_rh_n), '[0]', delta_rh_n[0])
+    print('delta_rh_n', delta_rh_n, type(delta_rh_n))
 
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
