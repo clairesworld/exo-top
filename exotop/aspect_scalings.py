@@ -106,7 +106,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
 
 def pickle_remove_duplicate(case, suffix, which='sol', fend='.pkl', data_path=data_path_bullard):
-    # remove duplicate entries - for when you fucked up storing
+    # remove duplicate rows (e.g. for solution or timestep) - for when you fucked up storing
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
 
@@ -615,7 +615,6 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
     for ii, case in enumerate(cases):
 
         pickle_remove_duplicate(case, suffix='_T', which='sol', data_path=data_path)
-
 
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
