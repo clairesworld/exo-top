@@ -1369,9 +1369,9 @@ def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bulla
             return fig, ax
 
     delta_rh_n = np.array(T_params['delta_rh'])
-    D_l_n = np.array(T_params['delta_L'])
-    T_l_n = np.array(T_params['T_l'])
-    T_i_n = np.array(T_params['T_i'])
+    D_l_n = float(T_params['delta_L'])
+    T_l_n = float(T_params['T_l'])
+    T_i_n = float(T_params['T_i'])
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
 
