@@ -105,7 +105,23 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     return df
 
 
-def concat_pickles(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):
+def pickle_remove_duplicate(case, suffix, which='sol', fend='.pkl', data_path=data_path_bullard):
+    # remove duplicate entries - for when you fucked up storing
+    case_path = data_path + 'output-' + case + '/'
+    fname = case + suffix + fend
+
+    if os.path.exists(case_path + 'pickle/' + fname):
+        df = pkl.load(open(case_path + 'pickle/' + fname, 'rb'))
+        print('\n\ndf', df)
+        series = df.loc[which]
+        unique = series.duplicated()  # boolean array of duplicates
+        df_new = df[unique]
+        print('\n\ndf_new', df_new)
+        # pkl.dump(df_new, open(case_path + 'pickle/' + fname, "wb"))
+    else:
+        print('pickle_remove_duplicate(): File', fname, 'not found')
+
+def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):
     case_path = data_path + 'output-' + case + '/'
     dfs = []
     for suffix in suffixes:
@@ -589,14 +605,17 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
     rms_all = []
 
     for ii, case in enumerate(cases):
+
+        pickle_remove_duplicate(case, suffix='_T', which='sol', data_path=data_path)
+
+
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
         # load h and T
         df1 = pickleio(case, suffix='_h', postprocess_functions=[h_at_ts], t1=t1[ii], load=load, dat_new=dat,
-                       data_path=data_path, hscale=hscale, **kwargs)
+                       data_path=data_path, hscale=hscale, at_sol=True, **kwargs)
         df2 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii], load=load,
-                       dat_new=dat,
-                       data_path=data_path, hscale=hscale, **kwargs)
+                       dat_new=dat, data_path=data_path, hscale=hscale, at_sol=True, **kwargs)
         df = pd.concat([df1, df2])
 
         try:

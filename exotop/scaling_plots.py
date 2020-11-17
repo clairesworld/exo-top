@@ -28,12 +28,12 @@ sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, sa
 
 ### plot scalings of other output parameters with Ra
 
-sc.subplots_vs_Ra(Ra_ls, eta_ls, t1=t1, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path, fig_path=fig_path,
-                  save=True, fname='delta-Nu-Ti', compare_pub=sc.moresi95, fig_fmt=fig_fmt, fit=True)
+# sc.subplots_vs_Ra(Ra_ls, eta_ls, t1=t1, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path, fig_path=fig_path,
+#                   save=True, load='auto', fname='delta-Nu-Ti', compare_pub=sc.moresi95, fig_fmt=fig_fmt, fit=True)
 
 ## Show convective regimes in parameter space
 ## example of transitional is Ra3e7 eta1e6 - still has regular cells
 
 # sc.plot_convection_regimes(Ra_ls, eta_ls, regime_grid, fname='regimes', data_path=data_path, fig_path=fig_path,
-#                            loadpickle=True, dumppickle=False, save=True,
+#                            load='auto', save=True, fig_fmt=fig_fmt,
 #                            overploth=True, nlevels=14, clist=c_regimes, cmap_contours='autumn')
