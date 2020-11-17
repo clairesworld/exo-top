@@ -606,6 +606,7 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
                     np.array(df['delta_rh']) / np.array(df['d_m']))
             df['h_components'] = h_components
 
+        print(df)
         h_peak = df['h_peak']
         h_rms = df['h_rms']
         # old way of accounting for loading all h instead of just at sols
@@ -713,7 +714,7 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes, load='auto', save=True,
     bigax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     legend = False
     for ii, eta in enumerate(eta_ls):
-        print('eta level', ii, '/', len(eta_ls))
+        print('eta level', ii, '/', len(eta_ls)-1)
         z = int(str(nrows) + str(ncols) + str(ii + 1))
         ax = fig.add_subplot(z)
         #         ax = flaxes[ii]
@@ -887,7 +888,7 @@ def plot_multi_Ra_scaling(Ra=None, eta=None, t1=None, keys=None, data_path=data_
             t1_ii = t1_eta[ii]
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
-                plot_data[Ra].append(float(Ra_var[ii]))
+                plot_data['Ra'].append(float(Ra_var[ii]))
 
                 # load T components  
                 dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,

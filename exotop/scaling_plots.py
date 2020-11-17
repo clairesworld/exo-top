@@ -1,11 +1,12 @@
 import sys
-sys.path.insert(0,'/home/cmg76/Works/exo-top/')
+
+sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 # import numpy as np
 from exotop import aspect_scalings as sc
 from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid
 
-#c_regimes = [(0.2208, 0.5455, 0.2338), (0.984, 0.925, 0.365), (0.6882, 0.1059, 0.2059)] # ['#112a12',  '#fbec5d', '#EA2446']
-c_regimes = ['xkcd:sage green', 'xkcd:blood red' , 'xkcd:dark violet']
+# c_regimes = [(0.2208, 0.5455, 0.2338), (0.984, 0.925, 0.365), (0.6882, 0.1059, 0.2059)] # ['#112a12',  '#fbec5d', '#EA2446']
+c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
 
 ### plot h scalings with Ra
 
@@ -19,16 +20,17 @@ print('\nAssuming you have properly saved h values for the right time period\n')
 ### plot h scalings - with dT_m*delta*d_m
 
 sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid=regime_grid, c_regimes=c_regimes, save=True, t1=t1,
-                           fit=True, load='auto', T_components=True, data_path=data_path,
-                           fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt,
-                           ylim=(3e-3, 7e-2), labelsize=14, xlim=(3e-8, 7e-7),
-                           xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', logx=True, logy=True,
-                           showallscatter=True, xlabelpad=8, ylabelpad=0)
+                 fit=True, load='auto', T_components=True, data_path=data_path,
+                 fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt,
+                 ylim=(3e-3, 7e-2), labelsize=14, xlim=(3e-8, 7e-7),
+                 xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', logx=True, logy=True,
+                 showallscatter=True, xlabelpad=8, ylabelpad=0)
 
 ### plot scalings of other output parameters with Ra
 
 sc.plot_multi_Ra_scaling(Ra_ls, eta_ls, keys=['Nu', 'delta_0', 'T_i'], save=True, compare_pub=sc.moresi95,
-                         fname='delta-Nu-Ti', t1=t1, fit=True, fig_fmt=fig_fmt, data_path=data_path, fig_path=fig_path,)
+                         fname='delta-Nu-Ti', t1=t1, fit=True, fig_fmt=fig_fmt, data_path=data_path,
+                         fig_path=fig_path, )
 
 ## Show convective regimes in parameter space
 ## example of transitional is Ra3e7 eta1e6 - still has regular cells
