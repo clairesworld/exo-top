@@ -6,7 +6,7 @@ from exotop import aspect_scalings as sc
 from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid
 
 case = 'Ra3e8-eta1e5-wide'
-pickle_remove_duplicate_row(case, suffix='_T', which='sol', data_path=data_path)
+sc.pickle_remove_duplicate_row(case, suffix='_T', which='sol', data_path=data_path)
 
 ## plot summaries across delta eta
 
