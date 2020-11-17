@@ -117,9 +117,10 @@ def pickle_remove_duplicate(case, suffix, which='sol', fend='.pkl', data_path=da
         unique = ~series.duplicated()  # boolean array of duplicates
         df_new = df[unique]
         print('\n\ndf_new', df_new)
-        # pkl.dump(df_new, open(case_path + 'pickle/' + fname, "wb"))
+        pkl.dump(df_new, open(case_path + 'pickle/' + fname, 'wb'))
     else:
         print('pickle_remove_duplicate(): File', fname, 'not found')
+
 
 def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):
     case_path = data_path + 'output-' + case + '/'
@@ -630,6 +631,7 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
         print('\n\n')
         print('df_T', df2)
         print('\n\n')
+        print('df', df)
         h_peak = df['h_peak']
         h_rms = df['h_rms']
         # old way of accounting for loading all h instead of just at sols
