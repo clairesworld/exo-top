@@ -144,7 +144,11 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
             dfs.append(df_new)
         else:
             print('File', fname, 'does not exist')
-    df_new = pd.concat(dfs, axis=1)  # concatenate along col axis
+    try:
+        df_new = pd.concat(dfs, axis=1)  # concatenate along col axis
+    except ValueError as e:
+        print([d['sol'] for d in dfs])
+        raise e
     is_dup_col = df_new.columns.duplicated()
     if is_dup_col.any():  # check for duplicate cols
         for i, col in enumerate(df_new.columns[df_new.columns.duplicated(keep=False)]):
@@ -155,6 +159,23 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
                     'Attempting to delete duplicate columns which do not match in ' + case_path + ', ' + suffixes)
         df_new = df_new.loc[:, ~is_dup_col]  # remove duplicate cols if any
     pkl.dump(df_new, open(case_path + 'pickle/' + case + new_suffix + fend, "wb"))
+
+
+def print_solution_data(case, suffix='_T', keys=None, data_path=data_path_bullard, fend='.pkl'):
+    case_path = data_path + 'output-' + case + '/'
+    fname = case + suffix + fend
+    if os.path.exists(case_path + 'pickle/' + fname):
+        df_print = pd.DataFrame()
+        df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
+        if keys is None:
+            keys = df.columns.values
+        for key in keys:
+            if key in df.columns:
+                df_print[key] = df[key]
+        print(df_print)
+        print('File name:', fname)
+    else:
+        print('File', fname, 'does not exist')
 
 
 def get_cases_list(Ra, eta):
@@ -576,7 +597,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
     yx_rms_all = []
 
     for ii, case in enumerate(cases):
-
         pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
         pickle_remove_duplicate(case, suffix=psuffix, which='sol', data_path=data_path)
 
