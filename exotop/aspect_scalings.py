@@ -587,8 +587,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         # load outputs
         df = pickleio(case, suffix=psuffix, postprocess_functions=postprocess_functions, t1=t1[ii],
                       data_path=data_path, at_sol=at_sol, **kwargs)
-        h_peak = df['h_peak']*hscale
-        h_rms = df['h_rms']*hscale
         if which_x == 'components':
             try:  # make sure alpha*delta*dT is calculated
                 h_components = df['h_components']
@@ -602,13 +600,12 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
             x = float(cases_var[ii]) * np.ones(
                 len(df.index))  # normally this is equal to Ra (constant at each df index)
         df[x_key] = x
-
-        yx_peak_all.append((h_peak, x))  # store coordinates for each xy point (y=h)
-        yx_rms_all.append((h_rms, x))
+        yx_peak_all.append((df['h_peak']*hscale, x))  # store coordinates for each xy point (y=h)
+        yx_rms_all.append((df['h_rms']*hscale, x))
 
         qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
-        quants_h_peak[ii, :] = qdict['h_peak']
-        quants_h_rms[ii, :] = qdict['h_rms']
+        quants_h_peak[ii, :] = qdict['h_peak']*hscale
+        quants_h_rms[ii, :] = qdict['h_rms']*hscale
         quants_x[ii, :] = qdict[x_key]
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
