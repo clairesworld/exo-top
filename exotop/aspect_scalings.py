@@ -629,6 +629,7 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
         print('\n\n')
         print('df_T', df2.index)
         print('\n\n')
+        print('df_h=df_T', df1.index==df2.index)
         print('df', df.index)
         h_peak = df['h_peak']
         h_rms = df['h_rms']
