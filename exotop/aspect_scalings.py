@@ -511,13 +511,13 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
-def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                 load='auto', showallscatter=False,
-                 save=True, fname='h_vs_Ra', sigma=2, fig_fmt='.png',
+def plot_h_vs_Ra(Ra=None, eta=None, t1=None, fig_path=fig_path_bullard,
+                 showallscatter=False,
+                 save=True, fname='h_vs_Ra', fig_fmt='.png',
                  labelsize=16, xlabel='', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
                  fit=False, cases=None, x_var=None, logx=True, logy=True, legend=True,
-                 fig=None, ax=None, ylim=(6e-3, 7e-2), xlim=None, hscale=1, **kwargs):
+                 fig=None, ax=None, ylim=(6e-3, 7e-2), xlim=None, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     if cases is None:
         cases, x_var = get_cases_list(Ra, eta)
@@ -531,15 +531,15 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
     rms_all = []
 
     for ii, case in enumerate(cases):
-        df = pickleio(case, suffix='_h_all', postprocess_functions=['h_at_ts'], t1=t1[ii], load=load, dat_new=None,
-                      data_path=data_path, hscale=hscale, at_sol=False, **kwargs)
+        df = pickleio(case, suffix='_h_all', postprocess_functions=['h_at_ts'], t1=t1[ii], dat_new=None,
+                      at_sol=False, **kwargs)
         x[ii, :] = float(x_var[ii])
         h_peak = df['h_peak']
         h_rms = df['h_rms']
         peak_all.append((h_peak, x[ii, 1]))
         rms_all.append((h_rms, x[ii, 1]))
 
-        qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms'], plot=False)
+        qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms'], plot=False)
         quants_h_peak[ii, :] = qdict['h_peak']
         quants_h_rms[ii, :] = qdict['h_rms']
 
@@ -592,12 +592,12 @@ def plot_h_vs_Ra(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_pa
 
 
 def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                         load='auto', fig_fmt='.png',
-                         save=True, fname='h_T', sigma=2, showallscatter=False,
+                         fig_fmt='.png',
+                         save=True, fname='h_T', showallscatter=False,
                          labelsize=16, xlabel=r'$\delta_rh \Delta T_{rh}$', ylabel='dynamic topography', title='',
                          c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
                          fit=False, cases=None, x_var=None, logx=True, logy=True,
-                         fig=None, ax=None, ylim=(6e-3, 7e-2), xlim=None, hscale=1, **kwargs):
+                         fig=None, ax=None, ylim=(6e-3, 7e-2), xlim=None, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
 
@@ -619,10 +619,10 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
         # load h and T
-        df1 = pickleio(case, suffix='_h', postprocess_functions=[h_at_ts], t1=t1[ii], load=load, dat_new=dat,
-                       data_path=data_path, hscale=hscale, at_sol=True, **kwargs)
-        df2 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii], load=load,
-                       dat_new=dat, data_path=data_path, hscale=hscale, at_sol=True, **kwargs)
+        df1 = pickleio(case, suffix='_h', postprocess_functions=[h_at_ts], t1=t1[ii], dat_new=dat,
+                       data_path=data_path, at_sol=True, **kwargs)
+        df2 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
+                       dat_new=dat, data_path=data_path, at_sol=True, **kwargs)
         try:
             df = pd.concat([df1, df2], axis=1)  # concatenate along columns
         except IndexError as e:
@@ -655,7 +655,7 @@ def plot_h_vs_components(Ra=None, eta=None, t1=None, data_path=data_path_bullard
         peak_all.append((h_peak, h_components))
         rms_all.append((h_rms, h_components))
 
-        qdict = parameter_percentiles(case, df=df, sigma=sigma, keys=['h_peak', 'h_rms', 'h_components'], plot=False)
+        qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', 'h_components'], plot=False)
         quants_h_peak[ii, :] = qdict['h_peak']
         quants_h_rms[ii, :] = qdict['h_rms']
         quants_h_components[ii, :] = qdict['h_components']
