@@ -49,6 +49,6 @@ from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_
 
 case = 'Ra1e8-eta1e7-wide'
 # sc.print_solution_data(case, suffix='_T', keys=['sol', 'time', 'delta_rh'], data_path=data_path)
-sc.print_solution_data(case, suffix='_h_all', keys=['time', 'h_rms', 'h_peak'], data_path=data_path)
+sc.print_solution_data(case, suffix='_T', keys=['sol'], data_path=data_path)
 
 print('Summary plots complete')
