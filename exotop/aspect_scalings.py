@@ -126,7 +126,8 @@ def pickle_drop_duplicate_row(case, suffix, which='sol', fend='.pkl', data_path=
         print('pickle_remove_duplicate(', case, suffix, which, '): File', fname, 'not found')
 
 
-def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore', data_path=data_path_bullard):
+def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore', data_path=data_path_bullard,
+                **kwargs):
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
@@ -135,9 +136,9 @@ def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore
         for key in keys:
             if key not in df.columns:
                 bad.append(key)
-        df2 = df.drop(labels=keys, axis=1, errors=errors)
         if not not bad:
             print('pickle_drop(', case, '): Keys', bad, ' not found to drop')
+        df2 = df.drop(labels=keys, axis=1, errors=errors)
     elif index is not None:  # drop rows
         df2 = df.drop(labels=index, axis=0, errors=errors)
     else:
