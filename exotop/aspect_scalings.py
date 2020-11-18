@@ -282,10 +282,9 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
                                read_parameters=False)
     time = dat.stats_time
     i_time = np.argmax(time > t1)  # index of first timestep to process (because argmax returns 1st occurrence of 1)
-    # print('ts @ t1:', i_time, 'time @ t1:', time[i_time], 't1:', t1)
 
     if i_time > 0:
-        print('        Processing', postprocess_functions, 'for ', case, ', from timestep', i_time, 'to', len(time))
+        print('        Processing', postprocess_functions, 'from timestep', i_time, 'to', len(time))
         for ii in range(i_time, len(time)):
             ts = ii  # timestep at this solution
             for fn in postprocess_functions:
@@ -1236,32 +1235,33 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                 settitle=False, setxlabel=setxlabel, setylabel=setylabel, legend=legend,
                                 labelsize=labelsize, labelpad=labelpad, label='bottom', sol_df=sol_df)
 
-            if includeTz and t1[ii] < 1:  # final timestep only
+            if includeTz :  # final timestep only
                 icol = icol + 1
                 ax = axes[ii, icol]
+                if t1[ii] < 1:
+                    if not show_sols:
+                        sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
+                                          dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
-                if not show_sols:
-                    sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
-                                      dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
-
-                fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, save=False,
-                                        setxlabel=setxlabel, setylabel=False, fig_path=fig_path, fig=fig,
-                                        ax=ax, legend=legend, labelsize=labelsize)
+                    fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, save=False,
+                                            setxlabel=setxlabel, setylabel=False, fig_path=fig_path, fig=fig,
+                                            ax=ax, legend=legend, labelsize=labelsize)
                 if setxlabel:
                     ax.set_xlabel('temperature', fontsize=labelsize)
                 if setylabel:
                     ax.set_ylabel('depth', fontsize=labelsize)
 
-            if includepdf and t1[ii] < 1:
+            if includepdf:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                ts_df = pickleio(case, suffix='_h_all', postprocess_functions=[h_at_ts], t1=t1[ii],
-                                  dat_new=dat, load=load, data_path=data_path, fig_path=fig_path,
-                                  at_sol=False, **kwargs)
+                if t1[ii] < 1:
+                    ts_df = pickleio(case, suffix='_h_all', postprocess_functions=[h_at_ts], t1=t1[ii],
+                                      dat_new=dat, load=load, data_path=data_path, fig_path=fig_path,
+                                      at_sol=False, **kwargs)
 
-                fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'], fig=fig, ax=ax, save=False,
-                                   settitle=False, setxlabel=setxlabel, legend=legend, labelsize=labelsize,
-                                   c_list=[c_rms, c_peak], path=data_path)
+                    fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'], fig=fig, ax=ax, save=False,
+                                       settitle=False, setxlabel=setxlabel, legend=legend, labelsize=labelsize,
+                                       c_list=[c_rms, c_peak], path=data_path)
                 ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison
 
             if includegraphic:
