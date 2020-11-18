@@ -673,15 +673,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
             dfs.append(df1)
         df = pd.concat(dfs, axis=1)
 
-        if which_x == 'Ra':
-            # correct for accidentally adding shit to h_all df - can eventually remove this?
-            pickle_drop(case, '_h_all', data_path=data_path,
-                        keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L',
-                              'delta_rh', 'h_components', 'y'], **kwargs)
+        # if which_x == 'Ra':
+        #     # correct for accidentally adding shit to h_all df - can eventually remove this?
+        #     pickle_drop(case, '_h_all', data_path=data_path,
+        #                 keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L',
+        #                       'delta_rh', 'h_components', 'y'], **kwargs)
 
         if which_x == 'components':
-            h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=True,
-                                                 **kwargs)
+            h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=True, **kwargs)
             x_key = 'h_components'
             x = h_components
         elif which_x == 'Ra':
@@ -691,6 +690,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         df[x_key] = x
         print('h', df['h_rms'].values)
         print('x', x)
+        print(df)
         yx_peak_all.append((df['h_peak'].values*hscale, x))  # store coordinates for each xy point (y=h)
         yx_rms_all.append((df['h_rms'].values*hscale, x))
 

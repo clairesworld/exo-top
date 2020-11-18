@@ -11,11 +11,11 @@ c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
 print('\nAssuming you have properly saved h values for the right time period\n')
 
 ### plot h scalings with Ra
-
-sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=True, fit=True,
-                 labelsize=14, xlim=(1e6, 3e8), ylim=(1, 9), xlabelpad=8, ylabelpad=10, logx=True, logy=True,
-                 fname='h_Ra_all', xlabel='Ra', hscale=2e-5 * 2700 * 2890, ylabel='dynamic topography (km)',
-                 data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
+#
+# sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=True, fit=True,
+#                  labelsize=14, xlim=(1e6, 3e8), ylim=(1, 9), xlabelpad=8, ylabelpad=10, logx=True, logy=True,
+#                  fname='h_Ra_all', xlabel='Ra', hscale=2e-5 * 2700 * 2890, ylabel='dynamic topography (km)',
+#                  data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ### plot h scalings - with dT_m*delta*alpha
 
