@@ -200,8 +200,8 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
 def print_solution_data(case, suffix='_T', keys=None, data_path=data_path_bullard, fend='.pkl'):
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
+    df_print = pd.DataFrame()
     if os.path.exists(case_path + 'pickle/' + fname):
-        df_print = pd.DataFrame()
         badkeys = []
         df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
         if keys is None:
@@ -218,6 +218,7 @@ def print_solution_data(case, suffix='_T', keys=None, data_path=data_path_bullar
         print('Columns:', df_print.columns.values)
     else:
         print('File', fname, 'does not exist')
+    return df_print
 
 
 def get_cases_list(Ra, eta):
@@ -293,6 +294,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 try:  # need to do this bullshit because adding array to single row breaks df init
                     new_params = pd.DataFrame(new_params_dict, index=[ts])
                 except ValueError as e:
+                    print('adding to df as list :((((')
+                    print(e)
                     new_params = pd.DataFrame({k: [v] for k, v in new_params_dict.items()}, index=[ts])
                 df_to_extend = pd.concat([df_to_extend, new_params])  # concat row axis (may causepdf duplicate index)
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
