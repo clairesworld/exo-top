@@ -291,15 +291,17 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 new_params_dict['sol'] = n
                 new_params_dict['time'] = time[ts]
-                try:  # need to do this bullshit because adding array to single row breaks df init
-                    new_params = pd.DataFrame(new_params_dict, index=[ts])
-                except ValueError as e:
-                    print('adding to df as list :((((')
-                    print(e)
-                    new_params = pd.DataFrame({k: [v] for k, v in new_params_dict.items()}, index=[ts])
-                df_to_extend = pd.concat([df_to_extend, new_params])  # concat row axis (may causepdf duplicate index)
+                new_params_dict['ts'] = ts
+                # try:  # need to do this bullshit because adding array to single row breaks df init
+                #     new_params = pd.DataFrame(new_params_dict, index=[ts])
+                # except ValueError as e:
+                #     print('adding to df as list :((((')
+                #     print(e)
+                #     new_params = pd.DataFrame({k: [v] for k, v in new_params_dict.items()}, index=[ts])
+                df_to_extend = df_to_extend.append(new_params_dict, ignore_index=True)
+                # df_to_extend = pd.concat([df_to_extend, new_params])  # concat row axis (may cause duplicate index)
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
-
+        df_to_extend.set_index('ts')
     else:
         # new_params = pd.DataFrame({'sol':[None], 'time':[None]}, index=[0])
         # df_to_extend = df_to_extend.combine_first(new_params)
