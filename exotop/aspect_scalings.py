@@ -390,6 +390,8 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
         df['h_components'] = h_components
         pkl.dump(df, open(data_path + 'output-' + case + '/pickle/' + case + psuffix + fend, 'wb'))
 
+    print('-------> case: h components returned by T_components_of_h')
+    print(h_components)
     return h_components
 
 
@@ -402,11 +404,11 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
     d_n = dat.T_components(n, T=T, u=u, v=v, cut=True)  # DataFrame of components just at solution n
     d_n['h_components'] = T_components_of_h(case, df=d_n, dat=dat, data_path=data_path, **kwargs)
 
-    for key in d_n.keys():
-        try:
-            _ = (e for e in d_n[key])
-        except TypeError:
-            d_n[key] = [d_n[key]]  # ensure iterable for some reason (so you can do list extension later)
+    # for key in d_n.keys():
+    #     try:
+    #         _ = (e for e in d_n[key])
+    #     except TypeError:
+    #         d_n[key] = [d_n[key]]  # ensure iterable for some reason (so you can do list extension later)
     return d_n
 
 
