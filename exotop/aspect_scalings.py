@@ -373,7 +373,7 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
                       dat_new=dat, data_path=data_path, at_sol=True, fend=fend, **kwargs)
     if alpha_m is None:
         if dat is None:
-                dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
+            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
                                        read_parameters=True)
         alpha_m = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
 
@@ -675,7 +675,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
                            data_path=data_path, at_sol=at_sol, **kwargs)
             dfs.append(df1)
         df = pd.concat(dfs, axis=1)
-        df = df.loc[:, ~df.columns.duplicated()]  # why is this necessary :(
+        df = df.loc[:, ~df.columns.duplicated()]
 
         # if which_x == 'Ra':
         #     # correct for accidentally adding shit to h_all df - can eventually remove this?
@@ -684,18 +684,17 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         #                       'delta_rh', 'h_components', 'y'], **kwargs)
 
         if which_x == 'components':
-            h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=False, **kwargs)
             x_key = 'h_components'
+            if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
+                h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=False, **kwargs)
+            else:
+                h_components = df['h_components']
             x = h_components
         elif which_x == 'Ra':
             x_key = 'Ra'
-            x = float(cases_var[ii]) * np.ones(
-                len(df.index))  # normally this is equal to Ra (constant at each df index)
+            x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
         df[x_key] = x
-        # print('h', df['h_rms'])
-        # print('x', x)
-        # print(df)
-        yx_peak_all.append((np.array(df['h_peak'].values)*hscale, np.array(x)))  # store coordinates for each xy point (y=h)
+        yx_peak_all.append((np.array(df['h_peak'].values)*hscale, np.array(x)))  # each xy point (y=h)
         yx_rms_all.append((np.array(df['h_rms'].values)*hscale, np.array(x)))
 
         qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
