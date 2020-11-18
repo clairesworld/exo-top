@@ -169,14 +169,19 @@ def print_solution_data(case, suffix='_T', keys=None, data_path=data_path_bullar
     fname = case + suffix + fend
     if os.path.exists(case_path + 'pickle/' + fname):
         df_print = pd.DataFrame()
+        badkeys = []
         df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
         if keys is None:
             keys = df.columns.values
         for key in keys:
             if key in df.columns:
                 df_print[key] = df[key]
+            else:
+                badkeys.append(key)
         print(df_print)
-        print('File name:', fname)
+        if not not badkeys:
+            print('Keys not found:', badkeys)
+        print('File name:', fname, '| length:', len(DataFrame.index))
     else:
         print('File', fname, 'does not exist')
 
