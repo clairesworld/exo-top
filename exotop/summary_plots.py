@@ -51,5 +51,7 @@ load = 'auto'
 #
 case = 'Ra3e8-eta1e5-wide'
 sc.print_solution_data(case, suffix='_sol', keys=None, data_path=data_path)
+sc.print_solution_data(case, suffix='_T', keys=None, data_path=data_path)
+sc.print_solution_data(case, suffix='_h', keys=None, data_path=data_path)
 
 print('Summary plots complete')
