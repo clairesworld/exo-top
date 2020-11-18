@@ -117,9 +117,11 @@ def pickle_remove_duplicate_row(case, suffix, which='sol', fend='.pkl', data_pat
             series = df[which]
             unique = ~series.duplicated()  # boolean array of duplicates
             df_new = df[unique]
+            if df_new.equals(df):
+                print('pickle_remove_duplicate(): No duplicate rows found')
             pkl.dump(df_new, open(case_path + 'pickle/' + fname, 'wb'))
         except KeyError:
-            print('KeyError:', fname, 'does not contain', which)
+            print('pickle_remove_duplicate():', fname, 'does not contain column', which)
     else:
         print('pickle_remove_duplicate(): File', fname, 'not found')
 
@@ -633,6 +635,12 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         # load outputs
         df = pickleio(case, suffix=psuffix, postprocess_functions=postprocess_functions, t1=t1[ii],
                       data_path=data_path, at_sol=at_sol, **kwargs)
+
+        if not at_sol:
+            # correct for accidentally adding shit to h_all df
+            pickle_drop(case, psuffix, keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L',
+                                             'delta_rh', 'h_components', 'y'], errors='raise', data_path=data_path)
+
         if which_x == 'components':
             try:  # make sure alpha*delta*dT is calculated
                 h_components = df['h_components']
