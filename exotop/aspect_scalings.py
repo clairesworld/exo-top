@@ -571,6 +571,9 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
         except KeyError as e:
             print(key, 'not processed yet for', case)
             raise e
+        except ValueError as e:
+            print('df[', key, ']', df[key])
+            raise e
 
     if plot:
         fig, ax = plot_pdf(case, df=df, keys=keys, **kwargs)
