@@ -106,6 +106,11 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     return df
 
 
+def pickle_and_postprocess(cases, suffix, postprocess_functions, t1=0, **kwargs):
+    for ii, case in enumerate(cases):
+        pickleio(case, suffix, postprocess_functions, t1=t1[ii], **kwargs)
+
+
 def pickle_drop_duplicate_row(case, suffix, which='sol', fend='.pkl', data_path=data_path_bullard):
     # remove duplicate rows (e.g. for solution or timestep) - for when you fucked up storing
     case_path = data_path + 'output-' + case + '/'
@@ -167,6 +172,8 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
                 if key in df_loaded.columns:
                     df_new[key] = df_loaded[key]  # add this column to new df
                     # print('Copied column', key, 'from', fname)
+                else:
+                    print('File', fname, 'does not contain', key)
             dfs.append(df_new)
         else:
             print('File', fname, 'does not exist')
@@ -632,8 +639,11 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
 
     for ii, case in enumerate(cases):
         pickle_drop_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
+
         if at_sol:
-            pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix='_sol', data_path=data_path)
+            pickle_concat(case, keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L', 'delta_rh',
+                                      'h_components', 'y', 'h_rms', 'h_peak'],
+                          suffixes=['_h', '_T'], new_suffix='_sol', data_path=data_path)
 
         # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
