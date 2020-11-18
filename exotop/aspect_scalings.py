@@ -689,6 +689,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         if which_x == 'components':
             x_key = 'h_components'
             if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
+                print('plot_h_vs(): Calculating T components')
                 h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=False, **kwargs)
             else:
                 h_components = df['h_components']
