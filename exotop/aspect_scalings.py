@@ -588,12 +588,13 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
 
 
 def fit_log(x, h):
-    x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
+
     try:
+        x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
         h1 = np.log10(np.array(h))
     except TypeError as e:
-        print('h', h)
-        print(type(h))
+        print('h', h, type(h))
+        print('x', x, type(x))
         raise e
     try:
         slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
