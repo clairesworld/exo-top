@@ -166,6 +166,7 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
         if os.path.exists(case_path + 'pickle/' + fname):
             df_new = pd.DataFrame()
             df_loaded = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
+            bad = []
             if copy_all_keys:
                 keys = df_loaded.columns.values
             for key in keys:
@@ -173,10 +174,12 @@ def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', 
                     df_new[key] = df_loaded[key]  # add this column to new df
                     # print('Copied column', key, 'from', fname)
                 else:
-                    print('File', fname, 'does not contain', key)
+                    bad.append(key)
             dfs.append(df_new)
+            if not not bad:
+                print('pickle_concat(): File', fname, 'does not contain', bad)
         else:
-            print('File', fname, 'does not exist')
+            print('pickle_concat(): File', fname, 'does not exist')
     try:
         df_new = pd.concat(dfs, axis=1)  # concatenate along col axis
     except ValueError as e:
@@ -629,7 +632,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
                                load='auto', data_path=data_path)
         for case in cases:
             # can eventually stop doing these things?
-            pickle_concat(case, keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L', 'delta_rh',
+            pickle_concat(case, keys=['time', 'sol', 'T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L', 'delta_rh',
                                       'h_components', 'y', 'h_rms', 'h_peak'],
                           suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
             pickle_drop_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
