@@ -3,7 +3,8 @@ sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 # import numpy as np
 # from exotop import aspect_postprocessing2 as asp
 from exotop import aspect_scalings as sc
-from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid
+from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid, \
+    load_grid
 
 # case = 'Ra3e8-eta1e5-wide'
 # sc.pickle_remove_duplicate_row(case, suffix='_T', which='sol', data_path=data_path)

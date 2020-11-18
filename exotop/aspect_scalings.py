@@ -377,10 +377,8 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
                                        read_parameters=True)
         alpha_m = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
 
-    print('T_components_of_h')
-    print(df)
-    h_components = alpha_m * (np.array(df['dT_rh'].values) / np.array(df['dT_m'].values)) * (
-                np.array(df['delta_rh'].values) / np.array(df['d_m'].values))
+    h_components = alpha_m * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
+                np.array(df['delta_rh']) / np.array(df['d_m']))
 
     if update:
         df['h_components'] = h_components
@@ -395,15 +393,15 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
                                read_statistics=True, read_parameters=True)
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
-    df_n = dat.T_components(n, T=T, u=u, v=v, cut=True)  # DataFrame of components just at solution n
-    df_n['h_components'] = T_components_of_h(case, df=df_n, dat=dat, data_path=data_path, **kwargs)
+    d_n = dat.T_components(n, T=T, u=u, v=v, cut=True)  # DataFrame of components just at solution n
+    d_n['h_components'] = T_components_of_h(case, df=d_n, dat=dat, data_path=data_path, **kwargs)
 
-    for key in df_n.keys():
+    for key in d_n.keys():
         try:
-            _ = (e for e in df_n[key])
+            _ = (e for e in d_n[key])
         except TypeError:
-            df_n[key] = [df_n[key]]  # ensure iterable for some reason (so you can do list extension later)
-    return df_n
+            d_n[key] = [d_n[key]]  # ensure iterable for some reason (so you can do list extension later)
+    return d_n
 
 
 # def get_T_params_old(case, t1=0, data_path=data_path_bullard, pickleto=None, picklefrom=None, plotTz=False,

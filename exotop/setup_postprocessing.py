@@ -16,6 +16,11 @@ regime_grid = np.array([['steady', 'steady', 'steady', 'chaotic', 'chaotic', 'ch
                ['no convection', 'steady', 'steady', 'transitional', 'chaotic', 'not converged'],  # eta 1e7
                ['no convection', 'no convection', 'steady', 'transitional', 'not converged', 'not converged']])  # eta 1e8
 
+load_grid = np.empty_like(t1, dtype=object)
+load_grid[:] = True
+load_grid[:, 5] = 'auto'  # which runs use ascii initialisation
+load_grid[3, 4] = 'auto'  # which runs use ascii initialisation
+
 # case names
 end = np.empty_like(t1, dtype=object)
 end[:] = "-wide"
