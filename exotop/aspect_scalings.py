@@ -376,8 +376,11 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
                 dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
                                        read_parameters=True)
         alpha_m = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
-    h_components = alpha_m * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
-                np.array(df['delta_rh']) / np.array(df['d_m']))
+
+    print('T_components_of_h')
+    print(df)
+    h_components = alpha_m * (np.array(df['dT_rh'].values) / np.array(df['dT_m'].values)) * (
+                np.array(df['delta_rh'].values) / np.array(df['d_m'].values))
 
     if update:
         df['h_components'] = h_components
@@ -681,7 +684,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         #                       'delta_rh', 'h_components', 'y'], **kwargs)
 
         if which_x == 'components':
-            h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=True, **kwargs)
+            h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=False, **kwargs)
             x_key = 'h_components'
             x = h_components
         elif which_x == 'Ra':
