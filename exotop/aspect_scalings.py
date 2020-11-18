@@ -94,6 +94,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                           t1=np.maximum(t1, t1_new),  # whichever comes later in time
                                           data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
+                print('df returned by process_at_solutions\n', df)
             else:
                 df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                          t1=np.maximum(t1, t1_new),
@@ -270,6 +271,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=False)
+
+    print('df accepted by process_at_solutions()\n', df_to_extend)
     time = dat.stats_time
     i_time = np.argmax(time > t1)  # index of first timestep to process
     # print('ts @ t1:', i_time, 'time @ t1:', time[i_time], 't1:', t1)
@@ -299,7 +302,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 #     print(e)
                 #     new_params = pd.DataFrame({k: [v] for k, v in new_params_dict.items()}, index=[ts])
                 df_to_extend = df_to_extend.append(new_params_dict, ignore_index=True)
-                print('appended', new_params_dict, 'to', df_to_extend)
+                print('appending\n', new_params_dict)
                 # df_to_extend = pd.concat([df_to_extend, new_params])  # concat row axis (may cause duplicate index)
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
         df_to_extend.set_index('ts')
