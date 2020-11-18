@@ -76,18 +76,18 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
             elif load == 'auto':  # pkl file not found
                 reprocess_flag = True
-                if at_sol:
-                    sol_new = dat_new.read_stats_sol_files()
                 dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                            read_statistics=True, read_parameters=False)
+                if at_sol:
+                    sol_new = dat_new.read_stats_sol_files()
                 print('    File', fname, 'not found, processing...')
 
         else:  # load is False so automatically calculate shit
             reprocess_flag = True
-            if at_sol:
-                sol_new = dat_new.read_stats_sol_files()
             dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                        read_statistics=True, read_parameters=False)
+            if at_sol:
+                sol_new = dat_new.read_stats_sol_files()
 
         if reprocess_flag:
             if at_sol:
@@ -624,6 +624,16 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         at_sol = True
         postprocess_functions = [T_parameters_at_sol, h_at_ts]
 
+        # check for topography at solutions
+        pickle_and_postprocess(cases, suffix='_h', postprocess_functions=[h_at_ts], t1=t1, at_sol=True,
+                               load='auto', data_path=data_path)
+        for case in cases:
+            # can eventually stop doing these things?
+            pickle_concat(case, keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L', 'delta_rh',
+                                      'h_components', 'y', 'h_rms', 'h_peak'],
+                          suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
+            pickle_drop_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
+
     elif which_x == 'Ra':
         psuffix = '_h_all'
         at_sol = False
@@ -638,24 +648,17 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
     yx_rms_all = []
 
     for ii, case in enumerate(cases):
-        pickle_drop_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
-
-        if at_sol:
-            pickle_concat(case, keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L', 'delta_rh',
-                                      'h_components', 'y', 'h_rms', 'h_peak'],
-                          suffixes=['_h', '_T'], new_suffix='_sol', data_path=data_path)
-
         # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
         # load outputs
         df = pickleio(case, suffix=psuffix, postprocess_functions=postprocess_functions, t1=t1[ii],
                       data_path=data_path, at_sol=at_sol, **kwargs)
 
-        if not at_sol:
-            # correct for accidentally adding shit to h_all df
-            pickle_drop(case, psuffix, keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L',
-                                             'delta_rh', 'h_components', 'y'], data_path=data_path,
-                        **kwargs)
+        if psuffix == '_sol':
+            # correct for accidentally adding shit to h_all df - can eventually remove this?
+            pickle_drop(case, psuffix, data_path=data_path,
+                        keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L',
+                              'delta_rh', 'h_components', 'y'], **kwargs)
 
         if which_x == 'components':
             try:  # make sure alpha*delta*dT is calculated

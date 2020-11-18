@@ -17,14 +17,12 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
     if ii in i_plot:
         cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end[ii])]
         labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
-        sc.pickle_and_postprocess(cases_ii, suffix='_h', postprocess_functions=[sc.h_at_ts], t1=t1[ii], at_sol=True,
-                                  load='auto', data_path=data_path)
-        # fig, ax = sc.subplots_cases(
-        #     cases_ii, labels=labels_ii, t1=t1[ii], save=True, load=load,
-        #     fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta,
-        #     includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-        #     includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid[ii],
-        # )
+        sc.subplots_cases(
+            cases_ii, labels=labels_ii, t1=t1[ii], save=True, load=load,
+            fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta,
+            includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid[ii],
+        )
 
 # compare 64 and 129 resolution for Ra=3e7
 # fig, ax = sc.case_subplots(
@@ -41,7 +39,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
 #     if ii in i_plot:
 #         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end.T[ii])]
 #         labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
-#         fig, ax = sc.subplots_cases(
+#         sc.subplots_cases(
 #             cases_ii, labels=labels_ii, t1=t1.T[ii], save=True, load=load,
 #             fname='all-Ra-' + Ra, suptitle='Ra = '+Ra,
 #             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
