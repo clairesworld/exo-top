@@ -182,6 +182,7 @@ def print_solution_data(case, suffix='_T', keys=None, data_path=data_path_bullar
         if not not badkeys:
             print('Keys not found:', badkeys)
         print('File name:', fname, '| length:', len(df_print.index))
+        print('Columns:', df_print.columns.values)
     else:
         print('File', fname, 'does not exist')
 
