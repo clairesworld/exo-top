@@ -299,6 +299,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 #     print(e)
                 #     new_params = pd.DataFrame({k: [v] for k, v in new_params_dict.items()}, index=[ts])
                 df_to_extend = df_to_extend.append(new_params_dict, ignore_index=True)
+                print('appended', new_params_dict, 'to', df_to_extend)
                 # df_to_extend = pd.concat([df_to_extend, new_params])  # concat row axis (may cause duplicate index)
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
         df_to_extend.set_index('ts')
@@ -695,6 +696,9 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
             x_key = 'h_components'
             if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
                 print('plot_h_vs(): Calculating T components')
+                print('x_key not in df.columns', x_key not in df.columns)
+                print('(x_key in df.columns)', (x_key in df.columns))
+                print('df[x_key]', df[x_key])
                 h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=False, **kwargs)
             else:
                 h_components = df['h_components']
