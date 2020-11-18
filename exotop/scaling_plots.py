@@ -18,9 +18,8 @@ sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=Tr
 
 ### plot h scalings - with dT_m*delta*alpha
 
-sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=True, fit=True,
+sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=True, fit=True, T_components=True,
                  labelsize=14, xlim=(3e-8, 7e-7), ylim=(8e-3, 6e-2), xlabelpad=8, ylabelpad=12, logx=True, logy=True,
-                 T_components=True,
                  fname='h_T_all', xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
                  showallscatter=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 

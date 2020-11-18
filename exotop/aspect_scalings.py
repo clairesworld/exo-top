@@ -118,12 +118,12 @@ def pickle_remove_duplicate_row(case, suffix, which='sol', fend='.pkl', data_pat
             unique = ~series.duplicated()  # boolean array of duplicates
             df_new = df[unique]
             if df_new.equals(df):
-                print('pickle_remove_duplicate(): No duplicate rows found')
+                print('pickle_remove_duplicate(', case, suffix, which, '): No duplicate rows found')
             pkl.dump(df_new, open(case_path + 'pickle/' + fname, 'wb'))
         except KeyError:
-            print('pickle_remove_duplicate():', fname, 'does not contain column', which)
+            print('pickle_remove_duplicate(', case, suffix, which, '):', fname, 'does not contain column', which)
     else:
-        print('pickle_remove_duplicate(): File', fname, 'not found')
+        print('pickle_remove_duplicate(', case, suffix, which, '): File', fname, 'not found')
 
 
 def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='raise', data_path=data_path_bullard):
@@ -137,7 +137,7 @@ def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='raise'
             df.drop(labels=index, axis=0, errors=errors)
         else:
             raise Exception('pickle_drop(): Must provide keys or index to drop')
-    except KeyError as e:
+    except KeyError or ValueError as e:
         print('Entries not dropped from', fname, '\ne')
     pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
 
