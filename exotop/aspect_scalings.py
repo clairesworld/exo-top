@@ -592,7 +592,11 @@ def fit_log(x, h):
     try:
         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
         h1 = np.log10(np.array(h))
-    except TypeError or ValueError as e:
+    except TypeError as e:
+        print('h', h, type(h))
+        print('x', x, type(x))
+        raise e
+    except ValueError as e:
         print('h', h, type(h))
         print('x', x, type(x))
         raise e
