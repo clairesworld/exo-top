@@ -689,8 +689,10 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
             x = float(cases_var[ii]) * np.ones(
                 len(df.index))  # normally this is equal to Ra (constant at each df index)
         df[x_key] = x
-        yx_peak_all.append((df['h_peak']*hscale, x))  # store coordinates for each xy point (y=h)
-        yx_rms_all.append((df['h_rms']*hscale, x))
+        print('h', df['h_rms'].values)
+        print('x', x)
+        yx_peak_all.append((df['h_peak'].values*hscale, x))  # store coordinates for each xy point (y=h)
+        yx_rms_all.append((df['h_rms'].values*hscale, x))
 
         qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
         quants_h_peak[ii, :] = qdict['h_peak']*hscale
