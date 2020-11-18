@@ -630,8 +630,10 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         at_sol = True
         postprocess_functions = [T_parameters_at_sol, h_at_ts]
 
-        # check for topography at solutions
+        # check for topography and T at solutions
         pickle_and_postprocess(cases, suffix='_h', postprocess_functions=[h_at_ts], t1=t1, at_sol=True,
+                               load='auto', data_path=data_path)
+        pickle_and_postprocess(cases, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1, at_sol=True,
                                load='auto', data_path=data_path)
         for case in cases:
             # can eventually stop doing these things?
