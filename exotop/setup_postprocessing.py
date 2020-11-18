@@ -1,5 +1,6 @@
 import numpy as np
 
+alpha_m = 1.35e-5
 Ra_ls = np.array(['1e6', '3e6', '1e7', '3e7', '1e8', '3e8'])  # 3e5 no convection
 eta_ls = np.array(['1e5', '1e6', '1e7', '1e8'])
 

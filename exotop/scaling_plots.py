@@ -2,7 +2,8 @@ import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 # import numpy as np
 from exotop import aspect_scalings as sc
-from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid
+from setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid, \
+    alpha_m
 
 # c_regimes = [(0.2208, 0.5455, 0.2338), (0.984, 0.925, 0.365), (0.6882, 0.1059, 0.2059)] # ['#112a12',  '#fbec5d', '#EA2446']
 c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
@@ -18,7 +19,8 @@ sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=Tr
 
 ### plot h scalings - with dT_m*delta*alpha
 
-sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=True, fit=True, T_components=True,
+sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=True, fit=True,
+                 T_components=True, alpha_m=alpha_m,
                  labelsize=14, xlim=(3e-8, 7e-7), ylim=(8e-3, 6e-2), xlabelpad=8, ylabelpad=12, logx=True, logy=True,
                  fname='h_T_all', xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
                  showallscatter=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)

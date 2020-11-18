@@ -284,6 +284,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         n_ts = n_indices + i_time  # TODO: not off by 1 ?
         for ii, n in enumerate(n_quasi):
             ts = n_ts[ii]  # timestep at this solution
+            if not isinstance(postprocess_functions, list):
+                postprocess_functions = [postprocess_functions]
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 new_params_dict['sol'] = n
@@ -364,26 +366,24 @@ def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
 
 
 def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path_bullard, update=False,
-                      fend='.pkl', **kwargs):
+                      fend='.pkl', alpha_m=None, **kwargs):
     # calculate T components in h heuristic for all processed solutions
     if df is None:
         df = pickleio(case, suffix=psuffix, postprocess_functions=[T_parameters_at_sol],
                       dat_new=dat, data_path=data_path, at_sol=True, fend=fend, **kwargs)
-    try:
-        return df['h_components'].values
-    except KeyError:
+    if alpha_m is None:
         if dat is None:
-            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
-                                   read_parameters=True)
-        alpha = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
-        h_components = alpha * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
-                    np.array(df['delta_rh']) / np.array(df['d_m']))
+                dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
+                                       read_parameters=True)
+        alpha_m = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
+    h_components = alpha_m * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
+                np.array(df['delta_rh']) / np.array(df['d_m']))
 
-        if update:
-            df['h_components'] = h_components
-            pkl.dump(df, open(data_path + 'output-' + case + '/pickle/' + case + psuffix + fend, 'wb'))
+    if update:
+        df['h_components'] = h_components
+        pkl.dump(df, open(data_path + 'output-' + case + '/pickle/' + case + psuffix + fend, 'wb'))
 
-        return h_components
+    return h_components
 
 
 def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs):
@@ -566,14 +566,18 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
         print('Unrecognized sigma value')
     qdict = {}
     for key in keys:
+        vals = df[key].values
         try:
-            qdict[key] = np.percentile(df[key], qs)
+            qdict[key] = np.percentile(vals, qs)
+        except TypeError:
+            vals = [np.array(a).item() for a in vals]
+            qdict[key] = np.percentile(vals, qs)
         except KeyError as e:
             print(key, 'not processed yet for', case)
             raise e
         except Exception as e:
             print(case, 'df[', key, ']')
-            print(df[key])
+            print(vals)
             raise e
 
     if plot:
@@ -618,33 +622,30 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
               save=True, fname='h', showallscatter=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
-              fit=False, cases=None, logx=True, logy=True, hscale=1,
+              fit=False,logx=True, logy=True, hscale=1,
               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     # either Ra or eta is list of strings (other is singular), t1 is a list of numbers the same length
 
-    if cases is None:
-        cases, cases_var = get_cases_list(Ra, eta)
+    cases, cases_var = get_cases_list(Ra, eta)
     if t1 is None:
         t1 = [0] * len(cases)
     if which_x == 'components':
-        psuffix = '_sol'
+        psuffixes = ['_T', '_h']
         at_sol = True
         postprocess_functions = [T_parameters_at_sol, h_at_ts]
-
         # check for topography and T at solutions
-        pickle_and_postprocess(cases, suffix='_h', postprocess_functions=[h_at_ts], t1=t1, at_sol=True,
-                               load='auto', data_path=data_path)
-        pickle_and_postprocess(cases, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1, at_sol=True,
-                               load='auto', data_path=data_path)
-        for case in cases:
-            # can eventually stop doing these things?
-            pickle_concat(case, keys=['time', 'sol', 'T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L', 'delta_rh',
-                                      'h_components', 'y', 'h_rms', 'h_peak'],
-                          suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
-            pickle_drop_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
-
+        # pickle_and_postprocess(cases, suffix='_h', postprocess_functions=[h_at_ts], t1=t1, at_sol=True,
+        #                        load='auto', data_path=data_path)
+        # pickle_and_postprocess(cases, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1, at_sol=True,
+        #                        load='auto', data_path=data_path)
+        # for case in cases:
+        #     # can eventually stop doing these things?
+        #     pickle_concat(case, keys=['time', 'sol', 'T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L', 'delta_rh',
+        #                               'h_components', 'y', 'h_rms', 'h_peak'],
+        #                   suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
+        #     pickle_drop_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
     elif which_x == 'Ra':
-        psuffix = '_h_all'
+        psuffixes = ['_h_all']
         at_sol = False
         postprocess_functions = [h_at_ts]
     else:
@@ -660,20 +661,21 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
         # load outputs
-        df = pickleio(case, suffix=psuffix, postprocess_functions=postprocess_functions, t1=t1[ii],
-                      data_path=data_path, at_sol=at_sol, **kwargs)
+        dfs = []
+        for ip, ps in enumerate(psuffixes):
+            df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1[ii],
+                          data_path=data_path, at_sol=at_sol, **kwargs)
+            dfs.append(df1)
+        df = pd.concat(dfs, axis=1)
 
-        if psuffix == '_sol':
+        if which_x == 'Ra':
             # correct for accidentally adding shit to h_all df - can eventually remove this?
-            pickle_drop(case, psuffix, data_path=data_path,
+            pickle_drop(case, '_h_all', data_path=data_path,
                         keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L',
                               'delta_rh', 'h_components', 'y'], **kwargs)
 
         if which_x == 'components':
-            try:  # make sure alpha*delta*dT is calculated
-                h_components = df['h_components']
-            except KeyError:
-                h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=True,
+            h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=True,
                                                  **kwargs)
             x_key = 'h_components'
             x = h_components
