@@ -572,7 +572,8 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
             print(key, 'not processed yet for', case)
             raise e
         except Exception as e:
-            print('df[', key, ']', df[key])
+            print(case, 'df[', key, ']')
+            print(df[key])
             raise e
 
     if plot:
