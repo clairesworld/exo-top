@@ -49,7 +49,7 @@ load = 'auto'
 
 ## look at individual case data
 
-case = 'Ra1e5-eta1e5-wide'
+case = 'Ra1e7-eta1e5-wide'
 sc.print_solution_data(case, suffix='_h_all', keys=None, data_path=data_path)
 
 print('Summary plots complete')
