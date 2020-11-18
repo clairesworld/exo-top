@@ -124,6 +124,22 @@ def pickle_remove_duplicate_row(case, suffix, which='sol', fend='.pkl', data_pat
         print('pickle_remove_duplicate(): File', fname, 'not found')
 
 
+def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='raise', data_path=data_path_bullard):
+    case_path = data_path + 'output-' + case + '/'
+    fname = case + suffix + fend
+    df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
+    try:
+        if keys is not None:  # drop columns
+            df.drop(labels=keys, axis=1, errors=errors)
+        elif index is not None:  # drop rows
+            df.drop(labels=index, axis=0, errors=errors)
+        else:
+            raise Exception('pickle_drop(): Must provide keys or index to drop')
+    except KeyError as e:
+        print('Entries not dropped from', fname, '\ne')
+    pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
+
+
 def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):
     if new_suffix is None:
         new_suffix = '_'
@@ -609,7 +625,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
 
     for ii, case in enumerate(cases):
         pickle_remove_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
-        pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix='_sol', data_path=data_path)
+        if at_sol:
+            pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix='_sol', data_path=data_path)
 
         # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
