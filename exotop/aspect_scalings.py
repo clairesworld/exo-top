@@ -608,7 +608,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
 
     for ii, case in enumerate(cases):
         pickle_remove_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
-        pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
+        pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix='_sol', data_path=data_path)
 
         # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
