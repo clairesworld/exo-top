@@ -17,7 +17,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
     if ii in i_plot:
         cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end[ii])]
         labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
-        sc.pickle_and_postprocess(cases_ii, suffix='_h', postprocess_functions=[sc.h_at_ts()], t1=t1[ii], at_sol=True,
+        sc.pickle_and_postprocess(cases_ii, suffix='_h', postprocess_functions=[sc.h_at_ts], t1=t1[ii], at_sol=True,
                                   load='auto', data_path=data_path)
         # fig, ax = sc.subplots_cases(
         #     cases_ii, labels=labels_ii, t1=t1[ii], save=True, load=load,
