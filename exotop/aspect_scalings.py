@@ -106,7 +106,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     return df
 
 
-def pickle_remove_duplicate_row(case, suffix, which='sol', fend='.pkl', data_path=data_path_bullard):
+def pickle_drop_duplicate_row(case, suffix, which='sol', fend='.pkl', data_path=data_path_bullard):
     # remove duplicate rows (e.g. for solution or timestep) - for when you fucked up storing
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
@@ -126,20 +126,24 @@ def pickle_remove_duplicate_row(case, suffix, which='sol', fend='.pkl', data_pat
         print('pickle_remove_duplicate(', case, suffix, which, '): File', fname, 'not found')
 
 
-def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='raise', data_path=data_path_bullard):
+def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore', data_path=data_path_bullard):
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
-    try:
-        if keys is not None:  # drop columns
-            df.drop(labels=keys, axis=1, errors=errors)
-        elif index is not None:  # drop rows
-            df.drop(labels=index, axis=0, errors=errors)
-        else:
-            raise Exception('pickle_drop(): Must provide keys or index to drop')
-    except KeyError or ValueError as e:
-        print('Entries not dropped from', fname, '\ne')
-    pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
+    if keys is not None:  # drop columns
+        bad = []
+        for key in keys:
+            if key not in df.columns:
+                bad.append(key)
+        df2 = df.drop(labels=keys, axis=1, errors=errors)
+        if not not bad:
+            print('pickle_drop(', case, '): Keys', bad, ' not found to drop')
+    elif index is not None:  # drop rows
+        df2 = df.drop(labels=index, axis=0, errors=errors)
+    else:
+        raise Exception('pickle_drop(): Must provide keys or index to drop')
+    if not df2.equals(df):
+        pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
 
 
 def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):
@@ -626,7 +630,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
     yx_rms_all = []
 
     for ii, case in enumerate(cases):
-        pickle_remove_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
+        pickle_drop_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
         if at_sol:
             pickle_concat(case, keys=None, suffixes=['_h', '_T'], new_suffix='_sol', data_path=data_path)
 
@@ -639,7 +643,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         if not at_sol:
             # correct for accidentally adding shit to h_all df
             pickle_drop(case, psuffix, keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L',
-                                             'delta_rh', 'h_components', 'y'], errors='raise', data_path=data_path)
+                                             'delta_rh', 'h_components', 'y'], data_path=data_path,
+                        **kwargs)
 
         if which_x == 'components':
             try:  # make sure alpha*delta*dT is calculated
