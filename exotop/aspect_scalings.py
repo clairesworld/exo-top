@@ -669,9 +669,10 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
         dfs = []
         for ip, ps in enumerate(psuffixes):
             df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1[ii],
-                          data_path=data_path, at_sol=at_sol, **kwargs)
+                           data_path=data_path, at_sol=at_sol, **kwargs)
             dfs.append(df1)
         df = pd.concat(dfs, axis=1)
+        df = df.loc[:, ~df.columns.duplicated()]  # why is this necessary :(
 
         # if which_x == 'Ra':
         #     # correct for accidentally adding shit to h_all df - can eventually remove this?
@@ -688,9 +689,9 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
             x = float(cases_var[ii]) * np.ones(
                 len(df.index))  # normally this is equal to Ra (constant at each df index)
         df[x_key] = x
-        print('h', df['h_rms'])
-        print('x', x)
-        print(df)
+        # print('h', df['h_rms'])
+        # print('x', x)
+        # print(df)
         yx_peak_all.append((np.array(df['h_peak'].values)*hscale, np.array(x)))  # store coordinates for each xy point (y=h)
         yx_rms_all.append((np.array(df['h_rms'].values)*hscale, np.array(x)))
 
