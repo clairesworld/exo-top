@@ -80,6 +80,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                                            read_statistics=True, read_parameters=False)
                 if at_sol:
                     sol_new = dat_new.read_stats_sol_files()
+
                 print('    File', fname, 'not found, processing...')
 
         else:  # load is False so automatically calculate shit
@@ -310,7 +311,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         # new_params = pd.DataFrame({'sol':[None], 'time':[None]}, index=[0])
         # df_to_extend = df_to_extend.combine_first(new_params)
         if t1 < 1:
-            print('    No timesteps after t = {:.2f} (tf = {:.2f})'.format(time[i_time], time[-1]))
+            print('    No timesteps after t = {:.2f} (tf = {:.2f}, t1 = {:.2f})'.format(time[i_time], time[-1], t1))
         else:
             print('    Skipping case with t1 > 1')
         # print('    No solutions after t =', time[i_time], '(tf =', time[-1], ')')
