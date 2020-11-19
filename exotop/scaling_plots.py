@@ -11,24 +11,24 @@ c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
 load = 'auto'
 
 ### plot h scalings with Ra
-#
-# sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=load, fit=True,
-#                  labelsize=14, xlim=(1e6, 3e8), ylim=(1, 9), xlabelpad=8, ylabelpad=10, logx=True, logy=True,
-#                  fname='h_Ra_all', xlabel='Ra', hscale=2e-5 * 2700 * 2890, ylabel='dynamic topography (km)',
-#                  data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
+
+sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, end=end, load=load, fit=True,
+                 labelsize=14, xlim=(1e6, 3e8), ylim=(1, 9), xlabelpad=8, ylabelpad=10, logx=True, logy=True,
+                 fname='h_Ra_all', xlabel='Ra', hscale=2e-5 * 2700 * 2890, ylabel='dynamic topography (km)',
+                 data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ### plot h scalings - with dT_m*delta*alpha
-#
-# sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=load, fit=True,
-#                  T_components=True, alpha_m=alpha_m,
-#                  labelsize=14, xlim=(3e-8, 7e-7), #ylim=(8e-3, 6e-2),
-#                  xlabelpad=8, ylabelpad=12, logx=True, logy=True,
-#                  fname='h_T_all', xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
-#                  showallscatter=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
+
+sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, end=end, load=load, fit=True,
+                 T_components=True, alpha_m=alpha_m,
+                 labelsize=14, xlim=(3e-8, 7e-7), #ylim=(8e-3, 6e-2),
+                 xlabelpad=8, ylabelpad=12, logx=True, logy=True,
+                 fname='h_T_all', xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
+                 showallscatter=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ### plot scalings of other output parameters with Ra
 
-sc.subplots_vs_Ra(Ra_ls, eta_ls, t1=t1, keys=['Nu', 'delta_0', 'T_i'], load=load, fit=True,
+sc.subplots_vs_Ra(Ra_ls, eta_ls, t1=t1, keys=['Nu', 'delta_0', 'T_i'], end=end, load=load, fit=True,
                   fname='delta-Nu-Ti', compare_pub=None, #sc.moresi95
                   ylabels=['Nu', r'$\delta$', r'$T_i$'], psuffixes=['_T', '_Nu'],
                   postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts],

@@ -223,14 +223,18 @@ def print_solution_data(case, suffix='_T', keys=None, data_path=data_path_bullar
     return df_print
 
 
-def get_cases_list(Ra, eta):
+def get_cases_list(Ra, eta, end=None):
     # either Ra or eta is iterable
     if isinstance(Ra, Iterable) and not isinstance(Ra, string_types):
         x_var = Ra
-        cases = ['Ra' + r + '-eta' + eta + '-wide' for r in Ra]
+        if end is None:
+            end = ['']*len(x_var)
+        cases = ['Ra' + r + '-eta' + eta + en for r, en in zip(Ra, end)]
     elif isinstance(eta, Iterable) and not isinstance(eta, string_types):
         x_var = eta
-        cases = ['Ra' + Ra + '-eta' + e + '-wide' for e in eta]
+        if end is None:
+            end = ['']*len(x_var)
+        cases = ['Ra' + Ra + '-eta' + eta + en for e, en in zip(eta, end)]
     else:
         raise Exception('Ra or eta must be iterable')
     return cases, x_var
@@ -642,7 +646,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
-def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
+def plot_h_vs(Ra=None, eta=None, t1=None, end=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
               fig_fmt='.png', which_x='components',
               save=True, fname='h', showallscatter=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
@@ -650,8 +654,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
               fit=False, logx=True, logy=True, hscale=1,
               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     # either Ra or eta is list of strings (other is singular), t1 is a list of numbers the same length
-
-    cases, cases_var = get_cases_list(Ra, eta)
+    cases, cases_var = get_cases_list(Ra, eta, end)
     if t1 is None:
         t1 = [0] * len(cases)
     if which_x == 'components':
@@ -992,7 +995,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
 
 
 def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes=None, save=True, t1=None, nrows=2, ncols=2, T_components=False,
-                  fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png',
+                  fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
                   labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
     # subplots for different eta
     #     fig, axes = plt.subplots(2,2, figsize=(7,7))
@@ -1007,6 +1010,9 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes=None, save=True, t1=None
         which_x = 'Ra'
     if t1 is None:
         t1 = np.zeros(len(eta_ls), len(Ra_ls))
+    if end is None:
+        end = np.empty_like(t1)
+        end[:] = ''
 
     fig = plt.figure(figsize=(7, 7))
     bigax = fig.add_subplot(111)  # The big subplot
@@ -1044,19 +1050,19 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes=None, save=True, t1=None
 
         # steady
         if not (not Ra_steady):
-            fig, ax = plot_h_vs(Ra=Ra_steady, eta=eta, t1=t1[ii, Ra_steady_idx], which_x=which_x,
+            fig, ax = plot_h_vs(Ra=Ra_steady, eta=eta, t1=t1[ii, Ra_steady_idx], end=end[ii, Ra_steady_idx], which_x=which_x,
                                 fig=fig, ax=ax, c_rms=c_regimes[0], c_peak=c_regimes[0],
                                 save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
             print('Finished', len(Ra_steady), 'steady-state case(s)')
         # trans
         if not (not Ra_trans):
-            fig, ax = plot_h_vs(Ra=Ra_trans, eta=eta, t1=t1[ii, Ra_trans_idx], which_x=which_x, fig=fig, ax=ax,
+            fig, ax = plot_h_vs(Ra=Ra_trans, eta=eta, t1=t1[ii, Ra_trans_idx], end=end[ii, Ra_trans_idx], which_x=which_x, fig=fig, ax=ax,
                                 c_rms=c_regimes[1], c_peak=c_regimes[1],
                                 save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
             print('Finished', len(Ra_trans), 'transitional case(s)')
             # chaotic
         if not (not Ra_chaos):
-            fig, ax = plot_h_vs(Ra=Ra_chaos, eta=eta, t1=t1[ii, Ra_chaos_idx], which_x=which_x, fig=fig, ax=ax,
+            fig, ax = plot_h_vs(Ra=Ra_chaos, eta=eta, t1=t1[ii, Ra_chaos_idx], end=end[ii, Ra_chaos_idx],which_x=which_x, fig=fig, ax=ax,
                                 c_rms=c_regimes[2], c_peak=c_regimes[2],
                                 save=False, xlabel='', ylabel='', labelsize=labelsize, **kwargs)
             print('Finished', len(Ra_chaos), 'chaotic case(s)')
@@ -1150,7 +1156,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
     return fig, ax
 
 
-def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
+def subplots_vs_Ra(Ra=None, eta=None, t1=None, end=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
                    save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
                    postprocess_functions=[],
                    cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
@@ -1171,7 +1177,7 @@ def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bu
     c_list = colorize(logeta_fl, cmap=cmap)[0]
 
     for jj, eta_str in enumerate(eta):
-        cases, Ra_var = get_cases_list(Ra, eta_str)
+        cases, Ra_var = get_cases_list(Ra, eta_str, end[jj])
         if t1 is None:
             t1_eta = [0] * len(cases)
         else:
