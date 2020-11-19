@@ -413,10 +413,12 @@ class Aspect_Data():
             p = self.parameters
         except AttributeError:
             self.read_parameters(verbose=False)
+            p = self.parameters
         try:
             F = self.stats_heatflux_top/p['Geometry model']['Box']['X extent']
         except AttributeError:
             self.read_statistics(verbose=False)
+            F = self.stats_heatflux_top / p['Geometry model']['Box']['X extent']
         d = p['Geometry model']['Box']['Y extent']
         dT = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
         Nu = d*F/(k*dT)
