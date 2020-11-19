@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_postprocessing2 as post
-from exotop.mpl_tools import colorize
+from exotop.useful_and_bespoke import colorize, iterable_not_string
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -11,8 +11,6 @@ import matplotlib.image as mpimg
 from matplotlib.colors import LinearSegmentedColormap
 import pandas as pd
 import pickle as pkl
-from collections import Iterable
-from six import string_types
 from scipy.optimize import curve_fit
 from scipy import stats
 
@@ -20,10 +18,12 @@ data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 
 
-def savefig(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', **kwargs):
+def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
     path = fig_path + fname + fig_fmt
     directory = os.path.dirname(path)
     os.makedirs(directory, exist_ok=True)
+    if tight_layout:
+        fig.tight_layout()
     fig.savefig(path, bbox_inches=bbox_inches, **kwargs)
     print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  saved to ', path, '!')
 
@@ -212,7 +212,7 @@ def print_solution_data(case, suffix='_T', keys=None, data_path=data_path_bullar
             if key in df.columns:
                 df_print[key] = df[key]
             else:
-                badkeys.append(key)
+                badkeys.append([key])
         print(df_print)
         if not not badkeys:
             print('Keys not found:', badkeys)
@@ -225,15 +225,15 @@ def print_solution_data(case, suffix='_T', keys=None, data_path=data_path_bullar
 
 def get_cases_list(Ra, eta, end=None):
     # either Ra or eta is iterable
-    if isinstance(Ra, Iterable) and not isinstance(Ra, string_types):
+    if iterable_not_string(Ra):
         x_var = Ra
         if end is None:
-            end = ['']*len(x_var)
+            end = [''] * len(x_var)
         cases = ['Ra' + r + '-eta' + eta + en for r, en in zip(Ra, end)]
-    elif isinstance(eta, Iterable) and not isinstance(eta, string_types):
+    elif iterable_not_string(eta):
         x_var = eta
         if end is None:
-            end = ['']*len(x_var)
+            end = [''] * len(x_var)
         cases = ['Ra' + Ra + '-eta' + eta + en for e, en in zip(eta, end)]
     else:
         raise Exception('Ra or eta must be iterable')
@@ -646,17 +646,19 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
-def plot_h_vs(Ra=None, eta=None, t1=None, end=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
+def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_path_bullard, fig_path=fig_path_bullard,
               fig_fmt='.png', which_x='components',
               save=True, fname='h', showallscatter=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
               fit=False, logx=True, logy=True, hscale=1,
               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
-    # either Ra or eta is list of strings (other is singular), t1 is a list of numbers the same length
+    # either Ra or eta is 1D list of strings (other is singular), t1, end must match shape
     cases, cases_var = get_cases_list(Ra, eta, end)
     if t1 is None:
         t1 = [0] * len(cases)
+    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
+        load = [load] * len(cases)
     if which_x == 'components':
         psuffixes = ['_T', '_h']
         at_sol = True
@@ -686,12 +688,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, data_path=data_path_bullard,
     yx_rms_all = []
 
     for ii, case in enumerate(cases):
+        t1_ii = t1[ii]
+        load_ii = load[ii]
         # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
         # load outputs
         dfs = []
         for ip, ps in enumerate(psuffixes):
-            df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1[ii],
+            df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
                            data_path=data_path, at_sol=at_sol, **kwargs)
             dfs.append(df1)
         df = pd.concat(dfs, axis=1)
@@ -710,7 +714,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, data_path=data_path_bullard,
                 print('x_key not in df.columns', x_key not in df.columns)
                 print('(x_key in df.columns)', (x_key in df.columns))
                 print('df[x_key]', df[x_key])
-                h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1[ii], update=False, **kwargs)
+                h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii, update=False,
+                                                 **kwargs)
             else:
                 h_components = df['h_components']
             x = h_components
@@ -778,7 +783,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, data_path=data_path_bullard,
     ax.set_title(title, fontsize=labelsize)
 
     if save:
-        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
@@ -994,25 +999,26 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, data_path=data_path_bullard,
 #     return fig, ax
 
 
-def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes=None, save=True, t1=None, nrows=2, ncols=2, T_components=False,
-                  fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
-                  labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
-    # subplots for different eta
-    #     fig, axes = plt.subplots(2,2, figsize=(7,7))
-    #     flaxes = axes.flatten()
+def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1=None, nrows=2,
+                          ncols=2, T_components=False,
+                          load='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
+                          show_bounds=False,
+                          labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
     if c_regimes is None:
         c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
+    if t1 is None:
+        t1 = np.zeros((len(eta_ls), len(Ra_ls)))
+    if end is None:
+        end = np.empty_like(t1, dtype=object)
+        end[:] = ''
+    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
+        load = [[load] * len(Ra_ls)] * len(eta_ls)
     if T_components:
         print(r'Plotting h vs. $\alpha \Delta T \delta$')
         which_x = 'components'
     else:
         print(r'Plotting h vs. Ra')
         which_x = 'Ra'
-    if t1 is None:
-        t1 = np.zeros(len(eta_ls), len(Ra_ls))
-    if end is None:
-        end = np.empty_like(t1)
-        end[:] = ''
 
     fig = plt.figure(figsize=(7, 7))
     bigax = fig.add_subplot(111)  # The big subplot
@@ -1024,87 +1030,50 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes=None, save=True, t1=None
     bigax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
     bigax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
 
-    for ii, eta in enumerate(eta_ls):
-        print('eta level', ii, '/', len(eta_ls) - 1)
+    for ii, eta_ii in enumerate(eta_ls):
+        print(r'$\Delta \eta$ level', ii, '/', len(eta_ls) - 1)
         z = int(str(nrows) + str(ncols) + str(ii + 1))
         ax = fig.add_subplot(z)
-        #         ax = flaxes[ii]
-        #         if (ii % 2) == 0:
-        #             ylabel='dynamic topography'
-        #         else:
-        #             ylabel=''
-        #         if ii==0:
-        #             legend=True
-        #         else:
-        #             legend=False
-        #         if ii>1:
-        #             xlabel='Ra'
-        #         else:
-        #             xlabel=''
-        Ra_steady = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == 'steady')[0]]
-        Ra_trans = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == 'transitional')[0]]
-        Ra_chaos = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == 'chaotic')[0]]
-        Ra_steady_idx = [j for j in np.nonzero(regime_grid[ii] == 'steady')[0]]
-        Ra_trans_idx = [j for j in np.nonzero(regime_grid[ii] == 'transitional')[0]]
-        Ra_chaos_idx = [j for j in np.nonzero(regime_grid[ii] == 'chaotic')[0]]
+        t1_ii = t1[ii]
+        end_ii = end[ii]
+        load_ii = load[ii]
 
-        # steady
-        if not (not Ra_steady):
-            fig, ax = plot_h_vs(Ra=Ra_steady, eta=eta, t1=t1[ii, Ra_steady_idx], end=end[ii, Ra_steady_idx], which_x=which_x,
-                                fig=fig, ax=ax, c_rms=c_regimes[0], c_peak=c_regimes[0],
-                                save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
-            print('Finished', len(Ra_steady), 'steady-state case(s)')
-        # trans
-        if not (not Ra_trans):
-            fig, ax = plot_h_vs(Ra=Ra_trans, eta=eta, t1=t1[ii, Ra_trans_idx], end=end[ii, Ra_trans_idx], which_x=which_x, fig=fig, ax=ax,
-                                c_rms=c_regimes[1], c_peak=c_regimes[1],
-                                save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
-            print('Finished', len(Ra_trans), 'transitional case(s)')
-            # chaotic
-        if not (not Ra_chaos):
-            fig, ax = plot_h_vs(Ra=Ra_chaos, eta=eta, t1=t1[ii, Ra_chaos_idx], end=end[ii, Ra_chaos_idx],which_x=which_x, fig=fig, ax=ax,
-                                c_rms=c_regimes[2], c_peak=c_regimes[2],
-                                save=False, xlabel='', ylabel='', labelsize=labelsize, **kwargs)
-            print('Finished', len(Ra_chaos), 'chaotic case(s)')
-        ax.text(0.5, 0.95, r'$\Delta \eta$=' + eta, fontsize=labelsize, ha='center', va='top',
-                transform=ax.transAxes)
+        for ir, regime_name in enumerate(regime_names):
+            Ra_regime = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
+            Ra_regime_idx = [j for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
+
+            if not (not Ra_regime):  # if this regime is not empty
+                fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
+                                    load_ii[Ra_regime_idx], which_x=which_x,
+                                    fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir],
+                                    save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
+                if show_bounds:
+                    ax.axvline(float(Ra_regime[-1]) * 2, c='k', lw=0.5, alpha=0.6, ls='--')
+                    # ax.text(ax.get_xlim()[0], ylim[0], regime_name, fontsize=8, va='bottom', ha='left')
+                print('Plotted', len(Ra_regime), regime_name, 'case(s)')
+
+        ax.text(0.5, 0.95, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize, ha='center', va='top',
+                transform=ax.transAxes)  # label
+
         if ii % ncols != 0:
             ax.yaxis.tick_right()
 
-        # show regime boundaries
-    #         try:
-    #             ax.axvline(float(Ra_steady[-1])*2, c='k', lw=0.5, alpha=0.6, ls='--')
-    #             ax.text(ax.get_xlim()[0], ylim[0], 'steady', fontsize=8, va='bottom', ha='left')
-    #         except:
-    #             print('no steady regime for eta', eta)
-    #         try:
-    #             ax.axvline(float(Ra_trans[-1])*2, c='k', lw=0.5, alpha=0.6, ls='--')
-    #             ax.text(float(Ra_steady[-1])*2, ylim[0], 'trans.', fontsize=8, va='bottom', ha='left')
-    #         except:
-    #             print('no transitional regime for eta', eta)
-    #         try:
-    #             ax.text(float(Ra_chaos[0]), ylim[0], 'chaotic', fontsize=8, va='bottom', ha='left')
-    #         except:
-    #             print('no chaotic regime for eta', eta)
-
-    axes = fig.axes
-    ax = bigax  # axes[0]
-    h1 = ax.scatter([], [], label='peak', marker='^', c='k', alpha=0.9)
-    h2 = ax.scatter([], [], label='rms', marker='o', c='k', alpha=0.9)
-    h3 = ax.scatter([], [], label='steady', marker='o', c=c_regimes[0], alpha=0.9)
-    h4 = ax.scatter([], [], label='trans.', marker='o', c=c_regimes[1], alpha=0.9)
-    h5 = ax.scatter([], [], label='chaotic', marker='o', c=c_regimes[2], alpha=0.9)
-    outer_legend = ax.legend(handles=[h1, h2, h3, h4, h5], labels=['peak', 'rms', 'steady', 'trans.', 'chaotic'],
-                             borderaxespad=0., ncol=5,
-                             bbox_to_anchor=(0., 1.02, 1., .102), loc=3, frameon=False,
-                             # mode="expand",
+    ax = bigax
+    handles = [ax.scatter([], [], label='peak', marker='^', c='k', alpha=0.9),
+               ax.scatter([], [], label='rms', marker='o', c='k', alpha=0.9)]
+    # hlabels = []
+    for ir, regime_name in enumerate(regime_names):
+        handles.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir], alpha=0.9))
+    outer_legend = ax.legend(handles=handles,  # labels=['peak', 'rms', 'steady', 'trans.', 'chaotic'],
+                             borderaxespad=0., ncol=len(handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                             frameon=False, mode="expand"
                              )
     ax.add_artist(outer_legend)
-    #     fig.tight_layout()
     fig.subplots_adjust(wspace=0.05, hspace=0.15)
     if save:
-        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None, bbox_extra_artists=(outer_legend,))
-    return fig, axes
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None, bbox_extra_artists=(outer_legend,),
+                  tight_layout=False)
+    return fig, fig.axes
 
 
 def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
@@ -1152,20 +1121,21 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
     ax.set_ylabel(ylabel, fontsize=labelsize)
 
     if save:
-        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
-def subplots_vs_Ra(Ra=None, eta=None, t1=None, end=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                   save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
-                   postprocess_functions=[],
-                   cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
-                   fig=None, axes=None, fig_fmt='.png', **kwargs):
+def subplots_Ra_scaling(Ra=None, eta=None, t1=None, end='', keys=None, data_path=data_path_bullard,
+                        fig_path=fig_path_bullard,
+                        save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
+                        postprocess_functions=[],
+                        cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
+                        fig=None, axes=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
     if ylabels is None:
         ylabels = keys
-    if isinstance(keys, Iterable) and not isinstance(keys, string_types):
+    if iterable_not_string(keys):
         nkeys = len(keys)
     elif keys is None:
         raise Exception('No y-axis keys provided!')
@@ -1212,7 +1182,6 @@ def subplots_vs_Ra(Ra=None, eta=None, t1=None, end=None, keys=None, data_path=da
                         print(dfi)
                     raise e
 
-
                 for key in keys:
                     plot_data[key].append(np.median(df[key]))
 
@@ -1241,7 +1210,7 @@ def subplots_vs_Ra(Ra=None, eta=None, t1=None, end=None, keys=None, data_path=da
     plt.suptitle(title, fontsize=labelsize, y=1.02)
 
     if save:
-        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, axes
 
 
@@ -1305,10 +1274,15 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
     numplotted = 0
     for ii, case in enumerate(cases):
         icol = 0
-        sol_df = None
+        sol_df = None  # make sure these are blanked
         ts_df = None
         if os.path.exists(data_path + 'output-' + case):
             print('Plotting summary for', case, 'using t1 =', t1[ii])
+            t1_ii = t1[ii]
+            if iterable_not_string(load):
+                load_ii = load[ii]
+            else:
+                load_ii = load
             dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
             if ii == ncases - 1:  # show x label in bottom row only
                 setxlabel = True
@@ -1319,16 +1293,16 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             if numplotted == 0:
                 legend = True
 
-            sol_df = None
             if show_sols:  # load df
                 if t1[ii] < 1:
-                    sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
-                                      dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+                    sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1_ii,
+                                      dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
                 else:
                     show_sols = False  # automatically override processing
 
+            # rms velocity plot
             ax = axes[ii, icol]
-            fig, ax = plot_evol(case, 'rms_velocity', fig=fig, ax=ax, save=False, mark_used=True, t1=t1[ii], dat=dat,
+            fig, ax = plot_evol(case, 'rms_velocity', fig=fig, ax=ax, save=False, mark_used=True, t1=t1_ii, dat=dat,
                                 show_sols=show_sols, ylabel='rms velocity', c='k', settitle=False, setxlabel=setxlabel,
                                 setylabel=setylabel, legend=False, labelsize=labelsize, labelpad=labelpad,
                                 sol_df=sol_df)
@@ -1336,28 +1310,33 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             ax.text(0.01, 0.95, labels[ii], horizontalalignment='left', verticalalignment='top',
                     transform=ax.transAxes, fontsize=labelsize, zorder=4)
 
+            # heat flux plot
             icol = icol + 1
             ax = axes[ii, icol]
             fig, ax = plot_evol(case, 'heatflux_top', fig=fig, ax=ax, save=False, mark_used=False, dat=dat,
                                 show_sols=False, ylabel='heat flux', c='xkcd:light red', settitle=False,
                                 setxlabel=setxlabel, setylabel=setylabel, labelsize=labelsize, labelpad=labelpad,
                                 label='top')
-            fig, ax = plot_evol(case, 'heatflux_bottom', fig=fig, ax=ax, save=False, mark_used=True, t1=t1[ii], dat=dat,
+            fig, ax = plot_evol(case, 'heatflux_bottom', fig=fig, ax=ax, save=False, mark_used=True, t1=t1_ii, dat=dat,
                                 show_sols=show_sols, ylabel='heat flux', yscale=-1, c='xkcd:purple blue',
                                 settitle=False, setxlabel=setxlabel, setylabel=setylabel, legend=legend,
                                 labelsize=labelsize, labelpad=labelpad, label='bottom', sol_df=sol_df)
 
-            if includeTz:  # final timestep only
+            if includeTz:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                if t1[ii] < 1:
+                if t1_ii < 1:
                     if not show_sols:
-                        sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
-                                          dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
-
+                        sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1_ii,
+                                          dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
+                    # n=-1 for final timestep only
                     fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, save=False,
                                             setxlabel=setxlabel, setylabel=False, fig_path=fig_path, fig=fig,
                                             ax=ax, legend=legend, labelsize=labelsize)
+                else:
+                    ax.text(0.01, 0.95, '\n\n\nnot converged?',
+                            horizontalalignment='left', verticalalignment='top',
+                            transform=ax.transAxes, fontsize=labelsize)
                 if setxlabel:
                     ax.set_xlabel('temperature', fontsize=labelsize)
                 if setylabel:
@@ -1366,14 +1345,18 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             if includepdf:
                 icol = icol + 1
                 ax = axes[ii, icol]
-                if t1[ii] < 1:
-                    ts_df = pickleio(case, suffix='_h_all', postprocess_functions=[h_at_ts], t1=t1[ii],
-                                     dat_new=dat, load=load, data_path=data_path, fig_path=fig_path,
+                if t1_ii < 1:
+                    ts_df = pickleio(case, suffix='_h_all', postprocess_functions=[h_at_ts], t1=t1_ii,
+                                     dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
                                      at_sol=False, **kwargs)
 
                     fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'], fig=fig, ax=ax, save=False,
                                        settitle=False, setxlabel=setxlabel, legend=legend, labelsize=labelsize,
                                        c_list=[c_rms, c_peak], path=data_path)
+                else:
+                    ax.text(0.01, 0.95, '\n\n\nnot converged?',
+                            horizontalalignment='left', verticalalignment='top',
+                            transform=ax.transAxes, fontsize=labelsize)
                 ax.set_xlim(dt_xlim[0], dt_xlim[1])  # for fair comparison
 
             if includegraphic:
@@ -1386,6 +1369,9 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                     print('Plotting graphical output for', case)
                 except FileNotFoundError:
                     print('Graphical output not found:', fgraph)
+                    ax.text(0.01, 0.95, '\n\n\nno image saved',
+                            horizontalalignment='left', verticalalignment='top',
+                            transform=ax.transAxes, fontsize=labelsize)
                     # fig.delaxes(ax)
 
             numplotted += 1
@@ -1398,38 +1384,47 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
     plt.suptitle(suptitle, fontsize=labelsize * 2, y=1.02)
     if save:
         fig.tight_layout()
-        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, axes
 
 
-def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
-                            save=True, fname='regimes', labelsize=16, fig_fmt='.png', t1=None,
-                            overploth=False, nlevels=10, clist=None, cmap_contours='spring', **kwargs):
-    # Ra and eta are lists of strings
+def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
+                        vmin=None, vmax=None,
+                        save=True, fname='grid', labelsize=16, fig_fmt='.png', t1=None, end=None, cticklabels=None,
+                        cticks=None,
+                        overplot_h=False, nlevels_contour=10, cmap='jet', clist=None, cmap_contours='spring', **kwargs):
+    # plot output of any (scalar-returning) function (with optional topo contours?)
+
     if t1 is None:
         t1 = np.zeros((len(eta), len(Ra)))
-    if clist is None:
-        cmap = plt.cm.get_cmap('jet', 3)
-    else:
-        cmap = cmap_from_list(clist, cmap_name='regimes')
+
     fig, ax = plt.subplots(1, 1)
 
     plot_grid = np.zeros((len(eta), len(Ra)))
-    for x, xval in enumerate(Ra):
-        for y, yval in enumerate(eta):
-            desc = regime_grid[y, x]
-            if desc == 'chaotic':
-                plot_grid[y, x] = 3
-            elif desc == 'transitional':
-                plot_grid[y, x] = 2
-            elif desc == 'steady':
-                plot_grid[y, x] = 1
-            else:  # i.e. no convection
-                plot_grid[y, x] = np.nan  # label grid with numbers
-    m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
-    im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None',
-                   vmin=1, vmax=3, cmap=cmap)
+    for jj, eta_str in enumerate(eta):
+        cases, _ = get_cases_list(Ra, eta_str, end[jj])
+        for ii, Ra_str in enumerate(Ra):
+            # calculate value at this parameter-space coordinate
+            ans = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load, **kwargs)
+            try:
+                plot_grid[jj, ii] = ans
+            except TypeError as e:
+                print('ans', ans)
+                raise e
 
+    if vmax is None:
+        vmax = np.max(plot_grid)
+    if vmin is None:
+        vmin = np.min(plot_grid)
+    if clist is None:
+        cmap = plt.cm.get_cmap(cmap, vmax - vmin)
+    else:
+        cmap = cmap_from_list(clist, cmap_name='regimes')
+
+    m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
+    im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax)
+
+    # draw grid lines
     for x, xval in enumerate(Ra):
         ax.axvline(x=x - 0.5, c='k', lw=0.5)
     for y, yval in enumerate(eta):
@@ -1442,10 +1437,13 @@ def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, f
     ax.set_xticklabels(Ra)
     ax.set_yticklabels(eta)
 
-    cbar = plt.colorbar(im, ticks=[1.5, 2, 2.5], shrink=0.5)
-    cbar.ax.set_yticklabels(['steady', 'transitional', 'chaotic'])
+    cbar = plt.colorbar(im, ticks=cticks, shrink=0.5, vmin=vmin, vmax=vmax)
+    if cticklabels is not None:
+        cbar.ax.set_yticklabels(cticklabels)
 
-    if overploth:  # do h rms contours, only if already stored rms
+    if overplot_h:
+        if t1 is None:
+            t1 = np.zeros((len(eta), len(Ra)))
         #         for iir in range(1,4): # separate contours for each regime (don't link)
         #             print('plotting contours for regime', iir)
         h_grid = np.zeros((len(eta), len(Ra)))
@@ -1459,12 +1457,20 @@ def plot_convection_regimes(Ra, eta, regime_grid, data_path=data_path_bullard, f
                                       load=load, data_path=data_path, fig_path=fig_path, **kwargs)
                     rms = np.median(sol_df['h_rms'])
                     h_grid[y, x] = rms
-        CS = ax.contour(h_grid, nlevels, cmap=cmap_contours)
+        CS = ax.contour(h_grid, nlevels_contour, cmap=cmap_contours)
         ax.clabel(CS, inline=1, fontsize=10)
 
     if save:
-        fig.tight_layout()
-        savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+
+
+def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **kwargs):
+    label = regime_grid[jj, ii]
+    digi = np.nonzero(np.array(regime_names) == label)[0]
+    if not digi:
+        return np.nan  # label not in names
+    else:
+        return digi + 1
 
 
 def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bullard, t1=0,
@@ -1512,7 +1518,7 @@ def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bulla
     if setylabel:
         ax.set_ylabel('depth', fontsize=labelsize)
     if save:
-        savefig(fig, case + fend, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, case + fend, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
@@ -1560,7 +1566,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
     if settitle:
         ax.set_title(case, fontsize=labelsize)
     if save:
-        savefig(fig, case + fend, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, case + fend, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
@@ -1647,12 +1653,12 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
         for t in sol_times:
             ax.axvline(x=t, c='k', lw=0.5, ls='-', alpha=0.6, zorder=0)
     if save:
-        savefig(fig, case + fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, case + fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
-def plot_top_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=data_path_bullard, verbose=True,
-                     fig_fmt='.png', ):
+def plot_topo_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=data_path_bullard, verbose=True,
+                      fig_fmt='.png', ):
     x, h = read_topo_stats(case, ts, data_path=data_path)
     # normalize to 0 mean
     h_norm = trapznorm(h)
@@ -1666,7 +1672,7 @@ def plot_top_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=d
         print('max:', np.max(h_norm))
         print('min:', np.min(h_norm))
     if save:
-        savefig(fig, case + '_h_' + '{:05}'.format(ts), fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, case + '_h_' + '{:05}'.format(ts), fig_path=fig_path, fig_fmt=fig_fmt)
 
 
 def cmap_from_list(clist, n_bin=None, cmap_name=''):

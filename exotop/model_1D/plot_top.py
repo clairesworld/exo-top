@@ -236,7 +236,7 @@ def snaps(pl, plot_snapshots=None, fig_path=None, plots_save=False, fformat='.pn
                        k_m=pl.k_m, legsize=10, **kwargs)
     plt.tight_layout()
     if plots_save:
-        fig2.savefig(fig_path+pl.ident+'_profiles'+fformat, bbox_inches='tight') 
+        fig2.plot_save(fig_path + pl.ident + '_profiles' + fformat, bbox_inches='tight')
     return fig2, axes2
 
 def plot_structure(ax=None, t=None, T_m=None, T_c=None, R_p=None, R_l=None, R_c=None, T_l=None, 
@@ -340,8 +340,8 @@ def plot_qsfc_error(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=Fa
                   fontsize=14)
     plt.tight_layout()
     if plots_save:
-        fig3.savefig(fig_path+pl.ident+'_test_qsfc'+fformat)
-        fig0.savefig(fig_path+pl.ident+'_q_error'+fformat)
+        fig3.plot_save(fig_path + pl.ident + '_test_qsfc' + fformat)
+        fig0.plot_save(fig_path + pl.ident + '_q_error' + fformat)
 
 def plot_Tavg(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, ident=None, fformat='.png', **kwargs):
     """ sanity check on T_avg """
@@ -377,7 +377,7 @@ def plot_Tavg(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, i
     
     plt.tight_layout()
     if plots_save:
-        fig3.savefig(fig_path+pl.ident+'_test_Tavg'+fformat)
+        fig3.plot_save(fig_path + pl.ident + '_test_Tavg' + fformat)
         
 def plot_one(ax, x, y, xlabel, ylabel, labelsize=15, legsize=16, ticksize=12, line_args=None,
              text=None, xticks=True, ylim=None, label=None,labelpad=None, fontname=None, **kwargs):

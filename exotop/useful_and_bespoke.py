@@ -1,7 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-import matplotlib.cm as cmx
 def colorize(vector,cmap='plasma', vmin=None, vmax=None):
     """Convert a vector to RGBA colors. @author: jlustigy
 
@@ -25,7 +22,10 @@ def colorize(vector,cmap='plasma', vmin=None, vmax=None):
     cNorm : matplotlib.colors.Normalize
         Color normalization
     """
-    
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+    import matplotlib.cm as cmx
+
     if vmin is None: vmin = np.min(vector)
     if vmax is None: vmax = np.max(vector)    
     
@@ -35,3 +35,11 @@ def colorize(vector,cmap='plasma', vmin=None, vmax=None):
     vcolors = scalarmap.to_rgba(vector)
     
     return vcolors,scalarmap,cNorm
+
+def iterable_not_string(obj):
+    from collections import Iterable
+    from six import string_types
+    if isinstance(obj, Iterable) and not isinstance(obj, string_types):
+        return True
+    else:
+        return False

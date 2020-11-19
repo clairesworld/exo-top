@@ -12,7 +12,7 @@ import os
 import h5py
 import re
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-rasterized=True
+rasterized = True
 
 def unique_rows(a):
     # Given a numpy array, return another numpy array with only the unique rows
