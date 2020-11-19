@@ -1196,9 +1196,15 @@ def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bu
                     df1 = pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
                                    dat_new=dat, data_path=data_path, **kwargs)
                     dfs.append(df1)
+                try:
+                    df = pd.concat(dfs, axis=1)
+                    df = df.loc[:, ~df.columns.duplicated()]
+                except Exception as e:
+                    print('dfs')
+                    for dfi in dfs:
+                        print(dfi)
+                    raise e
 
-                df = pd.concat(dfs, axis=1)
-                df = df.loc[:, ~df.columns.duplicated()]
 
                 for key in keys:
                     plot_data[key].append(np.median(df[key]))
