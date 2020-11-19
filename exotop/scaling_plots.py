@@ -8,7 +8,7 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1, end, data_path, fig_p
 # c_regimes = [(0.2208, 0.5455, 0.2338), (0.984, 0.925, 0.365), (0.6882, 0.1059, 0.2059)] # ['#112a12',  '#fbec5d', '#EA2446']
 c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
 
-load = True
+load = 'auto'
 
 ### plot h scalings with Ra
 #
@@ -30,7 +30,8 @@ load = True
 
 sc.subplots_vs_Ra(Ra_ls, eta_ls, t1=t1, keys=['Nu', 'delta_0', 'T_i'], load=load, fit=True,
                   fname='delta-Nu-Ti', compare_pub=None, #sc.moresi95
-                  ylabels=['Nu', r'$\delta$', r'$T_i$'], psuffixes=['_T, ''_Nu'], postprocess_functions=[sc.Nu_at_ts, sc.T_parameters_at_sol],
+                  ylabels=['Nu', r'$\delta$', r'$T_i$'], psuffixes=['_T', '_Nu'],
+                  postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts],
                   data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ## Show convective regimes in parameter space
