@@ -1181,13 +1181,14 @@ def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bu
                 # load T components  
                 dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                        read_statistics=True)
-                df1 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1[ii],
+                df1 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1_ii,
                                dat_new=dat, data_path=data_path, **kwargs)
 
                 # extract Nu
-                df2 = pickleio(case, suffix='_Nu', postprocess_functions=[Nu_at_ts], t1=t1[ii],
+                df2 = pickleio(case, suffix='_Nu', postprocess_functions=[Nu_at_ts], t1=t1_ii,
                                dat_new=dat, data_path=data_path, **kwargs)
                 df = pd.concat([df1, df2], axis=1)
+                df = df.loc[:, ~df.columns.duplicated()]
 
                 for key in keys:
                     plot_data[key].append(np.median(df[key]))

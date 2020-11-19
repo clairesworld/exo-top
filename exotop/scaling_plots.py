@@ -20,13 +20,13 @@ print('\nAssuming you have properly saved h values for the right time period\n')
 #                  data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ### plot h scalings - with dT_m*delta*alpha
-
-sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=load, fit=True,
-                 T_components=True, alpha_m=alpha_m,
-                 labelsize=14, xlim=(3e-8, 7e-7), #ylim=(8e-3, 6e-2),
-                 xlabelpad=8, ylabelpad=12, logx=True, logy=True,
-                 fname='h_T_all', xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
-                 showallscatter=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
+#
+# sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=load, fit=True,
+#                  T_components=True, alpha_m=alpha_m,
+#                  labelsize=14, xlim=(3e-8, 7e-7), #ylim=(8e-3, 6e-2),
+#                  xlabelpad=8, ylabelpad=12, logx=True, logy=True,
+#                  fname='h_T_all', xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
+#                  showallscatter=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ### plot scalings of other output parameters with Ra
 
