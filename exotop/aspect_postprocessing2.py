@@ -407,7 +407,7 @@ class Aspect_Data():
         deltaeta = np.round(np.exp(deltaeta))
         return Ra_0*deltaeta
     
-    def Nu(self, k=1):
+    def nusselt(self, k=1):
         # Nusselt number with no internal heating
         try:
             p = self.parameters
@@ -444,34 +444,34 @@ class Aspect_Data():
             delta_L = self.lid_thickness(**kwargs)
         return delta_rh + delta_L
 
-    def delta_Ti_MS95(self, n, Nu=None, T=None, tol=1e-5, **kwargs):
-        # corresponds to the stagnant lid thickness + rheological sublayer (upper tbl)
-        def delta_0(Ti, Nu):
-            return Ti/Nu
-        def delta_1(Ti, Nu):
-            return (1-Ti)/Nu
-        def T_i(d0, d1, T, x, z):  # area-averaged temperature between thermal boundary layers
-            Ix = trapz(T, x=x)
-            z_d0 = find_nearest_idx(z, 1 - d0)
-            z_d1 = find_nearest_idx(z, d1)
-            Iz = trapz(Ix[z_d0:z_d1], x=z[z_d0:z_d1])
-            return 1/(1 - d0 - d1)*Iz
-
-        x = self.x
-        y = self.y
-        if Nu is None:
-            Nu = self.Nu(**kwargs)
-        if T is None:
-            _, _, _, T = self.read_temperature(n, verbose=verbose)
-        Ti = np.mean(horizontal_mean(T, x))  # initial guess
-        diff = 10
-        while diff >= tol:
-            Ti_guess = Ti
-            d0 = delta_0(Ti_guess, Nu)
-            d1 = delta_1(Ti_guess, Nu)
-            Ti = T_i(d0, d1, T, x, z)
-            diff = abs(Ti - Ti_guess)
-        return Ti, d0
+    # def delta_Ti_MS95(self, n, Nu=None, T=None, tol=1e-5, verbose=False, **kwargs):
+    #     # corresponds to the stagnant lid thickness + rheological sublayer (upper tbl)
+    #     def delta_0(Ti, Nu):
+    #         return Ti/Nu
+    #     def delta_1(Ti, Nu):
+    #         return (1-Ti)/Nu
+    #     def T_i(d0, d1, T, x, z):  # area-averaged temperature between thermal boundary layers
+    #         Ix = trapz(T, x=x)
+    #         z_d0 = find_nearest_idx(z, 1 - d0)
+    #         z_d1 = find_nearest_idx(z, d1)
+    #         Iz = trapz(Ix[z_d0:z_d1], x=z[z_d0:z_d1])
+    #         return 1/(1 - d0 - d1)*Iz
+    #
+    #     x = self.x
+    #     y = self.y
+    #     if Nu is None:
+    #         Nu = self.nusselt(**kwargs)
+    #     if T is None:
+    #         _, _, _, T = self.read_temperature(n, verbose=verbose)
+    #     Ti = np.mean(horizontal_mean(T, x))  # initial guess
+    #     diff = 10
+    #     while diff >= tol:
+    #         Ti_guess = Ti
+    #         d0 = delta_0(Ti_guess, Nu)
+    #         d1 = delta_1(Ti_guess, Nu)
+    #         Ti = T_i(d0, d1, T, x, z)
+    #         diff = abs(Ti - Ti_guess)
+    #     return Ti, d0
 
     def lid_thickness(self, u=None, v=None, n=None, tol=1, cut=False, plot=False, cutdiv=2, **kwargs):
         # stagnant lid thickness (mechanical boundary layer) from Moresi & Solomatov 2000
@@ -536,7 +536,8 @@ class Aspect_Data():
         T_l = T_av[find_nearest_idx(y, delta_L)]
         return T_l
         
-    def internal_temperature(self, n=None, T=None, T_av=None, plot=False, return_coords=False, **kwargs):
+    def internal_temperature(self, n=None, T=None, T_av=None, plot=False, return_coords=False, verbose=False,
+                             **kwargs):
         # almost-isothermal temperature of core of convecting cell
         # note: MS2000 define this as the maximal horizontally-averaged temperature in the layer
         x = self.x
@@ -615,9 +616,9 @@ class Aspect_Data():
         u_0 = horizontal_mean(u, self.x)[-1]
         if delta_0 is None:
             if delta_rh is None:
-                delta_rh = ubl_thickness(self, n=n, **kwargs)
+                delta_rh = self.ubl_thickness(n=n, **kwargs)
             if delta_l is None:
-                delta_l = lid_thickness(self, n=n, u=u, **kwargs)
+                delta_l = self.lid_thickness(n=n, u=u, **kwargs)
             delta_0 = delta_rh + delta_l
         return delta_0**2 * u_0
 
@@ -707,7 +708,8 @@ class Aspect_Data():
         cax.set_xlabel(vlabel, fontsize=18)       
         return fig, ax
         
-    def write_ascii(self, A=None, fname='ascii', ext='.txt', path='', n=None, default_field='T', **kwargs):
+    def write_ascii(self, A=None, fname='ascii', ext='.txt', path='', n=None, default_field='T', verbose=False,
+                    **kwargs):
         # format ascii file for initialising future ASPECT runs. A is 2D array
         if n is None:
             n = self.final_step()

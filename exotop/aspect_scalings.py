@@ -371,7 +371,7 @@ def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=True)
-    N = dat.Nu(k=1)
+    N = dat.nusselt(k=1)
     print('N', N)
     return {'Nu': N[ts]}
 
