@@ -1473,6 +1473,18 @@ def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **k
         return digi + 1
 
 
+def lid_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard, **kwargs):
+    if dat is None:
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
+                               read_statistics=False, read_parameters=False)
+    if n is None:
+        n = dat.final_step()
+    df_T = pickleio(case, '_T', [T_parameters_at_sol], dat_new=dat, at_sol=True,
+                    data_path=data_path, **kwargs)
+    S = dat.surface_mobility(n=n, delta_0=df_T['delta_0'], delta_rh=df_T['delta_rh'], delta_l=df_T['delta_L'])
+    return S
+
+
 def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bullard, t1=0,
                   setylabel=True, setxlabel=True, save=True, load='auto',
                   fig_path=fig_path_bullard, fig=None, ax=None, fend='_T-z', fig_fmt='.png',
