@@ -292,9 +292,9 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 postprocess_functions = [postprocess_functions]
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
-                new_params_dict['sol'] = n
+                new_params_dict['sol'] = int(n)
                 new_params_dict['time'] = time[ts]
-                new_params_dict['ts'] = ts
+                new_params_dict['ts'] = int(ts)
                 # try:  # need to do this bullshit because adding array to single row breaks df init
                 #     new_params = pd.DataFrame(new_params_dict, index=[ts])
                 # except ValueError as e:
@@ -359,11 +359,11 @@ def h_at_ts(case, ts=None, **kwargs):
 
     except FileNotFoundError:
         print('    No dynamic topography found at ts =', ts)
-        h_params_n['h_peak'] = np.nan
-        h_params_n['h_rms'] = np.nan
+        # h_params_n['h_peak'] = np.nan
+        # h_params_n['h_rms'] = np.nan
 
-    for key in h_params_n.keys():
-        h_params_n[key] = [h_params_n[key]]
+    # for key in h_params_n.keys():
+    #     h_params_n[key] = [h_params_n[key]]
     return h_params_n
 
 
@@ -393,8 +393,8 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
         df['h_components'] = h_components
         pkl.dump(df, open(data_path + 'output-' + case + '/pickle/' + case + psuffix + fend, 'wb'))
 
-    print('-------> case: h components returned by T_components_of_h')
-    print(h_components)
+    # print('-------> case: h components returned by T_components_of_h')
+    # print(h_components)
     return h_components
 
 
