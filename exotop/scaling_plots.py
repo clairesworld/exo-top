@@ -28,9 +28,9 @@ load = True
 
 ### plot scalings of other output parameters with Ra
 
-sc.subplots_vs_Ra(Ra_ls, eta_ls, t1=t1, keys=['Nu', 'delta_0', 'T_i'], load='auto', fit=True,
+sc.subplots_vs_Ra(Ra_ls, eta_ls, t1=t1, keys=['Nu', 'delta_0', 'T_i'], load=load, fit=True,
                   fname='delta-Nu-Ti', compare_pub=None, #sc.moresi95
-                  data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
+                  ylabel=['Nu', r'$\delta$', r'$T_i$'], data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, save=True)
 
 ## Show convective regimes in parameter space
 ## example of transitional is Ra3e7 eta1e6 - still has regular cells

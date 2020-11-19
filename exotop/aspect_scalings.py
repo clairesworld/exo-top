@@ -94,7 +94,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                           t1=np.maximum(t1, t1_new),  # whichever comes later in time
                                           data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
-                print('re-indexed df returned by process_at_solutions\n', df)
+                # print('re-indexed df returned by process_at_solutions\n', df)
             else:
                 df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                          t1=np.maximum(t1, t1_new),
@@ -272,7 +272,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=False)
 
-    print('df accepted by process_at_solutions()\n', df_to_extend)
+    # print('df accepted by process_at_solutions()\n', df_to_extend)
     time = dat.stats_time
     i_time = np.argmax(time > t1)  # index of first timestep to process
     # print('ts @ t1:', i_time, 'time @ t1:', time[i_time], 't1:', t1)
@@ -372,7 +372,6 @@ def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=True)
     N = dat.nusselt(k=1)
-    print('N', N)
     return {'Nu': N[ts]}
 
 
@@ -1150,13 +1149,13 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
 
 def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                   save=True, fname='bl-Nu', labelsize=16, ylabel=None, title='',
+                   save=True, fname='Ra_scalings', labelsize=16, ylabel=None, title='',
                    cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
                    fig=None, axes=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
     if ylabel is None:
-        ylabel = [r'$\delta$', 'Nu']
+        ylabel = keys
     if fig is None:
         fig, axes = plt.subplots(2, 1)
     logeta_fl = [np.log10(float(a)) for a in eta]
