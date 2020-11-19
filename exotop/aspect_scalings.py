@@ -286,10 +286,10 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         sols_in_time = sol_files[i_time:]
         n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
         n_ts = n_indices + i_time  # TODO: not off by 1 ?
+        if not isinstance(postprocess_functions, list):
+            postprocess_functions = [postprocess_functions]
         for ii, n in enumerate(n_quasi):
             ts = n_ts[ii]  # timestep at this solution
-            if not isinstance(postprocess_functions, list):
-                postprocess_functions = [postprocess_functions]
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 new_params_dict['sol'] = int(n)
@@ -330,6 +330,8 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
 
     if i_time > 0:
         print('        Processing', postprocess_functions, 'from timestep', i_time, 'to', len(time))
+        if not isinstance(postprocess_functions, list):
+            postprocess_functions = [postprocess_functions]
         for ii in range(i_time, len(time)):
             ts = ii  # timestep at this solution
             for fn in postprocess_functions:
@@ -384,11 +386,11 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
     if alpha_m is None:
         if dat is None:
             dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
-                                       read_parameters=True)
+                                   read_parameters=True)
         alpha_m = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
 
     h_components = alpha_m * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
-                np.array(df['delta_rh']) / np.array(df['d_m']))
+            np.array(df['delta_rh']) / np.array(df['d_m']))
 
     if update:
         df['h_components'] = h_components
@@ -600,7 +602,6 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
 
 
 def fit_log(x, h):
-
     try:
         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
         h1 = np.log10(np.array(h))
@@ -645,7 +646,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
               save=True, fname='h', showallscatter=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
-              fit=False,logx=True, logy=True, hscale=1,
+              fit=False, logx=True, logy=True, hscale=1,
               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     # either Ra or eta is list of strings (other is singular), t1 is a list of numbers the same length
 
@@ -713,12 +714,12 @@ def plot_h_vs(Ra=None, eta=None, t1=None, data_path=data_path_bullard, fig_path=
             x_key = 'Ra'
             x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
         df[x_key] = x
-        yx_peak_all.append((np.array(df['h_peak'].values)*hscale, np.array(x)))  # each xy point (y=h)
-        yx_rms_all.append((np.array(df['h_rms'].values)*hscale, np.array(x)))
+        yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(x)))  # each xy point (y=h)
+        yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(x)))
 
         qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
-        quants_h_peak[ii, :] = qdict['h_peak']*hscale
-        quants_h_rms[ii, :] = qdict['h_rms']*hscale
+        quants_h_peak[ii, :] = qdict['h_peak'] * hscale
+        quants_h_rms[ii, :] = qdict['h_rms'] * hscale
         quants_x[ii, :] = qdict[x_key]
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
@@ -1049,14 +1050,14 @@ def subplots_h_vs(Ra_ls, eta_ls, regime_grid, c_regimes=None, save=True, t1=None
         # trans
         if not (not Ra_trans):
             fig, ax = plot_h_vs(Ra=Ra_trans, eta=eta, t1=t1[ii, Ra_trans_idx], which_x=which_x, fig=fig, ax=ax,
-                              c_rms=c_regimes[1], c_peak=c_regimes[1],
-                              save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
+                                c_rms=c_regimes[1], c_peak=c_regimes[1],
+                                save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
             print('Finished', len(Ra_trans), 'transitional case(s)')
             # chaotic
         if not (not Ra_chaos):
             fig, ax = plot_h_vs(Ra=Ra_chaos, eta=eta, t1=t1[ii, Ra_chaos_idx], which_x=which_x, fig=fig, ax=ax,
-                              c_rms=c_regimes[2], c_peak=c_regimes[2],
-                              save=False, xlabel='', ylabel='', labelsize=labelsize, **kwargs)
+                                c_rms=c_regimes[2], c_peak=c_regimes[2],
+                                save=False, xlabel='', ylabel='', labelsize=labelsize, **kwargs)
             print('Finished', len(Ra_chaos), 'chaotic case(s)')
         ax.text(0.5, 0.95, r'$\Delta \eta$=' + eta, fontsize=labelsize, ha='center', va='top',
                 transform=ax.transAxes)
@@ -1149,15 +1150,22 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
 
 def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bullard, fig_path=fig_path_bullard,
-                   save=True, fname='Ra_scalings', labelsize=16, ylabel=None, title='',
+                   save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
+                   postprocess_functions=[],
                    cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
                    fig=None, axes=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
-    if ylabel is None:
-        ylabel = keys
+    if ylabels is None:
+        ylabels = keys
+    if isinstance(keys, Iterable) and not isinstance(keys, string_types):
+        nkeys = len(keys)
+    elif keys is None:
+        raise Exception('No y-axis keys provided!')
+    else:
+        nkeys = 1
     if fig is None:
-        fig, axes = plt.subplots(2, 1)
+        fig, axes = plt.subplots(nkeys, 1)
     logeta_fl = [np.log10(float(a)) for a in eta]
     c_list = colorize(logeta_fl, cmap=cmap)[0]
 
@@ -1179,16 +1187,17 @@ def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bu
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 plot_data['Ra'].append(float(Ra_var[ii]))
 
-                # load T components  
+                # load data
                 dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                        read_statistics=True)
-                df1 = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1_ii,
-                               dat_new=dat, data_path=data_path, **kwargs)
 
-                # extract Nu
-                df2 = pickleio(case, suffix='_Nu', postprocess_functions=[Nu_at_ts], t1=t1_ii,
-                               dat_new=dat, data_path=data_path, **kwargs)
-                df = pd.concat([df1, df2], axis=1)
+                dfs = []
+                for ip, suffix in enumerate(psuffixes):
+                    df1 = pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
+                                   dat_new=dat, data_path=data_path, **kwargs)
+                    dfs.append(df1)
+
+                df = pd.concat(dfs, axis=1)
                 df = df.loc[:, ~df.columns.duplicated()]
 
                 for key in keys:
@@ -1202,19 +1211,21 @@ def subplots_vs_Ra(Ra=None, eta=None, t1=None, keys=None, data_path=data_path_bu
                                             **kwargs)
                     for k, key in enumerate(keys):
                         try:
-                            axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', alpha=0.7, c=c_scatter, label=cmplabel)
+                            axes[k].plot(d_compare['Ra_i'], d_compare[keys], '^', alpha=0.7, c=c_scatter,
+                                         label=cmplabel)
                         except KeyError:
                             print('Key', key, 'not returned by', compare_pub)
 
         for k, key in enumerate(keys):
-            fig, axes[0] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key],
-                                           save=False, labelsize=labelsize, ylabel=ylabel[k], c_scatter=c_scatter,
+            fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key],
+                                           save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
                                            fig=fig, ax=axes[k], **kwargs)
 
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
                             vmin=vmin, vmax=vmax)  # dummy
     cbar = fig.colorbar(scat, ax=[axes[0], axes[1]])
     cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=18)
+    plt.suptitle(title, fontsize=labelsize, y=1.02)
 
     if save:
         savefig(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
@@ -1321,7 +1332,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                 settitle=False, setxlabel=setxlabel, setylabel=setylabel, legend=legend,
                                 labelsize=labelsize, labelpad=labelpad, label='bottom', sol_df=sol_df)
 
-            if includeTz :  # final timestep only
+            if includeTz:  # final timestep only
                 icol = icol + 1
                 ax = axes[ii, icol]
                 if t1[ii] < 1:
@@ -1342,8 +1353,8 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 ax = axes[ii, icol]
                 if t1[ii] < 1:
                     ts_df = pickleio(case, suffix='_h_all', postprocess_functions=[h_at_ts], t1=t1[ii],
-                                      dat_new=dat, load=load, data_path=data_path, fig_path=fig_path,
-                                      at_sol=False, **kwargs)
+                                     dat_new=dat, load=load, data_path=data_path, fig_path=fig_path,
+                                     at_sol=False, **kwargs)
 
                     fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'], fig=fig, ax=ax, save=False,
                                        settitle=False, setxlabel=setxlabel, legend=legend, labelsize=labelsize,
@@ -1472,10 +1483,10 @@ def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bulla
     ax.axhline(D_l_n - delta_rh_n, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
     try:
         ax.text(0, D_l_n - delta_rh_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n), ha='left', va='top',
-            color='xkcd:red orange', fontsize=labelsize - 2)
+                color='xkcd:red orange', fontsize=labelsize - 2)
     except TypeError:
         ax.text(0, D_l_n - delta_rh_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n.item()), ha='left', va='top',
-            color='xkcd:red orange', fontsize=labelsize - 2)
+                color='xkcd:red orange', fontsize=labelsize - 2)
     ax.plot([T_l_n, T_l_n], [0, D_l_n], ls='--', alpha=0.5, lw=0.5, label=r'$T_L$', c='xkcd:tangerine')
     ax.plot([T_i_n, T_i_n], [0, D_l_n - delta_rh_n], ls='--', alpha=0.5, lw=0.5,
             label=r'$T_i$', c='xkcd:red orange')
