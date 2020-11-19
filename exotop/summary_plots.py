@@ -13,17 +13,17 @@ load = 'auto'
 
 ## plot summaries across delta eta
 
-# i_plot = list(range(len(eta_ls)))
-# for ii, eta in enumerate(eta_ls):  # across eta_ls
-#     if ii in i_plot:
-#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end[ii])]
-#         labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
-#         sc.subplots_cases(
-#             cases_ii, labels=labels_ii, t1=t1[ii], save=True, load=load,
-#             fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta,
-#             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid[ii],
-#         )
+i_plot = list(range(len(eta_ls)))
+for ii, eta in enumerate(eta_ls):  # across eta_ls
+    if ii in i_plot:
+        cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end[ii])]
+        labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
+        sc.subplots_cases(
+            cases_ii, labels=labels_ii, t1=t1[ii], save=True, load=load,
+            fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta,
+            includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid[ii],
+        )
 
 # compare 64 and 129 resolution for Ra=3e7
 # fig, ax = sc.case_subplots(
@@ -50,9 +50,9 @@ load = 'auto'
 
 ## look at individual case data
 #
-case = 'Ra3e8-eta1e5-wide'
-sc.print_solution_data(case, suffix='_sol', keys=None, data_path=data_path)
-sc.print_solution_data(case, suffix='_T', keys=None, data_path=data_path)
-sc.print_solution_data(case, suffix='_h', keys=None, data_path=data_path)
+# case = 'Ra3e8-eta1e5-wide'
+# sc.print_solution_data(case, suffix='_sol', keys=None, data_path=data_path)
+# sc.print_solution_data(case, suffix='_T', keys=None, data_path=data_path)
+# sc.print_solution_data(case, suffix='_h', keys=None, data_path=data_path)
 
 print('Summary plots complete')
