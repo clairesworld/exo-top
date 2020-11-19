@@ -1437,7 +1437,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     ax.set_xticklabels(Ra)
     ax.set_yticklabels(eta)
 
-    cbar = plt.colorbar(im, ticks=cticks, shrink=0.5, vmin=vmin, vmax=vmax)
+    cbar = plt.colorbar(im, ticks=cticks, shrink=0.5)
     if cticklabels is not None:
         cbar.ax.set_yticklabels(cticklabels)
 
