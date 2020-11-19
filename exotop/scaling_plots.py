@@ -10,8 +10,6 @@ c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
 
 load = True
 
-print('\nAssuming you have properly saved h values for the right time period\n')
-
 ### plot h scalings with Ra
 #
 # sc.subplots_h_vs(Ra_ls, eta_ls, regime_grid, t1=t1, c_regimes=c_regimes, load=load, fit=True,

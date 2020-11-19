@@ -409,8 +409,14 @@ class Aspect_Data():
     
     def Nu(self, k=1):
         # Nusselt number with no internal heating
-        p = self.parameters
-        F = self.stats_heatflux_top/p['Geometry model']['Box']['X extent']
+        try:
+            p = self.parameters
+        except AttributeError:
+            self.read_parameters(verbose=False)
+        try:
+            F = self.stats_heatflux_top/p['Geometry model']['Box']['X extent']
+        except AttributeError:
+            self.read_statistics(verbose=False)
         d = p['Geometry model']['Box']['Y extent']
         dT = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
         Nu = d*F/(k*dT)
