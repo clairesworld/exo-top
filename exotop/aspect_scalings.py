@@ -371,8 +371,9 @@ def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=True)
-    Nu = dat.Nu(k=1)
-    return {'Nu': Nu[ts]}
+    N = dat.Nu(k=1)
+    print('N', N)
+    return {'Nu': N[ts]}
 
 
 def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path_bullard, update=False,
