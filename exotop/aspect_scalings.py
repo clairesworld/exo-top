@@ -1400,10 +1400,11 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 
     if t1 is None:
         t1 = np.zeros((len(eta), len(Ra)))
-
+    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
+        load = [[load] * len(Ra)]*len(eta)
     fig, ax = plt.subplots(1, 1)
-
     plot_grid = np.zeros((len(eta), len(Ra)))
+
     for jj, eta_str in enumerate(eta):
         cases, _ = get_cases_list(Ra, eta_str, end[jj])
         for ii, Ra_str in enumerate(Ra):
