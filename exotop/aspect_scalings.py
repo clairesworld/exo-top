@@ -316,6 +316,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         except ValueError as e:
             print(df_to_extend.ts)
             print(df_to_extend.sol)
+            raise e
         df_to_extend = df_to_extend.set_index('ts')
     else:
         # new_params = pd.DataFrame({'sol':[None], 'time':[None]}, index=[0])
