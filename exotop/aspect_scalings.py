@@ -1416,7 +1416,6 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
             except Exception as e:
                 print('ans', ans)
                 raise e
-                raise e
 
     if vmax is None:
         vmax = np.max(plot_grid)
