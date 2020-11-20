@@ -44,67 +44,69 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     reprocess_flag = False
     t1_new = t1
 
-    if os.path.exists(case_path):  # do nothing if case doesn't exist
-        os.makedirs(case_path + 'pickle/', exist_ok=True)
-        if load == 'auto' or load is True:
-            if os.path.exists(case_path + 'pickle/' + fname):
-                # open pickled file
-                try:
-                    df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
-                except ValueError:  # python 2?
-                    df = pkl.load(open(case_path + 'pickle/' + fname, "rb"), protocol=2)
-                print('    Found', fname)
+    if t1 < 1:
+        if os.path.exists(case_path):  # do nothing if case doesn't exist
+            os.makedirs(case_path + 'pickle/', exist_ok=True)
+            if load == 'auto' or load is True:
+                if os.path.exists(case_path + 'pickle/' + fname):
+                    # open pickled file
+                    try:
+                        df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
+                    except ValueError:  # python 2?
+                        df = pkl.load(open(case_path + 'pickle/' + fname, "rb"), protocol=2)
+                    print('    Found', fname)
 
-                if load == 'auto':  # check for additional timesteps
-                    if dat_new is None:
-                        dat_new = post.Aspect_Data(directory=case_path, verbose=False,
-                                                   read_statistics=True, read_parameters=False)
+                    if load == 'auto':  # check for additional timesteps
+                        if dat_new is None:
+                            dat_new = post.Aspect_Data(directory=case_path, verbose=False,
+                                                       read_statistics=True, read_parameters=False)
+                        if at_sol:
+                            print('      Checking for new solutions...')
+                            sol_f_old = df.sol.iat[-1]
+                            sol_new = dat_new.read_stats_sol_files()
+                            sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
+                            t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
+                        else:
+                            print('      Checking for new timesteps...')
+                            time_f_old = df.time.iat[-1]
+                            time_new = dat_new.stats_time
+                            t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
+                        if t1_new > 0:  # new timesteps
+                            reprocess_flag = True
+                            print('      Updating', fname, 'from t = {:4f}'.format(t1_new))
+
+                elif load == 'auto':  # pkl file not found
+                    reprocess_flag = True
+                    dat_new = post.Aspect_Data(directory=case_path, verbose=False,
+                                               read_statistics=True, read_parameters=False)
                     if at_sol:
-                        print('      Checking for new solutions...')
-                        sol_f_old = df.sol.iat[-1]
                         sol_new = dat_new.read_stats_sol_files()
-                        sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
-                        t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
-                    else:
-                        print('      Checking for new timesteps...')
-                        time_f_old = df.time.iat[-1]
-                        time_new = dat_new.stats_time
-                        t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
-                    if t1_new > 0:  # new timesteps
-                        reprocess_flag = True
-                        print('      Updating', fname, 'from t = {:4f}'.format(t1_new))
 
-            elif load == 'auto':  # pkl file not found
+                    print('    File', fname, 'not found, processing...')
+
+            else:  # load is False so automatically calculate shit
                 reprocess_flag = True
                 dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                            read_statistics=True, read_parameters=False)
                 if at_sol:
                     sol_new = dat_new.read_stats_sol_files()
 
-                print('    File', fname, 'not found, processing...')
+            if reprocess_flag:
+                if at_sol:
+                    df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
+                                              t1=np.maximum(t1, t1_new),  # whichever comes later in time
+                                              data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
+                    # print('re-indexed df returned by process_at_solutions\n', df)
+                else:
+                    df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
+                                             t1=np.maximum(t1, t1_new),
+                                             data_path=data_path, df_to_extend=df, **kwargs)
+                dump_flag = True  # always save if you did something
 
-        else:  # load is False so automatically calculate shit
-            reprocess_flag = True
-            dat_new = post.Aspect_Data(directory=case_path, verbose=False,
-                                       read_statistics=True, read_parameters=False)
-            if at_sol:
-                sol_new = dat_new.read_stats_sol_files()
-
-        if reprocess_flag:
-            if at_sol:
-                df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
-                                          t1=np.maximum(t1, t1_new),  # whichever comes later in time
-                                          data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
-                # print('re-indexed df returned by process_at_solutions\n', df)
-            else:
-                df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
-                                         t1=np.maximum(t1, t1_new),
-                                         data_path=data_path, df_to_extend=df, **kwargs)
-            dump_flag = True  # always save if you did something
-
-        if dump_flag:
-            pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
-
+            if dump_flag:
+                pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
+    else:
+        print('Skipping case', case, 'for t1 <= 1')
     return df
 
 
