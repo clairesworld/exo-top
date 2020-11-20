@@ -7,7 +7,7 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
     load_grid
 
 for jj, eta in enumerate(eta_ls):
-    cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
+    cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[jj])]
     for ii, case in enumerate(cases_ii):
         print('\n\n', case)
         sc.print_solution_data(case, suffix='_T', keys=['h_components', 'sol'], data_path=data_path)
