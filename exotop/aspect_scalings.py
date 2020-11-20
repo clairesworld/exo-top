@@ -310,6 +310,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 # print('appending\n', new_params_dict)
                 # df_to_extend = pd.concat([df_to_extend, new_params])  # concat row axis (may cause duplicate index)
                 print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
+        df_to_extend.ts = df_to_extend.ts.astype(int)
+        df_to_extend.sol = df_to_extend.sol.astype(int)
         df_to_extend = df_to_extend.set_index('ts')
     else:
         # new_params = pd.DataFrame({'sol':[None], 'time':[None]}, index=[0])
@@ -412,7 +414,7 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
                                read_statistics=True, read_parameters=True)
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
-    d_n = dat.T_components(n, T=T, u=u, v=v, cut=True)  # DataFrame of components just at solution n
+    d_n = dat.T_components(n, T=T, u=u, v=v, cut=True)  # dict of components just at solution n
     d_n['h_components'] = T_components_of_h(case, df=d_n, dat=dat, data_path=data_path, **kwargs)
 
     # for key in d_n.keys():
