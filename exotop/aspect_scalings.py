@@ -1444,7 +1444,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 
     cbar = plt.colorbar(im, ticks=cticks, shrink=0.5)
     if cticklabels is not None:
-        print('trying to set cticklabels'. cticklabels)
+        print('trying to set cticklabels', cticklabels)
         cbar.ax.set_yticklabels(cticklabels)
 
     if overplot_h:
@@ -1475,6 +1475,7 @@ def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **k
     digi = np.nonzero(np.array(regime_names) == label)[0]
     print('label', label, 'nonzero returned', digi)
     if not digi:
+        print('not digi = True')
         return np.nan  # label not in names
     else:
         return digi[0] + 1
