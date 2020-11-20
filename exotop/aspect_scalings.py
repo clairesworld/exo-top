@@ -1409,7 +1409,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cases, _ = get_cases_list(Ra, eta_str, end[jj])
         for ii, Ra_str in enumerate(Ra):
             # calculate value at this parameter-space coordinate
-            ans = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load, **kwargs)
+            ans = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load[jj][ii], t1=t1[jj][ii], **kwargs)
             try:
                 plot_grid[jj, ii] = ans
             except TypeError as e:
