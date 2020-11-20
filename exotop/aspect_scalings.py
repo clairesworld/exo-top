@@ -110,7 +110,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
 def pickle_and_postprocess(cases, suffix, postprocess_functions, t1=0, **kwargs):
     for ii, case in enumerate(cases):
-        pickleio(case, suffix, postprocess_functions, t1=t1[ii], **kwargs)
+        pickleio(case, suffix, postprocess_functions, t1=t1, **kwargs)
 
 
 def pickle_drop_duplicate_row(case, suffix, which='sol', fend='.pkl', data_path=data_path_bullard):
