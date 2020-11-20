@@ -1408,9 +1408,9 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cases, _ = get_cases_list(Ra, eta_str, end[jj])
         for ii, Ra_str in enumerate(Ra):
             # calculate value at this parameter-space coordinate
-
+            print('Ra', Ra_str, 'eta', eta_str, 'ii, jj', ii, jj)
             ans = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load, **kwargs)
-            print('Ra', Ra_str, 'eta', eta_str, 'ii, jj', ii, jj, 'ans:', ans)
+            print('ans:', ans)
             try:
                 plot_grid[jj, ii] = ans
             except TypeError as e:
@@ -1444,6 +1444,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 
     cbar = plt.colorbar(im, ticks=cticks, shrink=0.5)
     if cticklabels is not None:
+        print('trying to set cticklabels'. cticklabels)
         cbar.ax.set_yticklabels(cticklabels)
 
     if overplot_h:
@@ -1466,17 +1467,17 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         ax.clabel(CS, inline=1, fontsize=10)
 
     if save:
-        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, tight_layout=False)
 
 
 def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **kwargs):
     label = regime_grid[jj, ii]
     digi = np.nonzero(np.array(regime_names) == label)[0]
-    print('label', label, 'digitized', digi+1)
+    print('label', label, 'nonzero returned', digi)
     if not digi:
         return np.nan  # label not in names
     else:
-        return digi + 1
+        return digi[0] + 1
 
 
 def lid_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard, **kwargs):

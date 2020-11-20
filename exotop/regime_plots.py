@@ -11,7 +11,7 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
 # example of transitional is Ra3e7 eta1e6 - still has regular cells
 
 sc.plot_parameter_grid(Ra_ls, eta_ls, function=sc.regime_to_digital, regime_grid=regime_grid, regime_names=regime_names,
-                       data_path=data_path, fig_path=fig_path, load=load_grid,
+                       data_path=data_path, fig_path=fig_path, load=load_grid, vmin=1, vmax=3,
                        saimportve=True, fname='grid', labelsize=16, fig_fmt=fig_fmt, t1=t1_grid, end=end_grid,
                        cticklabels=['steady', 'transitional', 'chaotic'], cticks=[1.5, 2, 2.5],
                        overplot_h=False, nlevels_contour=14, cmap='jet', clist=c_regimes, cmap_contours='autumn')
