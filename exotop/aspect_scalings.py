@@ -1408,8 +1408,9 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cases, _ = get_cases_list(Ra, eta_str, end[jj])
         for ii, Ra_str in enumerate(Ra):
             # calculate value at this parameter-space coordinate
-            print('Ra', Ra_str, 'eta', eta_str, 'ii, jj', ii, jj, 'ans:', ans)
+
             ans = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load, **kwargs)
+            print('Ra', Ra_str, 'eta', eta_str, 'ii, jj', ii, jj, 'ans:', ans)
             try:
                 plot_grid[jj, ii] = ans
             except TypeError as e:
@@ -1471,6 +1472,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **kwargs):
     label = regime_grid[jj, ii]
     digi = np.nonzero(np.array(regime_names) == label)[0]
+    print('label', label, 'digitized', digi+1)
     if not digi:
         return np.nan  # label not in names
     else:
