@@ -1474,7 +1474,7 @@ def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **k
     label = regime_grid[jj, ii]
     digi = np.nonzero(np.array(regime_names) == label)[0]
     print('label', label, 'nonzero returned', digi)
-    if not digi:
+    if not list(digi):
         print('not digi = True')
         return np.nan  # label not in names
     else:
