@@ -6,13 +6,14 @@ from exotop import aspect_scalings as sc
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid, \
     load_grid
 
-for jj, eta in enumerate(eta_ls):
-    cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[jj])]
-    for ii, case in enumerate(cases_ii):
-        print('\n\n', case)
-        sc.print_solution_data(case, suffix='_T', keys=['h_components', 'sol'], data_path=data_path)
-        sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
-        sc.print_solution_data(case, suffix='_h_all', keys=['h_rms', 'time'], data_path=data_path)
+jj = 0
+eta = eta_ls[jj]
+cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[jj])]
+for ii, case in enumerate(cases_ii):
+    print('\n\n', case)
+    sc.print_solution_data(case, suffix='_T', keys=['h_components', 'sol'], data_path=data_path)
+    sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
+    sc.print_solution_data(case, suffix='_h_all', keys=['h_rms', 'time'], data_path=data_path)
 
 #
 # ## plot summaries across delta eta
