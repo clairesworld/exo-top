@@ -1413,8 +1413,9 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
                            data_path=data_path, **kwargs)
             try:
                 plot_grid[jj, ii] = ans
-            except TypeError as e:
+            except Exception as e:
                 print('ans', ans)
+                raise e
                 raise e
 
     if vmax is None:
