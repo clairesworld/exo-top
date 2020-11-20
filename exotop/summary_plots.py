@@ -7,7 +7,7 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
     load_grid
 
 # look closely at individual pickles
-jj = 1
+jj = 2
 eta = eta_ls[jj]
 cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[jj])]
 for ii, case in enumerate(cases_ii):

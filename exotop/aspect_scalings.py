@@ -114,7 +114,7 @@ def pickle_and_postprocess(cases, suffix, postprocess_functions, t1=0, **kwargs)
 
 
 def pickle_drop_duplicate_row(case, suffix, which='sol', fend='.pkl', data_path=data_path_bullard):
-    # remove duplicate rows (e.g. for solution or timestep) - for when you fucked up storing
+    # remove duplicate rows or nan (e.g. for solution or timestep) - for when you fucked up storing
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
 
