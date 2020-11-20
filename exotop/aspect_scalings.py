@@ -293,6 +293,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         n_ts = n_indices + i_time  # TODO: not off by 1 ?
         if not isinstance(postprocess_functions, list):
             postprocess_functions = [postprocess_functions]
+        df_to_extend = df_to_extend.reset_index()
         for ii, n in enumerate(n_quasi):
             ts = n_ts[ii]  # timestep at this solution
             for fn in postprocess_functions:
