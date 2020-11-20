@@ -314,7 +314,7 @@ class Aspect_Data():
         self.sol_files = files
         return files
 
-    def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, i_vis=20, skip_header=26):
+    def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, verbose=False, i_vis=20, skip_header=26):
         # input solution file and get first timestep - for n or all solutions
         # n is the number in the solution filename
         if sol_files is None:
@@ -326,7 +326,11 @@ class Aspect_Data():
             else:
                 return indices[n]
         else:
-            time = self.stats_time
+            try:
+                time = self.stats_time
+            except AttributeError as e:
+                self.read_statistics(verbose=verbose)
+                time = self.stats_time
             if n is None:
                 return time[indices]
             else:
@@ -621,9 +625,9 @@ class Aspect_Data():
             if delta_l is None:
                 delta_l = self.lid_thickness(n=n, u=u, **kwargs)
             delta_0 = delta_rh + delta_l
-        print('delta_0', delta_0)
-        print('ans', np.array(delta_0)**2 * np.array(u_0))
-        return np.array(delta_0)**2 * np.array(u_0)
+        # print('delta_0', delta_0)
+        print('ans', np.array(delta_0)**2 * np.array(abs(u_0)))
+        return np.array(delta_0)**2 * np.array(abs(u_0))
 
     def vbcs(self):
         # Determine velocity boundary conditions from the input parameters
