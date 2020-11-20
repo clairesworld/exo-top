@@ -1394,7 +1394,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
                         vmin=None, vmax=None,
                         save=True, fname='grid', labelsize=16, fig_fmt='.png', t1=None, end=None, cticklabels=None,
-                        cticks=None,
+                        cticks=None, title='',
                         overplot_h=False, nlevels_contour=10, cmap='jet', clist=None, cmap_contours='spring', **kwargs):
     # plot output of any (scalar-returning) function (with optional topo contours?)
 
@@ -1408,9 +1408,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cases, _ = get_cases_list(Ra, eta_str, end[jj])
         for ii, Ra_str in enumerate(Ra):
             # calculate value at this parameter-space coordinate
-            print('Ra', Ra_str, 'eta', eta_str, 'ii, jj', ii, jj)
             ans = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load, **kwargs)
-            print('ans:', ans)
             try:
                 plot_grid[jj, ii] = ans
             except TypeError as e:
@@ -1444,7 +1442,6 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 
     cbar = plt.colorbar(im, ticks=cticks, shrink=0.5)
     if cticklabels is not None:
-        print('trying to set cticklabels', cticklabels)
         cbar.ax.set_yticklabels(cticklabels)
 
     if overplot_h:
@@ -1466,6 +1463,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         CS = ax.contour(h_grid, nlevels_contour, cmap=cmap_contours)
         ax.clabel(CS, inline=1, fontsize=10)
 
+    ax.set_title(title, fontsize=labelsize)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, tight_layout=False)
 
@@ -1473,9 +1471,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **kwargs):
     label = regime_grid[jj, ii]
     digi = np.nonzero(np.array(regime_names) == label)[0]
-    print('label', label, 'nonzero returned', digi)
     if not list(digi):
-        print('not digi = True')
         return np.nan  # label not in names
     else:
         return digi[0] + 1
