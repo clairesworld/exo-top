@@ -621,6 +621,8 @@ class Aspect_Data():
             if delta_l is None:
                 delta_l = self.lid_thickness(n=n, u=u, **kwargs)
             delta_0 = delta_rh + delta_l
+        else:
+            delta_0 = delta_0[n]
         print('delta_0', delta_0)
         print('ans', np.array(delta_0)**2 * np.array(u_0))
         return np.array(delta_0)**2 * np.array(u_0)
