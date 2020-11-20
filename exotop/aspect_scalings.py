@@ -1125,8 +1125,8 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
     return fig, ax
 
 
-def subplots_Ra_scaling(Ra=None, eta=None, t1=None, end='', keys=None, data_path=data_path_bullard,
-                        fig_path=fig_path_bullard,
+def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, data_path=data_path_bullard,
+                        fig_path=fig_path_bullard, load='auto',
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
                         postprocess_functions=[],
                         cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
@@ -1141,17 +1141,17 @@ def subplots_Ra_scaling(Ra=None, eta=None, t1=None, end='', keys=None, data_path
         raise Exception('No y-axis keys provided!')
     else:
         nkeys = 1
+    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
+        load = [[load] * len(Ra_ls)] * len(eta_ls)
+    if t1 is None:
+        t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
         fig, axes = plt.subplots(nkeys, 1)
-    logeta_fl = [np.log10(float(a)) for a in eta]
+    logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap)[0]
 
-    for jj, eta_str in enumerate(eta):
-        cases, Ra_var = get_cases_list(Ra, eta_str, end[jj])
-        if t1 is None:
-            t1_eta = [0] * len(cases)
-        else:
-            t1_eta = t1[jj]
+    for jj, eta_str in enumerate(eta_ls):
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
         c_scatter = c_list[jj]
 
         plot_data = {'Ra': []}
@@ -1159,7 +1159,8 @@ def subplots_Ra_scaling(Ra=None, eta=None, t1=None, end='', keys=None, data_path
             plot_data[key] = []
 
         for ii, case in enumerate(cases):
-            t1_ii = t1_eta[ii]
+            t1_ii = t1[jj][ii]
+            load_ii = load[jj][ii]
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 plot_data['Ra'].append(float(Ra_var[ii]))
@@ -1171,7 +1172,7 @@ def subplots_Ra_scaling(Ra=None, eta=None, t1=None, end='', keys=None, data_path
                 dfs = []
                 for ip, suffix in enumerate(psuffixes):
                     df1 = pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
-                                   dat_new=dat, data_path=data_path, **kwargs)
+                                   dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
                     dfs.append(df1)
                 try:
                     df = pd.concat(dfs, axis=1)
@@ -1190,7 +1191,7 @@ def subplots_Ra_scaling(Ra=None, eta=None, t1=None, end='', keys=None, data_path
                     if (jj > 0) and (ii > 0):
                         cmplabel = None
                     d_compare = compare_pub(case, dat=dat, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df,
-                                            **kwargs)
+                                            load=load_ii, **kwargs)
                     for k, key in enumerate(keys):
                         try:
                             axes[k].plot(d_compare['Ra_i'], d_compare[keys], '^', alpha=0.7, c=c_scatter,

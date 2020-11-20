@@ -24,9 +24,10 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_r
 ### plot scalings of other output parameters with Ra
 
 sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path,
-                       fig_path=fig_path, save=True, fname='delta-Nu-Ti', ylabels=['Nu', r'$\delta$', r'$T_i$'],
-                       psuffixes=['_T', '_Nu'], postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts],
-                       compare_pub=None, fig_fmt=fig_fmt, fit=True, load=load_grid)
+                       fig_path=fig_path, load=load_grid, save=True, fname='delta-Nu-Ti',
+                       ylabels=['Nu', r'$\delta$', r'$T_i$'], psuffixes=['_T', '_Nu'],
+                       postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], compare_pub=None, fig_fmt=fig_fmt,
+                       fit=True)
 
 ## Show convective regimes in parameter space
 
