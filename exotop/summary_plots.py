@@ -6,14 +6,15 @@ from exotop import aspect_scalings as sc
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid, \
     load_grid
 
-jj = 0
+# look closely at individual pickles
+jj = 1
 eta = eta_ls[jj]
 cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[jj])]
 for ii, case in enumerate(cases_ii):
     print('\n\n', case)
-    sc.pickleio(case, '_h_all', [sc.h_at_ts], t1=t1_grid[jj, ii], load=False, at_sol=False, data_path=data_path)
-    # sc.print_solution_data(case, suffix='_T', keys=['h_components', 'sol'], data_path=data_path)
-    # sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
+    # sc.pickleio(case, '_h_all', [sc.h_at_ts], t1=t1_grid[jj, ii], load=False, at_sol=False, data_path=data_path)
+    sc.print_solution_data(case, suffix='_T', keys=['h_components', 'sol'], data_path=data_path)
+    sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
     sc.print_solution_data(case, suffix='_h_all', keys=['h_rms', 'time'], data_path=data_path)
 
 #
