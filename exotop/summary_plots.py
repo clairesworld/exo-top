@@ -20,7 +20,7 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
 #     # sc.print_solution_data(case, suffix='_h_all', keys=['h_rms', 'time'], data_path=data_path)
 case = 'Ra3e8-eta1e5-wide'
 print('\n\n', case)
-sc.pickleio(case, '_h', [sc.h_at_ts], t1=0.065, load=False, at_sol=True, data_path=data_path)
+sc.pickleio(case, '_h', [sc.h_at_ts], t1=0.0590015, load=False, at_sol=True, data_path=data_path)
 sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
 #
 # ## plot summaries across delta eta
