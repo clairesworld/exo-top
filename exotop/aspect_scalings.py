@@ -1487,7 +1487,7 @@ def lid_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard
         n = dat.final_step()
     df_T = pickleio(case, '_T', [T_parameters_at_sol], dat_new=dat, at_sol=True,
                     data_path=data_path, **kwargs)
-    S = dat.surface_mobility(n=n, delta_0=df_T['delta_0'], delta_rh=df_T['delta_rh'], delta_l=df_T['delta_L'])
+    S = dat.surface_mobility(n=n, delta_0=df_T['delta_0'].values, delta_rh=df_T['delta_rh'].values, delta_l=df_T['delta_L'].values)
     return S
 
 
