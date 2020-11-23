@@ -619,7 +619,8 @@ class Aspect_Data():
             x, _, _, u, v, _ = self.read_velocity(n, verbose=False)
         mag = np.sqrt(u ** 2 + v ** 2)
         mag_av = horizontal_mean(mag, x)
-        u_0 = horizontal_mean(mag_av, x)[-1]  # surface velocity
+        u_0 = mag_av[-1]
+        # u_0 = horizontal_mean(u, x)[-1]  # surface velocity
         print('u_0', u_0)
         if delta_0 is None:
             if delta_rh is None:
