@@ -1400,7 +1400,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
 
 def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
-                        vmin=None, vmax=None,
+                        vmin=None, vmax=None, set_under=None,
                         save=True, fname='grid', labelsize=16, fig_fmt='.png', t1=None, end=None, cticklabels=None,
                         cticks=None, title='',
                         overplot_h=False, nlevels_contour=10, cmap='jet', clist=None, cmap_contours='spring', **kwargs):
@@ -1437,6 +1437,8 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cmap = plt.cm.get_cmap(cmap, vmax - vmin)
     else:
         cmap = cmap_from_list(clist, cmap_name='regimes')
+    if set_under is not None:
+        cmap.set_under(set_under, vmin)
 
     im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax)
 
