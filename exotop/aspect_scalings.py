@@ -1430,11 +1430,13 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 
     if vmax is None:
         vmax = np.max(m)
+    elif log:
+        vmax = np.log10(vmax)
     if vmin is None:
         vmin = np.min(m)
-    if log:
+    elif log:
         vmin = np.log10(vmin)
-        vmax = np.log10(vmax)
+
     if clist is None:
         cmap = plt.cm.get_cmap(cmap, vmax - vmin)
     else:
