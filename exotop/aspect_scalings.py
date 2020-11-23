@@ -1427,16 +1427,17 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
                     print('ans', ans)
                     raise e
 
+    m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
+
     if vmax is None:
-        vmax = np.max(plot_grid)
+        vmax = np.max(m)
     if vmin is None:
-        vmin = np.min(plot_grid)
+        vmin = np.min(m)
     if clist is None:
         cmap = plt.cm.get_cmap(cmap, vmax - vmin)
     else:
         cmap = cmap_from_list(clist, cmap_name='regimes')
 
-    m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
     im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax)
 
     # draw grid lines
