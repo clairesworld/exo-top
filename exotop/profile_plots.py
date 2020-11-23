@@ -7,7 +7,7 @@ from exotop import aspect_scalings as sc
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, fig_fmt
 
 
-cases = ['Ra3e7-eta1e5-wide', 'Ra1e8-eta1e5-wide', 'Ra3e8-eta1e5-wide', 'Ra3e8-eta1e6-wide']
+cases = ['Ra1e7-eta1e5-wide', 'Ra3e7-eta1e5-wide', 'Ra1e8-eta1e5-wide', 'Ra3e8-eta1e5-wide', 'Ra3e8-eta1e6-wide']
 for case in cases:
     sc.plot_velocity_profile(case, n=None, data_path=data_path, labelsize=16, fig_path=fig_path, fname=case+'-u_mean',
                              save=True, fig_fmt=fig_fmt)
