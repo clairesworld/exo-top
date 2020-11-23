@@ -1453,6 +1453,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     else:
         im_norm = None
     print('m', m)
+    print('vmin', vmin, 'vmax', vmax)
     im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax,
                    norm=im_norm)
 
