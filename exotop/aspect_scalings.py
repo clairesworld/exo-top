@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import LinearSegmentedColormap, LogNorm
 import pandas as pd
 import pickle as pkl
 from scipy.optimize import curve_fit
@@ -1341,9 +1341,9 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                         sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1_ii,
                                           dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
                     # n=-1 for final timestep only
-                    fig, ax = plot_T_params(case, T_params=sol_df, data_path=data_path, n=-1, save=False,
-                                            setxlabel=setxlabel, setylabel=False, fig_path=fig_path, fig=fig,
-                                            ax=ax, legend=legend, labelsize=labelsize)
+                    fig, ax = plot_T_profile(case, T_params=sol_df, n=-1, data_path=data_path, setylabel=False,
+                                             setxlabel=setxlabel, save=False, fig_path=fig_path, fig=fig, ax=ax,
+                                             legend=legend, labelsize=labelsize)
                 else:
                     ax.text(0.01, 0.95, '\n\n\nnot converged?',
                             horizontalalignment='left', verticalalignment='top',
@@ -1402,7 +1402,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
                         vmin=None, vmax=None, set_under=None, set_over=None,
                         save=True, fname='grid', labelsize=16, fig_fmt='.png', t1=None, end=None, cticklabels=None,
-                        cticks=None, title='',
+                        cticks=None, title='', lognorm=False,
                         overplot_h=False, nlevels_contour=10, cmap='jet', clist=None, cmap_contours='spring', **kwargs):
     # plot output of any (scalar-returning) function (with optional topo contours?)
 
@@ -1448,7 +1448,12 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         else:
             cmap_extend = 'both'
 
-    im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax)
+    if lognorm:
+        im_norm = LogNorm(vmin=vmin, vmax=vmax)
+    else:
+        im_norm = None
+    im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax,
+                   norm=im_norm)
 
     # draw grid lines
     for x, xval in enumerate(Ra):
@@ -1517,7 +1522,30 @@ def sfc_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard
     else:
         return np.nan
 
-def plot_T_params(case, T_params=None, n=-1, dat=None, data_path=data_path_bullard, t1=0,
+
+def plot_velocity_profile(case, dat=None, n=None, xlabel='u', ylabel='depth', fig=None, ax=None, data_path=data_path_bullard,
+                  labelsize=16, fig_path=fig_path_bullard, fname='velocity', save=True, fig_fmt='.png',  **kwargs):
+    if fig is None:
+        fig, ax = plt.subplots(figsize=(4,4))
+
+    if dat is None:
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
+                               read_statistics=False, read_parameters=False)
+    if n is None:
+        n = dat.final_step()
+
+    x, y, _, u, v, _ = dat.read_velocity(n=n, verbose=False)
+    fig, ax = dat.plot_profile(u, n=n, y=y, label='', ylabel=None, fig=fig, ax=ax, **kwargs)
+    ax.set_xlabel(xlabel, fontsize=labelsize)
+    ax.set_ylabel(ylabel, fontsize=labelsize)
+    ax.set_ylim(y.min(), y.max())
+
+    if save:
+        plot_save(fig, fig_path=fig_path, fname=fname, fig_fmt=fig_fmt)
+    return fig, ax
+
+
+def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bullard, t1=0,
                   setylabel=True, setxlabel=True, save=True, load='auto',
                   fig_path=fig_path_bullard, fig=None, ax=None, fend='_T-z', fig_fmt='.png',
                   legend=True, labelsize=16, **kwargs):
