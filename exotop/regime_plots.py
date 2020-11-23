@@ -22,3 +22,4 @@ sc.plot_parameter_grid(Ra_ls, eta_ls, function=sc.lid_mobility_at_sol, regime_gr
                        data_path=data_path, fig_path=fig_path, load=load_grid, vmax=1,
                        save=True, fname='lid-mobility', labelsize=16, fig_fmt=fig_fmt, t1=t1_grid, end=end_grid,
                        overplot_h=False, nlevels_contour=14, cmap='Wistia', set_over='xkcd:navy blue')
+K
