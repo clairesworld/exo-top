@@ -1437,10 +1437,16 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cmap = plt.cm.get_cmap(cmap, vmax - vmin)
     else:
         cmap = cmap_from_list(clist, cmap_name='regimes')
+    cmap_extend = 'neither'
     if set_under is not None:
         cmap.set_under(set_under, vmin)
+        cmap_extend = 'min'
     if set_over is not None:
-        cmap.set_under(set_over, vmax)
+        cmap.set_over(set_over, vmax)
+        if set_under is None:
+            cmap_extend = 'max'
+        else:
+            cmap_extend = 'both'
 
     im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax)
 
@@ -1457,7 +1463,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     ax.set_xticklabels(Ra)
     ax.set_yticklabels(eta)
 
-    cbar = plt.colorbar(im, ticks=cticks, shrink=0.5)
+    cbar = plt.colorbar(im, ticks=cticks, shrink=0.5, extend=cmap_extend)
     if cticklabels is not None:
         cbar.ax.set_yticklabels(cticklabels)
 
@@ -1494,7 +1500,7 @@ def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **k
         return digi[0] + 1
 
 
-def lid_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard, **kwargs):
+def sfc_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                read_statistics=False, read_parameters=False)
