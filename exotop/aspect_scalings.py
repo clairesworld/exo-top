@@ -1419,13 +1419,10 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
             # calculate value at this parameter-space coordinate
 
             if os.path.exists(data_path + 'output-' + cases[ii] + '/'):  # do nothing if case doesn't exist
-                ans = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load[jj][ii], t1=t1[jj][ii],
+                plot_grid[jj, ii] = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load[jj][ii], t1=t1[jj][ii],
                                data_path=data_path, **kwargs)
-                try:
-                    plot_grid[jj, ii] = ans
-                except Exception as e:
-                    print('ans', ans)
-                    raise e
+            else:
+                plot_grid[jj, ii] = np.nan
 
     m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
 
