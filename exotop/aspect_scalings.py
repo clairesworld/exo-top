@@ -1534,7 +1534,7 @@ def sfc_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard
         return np.nan
 
 
-def plot_velocity_profile(case, dat=None, n=None, xlabel='u', ylabel='depth', fig=None, ax=None, data_path=data_path_bullard,
+def plot_velocity_profile(case, dat=None, n=None, xlabel='rms velocity', ylabel='depth', fig=None, ax=None, data_path=data_path_bullard,
                   labelsize=16, fig_path=fig_path_bullard, fname='velocity', save=True, fig_fmt='.png',  **kwargs):
     if fig is None:
         fig, ax = plt.subplots(figsize=(4,4))
@@ -1546,7 +1546,9 @@ def plot_velocity_profile(case, dat=None, n=None, xlabel='u', ylabel='depth', fi
         n = dat.final_step()
 
     x, y, _, u, v, _ = dat.read_velocity(n=n, verbose=False)
-    fig, ax = dat.plot_profile(u, n=n, y=y, label='', ylabel=None, fig=fig, ax=ax, **kwargs)
+    mag = np.sqrt(u ** 2 + v ** 2)
+    mag_av = horizontal_mean(mag, x)
+    fig, ax = dat.plot_profile(mag_av, n=n, y=y, label='', ylabel=None, fig=fig, ax=ax, **kwargs)
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_ylabel(ylabel, fontsize=labelsize)
     ax.set_ylim(y.min(), y.max())
