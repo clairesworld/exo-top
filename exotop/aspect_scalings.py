@@ -1547,7 +1547,7 @@ def plot_velocity_profile(case, dat=None, n=None, xlabel='rms velocity', ylabel=
 
     x, y, _, u, v, _ = dat.read_velocity(n=n, verbose=False)
     mag = np.sqrt(u ** 2 + v ** 2)
-    mag_av = horizontal_mean(mag, x)
+    mag_av = post.horizontal_mean(mag, x)
     fig, ax = dat.plot_profile(mag_av, n=n, y=y, label='', ylabel=None, fig=fig, ax=ax, **kwargs)
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_ylabel(ylabel, fontsize=labelsize)
