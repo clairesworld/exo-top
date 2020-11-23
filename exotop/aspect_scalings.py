@@ -1481,7 +1481,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if cticklabels is not None:
         cbar.ax.set_yticklabels(cticklabels)
     if clabel is not None:
-        cbar.set_label(clabel, rotation=270, labelpad=15, fontsize=labelsize)
+        cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
 
     if overplot_h:
         if t1 is None:
