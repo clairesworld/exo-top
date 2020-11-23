@@ -1402,7 +1402,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
                         vmin=None, vmax=None, set_under=None, set_over=None,
                         save=True, fname='grid', labelsize=16, fig_fmt='.png', t1=None, end=None, cticklabels=None,
-                        cticks=None, title='', lognorm=False,
+                        cticks=None, title='', lognorm=False, log=False, clabel=None,
                         overplot_h=False, nlevels_contour=10, cmap='jet', clist=None, cmap_contours='spring', **kwargs):
     # plot output of any (scalar-returning) function (with optional topo contours?)
 
@@ -1424,12 +1424,17 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
             else:
                 plot_grid[jj, ii] = np.nan
 
+    if log:
+        plot_grid = np.log10(plot_grid)
     m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
 
     if vmax is None:
         vmax = np.max(m)
     if vmin is None:
         vmin = np.min(m)
+    if log:
+        vmin = np.log10(vmin)
+        vmax = np.log10(vmax)
     if clist is None:
         cmap = plt.cm.get_cmap(cmap, vmax - vmin)
     else:
@@ -1470,6 +1475,8 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     cbar = plt.colorbar(im, ticks=cticks, shrink=0.5, extend=cmap_extend)
     if cticklabels is not None:
         cbar.ax.set_yticklabels(cticklabels)
+    if clabel is not None:
+        cbar.set_label(clabel, rotation=270, fontsize=labelsize)
 
     if overplot_h:
         if t1 is None:
