@@ -613,7 +613,7 @@ class Aspect_Data():
         self.T_params = {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_rh':delta_rh, 'd_m':d_m, 'delta_L':delta_L, 'T_l':T_l, 'T_i':T_i, 'delta_0':delta_0, 'T_av':T_av, 'y':y}
         return self.T_params
     
-    def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, u=None, v=None **kwargs):
+    def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, u=None, v=None, **kwargs):
         # stagnant lid criterion S <<1 from Moresi & Solomatov 2000
         if (u is None) or (v is None):
             x, _, _, u, v, _ = self.read_velocity(n, verbose=False)
