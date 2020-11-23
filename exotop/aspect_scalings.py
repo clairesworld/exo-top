@@ -1441,12 +1441,14 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cmap = plt.cm.get_cmap(cmap, vmax - vmin)
     else:
         cmap = cmap_from_list(clist, cmap_name='regimes')
+
     cmap_extend = 'neither'
     if set_under is not None:
         cmap.set_under(set_under, vmin)
         cmap_extend = 'min'
     if set_over is not None:
         cmap.set_over(set_over, vmax)
+        print('set_over applies to above', vmax)
         if set_under is None:
             cmap_extend = 'max'
         else:
@@ -1456,6 +1458,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         im_norm = LogNorm(vmin=vmin, vmax=vmax)
     else:
         im_norm = None
+
     print('m', m)
     print('vmin', vmin, 'vmax', vmax)
     im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax,
@@ -1478,7 +1481,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if cticklabels is not None:
         cbar.ax.set_yticklabels(cticklabels)
     if clabel is not None:
-        cbar.set_label(clabel, rotation=270, fontsize=labelsize)
+        cbar.set_label(clabel, rotation=270, labelpad=15, fontsize=labelsize)
 
     if overplot_h:
         if t1 is None:
