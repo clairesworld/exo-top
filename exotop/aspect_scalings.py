@@ -74,6 +74,8 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                                 t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
                         except AttributeError:  # i.e. sol not found in df (because it's empty?)
                             reprocess_flag = True
+                            if at_sol:
+                                sol_new = dat_new.read_stats_sol_files()
                         if t1_new > 0:  # new timesteps
                             reprocess_flag = True
                             print('      Updating', fname, 'from t = {:4f}'.format(t1_new))
