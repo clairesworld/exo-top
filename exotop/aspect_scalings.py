@@ -60,17 +60,20 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                         if dat_new is None:
                             dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                                        read_statistics=True, read_parameters=False)
-                        if at_sol:
-                            print('      Checking for new solutions...')
-                            sol_f_old = df.sol.iat[-1]
-                            sol_new = dat_new.read_stats_sol_files()
-                            sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
-                            t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
-                        else:
-                            print('      Checking for new timesteps...')
-                            time_f_old = df.time.iat[-1]
-                            time_new = dat_new.stats_time
-                            t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
+                        try:
+                            if at_sol:
+                                print('      Checking for new solutions...')
+                                sol_f_old = df.sol.iat[-1]
+                                sol_new = dat_new.read_stats_sol_files()
+                                sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
+                                t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
+                            else:
+                                print('      Checking for new timesteps...')
+                                time_f_old = df.time.iat[-1]
+                                time_new = dat_new.stats_time
+                                t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
+                        except AttributeError:  # i.e. sol not found in df (because it's empty?)
+                            reprocess_flag = True
                         if t1_new > 0:  # new timesteps
                             reprocess_flag = True
                             print('      Updating', fname, 'from t = {:4f}'.format(t1_new))
