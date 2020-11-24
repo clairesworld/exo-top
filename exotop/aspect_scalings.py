@@ -1422,7 +1422,6 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cases, _ = get_cases_list(Ra, eta_str, end[jj])
         for ii, Ra_str in enumerate(Ra):
             # calculate value at this parameter-space coordinate
-            print('t1', t1[jj][ii])
             if os.path.exists(data_path + 'output-' + cases[ii] + '/'):  # do nothing if case doesn't exist
                 plot_grid[jj, ii] = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load[jj][ii],
                                              t1=t1[jj][ii], data_path=data_path, **kwargs)
@@ -1536,6 +1535,7 @@ def sfc_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard
                     data_path=data_path, **kwargs)
     if not df_T.empty:
         df_sol = df_T.set_index('sol')
+        print('df_sol', df_sol)
         S = dat.surface_mobility(n=n, delta_0=df_sol.loc[n, 'delta_0'], delta_rh=df_sol.loc[n, 'delta_rh'],
                                  delta_l=df_sol.loc[n, 'delta_L'])
         return S
