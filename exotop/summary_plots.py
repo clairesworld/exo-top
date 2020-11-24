@@ -62,10 +62,10 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
 #     sc.print_solution_data(case, suffix='_T', keys=['h_components', 'sol'], data_path=data_path)
 #     # sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
 #     # sc.print_solution_data(case, suffix='_h_all', keys=['h_rms', 'time'], data_path=data_path)
-case = 'Ra3e8-eta1e6-wide'
-print('\n\n', case)
-sc.pickleio(case, '_h', [sc.h_at_ts], t1=0.0590015, load=False, at_sol=True, data_path=data_path)
-sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
-#
+# case = 'Ra3e8-eta1e6-wide'
+# print('\n\n', case)
+# sc.pickleio(case, '_h', [sc.h_at_ts], t1=0.0590015, load=False, at_sol=True, data_path=data_path)
+# sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
+# #
 
 print('Summary plots complete')

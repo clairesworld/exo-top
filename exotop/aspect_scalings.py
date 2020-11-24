@@ -71,7 +71,8 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                                 print('      Checking for new timesteps...')
                                 time_f_old = df.time.iat[-1]
                                 time_new = dat_new.stats_time
-                                t1_new = time_new[np.argmax(time_new > time_f_old)]  # first time after latest saved time
+                                t1_new = time_new[
+                                    np.argmax(time_new > time_f_old)]  # first time after latest saved time
                         except AttributeError:  # i.e. sol not found in df (because it's empty?)
                             reprocess_flag = True
                         if t1_new > 0:  # new timesteps
@@ -1406,14 +1407,14 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
                         vmin=None, vmax=None, set_under=None, set_over=None,
                         save=True, fname='grid', labelsize=16, fig_fmt='.png', t1=None, end=None, cticklabels=None,
-                        cticks=None, title='', lognorm=False, log=False, clabel=None,
+                        cticks=None, title='', lognorm=False, log=False, clabel=None, discrete=False,
                         overplot_h=False, nlevels_contour=10, cmap='jet', clist=None, cmap_contours='spring', **kwargs):
     # plot output of any (scalar-returning) function (with optional topo contours?)
 
     if t1 is None:
         t1 = np.zeros((len(eta), len(Ra)))
     if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
-        load = [[load] * len(Ra)]*len(eta)
+        load = [[load] * len(Ra)] * len(eta)
     fig, ax = plt.subplots(1, 1)
     plot_grid = np.zeros((len(eta), len(Ra)))
 
@@ -1423,8 +1424,8 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
             # calculate value at this parameter-space coordinate
 
             if os.path.exists(data_path + 'output-' + cases[ii] + '/'):  # do nothing if case doesn't exist
-                plot_grid[jj, ii] = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load[jj][ii], t1=t1[jj][ii],
-                               data_path=data_path, **kwargs)
+                plot_grid[jj, ii] = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load[jj][ii],
+                                             t1=t1[jj][ii], data_path=data_path, **kwargs)
             else:
                 plot_grid[jj, ii] = np.nan
 
@@ -1442,7 +1443,10 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         vmin = np.log10(vmin)
 
     if clist is None:
-        cmap = plt.cm.get_cmap(cmap, vmax - vmin)
+        if discrete:
+            cmap = plt.cm.get_cmap(cmap, vmax - vmin)
+        else:
+            cmap = plt.cm.get_cmap(cmap)
     else:
         cmap = cmap_from_list(clist, cmap_name='regimes')
 
@@ -1453,6 +1457,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if set_over is not None:
         cmap.set_over(set_over, vmax)
         print('set_over applies to above', vmax)
+        print(np.nonzero(m > vmax))
         if set_under is None:
             cmap_extend = 'max'
         else:
@@ -1538,10 +1543,12 @@ def sfc_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard
         return np.nan
 
 
-def plot_velocity_profile(case, dat=None, n=None, xlabel='rms velocity', ylabel='depth', fig=None, ax=None, data_path=data_path_bullard,
-                  labelsize=16, fig_path=fig_path_bullard, fname='velocity', save=True, fig_fmt='.png',  **kwargs):
+def plot_velocity_profile(case, dat=None, n=None, xlabel='rms velocity', ylabel='depth', fig=None, ax=None,
+                          data_path=data_path_bullard,
+                          labelsize=16, fig_path=fig_path_bullard, fname='velocity', save=True, fig_fmt='.png',
+                          **kwargs):
     if fig is None:
-        fig, ax = plt.subplots(figsize=(4,4))
+        fig, ax = plt.subplots(figsize=(4, 4))
 
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
@@ -1563,9 +1570,9 @@ def plot_velocity_profile(case, dat=None, n=None, xlabel='rms velocity', ylabel=
 
 
 def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bullard, t1=0,
-                  setylabel=True, setxlabel=True, save=True, load='auto',
-                  fig_path=fig_path_bullard, fig=None, ax=None, fend='_T-z', fig_fmt='.png',
-                  legend=True, labelsize=16, **kwargs):
+                   setylabel=True, setxlabel=True, save=True, load='auto',
+                   fig_path=fig_path_bullard, fig=None, ax=None, fend='_T-z', fig_fmt='.png',
+                   legend=True, labelsize=16, **kwargs):
     if T_params is None:
         T_params = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1,
                             dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
