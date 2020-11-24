@@ -1114,8 +1114,12 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
             h3, = ax.plot(xprime, yprime, c=c_scatter, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
             if legend:
+                handles, labels = ax.get_legend_handles_labels()
+                handles.append(h3)
+                labels.append('{:.2e} x^{:.3f}'.format(const, expon))
                 ax.legend(
-                    # handles=[h3], labels=[],
+                    handles=handles,
+                    labels=labels,
                     # loc='lower left'
                 )
         else:
