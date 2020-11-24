@@ -670,7 +670,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     if t1 is None:
         t1 = [0] * len(cases)
     if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
-        load = [load] * len(cases)
+        load = np.array([load] * len(cases))
     if which_x == 'components':
         psuffixes = ['_T', '_h']
         at_sol = True
@@ -707,6 +707,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         # load outputs
         dfs = []
         for ip, ps in enumerate(psuffixes):
+            print('load', load_ii)
             df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
                            data_path=data_path, at_sol=at_sol, **kwargs)
             dfs.append(df1)
@@ -1022,7 +1023,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     if end is None:
         end = np.empty_like(t1, dtype=object)
         end[:] = ''
-    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
+    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if T_components:
         print(r'Plotting h vs. $\alpha \Delta T \delta$')

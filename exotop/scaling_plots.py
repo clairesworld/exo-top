@@ -6,14 +6,14 @@ from exotop import aspect_scalings as sc
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, c_regimes, fig_fmt, \
     regime_grid, regime_names, load_grid, alpha_m
 
-load = False  # load_grid
+load = True  # load_grid
 
-### plot h scalings with Ra
-
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, load=load,
-                         fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
-                         ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=10, fit=True, xlim=(0.7e6, 3.05e8),
-                         ylim=(1, 10), logx=True, logy=True, hscale=2e-5 * 2700 * 2890, data_path=data_path)
+# ### plot h scalings with Ra
+#
+# sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, load=load,
+#                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
+#                          ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=10, fit=True, xlim=(0.7e6, 3.05e8),
+#                          ylim=(1, 10), logx=True, logy=True, hscale=2e-5 * 2700 * 2890, data_path=data_path)
 
 ### plot h scalings - with dT_m*delta*alpha
 
@@ -31,9 +31,3 @@ sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'del
                        postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], compare_pub=None, fig_fmt=fig_fmt,
                        fit=True)
 
-## Show convective regimes in parameter space
-
-
-# sc.plot_convection_regimes(Ra_ls, eta_ls, regime_grid, fname='regimes', data_path=data_path, fig_path=fig_path,
-#                            load='auto', save=True, fig_fmt=fig_fmt,
-#                            overploth=True, nlevels=14, clist=c_regimes, cmap_contours='autumn')
