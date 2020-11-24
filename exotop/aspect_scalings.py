@@ -1535,7 +1535,6 @@ def sfc_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard
                     data_path=data_path, **kwargs)
     if not df_T.empty:
         df_sol = df_T.set_index('sol')
-        print('df_sol', df_sol)
         S = dat.surface_mobility(n=n, delta_0=df_sol.loc[n, 'delta_0'], delta_rh=df_sol.loc[n, 'delta_rh'],
                                  delta_l=df_sol.loc[n, 'delta_L'])
         return S

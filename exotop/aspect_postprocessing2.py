@@ -621,15 +621,13 @@ class Aspect_Data():
         mag_av = horizontal_mean(mag, x)
         u_0 = mag_av[-1]
         # u_0 = horizontal_mean(u, x)[-1]  # surface velocity
-        print('u_0', u_0)
         if delta_0 is None:
             if delta_rh is None:
                 delta_rh = self.ubl_thickness(n=n, **kwargs)
             if delta_l is None:
                 delta_l = self.lid_thickness(n=n, u=u, **kwargs)
             delta_0 = delta_rh + delta_l
-        print('delta_0', delta_0)
-        print('S =', np.array(delta_0)**2 * np.array(abs(u_0)))
+        print('u_0', u_0, 'delta_0', delta_0, 'S =', np.array(delta_0)**2 * np.array(abs(u_0)))
         return np.array(delta_0)**2 * np.array(abs(u_0))
 
     def vbcs(self):
