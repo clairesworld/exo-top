@@ -1103,6 +1103,10 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
         fig = plt.figure()
         ax = plt.gca()
 
+    print('Ra_data', Ra_data)
+    print('y_data', y_data)
+    print('c_scatter', c_scatter)
+
     ax.plot(Ra_data, y_data, '-o', c=c_scatter)
 
     if fit:
@@ -1113,6 +1117,9 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
             yprime = const * xprime ** expon
             h3, = ax.plot(xprime, yprime, c=c_scatter, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
+
+            print('xprime', xprime, 'yprime', yprime)
+            print('h3', h3)
             if legend:
                 handles, labels = ax.get_legend_handles_labels()
                 handles.append(h3)
