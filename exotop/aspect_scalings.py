@@ -305,7 +305,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         print('df_to_extend after reset', df_to_extend)
         for ii, n in enumerate(n_quasi):
             ts = n_ts[ii]  # timestep at this solution
-            print('ts', timestep at solution, 'n')
+            print(ts, 'timestep at solution', n)
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 new_params_dict['sol'] = int(n)
