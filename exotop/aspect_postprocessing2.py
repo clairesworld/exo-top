@@ -334,8 +334,6 @@ class Aspect_Data():
             if n is None:
                 return time[indices]
             else:
-                print('time', time)
-                print('indices[n]', indices[n])
                 return time[indices[n]]
         
     def read_parameters(self, verbose=True):

@@ -284,10 +284,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=False)
 
-    # print('df accepted by process_at_solutions()\n', df_to_extend)
     time = dat.stats_time
     i_time = np.argmax(time > t1)  # index of first timestep to process
-    # print('ts @ t1:', i_time, 'time @ t1:', time[i_time], 't1:', t1)
 
     if i_time > 0:
         if sol_files is None:
@@ -333,7 +331,6 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
             print('    No timesteps after t = {:.2f} (tf = {:.2f}, t1 = {:.2f})'.format(time[i_time], time[-1], t1))
         else:
             print('    Skipping case with t1 > 1')
-        # print('    No solutions after t =', time[i_time], '(tf =', time[-1], ')')
     return df_to_extend
 
 
@@ -662,7 +659,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 
 def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_path_bullard, fig_path=fig_path_bullard,
-              fig_fmt='.png', which_x='components',
+              fig_fmt='.png', which_x=None,
               save=True, fname='h', showallscatter=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
@@ -726,7 +723,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             x_key = 'h_components'
             if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
                 print('plot_h_vs(): Calculating T components')
-                print('x_key not in df.columns', x_key not in df.columns)
                 print('(x_key in df.columns)', (x_key in df.columns))
                 print('df[x_key]', df[x_key])
                 h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii, update=False,
