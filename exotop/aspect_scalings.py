@@ -64,13 +64,9 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                             if at_sol:
                                 print('      Checking for new solutions...')
                                 sol_f_old = df.sol.iat[-1]
-                                print('sol_f_old', sol_f_old)
                                 sol_new = dat_new.read_stats_sol_files()
-                                print('sol_new', sol_new)
                                 sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
                                 t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
-                                print('sol1_new', sol1_new)
-                                print('t1_new', t1_new)
                             else:
                                 print('      Checking for new timesteps...')
                                 time_f_old = df.time.iat[-1]
@@ -79,7 +75,6 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                                     np.argmax(time_new > time_f_old)]  # first time after latest saved time
                         except AttributeError as e:  # i.e. sol not found in df (because it's empty?)
                             reprocess_flag = True
-                            print('triggered AttributeError', e, '(reprocessing)')
                         if t1_new > 0:  # new timesteps
                             reprocess_flag = True
                             print('      Updating', fname, 'from t = {:4f}'.format(t1_new))
@@ -1461,7 +1456,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if set_over is not None:
         cmap.set_over(set_over, vmax)
         print('set_over applies to above', vmax)
-        print(np.nonzero(m > vmax))
+        print('m>vmax @', m[m > vmax])
         if set_under is None:
             cmap_extend = 'max'
         else:
