@@ -1177,6 +1177,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         fig, axes = plt.subplots(nkeys, 1)
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap)[0]
+    print('c_list', c_list)
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
@@ -1212,6 +1213,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     raise e
 
                 for key in keys:
+                    print('key', key, 'df[key]:')
+                    print(df[key])
                     plot_data[key].append(np.median(df[key]))
 
                 if compare_pub is not None:
@@ -1228,6 +1231,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                             print('Key', key, 'not returned by', compare_pub)
 
         for k, key in enumerate(keys):
+            print('key', key)
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key],
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
                                            fig=fig, ax=axes[k], **kwargs)
