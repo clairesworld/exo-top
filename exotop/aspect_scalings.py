@@ -1103,9 +1103,6 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
         fig = plt.figure()
         ax = plt.gca()
 
-    print('Ra_data', Ra_data)
-    print('y_data', y_data)
-
     ax.plot(Ra_data, y_data, '-o', c=c_scatter)
 
     if fit:
@@ -1117,7 +1114,6 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
             h3, = ax.plot(xprime, yprime, c=c_scatter, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
 
-            print('xprime', xprime, 'yprime', yprime)
             print('h3', h3)
             if legend:
                 handles, labels = ax.get_legend_handles_labels()
@@ -1173,7 +1169,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
-        fig, axes = plt.subplots(nkeys, 1)
+        fig, axes = plt.subplots(nkeys, 1, figsize=(nkeys*4, 10))
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap)[0]
 
@@ -1211,8 +1207,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     raise e
 
                 for key in keys:
-                    print('key', key, 'df[key]:')
-                    print(df[key])
                     plot_data[key].append(np.median(df[key]))
 
                 if compare_pub is not None:
@@ -1229,14 +1223,13 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                             print('Key', key, 'not returned by', compare_pub)
 
         for k, key in enumerate(keys):
-            print('key', key)
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key],
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
                                            fig=fig, ax=axes[k], **kwargs)
 
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
                             vmin=vmin, vmax=vmax)  # dummy
-    cbar = fig.colorbar(scat, ax=[axes[0], axes[1]])
+    cbar = fig.colorbar(scat, ax=[a for a in axes])
     cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=18)
     plt.suptitle(title, fontsize=labelsize, y=1.02)
 
