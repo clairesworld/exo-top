@@ -69,14 +69,17 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                                 print('sol_new', sol_new)
                                 sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
                                 t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
+                                print('sol1_new', sol1_new)
+                                print('t1_new', t1_new)
                             else:
                                 print('      Checking for new timesteps...')
                                 time_f_old = df.time.iat[-1]
                                 time_new = dat_new.stats_time
                                 t1_new = time_new[
                                     np.argmax(time_new > time_f_old)]  # first time after latest saved time
-                        except AttributeError:  # i.e. sol not found in df (because it's empty?)
+                        except AttributeError as e:  # i.e. sol not found in df (because it's empty?)
                             reprocess_flag = True
+                            print('triggered AttributeError', e, '(reprocessing)')
                         if t1_new > 0:  # new timesteps
                             reprocess_flag = True
                             print('      Updating', fname, 'from t = {:4f}'.format(t1_new))
