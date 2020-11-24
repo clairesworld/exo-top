@@ -43,18 +43,12 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     dump_flag = False
     reprocess_flag = False
     t1_new = t1
-    print('case', case)
-    print('load', load)
 
     if t1 < 1:
-        print('t1 < 1')
         if os.path.exists(case_path):  # do nothing if case doesn't exist
-            print('os.path.exists(case_path)')
             os.makedirs(case_path + 'pickle/', exist_ok=True)
-            if load == 'auto' or load is True:
-                print('load == auto or load is True')
+            if load == 'auto' or load:
                 if os.path.exists(case_path + 'pickle/' + fname):
-                    print('os.path.exists(case_path + pickle/ + fname)')
                     # open pickled file
                     try:
                         df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
@@ -96,9 +90,9 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 reprocess_flag = True
                 dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                            read_statistics=True, read_parameters=False)
-
             else:
                 raise Exception('load value not understood:', load, type(load))
+
             if reprocess_flag:
                 print('reprocess_flag')
                 if not hasattr(dat_new, 'stats_time'):
