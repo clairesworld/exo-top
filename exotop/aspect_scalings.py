@@ -92,11 +92,13 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
                     print('    File', fname, 'not found, processing...')
 
-            else:  # load is False so automatically calculate shit
+            elif not load:  # load is False so automatically calculate shit
                 reprocess_flag = True
                 dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                            read_statistics=True, read_parameters=False)
 
+            else:
+                raise Exception('load value not understood:', load, type(load))
             if reprocess_flag:
                 print('reprocess_flag')
                 if not hasattr(dat_new, 'stats_time'):
