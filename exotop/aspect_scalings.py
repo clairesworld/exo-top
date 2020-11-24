@@ -1451,12 +1451,10 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 
     cmap_extend = 'neither'
     if set_under is not None:
-        cmap.set_under(set_under, vmin)
+        cmap.set_under(set_under)
         cmap_extend = 'min'
     if set_over is not None:
-        cmap.set_over(set_over, vmax)
-        print('set_over applies to above', vmax)
-        print('m>vmax @', m[m > vmax])
+        cmap.set_over(set_over)
         if set_under is None:
             cmap_extend = 'max'
         else:
@@ -1467,8 +1465,6 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     else:
         im_norm = None
 
-    print('m', m)
-    print('vmin', vmin, 'vmax', vmax)
     im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax,
                    norm=im_norm)
 
