@@ -1023,7 +1023,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
         end = np.empty_like(t1, dtype=object)
         end[:] = ''
     if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
-        load = [[load] * len(Ra_ls)] * len(eta_ls)
+        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if T_components:
         print(r'Plotting h vs. $\alpha \Delta T \delta$')
         which_x = 'components'
@@ -1154,7 +1154,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     else:
         nkeys = 1
     if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
-        load = [[load] * len(Ra_ls)] * len(eta_ls)
+        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
