@@ -728,6 +728,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 print('plot_h_vs(): Calculating T components')
                 print('(x_key in df.columns)', (x_key in df.columns))
                 print('df[x_key]', df[x_key])
+                print('df[h_rms]', df['h_rms'])
                 h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii, update=False,
                                                  **kwargs)
             else:
