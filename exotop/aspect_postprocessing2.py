@@ -288,8 +288,8 @@ class Aspect_Data():
         if verbose:
             print("Reading statistics from", filename)
         
-        data = np.genfromtxt(filename, skip_header=skip_header)
-        all_data = np.genfromtxt(filename, skip_header=26, dtype=None)
+        data = np.genfromtxt(filename, comments='#')
+        all_data = np.genfromtxt(filename, comments='#', dtype=None)
         self.stats_timestep = np.array([d[0] for d in all_data])
         self.stats_time = data[:,1]
         self.stats_rms_velocity = data[:,10]
