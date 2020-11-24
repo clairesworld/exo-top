@@ -1422,7 +1422,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cases, _ = get_cases_list(Ra, eta_str, end[jj])
         for ii, Ra_str in enumerate(Ra):
             # calculate value at this parameter-space coordinate
-
+            print('t1', t1[jj][ii])
             if os.path.exists(data_path + 'output-' + cases[ii] + '/'):  # do nothing if case doesn't exist
                 plot_grid[jj, ii] = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load[jj][ii],
                                              t1=t1[jj][ii], data_path=data_path, **kwargs)
