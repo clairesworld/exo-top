@@ -1052,6 +1052,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
         for ir, regime_name in enumerate(regime_names):
             Ra_regime = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
             Ra_regime_idx = [j for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
+            print(regime_name, 'Ra_regime_idx', Ra_regime_idx)
 
             if not (not Ra_regime):  # if this regime is not empty
                 fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
