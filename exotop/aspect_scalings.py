@@ -96,6 +96,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 if at_sol:
                     if not hasattr(dat_new, 'sol_files'):
                         dat_new.read_stats_sol_files()
+                        sol_new = dat_new.sol_files
                     df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                               t1=np.maximum(t1, t1_new),  # whichever comes later in time
                                               data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
