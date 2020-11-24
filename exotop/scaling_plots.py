@@ -16,12 +16,12 @@ load = load_grid  # True
 #                          ylim=(1, 10), logx=True, logy=True, hscale=2e-5 * 2700 * 2890, data_path=data_path)
 
 ### plot h scalings - with dT_m*delta*alpha
-
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, T_components=True,
-                         load=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end=end_grid,
-                         labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
-                         xlabelpad=8, ylabelpad=14, fit=True, alpha_m=alpha_m, showallscatter=True, xlim=(3e-8, 7e-7),
-                         logx=True, logy=True, data_path=data_path)
+#
+# sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, T_components=True,
+#                          load=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end=end_grid,
+#                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
+#                          xlabelpad=8, ylabelpad=14, fit=True, alpha_m=alpha_m, showallscatter=True, xlim=(3e-8, 7e-7),
+#                          logx=True, logy=True, data_path=data_path)
 
 ### plot scalings of other output parameters with Ra
 

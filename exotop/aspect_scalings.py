@@ -94,7 +94,6 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 raise Exception('load value not understood:', load, type(load))
 
             if reprocess_flag:
-                print('reprocess_flag')
                 if not hasattr(dat_new, 'stats_time'):
                     dat_new.read_statistics()
                 if at_sol:
@@ -301,9 +300,12 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         n_ts = n_indices + i_time  # TODO: not off by 1 ?
         if not isinstance(postprocess_functions, list):
             postprocess_functions = [postprocess_functions]
+        print('df_to_extend before reset', df_to_extend)
         df_to_extend = df_to_extend.reset_index()
+        print('df_to_extend after reset', df_to_extend)
         for ii, n in enumerate(n_quasi):
             ts = n_ts[ii]  # timestep at this solution
+            print('ts', timestep at solution, 'n')
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 new_params_dict['sol'] = int(n)
