@@ -1105,7 +1105,6 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
     print('Ra_data', Ra_data)
     print('y_data', y_data)
-    print('c_scatter', c_scatter)
 
     ax.plot(Ra_data, y_data, '-o', c=c_scatter)
 
@@ -1177,7 +1176,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         fig, axes = plt.subplots(nkeys, 1)
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap)[0]
-    print('c_list', c_list)
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])

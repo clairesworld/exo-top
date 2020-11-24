@@ -6,7 +6,7 @@ from exotop import aspect_scalings as sc
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, c_regimes, fig_fmt, \
     regime_grid, regime_names, load_grid, alpha_m
 
-load = True  # True
+load = load_grid  # True
 
 # ### plot h scalings with Ra
 #
