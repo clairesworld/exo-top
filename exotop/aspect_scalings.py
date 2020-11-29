@@ -1184,7 +1184,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
             load_ii = load[jj][ii]
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
-                plot_data['Ra'].append(float(Ra_var[ii]))
+                Ra_ii = float(Ra_var[ii])
+                plot_data['Ra'].append(Ra_ii)
 
                 # load data
                 dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
@@ -1213,7 +1214,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     cmplabel = compare_label
                     if (jj > 0) and (ii > 0):
                         cmplabel = None
-                    d_compare = compare_pub(case, dat=dat, Ra=plot_data['Ra'][ii], d_eta=float(eta_str), df=df,
+                    d_compare = compare_pub(case, dat=dat, Ra=Ra_ii, d_eta=float(eta_str), df=df,
                                             load=load_ii, **kwargs)
                     for k, key in enumerate(keys):
                         try:
