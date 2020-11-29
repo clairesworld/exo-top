@@ -1,14 +1,8 @@
 import sys
-
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-
 from exotop import aspect_postprocessing2 as post
 from exotop.useful_and_bespoke import colorize, iterable_not_string
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.image as mpimg
-from matplotlib.colors import LinearSegmentedColormap, LogNorm
 import pandas as pd
 import pickle as pkl
 from scipy.optimize import curve_fit
@@ -16,6 +10,10 @@ from scipy import stats
 import os
 from matplotlib import use as matplotlibuse
 matplotlibuse('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.image as mpimg
+from matplotlib.colors import LinearSegmentedColormap, LogNorm
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 
