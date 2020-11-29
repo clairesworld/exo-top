@@ -13,7 +13,7 @@ import pandas as pd
 import pickle as pkl
 from scipy.optimize import curve_fit
 from scipy import stats
-
+matplotlib.use('Agg')
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 
