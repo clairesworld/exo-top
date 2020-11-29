@@ -1214,7 +1214,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     cmplabel = compare_label
                     if (jj > 0) and (ii > 0):
                         cmplabel = None
-                    d_compare = compare_pub(case, dat=dat, Ra=Ra_ii, d_eta=float(eta_str), df=df,
+                    d_compare = compare_pub(Ra=Ra_ii, d_eta=float(eta_str), case=case, dat=dat, df=df,
                                             load=load_ii, **kwargs)
                     for k, key in enumerate(keys):
                         try:
