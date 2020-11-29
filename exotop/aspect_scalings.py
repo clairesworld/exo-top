@@ -1112,7 +1112,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
             h3, = ax.plot(xprime, yprime, c=c_scatter, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
 
-            print('h3', h3)
+            # print('h3', h3)
             if legend:
                 handles, labels = ax.get_legend_handles_labels()
                 handles.append(h3)
@@ -1194,14 +1194,11 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                 for ip, suffix in enumerate(psuffixes):
                     df1 = pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
                                    dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
-                    print('\n', key)
-                    print(df1)
                     dfs.append(df1)
                 try:
                     df = pd.concat(dfs, axis=1)
                     df = df.loc[:, ~df.columns.duplicated()]
                 except Exception as e:
-                    print('dfs')
                     for dfi in dfs:
                         print(dfi)
                     raise e
@@ -1226,9 +1223,9 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                             print('Key', key, 'not returned by', compare_pub)
 
         for k, key in enumerate(keys):
-            xlabel = 'Ra'
-            if k > 0:
-                xlabel = ''
+            xlabel = ''
+            if k == len(keys)-1:
+                xlabel = 'Ra'
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key],
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
                                            fig=fig, ax=axes[k], xlabel=xlabel, **kwargs)

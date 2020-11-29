@@ -28,6 +28,7 @@ load = load_grid  # True
 sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path,
                        fig_path=fig_path, load=True, save=True, fname='delta-Nu-Ti',
                        ylabels=['Nu', r'$\delta$', r'$T_i$'], psuffixes=['_T', '_Nu'],
-                       postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], compare_pub=None, fig_fmt=fig_fmt,
+                       postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], compare_pub=[sc.moresi95],
+                       fig_fmt=fig_fmt,
                        fit=True)
 
