@@ -1218,7 +1218,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                                             load=load_ii, **kwargs)
                     for k, key in enumerate(keys):
                         try:
-                            axes[k].plot(d_compare['Ra_i'], d_compare[keys], '^', alpha=0.7, c=c_scatter,
+                            axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', alpha=0.7, c=c_scatter,
                                          label=cmplabel)
                         except KeyError:
                             print('Key', key, 'not returned by', compare_pub)
