@@ -1207,6 +1207,9 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     raise e
 
                 for key in keys:
+                    med = np.median(df[key])
+                    if np.isnan(med):
+                        raise Exception('nan in median, key:', key, '\n', df[key])
                     plot_data[key].append(np.median(df[key]))
 
                 if compare_pub is not None:

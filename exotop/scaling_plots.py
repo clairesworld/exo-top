@@ -9,11 +9,11 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
 load = load_grid  # True
 
 # ### plot h scalings with Ra
-#
-# sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, load=load,
-#                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
-#                          ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=10, fit=True, xlim=(0.7e6, 3.05e8),
-#                          ylim=(1, 10), logx=True, logy=True, hscale=2e-5 * 2700 * 2890, data_path=data_path)
+
+sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, load=load,
+                         fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
+                         ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=10, fit=True, xlim=(0.7e6, 3.05e8),
+                         ylim=(1, 10), logx=True, logy=True, hscale=2e-5 * 2700 * 2890, data_path=data_path)
 
 ### plot h scalings - with dT_m*delta*alpha
 #
