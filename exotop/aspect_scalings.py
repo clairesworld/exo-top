@@ -8,8 +8,6 @@ import pickle as pkl
 from scipy.optimize import curve_fit
 from scipy import stats
 import os
-from matplotlib import use as matplotlibuse
-matplotlibuse('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg

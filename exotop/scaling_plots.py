@@ -1,10 +1,10 @@
 import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-# import numpy as np
-from exotop import aspect_scalings as sc
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, c_regimes, fig_fmt, \
     regime_grid, regime_names, load_grid, alpha_m
+from exotop import aspect_scalings as sc
+
 
 load = load_grid  # True
 

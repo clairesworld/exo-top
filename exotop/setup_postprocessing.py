@@ -1,4 +1,6 @@
 import numpy as np
+from matplotlib import use as matplotlibuse
+matplotlibuse('Agg')
 
 default_load_value = True
 check_new = True  # always check for new timesteps with ongoing runs

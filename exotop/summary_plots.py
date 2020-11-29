@@ -1,10 +1,10 @@
 import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-# import numpy as np
-# from exotop import aspect_postprocessing2 as asp
-from exotop import aspect_scalings as sc
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid, \
     load_grid
+# from exotop import aspect_postprocessing2 as asp
+from exotop import aspect_scalings as sc
+
 
 sc.pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None, at_sol=True,
              data_path=data_path_bullard, fend='.pkl', **kwargs):
