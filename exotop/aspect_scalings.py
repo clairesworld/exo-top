@@ -1194,6 +1194,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                 for ip, suffix in enumerate(psuffixes):
                     df1 = pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
                                    dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
+                    print('\n', key)
+                    print(df1)
                     dfs.append(df1)
                 try:
                     df = pd.concat(dfs, axis=1)
