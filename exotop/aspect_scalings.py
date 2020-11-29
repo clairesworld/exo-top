@@ -1226,13 +1226,16 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                             print('Key', key, 'not returned by', compare_pub)
 
         for k, key in enumerate(keys):
+            xlabel = 'Ra'
+            if k > 0:
+                xlabel = ''
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key],
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
-                                           fig=fig, ax=axes[k], **kwargs)
+                                           fig=fig, ax=axes[k], xlabel=xlabel, **kwargs)
 
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
                             vmin=vmin, vmax=vmax)  # dummy
-    cbar = fig.colorbar(scat, ax=[a for a in axes])
+    cbar = fig.colorbar(scat, ax=axes.ravel().tolist())
     cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=18)
     plt.suptitle(title, fontsize=labelsize, y=1.02)
 
