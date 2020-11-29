@@ -1222,6 +1222,10 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                                          label=cmplabel)
                         except KeyError:
                             print('Key', key, 'not returned by', compare_pub)
+                        except Exception as e:
+                            print('d_compare[Ra_i]', d_compare['Ra_i'])
+                            print('d_compare[keys]', d_compare[keys])
+                            print('c_scatter', c_scatter, 'cmplabel', cmplabel)
 
         for k, key in enumerate(keys):
             xlabel = ''
