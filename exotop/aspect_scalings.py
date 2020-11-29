@@ -298,12 +298,12 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         n_ts = n_indices + i_time  # TODO: not off by 1 ?
         if not isinstance(postprocess_functions, list):
             postprocess_functions = [postprocess_functions]
-        print('df_to_extend before reset', df_to_extend)
+        # print('df_to_extend before reset', df_to_extend)
         df_to_extend = df_to_extend.reset_index()
-        print('df_to_extend after reset', df_to_extend)
+        # print('df_to_extend after reset', df_to_extend)
         for ii, n in enumerate(n_quasi):
             ts = n_ts[ii]  # timestep at this solution
-            print(ts, 'timestep at solution', n)
+            # print(ts, 'timestep at solution', n)
             for fn in postprocess_functions:
                 new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
                 new_params_dict['sol'] = int(n)
@@ -318,7 +318,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 df_to_extend = df_to_extend.append(new_params_dict, ignore_index=True)
                 # print('appending\n', new_params_dict)
                 # df_to_extend = pd.concat([df_to_extend, new_params])  # concat row axis (may cause duplicate index)
-                print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]))
+                print('        Processed', fn, 'for solution', n, '/', int(n_quasi[-1]), '@ ts', ts)
         try:
             df_to_extend.ts = df_to_extend.ts.astype(int)
             df_to_extend.sol = df_to_extend.sol.astype(int)
@@ -1209,7 +1209,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                 for key in keys:
                     med = np.median(df[key])
                     if np.isnan(med):
-                        raise Exception('nan in median, key:', key, '\n', df[key])
+                        raise Exception('NaN in median, key:', key, '\n', df[key])
                     plot_data[key].append(np.median(df[key]))
 
                 if compare_pub is not None:
@@ -1237,7 +1237,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     plt.suptitle(title, fontsize=labelsize, y=1.02)
 
     if save:
-        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, tight_layout=False)
     return fig, axes
 
 

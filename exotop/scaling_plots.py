@@ -10,10 +10,10 @@ load = load_grid  # True
 
 # ### plot h scalings with Ra
 
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, load=load,
-                         fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
-                         ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=10, fit=True, xlim=(0.7e6, 3.5e8),
-                         ylim=(1, 10), logx=True, logy=True, hscale=2e-5 * 2700 * 2890, data_path=data_path)
+# sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, load=load,
+#                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
+#                          ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=10, fit=True, xlim=(0.7e6, 3.5e8),
+#                          ylim=(1, 10), logx=True, logy=True, hscale=2e-5 * 2700 * 2890, data_path=data_path)
 
 ### plot h scalings - with dT_m*delta*alpha
 #
@@ -26,7 +26,7 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_r
 ### plot scalings of other output parameters with Ra
 
 sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta-Nu-Ti',
+                       fig_path=fig_path, load=True, save=True, fname='delta-Nu-Ti',
                        ylabels=['Nu', r'$\delta$', r'$T_i$'], psuffixes=['_T', '_Nu'],
                        postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], compare_pub=None, fig_fmt=fig_fmt,
                        fit=True)
