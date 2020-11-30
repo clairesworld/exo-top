@@ -1545,7 +1545,7 @@ def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **k
         return digi[0] + 1
 
 
-def sfc_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard, **kwargs):
+def surf_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                read_statistics=False, read_parameters=False)

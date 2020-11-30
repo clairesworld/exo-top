@@ -19,7 +19,7 @@ load = True  # load_grid
 
 # lid mobility
 
-sc.plot_parameter_grid(Ra_ls, eta_ls, function=sc.sfc_mobility_at_sol, regime_grid=regime_grid,
+sc.plot_parameter_grid(Ra_ls, eta_ls, function=sc.surf_mobility_at_sol, regime_grid=regime_grid,
                        data_path=data_path, fig_path=fig_path, load=True, vmax=1, log=True, clabel='log surface mobility',
                        save=True, fname='surface-mobility', labelsize=16, fig_fmt=fig_fmt, t1=t1_grid, end=end_grid,
                        overplot_h=False, nlevels_contour=14, discrete=False, cmap='Wistia', set_over='xkcd:navy blue')
