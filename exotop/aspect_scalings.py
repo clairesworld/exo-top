@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_postprocessing2 as post
 from exotop.useful_and_bespoke import colorize, iterable_not_string
@@ -12,6 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg
 from matplotlib.colors import LinearSegmentedColormap, LogNorm
+
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 
@@ -1164,13 +1166,13 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     else:
         nkeys = 1
     if ylim is None:
-        ylim = [None]*nkeys
+        ylim = [None] * nkeys
     if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
-        fig, axes = plt.subplots(nkeys, 1, figsize=(nkeys*3, 8), sharex=True)
+        fig, axes = plt.subplots(nkeys, 1, figsize=(nkeys * 3, 8), sharex=True)
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
@@ -1188,14 +1190,12 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 Ra_ii = float(Ra_var[ii])
-
                 # load data
                 if load_ii == 'auto':
                     dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
-                                       read_statistics=True)
+                                           read_statistics=True)
                 else:
                     dat = None
-
                 dfs = []
                 for ip, suffix in enumerate(psuffixes):
                     df1 = pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
@@ -1208,15 +1208,13 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     for dfi in dfs:
                         print(dfi)
                     raise e
-
                 for key in keys:
                     med = np.median(df[key])
                     if np.isnan(med):
                         raise Exception('NaN in median, key:', key, '\n', df[key])
                     plot_data[key].append(np.median(df[key]))
-
                 if Ra_i:
-                    plot_data['Ra'].append(Ra_i_fast(Ra_0=Ra_ii, d_eta=float(eta_str), T_i=df['T_i'], T0=1))
+                    plot_data['Ra'].append(Ra_i_fast(Ra_0=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i']), T0=1))
                 else:
                     plot_data['Ra'].append(Ra_ii)
 
@@ -1235,7 +1233,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
 
         for k, key in enumerate(keys):
             xlabel = ''
-            if k == len(keys)-1:
+            if k == len(keys) - 1:
                 xlabel = 'Ra'
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key], xlim=xlim, ylim=ylim[k],
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
@@ -1249,7 +1247,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                                  borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                                  frameon=False, mode="expand")
         ax.add_artist(outer_legend)
-
 
     # colorbar proxy artist
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
@@ -1309,6 +1306,7 @@ def Ra_i_fast(Ra_0=None, d_eta=None, T_i=None, T0=1):
     eta_i = np.exp(-gamma * T_i)
     Ra_i = np.array(Ra_0) * eta_0 / eta_i
     return Ra_i
+
 
 def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
                    fname='cases', data_path=data_path_bullard, fig_path=fig_path_bullard, fig_fmt='.png',
