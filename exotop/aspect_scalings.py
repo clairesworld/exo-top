@@ -1234,7 +1234,10 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         for k, key in enumerate(keys):
             xlabel = ''
             if k == len(keys) - 1:
-                xlabel = 'Ra'
+                if Ra_i:
+                    xlabel = r'Ra$_i$'
+                else:
+                    xlabel = r'Ra$_1$'
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key], xlim=xlim, ylim=ylim[k],
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
                                            fig=fig, ax=axes[k], xlabel=xlabel, legend=True, **kwargs)
