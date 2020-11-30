@@ -609,7 +609,6 @@ class Aspect_Data():
         if delta_rh is None:
             delta_rh = self.ubl_thickness(n=n, T_l=T_l, T_i=T_i, **kwargs)
         delta_L = y[-1] - y_L
-        print('y[-1]', y[-1])
         delta_0 = self.delta_0(delta_rh=delta_rh, delta_L=delta_L)  # mechanical boundary layer MS95
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
         self.T_params = {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_rh':delta_rh, 'd_m':d_m, 'y_L':y_L, 'T_l':T_l, 'T_i':T_i,
