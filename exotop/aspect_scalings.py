@@ -286,7 +286,6 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
 
     time = dat.stats_time
     i_time = np.argmax(time >= t1)  # index of first timestep to process
-    print('i_time', i_time)
 
     if i_time > 0:
         if sol_files is None:
@@ -296,8 +295,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                 sol_files = dat.read_stats_sol_files()
         sols_in_time = sol_files[i_time:]
         n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
-        n_ts = n_indices + i_time  # TODO: not off by 1 ?
-        print('ts at sols', n_ts)
+        n_ts = n_indices + i_time
         if not isinstance(postprocess_functions, list):
             postprocess_functions = [postprocess_functions]
         # print('df_to_extend before reset', df_to_extend)
@@ -1152,7 +1150,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, data_path=data_path_bullard,
                         fig_path=fig_path_bullard, load='auto',
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
-                        postprocess_functions=[],
+                        postprocess_functions=[], vmin=None, vmax=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
                         fig=None, axes=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
@@ -1170,9 +1168,9 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
-        fig, axes = plt.subplots(nkeys, 1, figsize=(nkeys*3, 8))
+        fig, axes = plt.subplots(nkeys, 1, figsize=(nkeys*3, 8), sharex=True)
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
-    c_list = colorize(logeta_fl, cmap=cmap)[0]
+    c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
     outer_handles = []
 
     for jj, eta_str in enumerate(eta_ls):
