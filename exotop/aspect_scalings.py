@@ -1425,9 +1425,9 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 try:
                     img = mpimg.imread(fgraph)
                     ax.imshow(img)
-                    print('Plotting graphical output for', case)
+                    print('    Grabbing graphical output for', case)
                 except FileNotFoundError:
-                    print('Graphical output not found:', fgraph)
+                    print('    Graphical output not found:', fgraph)
                     ax.text(0.01, 0.95, '\n\n\nno image saved',
                             horizontalalignment='left', verticalalignment='top',
                             transform=ax.transAxes, fontsize=labelsize)
