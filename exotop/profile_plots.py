@@ -1,7 +1,7 @@
 import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, fig_fmt
+from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, load_grid, data_path, fig_path, fig_fmt
 from exotop import aspect_scalings as sc
 
 # cases = ['Ra1e7-eta1e5-wide', 'Ra3e7-eta1e5-wide', 'Ra1e8-eta1e5-wide', 'Ra3e8-eta1e5-wide', 'Ra3e8-eta1e6-wide']
