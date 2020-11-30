@@ -285,7 +285,8 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
                                read_parameters=False)
 
     time = dat.stats_time
-    i_time = np.argmax(time > t1)  # index of first timestep to process
+    i_time = np.argmax(time >= t1)  # index of first timestep to process
+    print('i_time', i_time)
 
     if i_time > 0:
         if sol_files is None:
