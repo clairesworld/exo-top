@@ -1148,7 +1148,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
 
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, data_path=data_path_bullard,
-                        fig_path=fig_path_bullard, load='auto',
+                        fig_path=fig_path_bullard, load='auto', T_i=False,
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
                         postprocess_functions=[], xlim=None, ylim=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
@@ -1188,7 +1188,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 Ra_ii = float(Ra_var[ii])
-                plot_data['Ra'].append(Ra_ii)
 
                 # load data
                 if load_ii == 'auto':
@@ -1215,6 +1214,11 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     if np.isnan(med):
                         raise Exception('NaN in median, key:', key, '\n', df[key])
                     plot_data[key].append(np.median(df[key]))
+
+                if Ra_i:
+                    plot_data['Ra'].append(Ra_i_fast(Ra_0=Ra_ii, d_eta=float(eta_str), T_i=df['T_i'], T0=1))
+                else:
+                    plot_data['Ra'].append(Ra_ii)
 
                 if compare_pub is not None:
                     d_compare = compare_pub(Ra=Ra_ii, d_eta=float(eta_str), case=case, dat=dat, df=df,
@@ -1298,6 +1302,13 @@ def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None,
     delta_0 = T_i_scaling / Nu
     return {'Ra_i': Ra_i, 'delta_0': delta_0, 'Nu': Nu, 'T_i': T_i_scaling, 'delta_1': delta_1}
 
+
+def Ra_i_fast(Ra_0=None, d_eta=None, T_i=None, T0=1):
+    gamma = np.log(d_eta)  # gamma for this delta eta
+    eta_0 = np.exp(-gamma * T0)
+    eta_i = np.exp(-gamma * T_i)
+    Ra_i = np.array(Ra_0) * eta_0 / eta_i
+    return Ra_i
 
 def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
                    fname='cases', data_path=data_path_bullard, fig_path=fig_path_bullard, fig_fmt='.png',

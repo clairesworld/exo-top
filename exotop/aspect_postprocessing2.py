@@ -410,7 +410,26 @@ class Aspect_Data():
         deltaeta = p['Material model']['Nondimensional model']['Viscosity temperature prefactor']
         deltaeta = np.round(np.exp(deltaeta))
         return Ra_0*deltaeta
-    
+
+
+    def Ra_i(self, n=None, Ra=None, d_eta=None, T_i=None, T0=None):
+        if T0 is None:
+            T0 = self.parameters['Boundary temperature model']['Box']['Bottom temperature']
+        if T_i is None:
+            T_i = self.internal_temperature(n=n)
+        if Ra is None:
+            Ra = self.Ra_1()
+        if d_eta is None:
+            gamma = self.parameters['Material model']['Nondimensional model']['Viscosity temperature prefactor']
+        else:
+            gamma = np.log(d_eta)  # gamma for this delta eta
+        eta_0 = np.exp(-gamma * T0)
+        eta_i = np.exp(-gamma * T_i)
+        Ra_i = np.array(Ra) * eta_0 / eta_i
+
+        self.Ra_i = Ra_i
+        return Ra_i
+
     def nusselt(self, k=1):
         # Nusselt number with no internal heating
         try:
