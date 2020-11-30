@@ -1113,16 +1113,16 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
             h3, = ax.plot(xprime, yprime, c=c_scatter, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
 
-            # print('h3', h3)
             if legend:
                 handles, labels = ax.get_legend_handles_labels()
                 handles.append(h3)
                 labels.append('{:.2e} x^{:.3f}'.format(const, expon))
-                ax.legend(
+                leg = ax.legend(
                     handles=handles,
                     labels=labels,
                     # loc='lower left'
                 )
+                ax.add_artist(leg)
         else:
             print('    Not enough points to fit')
 
@@ -1235,10 +1235,10 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                 xlabel = 'Ra'
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key], xlim=xlim, ylim=ylim[k],
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
-                                           fig=fig, ax=axes[k], xlabel=xlabel, **kwargs)
+                                           fig=fig, ax=axes[k], xlabel=xlabel, legend=True, **kwargs)
 
     if compare_pub is not None:  # add top legend
-        ax = axes[-1]
+        ax = axes[0]
         outer_handles = [ax.scatter([], [], label=compare_label, marker='^', c=c_scatter),
                          ax.scatter([], [], label='This work', marker='o', c=c_scatter)]
         outer_legend = ax.legend(handles=outer_handles, labels=[compare_label, 'This work'],
