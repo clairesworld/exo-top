@@ -1150,8 +1150,8 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, data_path=data_path_bullard,
                         fig_path=fig_path_bullard, load='auto',
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
-                        postprocess_functions=[], vmin=None, vmax=None,
-                        cmap='magma', compare_pub=None, compare_label=None, vmin=4, vmax=9,
+                        postprocess_functions=[],
+                        cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
                         fig=None, axes=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
