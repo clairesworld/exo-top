@@ -26,8 +26,9 @@ load = load_grid
 ### plot scalings of other output parameters with Ra
 
 sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta-Nu-Ti',
-                       ylabels=['Nu', r'$\delta_0$', r'$T_i$'], psuffixes=['_T', '_Nu'], vmax=11,
-                       postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], compare_pub=sc.moresi95,
+                       fig_path=fig_path, load=load, save=True, fname='delta-Nu-Ti', xlim=[1e5, 5e8],
+                       ylabels=['Nu', r'$\delta_0$', r'$T_i$'], psuffixes=['_T', '_Nu'],
+                       postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts],
+                       compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 

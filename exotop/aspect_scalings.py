@@ -1171,7 +1171,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         fig, axes = plt.subplots(nkeys, 1, figsize=(nkeys*3, 8), sharex=True)
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
-    outer_handles = []
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
@@ -1190,8 +1189,11 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                 plot_data['Ra'].append(Ra_ii)
 
                 # load data
-                dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
+                if load_ii == 'auto':
+                    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                        read_statistics=True)
+                else:
+                    dat = None
 
                 dfs = []
                 for ip, suffix in enumerate(psuffixes):
@@ -1213,8 +1215,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     plot_data[key].append(np.median(df[key]))
 
                 if compare_pub is not None:
-                    if (jj > 0) and (ii > 0):
-                        outer_handles.append(axes[0].scatter([], [], label=compare_label, marker='^', c=c_scatter))
                     d_compare = compare_pub(Ra=Ra_ii, d_eta=float(eta_str), case=case, dat=dat, df=df,
                                             load=load_ii, **kwargs)
                     for k, key in enumerate(keys):
@@ -1225,7 +1225,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                         except Exception as e:
                             print('d_compare[Ra_i]', d_compare['Ra_i'])
                             print('d_compare[keys]', d_compare[keys])
-                            print('c_scatter', c_scatter, 'cmplabel', cmplabel)
                             raise e
 
         for k, key in enumerate(keys):
@@ -1236,11 +1235,11 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
                                            fig=fig, ax=axes[k], xlabel=xlabel, **kwargs)
 
-    if compare_pub is not None:
-        outer_legend = axes[0].legend(handles=outer_handles,
+    if compare_pub is not None:  # add top legend
+        outer_handles = [axes[0].scatter([], [], label=compare_label, marker='^', c=c_scatter)]
+        outer_legend = axes[0].legend(handles=outer_handles, labels=compare_label,
                                  borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                                 frameon=False, mode="expand"
-                                 )
+                                 frameon=False, mode="expand")
         axes[0].add_artist(outer_legend)
 
 
@@ -1252,7 +1251,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     plt.suptitle(title, fontsize=labelsize, y=1.02)
 
     if save:
-        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, tight_layout=False)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None, bbox_extra_artists=(outer_legend,),
+                  tight_layout=False)
     return fig, axes
 
 
