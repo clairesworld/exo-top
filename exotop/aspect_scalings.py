@@ -1167,9 +1167,10 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
-        fig, axes = plt.subplots(nkeys, 1, figsize=(nkeys*4, 10))
+        fig, axes = plt.subplots(nkeys, 1, figsize=(nkeys*3, 8))
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap)[0]
+    outer_handles = []
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
@@ -1211,21 +1212,20 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     plot_data[key].append(np.median(df[key]))
 
                 if compare_pub is not None:
-                    cmplabel = compare_label
                     if (jj > 0) and (ii > 0):
-                        cmplabel = None
+                        outer_handles.append(axes[0].scatter([], [], label=compare_label, marker='^', c=c_scatter))
                     d_compare = compare_pub(Ra=Ra_ii, d_eta=float(eta_str), case=case, dat=dat, df=df,
                                             load=load_ii, **kwargs)
                     for k, key in enumerate(keys):
                         try:
-                            axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', alpha=0.7, c=c_scatter,
-                                         label=cmplabel)
+                            axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', c=c_scatter)
                         except KeyError:
                             print('Key', key, 'not returned by', compare_pub)
                         except Exception as e:
                             print('d_compare[Ra_i]', d_compare['Ra_i'])
                             print('d_compare[keys]', d_compare[keys])
                             print('c_scatter', c_scatter, 'cmplabel', cmplabel)
+                            raise e
 
         for k, key in enumerate(keys):
             xlabel = ''
@@ -1235,6 +1235,15 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
                                            fig=fig, ax=axes[k], xlabel=xlabel, **kwargs)
 
+    if compare_pub is not None:
+        outer_legend = axes[0].legend(handles=outer_handles,
+                                 borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                                 frameon=False, mode="expand"
+                                 )
+        axes[0].add_artist(outer_legend)
+
+
+    # colorbar proxy artist
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
                             vmin=vmin, vmax=vmax)  # dummy
     cbar = fig.colorbar(scat, ax=axes.ravel().tolist())
@@ -1600,11 +1609,13 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
             return fig, ax
 
     delta_rh_n = np.array(T_params['delta_rh'])  # ensure not list
-    D_l_n = np.array(T_params['delta_L'])
+    delta_0_n = np.array(T_params['delta_0'])
+    D_l_n = np.array(T_params['y_L'])
     T_l_n = np.array(T_params['T_l'])
     T_i_n = np.array(T_params['T_i'])
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
+    print('delta_0', delta_0_n, 'delta_rh', delta_rh_n, 'delta_L', 1 - D_l_n)
 
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)

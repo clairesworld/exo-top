@@ -478,7 +478,7 @@ class Aspect_Data():
     #     return Ti, d0
 
     def lid_thickness(self, u=None, v=None, n=None, tol=1, cut=False, plot=False, cutdiv=2, **kwargs):
-        # stagnant lid thickness (mechanical boundary layer) from Moresi & Solomatov 2000
+        # stagnant lid depth y_L from Moresi & Solomatov 2000 method - thickness delta_L = 1 - y_L
         x = self.x
         y = self.y
         if (u is None) or (v is None):
@@ -522,7 +522,7 @@ class Aspect_Data():
         if plot:  # overplot
             plt.plot(x_vel, y_tan, c='g', ls='--', label='tangent to max gradient')
             plt.legend()
-        return b
+        return b   # y_L
     
     def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, u=None, v=None, cut=False, plot=False,
                              verbose=False, **kwargs):
@@ -579,7 +579,7 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
     
-    def T_components(self, n, T=None, T_i=None, T_l=None, delta_rh=None, delta_L=None, u=None, v=None, cut=False, plot=False,
+    def T_components(self, n, T=None, T_i=None, T_l=None, delta_rh=None, y_L=None, u=None, v=None, cut=False, plot=False,
                      verbose=False, **kwargs):
         if n is None:
             n = self.final_step()
@@ -600,17 +600,20 @@ class Aspect_Data():
             p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
-        if delta_L is None:
-            delta_L = self.lid_thickness(u=u, v=v, cut=cut, plot=plot)
+        if y_L is None:
+            y_L = self.lid_thickness(u=u, v=v, cut=cut, plot=plot)
         if T_i is None:
             T_i = self.internal_temperature(T_av=T_av, **kwargs)
         if T_l is None:
-            T_l = self.lid_base_temperature(T_av=T_av, delta_L=delta_L, cut=cut, **kwargs)
+            T_l = self.lid_base_temperature(T_av=T_av, delta_L=y_L, cut=cut, **kwargs)
         if delta_rh is None:
             delta_rh = self.ubl_thickness(n=n, T_l=T_l, T_i=T_i, **kwargs)
+        delta_L = y[-1] - y_L
+        print('y[-1]', y[-1])
         delta_0 = self.delta_0(delta_rh=delta_rh, delta_L=delta_L)  # mechanical boundary layer MS95
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
-        self.T_params = {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_rh':delta_rh, 'd_m':d_m, 'delta_L':delta_L, 'T_l':T_l, 'T_i':T_i, 'delta_0':delta_0, 'T_av':T_av, 'y':y}
+        self.T_params = {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_rh':delta_rh, 'd_m':d_m, 'y_L':y_L, 'T_l':T_l, 'T_i':T_i,
+                         'delta_L':delta_L, 'delta_0':delta_0, 'T_av':T_av, 'y':y}
         return self.T_params
     
     def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, u=None, v=None, **kwargs):
