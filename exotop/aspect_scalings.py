@@ -1245,7 +1245,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                          ax.scatter([], [], label='This work', marker='o', c=c_scatter)]
         outer_legend = ax.legend(handles=outer_handles, labels=[compare_label, 'This work'],
                                  borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                                 frameon=False, mode="expand")
+                                 frameon=False, #mode="expand"
+                                 # )
         ax.add_artist(outer_legend)
 
     # colorbar proxy artist
