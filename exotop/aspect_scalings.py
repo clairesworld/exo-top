@@ -1238,8 +1238,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                                            fig=fig, ax=axes[k], xlabel=xlabel, **kwargs)
 
     if compare_pub is not None:  # add top legend
-        bigax = fig.add_subplot(111)  # The big subplot
-        ax = bigax
+        ax = axes[-1]
         outer_handles = [ax.scatter([], [], label=compare_label, marker='^', c=c_scatter),
                          ax.scatter([], [], label='This work', marker='o', c=c_scatter)]
         outer_legend = ax.legend(handles=outer_handles, labels=[compare_label, 'This work'],
