@@ -1150,7 +1150,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, data_path=data_path_bullard,
                         fig_path=fig_path_bullard, load='auto',
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
-                        postprocess_functions=[], xlim=None,
+                        postprocess_functions=[], xlim=None, ylim=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
                         fig=None, axes=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
@@ -1163,6 +1163,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         raise Exception('No y-axis keys provided!')
     else:
         nkeys = 1
+    if ylim is None:
+        ylim = [None]*nkeys
     if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if t1 is None:
@@ -1231,17 +1233,19 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
             xlabel = ''
             if k == len(keys)-1:
                 xlabel = 'Ra'
-            fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key], xlim=xlim,
+            fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key], xlim=xlim, ylim=ylim[k],
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
                                            fig=fig, ax=axes[k], xlabel=xlabel, **kwargs)
 
     if compare_pub is not None:  # add top legend
-        outer_handles = [axes[0].scatter([], [], label=compare_label, marker='^', c=c_scatter),
-                         axes[0].scatter([], [], label='This work', marker='o', c=c_scatter)]
-        outer_legend = axes[0].legend(handles=outer_handles, labels=[compare_label, 'This work'],
+        bigax = fig.add_subplot(111)  # The big subplot
+        ax = bigax
+        outer_handles = [ax.scatter([], [], label=compare_label, marker='^', c=c_scatter),
+                         ax.scatter([], [], label='This work', marker='o', c=c_scatter)]
+        outer_legend = ax.legend(handles=outer_handles, labels=[compare_label, 'This work'],
                                  borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                                  frameon=False, mode="expand")
-        axes[0].add_artist(outer_legend)
+        ax.add_artist(outer_legend)
 
 
     # colorbar proxy artist
