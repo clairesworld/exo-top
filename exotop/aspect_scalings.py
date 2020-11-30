@@ -1148,7 +1148,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
 
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, data_path=data_path_bullard,
-                        fig_path=fig_path_bullard, load='auto', T_i=False,
+                        fig_path=fig_path_bullard, load='auto', Ra_i=False,
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
                         postprocess_functions=[], xlim=None, ylim=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
