@@ -297,12 +297,14 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         sols_in_time = sol_files[i_time:]
         n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
         n_ts = n_indices + i_time  # TODO: not off by 1 ?
+        print('ts at sols', n_ts)
         if not isinstance(postprocess_functions, list):
             postprocess_functions = [postprocess_functions]
         # print('df_to_extend before reset', df_to_extend)
         df_to_extend = df_to_extend.reset_index()
         # print('df_to_extend after reset', df_to_extend)
         for ii, n in enumerate(n_quasi):
+
             ts = n_ts[ii]  # timestep at this solution
             # print(ts, 'timestep at solution', n)
             for fn in postprocess_functions:
