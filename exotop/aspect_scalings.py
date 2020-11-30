@@ -1615,7 +1615,6 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     T_i_n = np.array(T_params['T_i'])
     T_f = np.array(T_params['T_av'].tolist())
     y_f = np.array(T_params['y'].tolist())
-    print('delta_0', delta_0_n, 'delta_rh', delta_rh_n, 'delta_L', 1 - D_l_n)
 
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
