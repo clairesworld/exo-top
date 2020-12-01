@@ -16,6 +16,7 @@ from matplotlib.colors import LinearSegmentedColormap, LogNorm
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
+highlight_colour = 'xkcd:coral'
 
 
 def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
@@ -760,7 +761,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             print('    Not enough points to fit')
 
     ax.errorbar(quants_x[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
-                fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor='xkcd:aqua')
+                fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
     ax.errorbar(quants_x[:, 1], quants_h_rms[:, 1], yerr=yerr_rms, xerr=xerr,
                 fmt='o', c=c_rms, capsize=5)
 
@@ -1058,7 +1059,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
 
     # add legends
     ax = bigax
-    handles1 = [ax.scatter([], [], label='peak', marker='d', edgecolors='xkcd:aqua', c='k'),
+    handles1 = [ax.scatter([], [], label='peak', marker='d', edgecolors=highlight_colour, c='k'),
                 ax.scatter([], [], label='rms', marker='o', c='k')]
     outer_legend = ax.legend(handles=handles1,
                              borderaxespad=0., ncol=len(handles1), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
@@ -1069,11 +1070,11 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     for ir, regime_name in enumerate(regime_names):
         handles2.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir], alpha=0.9))
     regime_legend = ax.legend(handles=handles2,
-                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(0, 1), loc='upper right',
+                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(-0.1, 1), loc='upper right',
                               frameon=False)
     ax.add_artist(regime_legend)
 
-    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.15)
+    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.2)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None,
                   bbox_extra_artists=(outer_legend, regime_legend), tight_layout=False)
@@ -1209,7 +1210,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     for k, key in enumerate(keys):
                         try:
                             axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', c=c_scatter,
-                                         markeredgecolor='xkcd:aqua', alpha=0.8)
+                                         markeredgecolor=highlight_colour, alpha=0.8)
                         except KeyError:
                             print('Key', key, 'not returned by', compare_pub)
                         except Exception as e:
@@ -1230,7 +1231,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
 
     if compare_pub is not None:  # add top legend
         ax = axes[0]
-        outer_handles = [ax.scatter([], [], label=compare_label, marker='^', c=c_scatter),
+        outer_handles = [ax.scatter([], [], label=compare_label, marker='^', c=c_scatter,
+                                    markeredgecolor=highlight_colour),
                          ax.scatter([], [], label='This work', marker='o', c=c_scatter)]
         outer_legend = ax.legend(handles=outer_handles, labels=[compare_label, 'This work'],
                                  borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
