@@ -20,7 +20,8 @@ regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 
                            ['steady', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic'],  # eta 1e6
                            ['no convection', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic'],  # eta 1e7
                            ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'chaotic']])  # eta 1e8
-regime_names_td = ['steady', 'trans.', 'chaotic']
+regime_names_td = ['steady', 'trans.', 'chaotic', 'sluggish']
+c_regimes_td = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure', 'xkcd:navy blue']
 
 load_grid = np.empty_like(t1_grid, dtype=object)
 load_grid[:] = default_load_value
@@ -42,5 +43,3 @@ fig_fmt = '.png'
 
 c_rms = 'xkcd:forest green'
 c_peak = 'xkcd:periwinkle'
-# c_regimes = [(0.2208, 0.5455, 0.2338), (0.984, 0.925, 0.365), (0.6882, 0.1059, 0.2059)] # ['#112a12',  '#fbec5d', '#EA2446']
-c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure']

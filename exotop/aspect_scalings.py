@@ -1500,10 +1500,8 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if set_under is not None:
         cmap.set_under(set_under)
         cmap_extend = 'min'
-    if set_over is not None:
+    if set_over is not None:  # doesn't work for custom LinearSegmented colormap (bug: https://github.com/matplotlib/matplotlib/issues/4117/)
         cmap.set_over(set_over)
-        print('setting over', set_over, 'vmax', vmax)
-        print(np.where(m > vmax))
         if set_under is None:
             cmap_extend = 'max'
         else:

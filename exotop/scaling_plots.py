@@ -1,7 +1,7 @@
 import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, c_regimes, fig_fmt, \
+from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, c_regimes_td, fig_fmt, \
     regime_grid_td, regime_names_td, load_grid, alpha_m
 from exotop import aspect_scalings as sc
 
@@ -10,7 +10,7 @@ load = load_grid
 
 # ### plot h scalings with Ra
 
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes, save=True, t1=t1_grid, load=load,
+sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid, load=load,
                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
                          ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=8, fit=True,
                          xlim=(0.6e6, 4e8), ylim=(1, 12), logx=True, logy=True, hscale=2e-5 * 2700 * 2890,
@@ -19,7 +19,7 @@ load = True
 
 ## plot h scalings - with dT_m*delta*alpha
 
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes, save=True, t1=t1_grid,
+sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
                          T_components=True,
                          load=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end=end_grid,
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
