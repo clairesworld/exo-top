@@ -758,7 +758,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
             if legend:
-                print('adding to legend label:', '{:.2e} x^{:.3f}'.format(const, expon))
                 ax.legend(fontsize=labelsize-8,
                           # handles=[h3], labels=[],
                           # loc='lower left'
@@ -766,13 +765,13 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         else:
             print('    Not enough points to fit')
 
-    ax.errorbar(quants_x[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
+    ax.errorbar(quants_x[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr, elinewidth=0.5,
                 fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
-    ax.errorbar(quants_x[:, 1], quants_h_rms[:, 1], yerr=yerr_rms, xerr=xerr,
+    ax.errorbar(quants_x[:, 1], quants_h_rms[:, 1], yerr=yerr_rms, xerr=xerr, elinewidth=0.5,
                 fmt='o', c=c_rms, capsize=5)
 
     if showallscatter:
-        ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.02, s=10)
+        ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.05, s=10)
         # ax.scatter(flatfitx, flatfith_peak, c=c_peak, alpha=0.1, s=20)
 
     if logx:
@@ -1081,7 +1080,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                               frameon=False)
     ax.add_artist(regime_legend)
 
-    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.24)
+    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.22)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None,
                   bbox_extra_artists=(outer_legend, regime_legend), tight_layout=False)
