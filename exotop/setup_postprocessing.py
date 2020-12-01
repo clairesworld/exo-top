@@ -43,4 +43,4 @@ fig_fmt = '.png'
 c_rms = 'xkcd:forest green'
 c_peak = 'xkcd:periwinkle'
 # c_regimes = [(0.2208, 0.5455, 0.2338), (0.984, 0.925, 0.365), (0.6882, 0.1059, 0.2059)] # ['#112a12',  '#fbec5d', '#EA2446']
-c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
+c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure']

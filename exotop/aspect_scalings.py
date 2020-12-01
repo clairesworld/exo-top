@@ -1469,7 +1469,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cases, _ = get_cases_list(Ra, eta_str, end[jj])
         for ii, Ra_str in enumerate(Ra):
             # calculate value at this parameter-space coordinate
-            if os.path.exists(data_path + 'output-' + cases[ii] + '/'):  # do nothing if case doesn't exist
+            if os.path.exists(data_path + 'output-' + cases[ii] + '/'):
                 plot_grid[jj, ii] = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, case=cases[ii], load=load[jj][ii],
                                              t1=t1[jj][ii], data_path=data_path, **kwargs)
             else:
@@ -1561,8 +1561,10 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **kwargs):
     label = regime_grid[jj, ii]
     digi = np.nonzero(np.array(regime_names) == label)[0]
-    if not list(digi):
-        return np.nan  # label not in names
+    if (not list(digi)) and (label == 'no convection'):
+        return np.nan
+    elif not list(digi):
+        return 9999  # label not in names - take to mean a non-stagnant lid regime
     else:
         return digi[0] + 1
 
