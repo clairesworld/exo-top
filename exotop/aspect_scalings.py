@@ -724,6 +724,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         df[x_key] = x
 
         df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key])  # remove any rows with nans
+        print(df)
 
         try:
             yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(x)))  # each xy point (y=h)
