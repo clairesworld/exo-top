@@ -1503,6 +1503,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if set_over is not None:
         cmap.set_over(set_over)
         print('setting over', set_over, 'vmax', vmax)
+        print(np.where(m > vmax))
         if set_under is None:
             cmap_extend = 'max'
         else:
