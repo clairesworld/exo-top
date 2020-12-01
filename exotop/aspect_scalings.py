@@ -753,7 +753,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
             if legend:
-                ax.legend(fontsize=12,
+                ax.legend(fontsize=10,
                           # handles=[h3], labels=[],
                           loc='lower left')
         else:
@@ -1069,7 +1069,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     for ir, regime_name in enumerate(regime_names):
         handles2.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir], alpha=0.9))
     regime_legend = ax.legend(handles=handles1,
-                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(1.05, 1), loc='upper left',
+                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(-0.05, 1), loc='upper right',
                               frameon=False)
     ax.add_artist(regime_legend)
 
@@ -1107,7 +1107,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
                 labels.append('{:.2e} x^{:.3f}'.format(const, expon))
                 leg = ax.legend(
                     handles=handles, labels=labels,
-                    loc='lower left', fontsize=12)
+                    loc='lower left', fontsize=10)
 
                 ax.add_artist(leg)
         else:

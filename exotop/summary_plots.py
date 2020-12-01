@@ -29,7 +29,7 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
         labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
         sc.subplots_cases(
             cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=load_grid.T[ii],
-            fname='all-Ra-' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
+            fname='all-Ra' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid.T[ii],
         )
