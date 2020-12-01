@@ -1369,7 +1369,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                         sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1_ii,
                                           dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
                     # n=-1 for final timestep only
-                    fig, ax = plot_T_profile(case, T_params=sol_df, n=-1, data_path=data_path, setylabel=False,
+                    fig, ax = plot_T_profile(case, T_params=sol_df, n='mean', data_path=data_path, setylabel=False,
                                              setxlabel=setxlabel, save=False, fig_path=fig_path, fig=fig, ax=ax,
                                              legend=legend, labelsize=labelsize)
                 else:
@@ -1599,9 +1599,10 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
 
     if n == 'mean':  # avg of all steady state sols
         T_params = T_params.mean(axis=0)  # T params df already only contains steady state values
+        print('T_params')
     else:
         try:
-            T_params = T_params.iloc[n]  # take nth row
+            T_params = T_params.loc[T_params['sol'] == n]
         except IndexError:
             print('No T parameterisation found for solution n =', n)
             return fig, ax
@@ -1616,15 +1617,15 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
 
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
-    ax.axhline(D_l_n - delta_rh_n, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
+    ax.axhlinedelta_0_n, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
     try:
-        ax.text(0, D_l_n - delta_rh_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n), ha='left', va='top',
+        ax.text(0, delta_0_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n), ha='left', va='top',
                 color='xkcd:red orange', fontsize=labelsize - 2)
     except TypeError:
-        ax.text(0, D_l_n - delta_rh_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n.item()), ha='left', va='top',
+        ax.text(0, delta_0_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n.item()), ha='left', va='top',
                 color='xkcd:red orange', fontsize=labelsize - 2)
     ax.plot([T_l_n, T_l_n], [0, D_l_n], ls='--', alpha=0.5, lw=0.5, label=r'$T_L$', c='xkcd:tangerine')
-    ax.plot([T_i_n, T_i_n], [0, D_l_n - delta_rh_n], ls='--', alpha=0.5, lw=0.5,
+    ax.plot([T_i_n, T_i_n], [0, delta_0_n], ls='--', alpha=0.5, lw=0.5,
             label=r'$T_i$', c='xkcd:red orange')
     if legend:
         ax.legend(frameon=True, fontsize=labelsize - 4, ncol=2)
