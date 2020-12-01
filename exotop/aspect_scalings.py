@@ -1479,6 +1479,8 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         plot_grid = np.log10(plot_grid)
     m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
 
+    if discrete and vmax is not None and vmin is not None and (vmax - vmin) != len(cticklabels):
+        print('Did you mean vmax - vmin =', len(cticklabels))
     if vmax is None:
         vmax = np.max(m)
     elif log:
@@ -1528,9 +1530,13 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     ax.set_xticklabels(Ra)
     ax.set_yticklabels(eta)
 
-    cbar = plt.colorbar(im, ticks=cticks, shrink=0.5, extend=cmap_extend)
+
+    cbar = plt.colorbar(im, shrink=0.5, extend=cmap_extend)
     if cticklabels is not None:
         cbar.ax.set_yticklabels(cticklabels)
+    if discrete:
+        tick_locs = (np.arange(cticklabels) + 0.5) * (cticklabels - 1) / cticklabels
+        cbar.set_ticks(tick_locs)
     if clabel is not None:
         cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
 
@@ -1561,10 +1567,8 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **kwargs):
     label = regime_grid[jj, ii]
     digi = np.nonzero(np.array(regime_names) == label)[0]
-    if (not list(digi)) and (label == 'no convection'):
+    if not list(digi):
         return np.nan
-    elif not list(digi):
-        return 9999  # label not in names - take to mean a non-stagnant lid regime
     else:
         return digi[0] + 1
 
