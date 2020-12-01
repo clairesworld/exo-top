@@ -1005,7 +1005,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
 
 def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1=None, nrows=2,
-                          ncols=2, T_components=False, leftlegpad=-0.05,
+                          ncols=2, T_components=False, leftleg_bbox=(-0.05, 1),
                           load='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
                           show_bounds=False, regimes_title='',
                           labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
@@ -1058,7 +1058,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                 # print('Plotted', len(Ra_regime), regime_name, 'case(s)')
 
         # ax.set_title(r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-2)
-        ax.text(0.01, 0.95, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-4, ha='left', va='top',
+        ax.text(0.01, 0.98, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-4, ha='left', va='top',
                 transform=ax.transAxes)  # label
 
         if ii % ncols != 0:
@@ -1077,11 +1077,11 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     for ir, regime_name in enumerate(regime_names):
         handles2.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir]))
     regime_legend = ax.legend(handles=handles2,
-                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(leftlegpad, 1), loc='upper right',
+                              borderaxespad=0., title=regimes_title, bbox_to_anchor=leftleg_bbox, loc='upper right',
                               frameon=False)
     ax.add_artist(regime_legend)
 
-    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.25)
+    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.24)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None,
                   bbox_extra_artists=(outer_legend, regime_legend), tight_layout=False)
