@@ -1200,7 +1200,10 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                         raise Exception('NaN in median, key:', key, '\n', df[key])
                     plot_data[key].append(np.median(df[key]))
                 if Ra_i:
-                    plot_data['Ra'].append(Ra_i_fast(Ra_0=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i']), T0=1))
+                    plot_data['Ra'].append(Ra_i_fast(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i'])))
+                elif Ra_i == 'eff':
+                    plot_data['Ra'].append(Ra_i_eff(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i']),
+                                                    T_l=np.median(df['T_l']), delta_L=np.median(df['delta_L'])))
                 else:
                     plot_data['Ra'].append(Ra_ii)
 
@@ -1272,19 +1275,18 @@ def solomatov95(Ra=None, d_eta=None, df=None, case=None, dat=None,
     return {'Ra_i': Ra_i, 'delta_0': delta_0, 'Nu': Nu}
 
 
-def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None,
+def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None, T1=1, dT=1,
              data_path=data_path_bullard, load='auto', **kwargs):
     if df is None:
         df = pickleio(case, postprocess_functions=[T_parameters_at_sol], suffix='_T', dat_new=dat, data_path=data_path,
                       load=load)
-    T0 = 1
-    dT = 1
+
     T_i = np.median(df['T_i'])
     gamma = np.log(d_eta)  # gamma for this delta eta
     p = gamma * dT
-    eta_0 = np.exp(-gamma * T0)
+    eta_1 = np.exp(-gamma * T1)
     eta_i = np.exp(-gamma * T_i)
-    Ra_i = np.array(Ra) * eta_0 / eta_i
+    Ra_i = np.array(Ra) * eta_1 / eta_i
     delta_1 = 0.58 * p ** 0.29 * Ra_i ** -0.24
     Nu = 1.89 * p ** -1.02 * Ra_i ** 0.2
     T_i_scaling = 1 - (1.1 * p ** -0.73 * Ra_i ** -0.04)
@@ -1292,12 +1294,23 @@ def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None,
     return {'Ra_i': Ra_i, 'delta_0': delta_0, 'Nu': Nu, 'T_i': T_i_scaling, 'delta_1': delta_1}
 
 
-def Ra_i_fast(Ra_0=None, d_eta=None, T_i=None, T0=1):
-    gamma = np.log(d_eta)  # gamma for this delta eta
-    eta_0 = np.exp(-gamma * T0)
+def Ra_i_fast(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0):
+    theta = np.log(d_eta)  # gamma for this delta eta
+    gamma = theta/(T1 - T0)
+    eta_1 = np.exp(-gamma * T1)  # viscosity at bottom
     eta_i = np.exp(-gamma * T_i)
-    Ra_i = np.array(Ra_0) * eta_0 / eta_i
+    Ra_i = np.array(Ra_1) * eta_1 / eta_i
     return Ra_i
+
+
+def Ra_i_eff(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0, T_l=None, Z=1, delta_L=None):
+    # accounting for effective depth of convection with large lid
+    theta = np.log(d_eta)  # gamma for this delta eta
+    gamma = theta/(T1 - T0)  # do you need effective gamma for smaller effective dT?
+    eta_1 = np.exp(-gamma * T1)
+    eta_i = np.exp(-gamma * T_i)
+    Ra_eff = Ra_1 * (T1 - T_l)/(T1 - T0) * ((Z - delta_L)/Z)**3 * eta_1 / eta_i
+    return Ra_eff
 
 
 def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
