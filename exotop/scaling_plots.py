@@ -9,11 +9,11 @@ from exotop import aspect_scalings as sc
 load = load_grid
 
 # ### plot h scalings with Ra
-#
-# sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, load=load,
-#                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
-#                          ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=10, fit=True, xlim=(0.7e6, 3.5e8),
-#                          ylim=(1, 10), logx=True, logy=True, hscale=2e-5 * 2700 * 2890, data_path=data_path)
+
+sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=c_regimes, save=True, t1=t1_grid, load=load,
+                         fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
+                         ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=10, fit=True, xlim=(0.7e6, 3.5e8),
+                         ylim=(1, 10), logx=True, logy=True, hscale=2e-5 * 2700 * 2890, data_path=data_path)
 
 ### plot h scalings - with dT_m*delta*alpha
 #
@@ -25,10 +25,10 @@ load = load_grid
 
 ### plot scalings of other output parameters with Ra
 
-sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta-Nu-Ti', xlim=(1e5, 5e8), ylim=[(None),(None),(0.8,1)],
-                       ylabels=['Nu', r'$\delta_0$', r'$T_i$'], psuffixes=['_T', '_Nu'],
-                       postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], Ra_i=True,
-                       compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
-                       fig_fmt=fig_fmt, cmap='winter', fit=True)
+# sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path,
+#                        fig_path=fig_path, load=load, save=True, fname='delta-Nu-Ti', xlim=(1e5, 5e8), ylim=[(None),(None),(0.8,1)],
+#                        ylabels=['Nu', r'$\delta_0$', r'$T_i$'], psuffixes=['_T', '_Nu'],
+#                        postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], Ra_i=True,
+#                        compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
+#                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 

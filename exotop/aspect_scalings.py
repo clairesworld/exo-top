@@ -1120,10 +1120,8 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
                 handles.append(h3)
                 labels.append('{:.2e} x^{:.3f}'.format(const, expon))
                 leg = ax.legend(
-                    handles=handles,
-                    labels=labels,
-                    loc='lower left'
-                )
+                    handles=handles, labels=labels,
+                    loc='lower left', fontsize=12)
 
                 ax.add_artist(leg)
         else:
@@ -1257,7 +1255,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
                             vmin=vmin, vmax=vmax)  # dummy
     cbar = fig.colorbar(scat, ax=axes.ravel().tolist())
-    cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=18)
+    cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=22)
     plt.suptitle(title, fontsize=labelsize, y=1.02)
 
     if save:
