@@ -750,7 +750,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     # flatfith_peak = [item for sublist in fith_peak for item in sublist]
 
     if fit:
-        if len(cases_var) > 1:  # can only fit if at least 2 data
+        print('len(fitx)', len(fitx))
+        if len(fitx) > 1:  # can only fit if at least 2 data
             expon, const = fit_log(flatfitx, flatfith_rms)
             xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
             hprime = const * xprime ** expon
@@ -759,7 +760,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             if legend:
                 ax.legend(fontsize=labelsize-6,
                           # handles=[h3], labels=[],
-                          loc='lower left')
+                          # loc='lower left'
+                          )
         else:
             print('    Not enough points to fit')
 
@@ -1073,11 +1075,11 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     for ir, regime_name in enumerate(regime_names):
         handles2.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir], alpha=0.9))
     regime_legend = ax.legend(handles=handles2,
-                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(-0.1, 1), loc='upper right',
+                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(-0.05, 1), loc='upper right',
                               frameon=False)
     ax.add_artist(regime_legend)
 
-    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.2)
+    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.5)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None,
                   bbox_extra_artists=(outer_legend, regime_legend), tight_layout=False)
