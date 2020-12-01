@@ -724,11 +724,10 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         df[x_key] = x
 
         df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key])  # remove any rows with nans
-        print(df)
 
         try:
-            yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(x)))  # each xy point (y=h)
-            yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(x)))
+            yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(df[x_key].values)))  # each xy point (y=h)
+            yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(df[x_key].values)))
             qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
             quants_h_peak[ii, :] = qdict['h_peak'] * hscale
             quants_h_rms[ii, :] = qdict['h_rms'] * hscale
