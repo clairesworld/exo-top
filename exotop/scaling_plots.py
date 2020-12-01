@@ -12,7 +12,7 @@ load = True # load_grid
 
 sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid, load=load,
                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
-                         ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=-2, fit=True,
+                         ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=-2, fit=True, showallscatter=True,
                          xlim=(0.6e6, 5e8), ylim=(1, 12), logx=True, logy=True, hscale=2e-5 * 2700 * 2890,
                          regimes_title='Time-dependence', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
 load = True
