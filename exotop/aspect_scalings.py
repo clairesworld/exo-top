@@ -1623,15 +1623,15 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
 
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
-    ax.axhline(delta_0_n, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
+    ax.axhline(1 - delta_0_n, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
     try:
-        ax.text(0, delta_0_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n), ha='left', va='top',
+        ax.text(0, 1 - delta_0_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n), ha='left', va='top',
                 color='xkcd:red orange', fontsize=labelsize - 2)
     except TypeError:
-        ax.text(0, delta_0_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n.item()), ha='left', va='top',
+        ax.text(0, 1 - delta_0_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n.item()), ha='left', va='top',
                 color='xkcd:red orange', fontsize=labelsize - 2)
     ax.plot([T_l_n, T_l_n], [0, D_l_n], ls='--', alpha=0.5, lw=0.5, label=r'$T_L$', c='xkcd:tangerine')
-    ax.plot([T_i_n, T_i_n], [0, delta_0_n], ls='--', alpha=0.5, lw=0.5,
+    ax.plot([T_i_n, T_i_n], [0, 1 - delta_0_n], ls='--', alpha=0.5, lw=0.5,
             label=r'$T_i$', c='xkcd:red orange')
     if legend:
         ax.legend(frameon=True, fontsize=labelsize - 4, ncol=2)
