@@ -12,7 +12,7 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg
-from matplotlib.colors import LinearSegmentedColormap, LogNorm
+from matplotlib.colors import LinearSegmentedColormap, LogNorm, Normalize
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
@@ -1478,7 +1478,6 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if log:
         plot_grid = np.log10(plot_grid)
     m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
-    print('m', m)
 
     if vmax is None:
         vmax = np.max(m)
@@ -1509,9 +1508,9 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
             cmap_extend = 'both'
 
     if lognorm:
-        im_norm = LogNorm(vmin=vmin, vmax=vmax)
+        im_norm = LogNorm(vmin=vmin, vmax=vmax, clip=False)
     else:
-        im_norm = None
+        im_norm = Normalize(vmin=vmin, vmax=vmax, clip=False)
 
     im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax,
                    norm=im_norm)
