@@ -753,7 +753,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
             if legend:
-                ax.legend(fontsize=10,
+                ax.legend(fontsize=labelsize-6,
                           # handles=[h3], labels=[],
                           loc='lower left')
         else:
@@ -1058,8 +1058,8 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
 
     # add legends
     ax = bigax
-    handles1 = [ax.scatter([], [], label='peak', marker='^', c='k', alpha=0.9),
-                ax.scatter([], [], label='rms', marker='o', c='k', alpha=0.9)]
+    handles1 = [ax.scatter([], [], label='peak', marker='d', edgecolors='xkcd:aqua', c='k'),
+                ax.scatter([], [], label='rms', marker='o', c='k')]
     outer_legend = ax.legend(handles=handles1,
                              borderaxespad=0., ncol=len(handles1), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                              frameon=False,  # mode="expand"
@@ -1068,8 +1068,8 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     handles2 = []
     for ir, regime_name in enumerate(regime_names):
         handles2.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir], alpha=0.9))
-    regime_legend = ax.legend(handles=handles1,
-                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(-0.05, 1), loc='upper right',
+    regime_legend = ax.legend(handles=handles2,
+                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(0, 1), loc='upper right',
                               frameon=False)
     ax.add_artist(regime_legend)
 
@@ -1107,7 +1107,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
                 labels.append('{:.2e} x^{:.3f}'.format(const, expon))
                 leg = ax.legend(
                     handles=handles, labels=labels,
-                    loc='lower left', fontsize=10)
+                    loc='lower left', fontsize=labelsize-6)
 
                 ax.add_artist(leg)
         else:
@@ -1533,7 +1533,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
                     rms = np.median(sol_df['h_rms'])
                     h_grid[y, x] = rms
         CS = ax.contour(h_grid, nlevels_contour, cmap=cmap_contours)
-        ax.clabel(CS, inline=1, fontsize=10)
+        ax.clabel(CS, inline=1, fontsize=labelsize)
 
     ax.set_title(title, fontsize=labelsize)
     if save:
