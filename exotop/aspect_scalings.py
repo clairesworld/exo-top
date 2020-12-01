@@ -1122,8 +1122,9 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
                 leg = ax.legend(
                     handles=handles,
                     labels=labels,
-                    # loc='lower left'
+                    loc='lower left'
                 )
+
                 ax.add_artist(leg)
         else:
             print('    Not enough points to fit')
