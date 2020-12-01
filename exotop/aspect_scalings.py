@@ -1502,6 +1502,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         cmap_extend = 'min'
     if set_over is not None:
         cmap.set_over(set_over)
+        print('setting over', set_over, 'vmax', vmax)
         if set_under is None:
             cmap_extend = 'max'
         else:
@@ -1510,7 +1511,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if lognorm:
         im_norm = LogNorm(vmin=vmin, vmax=vmax, clip=False)
     else:
-        im_norm = Normalize(vmin=vmin, vmax=vmax, clip=False)
+        im_norm = None #Normalize(vmin=vmin, vmax=vmax, clip=False)
 
     im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax,
                    norm=im_norm)
