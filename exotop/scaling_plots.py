@@ -24,7 +24,7 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          load=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end=end_grid,
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
                          xlabelpad=8, ylabelpad=5, fit=True, alpha_m=alpha_m, showallscatter=True,
-                         xlim=(2e-8, 1e-6), ylim=(5e-3, 7.5e-2), logx=True, logy=True,
+                         xlim=(1e-8, 1e-6), ylim=(5e-3, 7.5e-2), logx=True, logy=True,
                          regimes_title='Time-dependence', data_path=data_path)
 
 ## plot scalings of other output parameters with Ra

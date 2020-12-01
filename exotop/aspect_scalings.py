@@ -746,11 +746,10 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     fith_rms = [a[0] for a in yx_rms_all]
     flatfitx = [item for sublist in fitx for item in sublist]
     flatfith_rms = [item for sublist in fith_rms for item in sublist]
-    fith_peak = [a[0] for a in yx_peak_all]
+    # fith_peak = [a[0] for a in yx_peak_all]
     # flatfith_peak = [item for sublist in fith_peak for item in sublist]
 
     if fit:
-        print('len(fitx)', len(fitx))
         if len(fitx) > 1:  # can only fit if at least 2 data
             expon, const = fit_log(flatfitx, flatfith_rms)
             xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
@@ -758,6 +757,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
             if legend:
+                print('adding to legend label:', '{:.2e} x^{:.3f}'.format(const, expon))
                 ax.legend(fontsize=labelsize-6,
                           # handles=[h3], labels=[],
                           # loc='lower left'
@@ -1035,7 +1035,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     bigax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
 
     for ii, eta_ii in enumerate(eta_ls):
-        print(r'$\Delta \eta$ level', ii, '/', len(eta_ls) - 1)
+        print(r' $\Delta \eta$:', eta_ii, ' (', ii, '/', len(eta_ls) - 1, ')')
         z = int(str(nrows) + str(ncols) + str(ii + 1))
         ax = fig.add_subplot(z)
         t1_ii = t1[ii]
@@ -1054,7 +1054,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                 if show_bounds:
                     ax.axvline(float(Ra_regime[-1]) * 2, c='k', lw=0.5, alpha=0.6, ls='--')
                     # ax.text(ax.get_xlim()[0], ylim[0], regime_name, fontsize=8, va='bottom', ha='left')
-                print('Plotted', len(Ra_regime), regime_name, 'case(s)')
+                # print('Plotted', len(Ra_regime), regime_name, 'case(s)')
 
         ax.text(0.5, 0.95, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize, ha='center', va='top',
                 transform=ax.transAxes)  # label
@@ -1079,7 +1079,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                               frameon=False)
     ax.add_artist(regime_legend)
 
-    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.5)
+    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.25)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None,
                   bbox_extra_artists=(outer_legend, regime_legend), tight_layout=False)

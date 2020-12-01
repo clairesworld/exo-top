@@ -20,8 +20,8 @@ regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 
                            ['steady', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic'],  # eta 1e6
                            ['no convection', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic'],  # eta 1e7
                            ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'chaotic']])  # eta 1e8
-regime_names_td = ['steady', 'trans.', 'chaotic', 'sluggish']
-c_regimes_td = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure', 'xkcd:grey']
+regime_names_td = ['steady', 'trans.', 'chaotic']
+c_regimes_td = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure']
 
 load_grid = np.empty_like(t1_grid, dtype=object)
 load_grid[:] = default_load_value
