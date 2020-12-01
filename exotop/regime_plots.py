@@ -11,10 +11,10 @@ load = True  # load_grid
 # plot convection regimes in parameter space
 # example of transitional is Ra3e7 eta1e6 - still has regular cells
 sc.plot_parameter_grid(Ra_ls, eta_ls, function=sc.regime_to_digital, regime_grid=regime_grid_td, regime_names=regime_names_td,
-                       data_path=data_path, fig_path=fig_path, load=True, vmin=1, vmax=3, discrete=True, log=False,
+                       data_path=data_path, fig_path=fig_path, load=True, vmin=1, vmax=4, discrete=True, log=False,
                        title='Styles of time-dependence',
                        save=True, fname='time-dependence', labelsize=16, fig_fmt=fig_fmt, t1=t1_grid, end=end_grid,
-                       cticklabels=['steady', 'transitional', 'chaotic', 'not stagnant lid'], cticks=[1.5, 2, 2.5],
+                       cticklabels=['steady', 'transitional', 'chaotic', 'not stagnant lid'], cticks=[1.5, 2, 3, 3.5],
                        overplot_h=False, nlevels_contour=14, cmap='jet', clist=c_regimes_td, cmap_contours='autumn',
                        )
 
