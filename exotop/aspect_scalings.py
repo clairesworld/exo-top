@@ -1478,6 +1478,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if log:
         plot_grid = np.log10(plot_grid)
     m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
+    print('m', m)
 
     if vmax is None:
         vmax = np.max(m)
