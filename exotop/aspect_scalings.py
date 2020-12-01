@@ -1479,7 +1479,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
         plot_grid = np.log10(plot_grid)
     m = np.ma.masked_where(np.isnan(plot_grid), plot_grid)
 
-    if discrete and vmax is not None and vmin is not None and (vmax - vmin) != len(cticklabels):
+    if discrete and vmax is not None and vmin is not None and (vmax - vmin + 1) != len(cticklabels):
         print('Did you mean vmax - vmin =', len(cticklabels))
     if vmax is None:
         vmax = np.max(m)
@@ -1531,12 +1531,15 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     ax.set_yticklabels(eta)
 
     cbar = plt.colorbar(im, shrink=0.5, extend=cmap_extend)
+
+    # if discrete:
+    #     nlabels = len(cticklabels)
+    #     tick_locs = (np.arange(nlabels) + 0.5) * (nlabels - 1) / nlabels
+    #     cbar.set_ticks(tick_locs)
+    if cticks is not None:
+        cbar.set_ticks(cticks)
     if cticklabels is not None:
         cbar.ax.set_yticklabels(cticklabels)
-    if discrete:
-        nlabels = len(cticklabels)
-        tick_locs = (np.arange(nlabels) + 0.5) * (nlabels - 1) / nlabels
-        cbar.set_ticks(tick_locs)
     if clabel is not None:
         cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
 
