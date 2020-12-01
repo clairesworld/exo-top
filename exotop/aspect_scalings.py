@@ -1538,6 +1538,8 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     #     cbar.set_ticks(tick_locs)
     if cticks is not None:
         cbar.set_ticks(cticks)
+    elif cticks is None and discrete:
+        cbar.set_ticks(np.arange(vmin, vmax))
     if cticklabels is not None:
         cbar.ax.set_yticklabels(cticklabels)
     if clabel is not None:
