@@ -772,7 +772,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 fmt='o', c=c_rms, capsize=5)
 
     if showallscatter:
-        ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.1, s=20)
+        ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.02, s=10)
         # ax.scatter(flatfitx, flatfith_peak, c=c_peak, alpha=0.1, s=20)
 
     if logx:
@@ -1005,7 +1005,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
 
 def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1=None, nrows=2,
-                          ncols=2, T_components=False,
+                          ncols=2, T_components=False, leftlegpad=-0.05,
                           load='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
                           show_bounds=False, regimes_title='',
                           labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
@@ -1077,7 +1077,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     for ir, regime_name in enumerate(regime_names):
         handles2.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir]))
     regime_legend = ax.legend(handles=handles2,
-                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(-0.06, 1), loc='upper right',
+                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(leftlegpad, 1), loc='upper right',
                               frameon=False)
     ax.add_artist(regime_legend)
 
