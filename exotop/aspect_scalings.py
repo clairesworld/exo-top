@@ -708,7 +708,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             dfs.append(df1)
         df = pd.concat(dfs, axis=1)
         df = df.loc[:, ~df.columns.duplicated()]
-        df = df.dropna(axis=0, how='any')  # remove any rows with nans
 
         if which_x == 'components':
             x_key = 'h_components'
@@ -723,6 +722,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             x_key = 'Ra'
             x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
         df[x_key] = x
+
+        df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key])  # remove any rows with nans
 
         try:
             yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(x)))  # each xy point (y=h)
