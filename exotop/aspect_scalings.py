@@ -1530,12 +1530,12 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     ax.set_xticklabels(Ra)
     ax.set_yticklabels(eta)
 
-
     cbar = plt.colorbar(im, shrink=0.5, extend=cmap_extend)
     if cticklabels is not None:
         cbar.ax.set_yticklabels(cticklabels)
     if discrete:
-        tick_locs = (np.arange(cticklabels) + 0.5) * (cticklabels - 1) / cticklabels
+        nlabels = len(cticklabels)
+        tick_locs = (np.arange(nlabels) + 0.5) * (nlabels - 1) / nlabels
         cbar.set_ticks(tick_locs)
     if clabel is not None:
         cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
