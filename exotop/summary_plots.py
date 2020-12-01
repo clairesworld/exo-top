@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid, \
+from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid_td, \
     load_grid
 # from exotop import aspect_postprocessing2 as asp
 from exotop import aspect_scalings as sc
@@ -17,7 +17,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
             cases_ii, labels=labels_ii, t1=t1_grid[ii], save=True, load=load_grid[ii],
             fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta, c_rms=c_rms, c_peak=c_peak,
             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid[ii],
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td[ii],
         )
 
 ## plot summaries across Ra
@@ -31,7 +31,7 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
             cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=load_grid.T[ii],
             fname='all-Ra' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid.T[ii],
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td.T[ii],
         )
 
 # compare 64 and 129 resolution for Ra=3e7
