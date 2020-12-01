@@ -1067,7 +1067,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                              frameon=False, mode="expand"
                              )
     ax.add_artist(outer_legend)
-    fig.subplots_adjust(wspace=0.05, hspace=0.15)
+    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.15)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None, bbox_extra_artists=(outer_legend,),
                   tight_layout=False)
