@@ -12,8 +12,8 @@ eta_ls = np.array(['1e5', '1e6', '1e7', '1e8'])
 # Ra from 1e6 to 3e8
 t1_grid = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 0.0590015],  # eta 1e5
                     [0.9, 0.3, 0.3, 0.4, 0.3, 0.055083],  # eta 1e6
-                    [0, 0.7, 0.35, 0.4, 0.3, 0.054],  # eta 1e7
-                    [0, 0, 0.6, 0.55, 0.065, 0.059]])  # eta 1e8
+                    [0, 0.7, 0.35, 0.4, 0.3, 0.05999],  # eta 1e7
+                    [0, 0, 0.6, 0.55, 0.065, 0.06636]])  # eta 1e8
 
 # Ra from 1e6 to 3e8
 regime_grid = np.array([['steady', 'steady', 'steady', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e5
