@@ -708,6 +708,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             dfs.append(df1)
         df = pd.concat(dfs, axis=1)
         df = df.loc[:, ~df.columns.duplicated()]
+        df = df.dropna(axis=0, how='any')  # remove any rows with nans
 
         if which_x == 'components':
             x_key = 'h_components'
@@ -1056,8 +1057,9 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                     # ax.text(ax.get_xlim()[0], ylim[0], regime_name, fontsize=8, va='bottom', ha='left')
                 # print('Plotted', len(Ra_regime), regime_name, 'case(s)')
 
-        ax.text(0.5, 0.95, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize, ha='center', va='top',
-                transform=ax.transAxes)  # label
+        ax.title(r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-2)
+        # ax.text(0.5, 0.95, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize, ha='center', va='top',
+        #         transform=ax.transAxes)  # label
 
         if ii % ncols != 0:
             ax.yaxis.tick_right()
@@ -1073,13 +1075,13 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     ax.add_artist(outer_legend)
     handles2 = []
     for ir, regime_name in enumerate(regime_names):
-        handles2.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir], alpha=0.9))
+        handles2.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir]))
     regime_legend = ax.legend(handles=handles2,
-                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(-0.05, 1), loc='upper right',
+                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(-0.06, 1), loc='upper right',
                               frameon=False)
     ax.add_artist(regime_legend)
 
-    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.25)
+    fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.23)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None,
                   bbox_extra_artists=(outer_legend, regime_legend), tight_layout=False)
