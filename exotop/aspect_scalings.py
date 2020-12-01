@@ -681,17 +681,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         psuffixes = ['_T', '_h']
         at_sol = True
         postprocess_functions = [T_parameters_at_sol, h_at_ts]
-        # check for topography and T at solutions
-        # pickle_and_postprocess(cases, suffix='_h', postprocess_functions=[h_at_ts], t1=t1, at_sol=True,
-        #                        load='auto', data_path=data_path)
-        # pickle_and_postprocess(cases, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1, at_sol=True,
-        #                        load='auto', data_path=data_path)
-        # for case in cases:
-        #     # can eventually stop doing these things?
-        #     pickle_concat(case, keys=['time', 'sol', 'T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L', 'delta_rh',
-        #                               'h_components', 'y', 'h_rms', 'h_peak'],
-        #                   suffixes=['_h', '_T'], new_suffix=psuffix, data_path=data_path)
-        #     pickle_drop_duplicate_row(case, suffix=psuffix, which='sol', data_path=data_path)
     elif which_x == 'Ra':
         psuffixes = ['_h_all']
         at_sol = False
@@ -719,19 +708,10 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         df = pd.concat(dfs, axis=1)
         df = df.loc[:, ~df.columns.duplicated()]
 
-        # if which_x == 'Ra':
-        #     # correct for accidentally adding shit to h_all df - can eventually remove this?
-        #     pickle_drop(case, '_h_all', data_path=data_path,
-        #                 keys=['T_av', 'T_i', 'T_l', 'dT_m', 'dT_rh', 'd_m', 'delta_0', 'delta_L',
-        #                       'delta_rh', 'h_components', 'y'], **kwargs)
-
         if which_x == 'components':
             x_key = 'h_components'
             if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
                 print('plot_h_vs(): Calculating T components')
-                print('(x_key in df.columns)', (x_key in df.columns))
-                print('df[x_key]', df[x_key])
-                print('df[h_rms]', df['h_rms'])
                 h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii, update=False,
                                                  **kwargs)
             else:
@@ -763,7 +743,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     flatfitx = [item for sublist in fitx for item in sublist]
     flatfith_rms = [item for sublist in fith_rms for item in sublist]
     fith_peak = [a[0] for a in yx_peak_all]
-    flatfith_peak = [item for sublist in fith_peak for item in sublist]
+    # flatfith_peak = [item for sublist in fith_peak for item in sublist]
 
     if fit:
         if len(cases_var) > 1:  # can only fit if at least 2 data
@@ -773,20 +753,20 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
             if legend:
-                ax.legend(
+                ax.legend(fontsize=12,
                     # handles=[h3], labels=[],
                     loc='lower left')
         else:
             print('    Not enough points to fit')
 
     ax.errorbar(quants_x[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr,
-                fmt='^', c=c_peak, alpha=0.9, capsize=5)
+                fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor='xkcd:aqua')
     ax.errorbar(quants_x[:, 1], quants_h_rms[:, 1], yerr=yerr_rms, xerr=xerr,
-                fmt='o', c=c_rms, alpha=0.9, capsize=5)
+                fmt='o', c=c_rms, capsize=5)
 
     if showallscatter:
         ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.1, s=20)
-        ax.scatter(flatfitx, flatfith_peak, c=c_peak, alpha=0.1, s=20)
+        # ax.scatter(flatfitx, flatfith_peak, c=c_peak, alpha=0.1, s=20)
 
     if logx:
         ax.set_xscale('log')
@@ -1222,7 +1202,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                                             load=load_ii, **kwargs)
                     for k, key in enumerate(keys):
                         try:
-                            axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', c=c_scatter)
+                            axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', c=c_scatter,
+                                         markeredgecolor='xkcd:aqua', alpha=0.8)
                         except KeyError:
                             print('Key', key, 'not returned by', compare_pub)
                         except Exception as e:
