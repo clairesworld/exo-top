@@ -722,13 +722,16 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             x_key = 'Ra'
             x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
         df[x_key] = x
-        yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(x)))  # each xy point (y=h)
-        yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(x)))
 
-        qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
-        quants_h_peak[ii, :] = qdict['h_peak'] * hscale
-        quants_h_rms[ii, :] = qdict['h_rms'] * hscale
-        quants_x[ii, :] = qdict[x_key]
+        try:
+            yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(x)))  # each xy point (y=h)
+            yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(x)))
+            qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
+            quants_h_peak[ii, :] = qdict['h_peak'] * hscale
+            quants_h_rms[ii, :] = qdict['h_rms'] * hscale
+            quants_x[ii, :] = qdict[x_key]
+        except KeyError as e:  # e.g. no h at solutions yet
+            print('catching KeyError:', e)
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
     yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
