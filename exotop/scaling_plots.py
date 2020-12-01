@@ -15,6 +15,7 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          ylabel='dynamic topography (km)', xlabelpad=8, ylabelpad=8, fit=True,
                          xlim=(0.6e6, 4e8), ylim=(1, 12), logx=True, logy=True, hscale=2e-5 * 2700 * 2890,
                          regimes_title='Time-dependence', data_path=data_path)
+load = True
 
 ## plot h scalings - with dT_m*delta*alpha
 

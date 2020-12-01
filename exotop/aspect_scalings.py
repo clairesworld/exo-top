@@ -731,7 +731,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             quants_h_rms[ii, :] = qdict['h_rms'] * hscale
             quants_x[ii, :] = qdict[x_key]
         except KeyError as e:  # e.g. no h at solutions yet
-            print('catching KeyError:', e)
+            print('Catching KeyError:', e)
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
     yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
@@ -1238,7 +1238,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     if compare_pub is not None:  # add top legend
         ax = axes[0]
         outer_handles = [ax.scatter([], [], label=compare_label, marker='^', c=c_scatter,
-                                    markeredgecolor=highlight_colour),
+                                    edgecolors=highlight_colour),
                          ax.scatter([], [], label='This work', marker='o', c=c_scatter)]
         outer_legend = ax.legend(handles=outer_handles, labels=[compare_label, 'This work'],
                                  borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
