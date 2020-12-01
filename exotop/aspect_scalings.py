@@ -754,8 +754,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                           label='{:.2e} x^{:.3f}'.format(const, expon))
             if legend:
                 ax.legend(fontsize=12,
-                    # handles=[h3], labels=[],
-                    loc='lower left')
+                          # handles=[h3], labels=[],
+                          loc='lower left')
         else:
             print('    Not enough points to fit')
 
@@ -1000,7 +1000,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1=None, nrows=2,
                           ncols=2, T_components=False,
                           load='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
-                          show_bounds=False,
+                          show_bounds=False, regimes_title='',
                           labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
     if c_regimes is None:
         c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
@@ -1056,21 +1056,27 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
         if ii % ncols != 0:
             ax.yaxis.tick_right()
 
+    # add legends
     ax = bigax
-    handles = [ax.scatter([], [], label='peak', marker='^', c='k', alpha=0.9),
-               ax.scatter([], [], label='rms', marker='o', c='k', alpha=0.9)]
-    # hlabels = []
-    for ir, regime_name in enumerate(regime_names):
-        handles.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir], alpha=0.9))
-    outer_legend = ax.legend(handles=handles,  # labels=['peak', 'rms', 'steady', 'trans.', 'chaotic'],
-                             borderaxespad=0., ncol=len(handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                             frameon=False, mode="expand"
+    handles1 = [ax.scatter([], [], label='peak', marker='^', c='k', alpha=0.9),
+                ax.scatter([], [], label='rms', marker='o', c='k', alpha=0.9)]
+    outer_legend = ax.legend(handles=handles1,
+                             borderaxespad=0., ncol=len(handles1), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                             frameon=False,  # mode="expand"
                              )
     ax.add_artist(outer_legend)
+    handles2 = []
+    for ir, regime_name in enumerate(regime_names):
+        handles2.append(ax.scatter([], [], label=regime_name, marker='o', c=c_regimes[ir], alpha=0.9))
+    regime_legend = ax.legend(handles=handles1,
+                              borderaxespad=0., title=regimes_title, bbox_to_anchor=(1.05, 1), loc='upper left',
+                              frameon=False)
+    ax.add_artist(regime_legend)
+
     fig.subplots_adjust(wspace=0.05, hspace=0.15, left=0.15)
     if save:
-        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None, bbox_extra_artists=(outer_legend,),
-                  tight_layout=False)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None,
+                  bbox_extra_artists=(outer_legend, regime_legend), tight_layout=False)
     return fig, fig.axes
 
 
@@ -1228,7 +1234,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                          ax.scatter([], [], label='This work', marker='o', c=c_scatter)]
         outer_legend = ax.legend(handles=outer_handles, labels=[compare_label, 'This work'],
                                  borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                                 frameon=False, #mode="expand"
+                                 frameon=False,  # mode="expand"
                                  )
         ax.add_artist(outer_legend)
 
@@ -1377,7 +1383,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                             horizontalalignment='left', verticalalignment='top',
                             transform=ax.transAxes, fontsize=labelsize)
                 if setxlabel:
-                    ax.set_xlabel('temperature', fontsize=labelsize)
+                    ax.set_xlabel('mean temperature', fontsize=labelsize)
                 if setylabel:
                     ax.set_ylabel('depth', fontsize=labelsize)
 
