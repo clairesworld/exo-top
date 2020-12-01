@@ -1057,9 +1057,9 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                     # ax.text(ax.get_xlim()[0], ylim[0], regime_name, fontsize=8, va='bottom', ha='left')
                 # print('Plotted', len(Ra_regime), regime_name, 'case(s)')
 
-        ax.set_title(r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-2)
-        # ax.text(0.5, 0.95, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize, ha='center', va='top',
-        #         transform=ax.transAxes)  # label
+        # ax.set_title(r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-2)
+        ax.text(0.01, 0.95, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-4, ha='left', va='top',
+                transform=ax.transAxes)  # label
 
         if ii % ncols != 0:
             ax.yaxis.tick_right()
