@@ -40,22 +40,40 @@ load = True
 #                        compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
 #                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 
-# plot scalings of chaotic time-dependence T parameters
+# plot scalings of chaotic time-dependence T parameters - effective Ra_i
+
+sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls, t1=t1_grid[:,3:], end=end_grid[:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
+                       fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic-eff', xlim=(0.85e6, 4e7),
+                       ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
+                       ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
+                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i='eff',
+                      compare_label='', compare_pub=sc.moresi95,
+                       fig_fmt=fig_fmt, cmap='winter', fit=True)
+
+sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1=t1_grid[:,:3], end=end_grid[:,:3], keys=['delta_rh', 'dT_rh'], data_path=data_path,
+                       fig_path=fig_path, load=load, save=True, fname='delta_rh-steady-eff', xlim=(0.7e5, 1e6),
+                       ylim=[(None) , (None)], labelsize=14, title='Steady-state',
+                       ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
+                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i='eff',
+                      compare_label='', compare_pub=sc.moresi95,
+                       fig_fmt=fig_fmt, cmap='winter', fit=True)
+
+
+
+# plot scalings of chaotic time-dependence T parameters - uncorrected Ra_i
 
 sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls, t1=t1_grid[:,3:], end=end_grid[:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
                        fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic', xlim=(1e6, 4e7),
                        ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
-                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i='eff',
-                      compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
+                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=False,
+                      compare_label='', compare_pub=sc.moresi95,
                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 
 sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1=t1_grid[:,:3], end=end_grid[:,:3], keys=['delta_rh', 'dT_rh'], data_path=data_path,
                        fig_path=fig_path, load=load, save=True, fname='delta_rh-steady', xlim=(1e5, 1e6),
                        ylim=[(None) , (None)], labelsize=14, title='Steady-state',
                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
-                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i='eff',
-                      # compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
+                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=False,
+                      compare_label='', compare_pub=sc.moresi95,
                        fig_fmt=fig_fmt, cmap='winter', fit=True)
-
-
