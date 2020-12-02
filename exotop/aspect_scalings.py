@@ -1205,11 +1205,11 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     if np.isnan(med):
                         raise Exception('NaN in median, key:', key, '\n', df[key])
                     plot_data[key].append(np.median(df[key]))
-                if Ra_i:
-                    plot_data['Ra'].append(Ra_i_fast(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i'])))
-                elif Ra_i == 'eff':
+                if Ra_i == 'eff':
                     plot_data['Ra'].append(Ra_i_eff(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i']),
                                                     T_l=np.median(df['T_l']), delta_L=np.median(df['delta_L'])))
+                elif Ra_i:
+                    plot_data['Ra'].append(Ra_i_fast(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i'])))
                 else:
                     plot_data['Ra'].append(Ra_ii)
 
@@ -1230,10 +1230,10 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         for k, key in enumerate(keys):
             xlabel = ''
             if k == len(keys) - 1:
-                if Ra_i:
-                    xlabel = r'Ra$_i$'
-                elif Ra_i == 'eff':
+                if Ra_i == 'eff':
                     xlabel = r'Ra$_{i,eff}$'
+                elif Ra_i:
+                    xlabel = r'Ra$_i$'
                 else:
                     xlabel = r'Ra$_1$'
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key], xlim=xlim, ylim=ylim[k],
