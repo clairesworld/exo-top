@@ -1248,6 +1248,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                                  frameon=False,  # mode="expand"
                                  )
         ax.add_artist(outer_legend)
+        bbox_extra_artists = (outer_legend,)
 
     # colorbar proxy artist
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
@@ -1257,8 +1258,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     plt.suptitle(title, fontsize=labelsize, y=1.02)
 
     if save:
-        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None, bbox_extra_artists=(outer_legend,),
-                  tight_layout=False)
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None,
+                  bbox_extra_artists=bbox_extra_artists, tight_layout=False)
     return fig, axes
 
 
