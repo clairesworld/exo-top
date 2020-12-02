@@ -1636,7 +1636,6 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
 
     if n == 'mean':  # avg of all steady state sols
         T_params = T_params.mean(axis=0)  # T params df already only contains steady state values
-        print('T_params')
     else:
         try:
             T_params = T_params.loc[T_params['sol'] == n]

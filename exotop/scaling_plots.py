@@ -29,11 +29,22 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
 
 ## plot scalings of other output parameters with Ra
 
-sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'delta_0', 'delta_rh', 'T_i'], data_path=data_path,
+sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path,
                        fig_path=fig_path, load=load, save=True, fname='delta-Nu-Ti', xlim=(1e5, 5e8),
-                       ylim=[(None),(None),(None),(0.8,1)], labelsize=14,
-                       ylabels=['Nu', r'$\delta_0$', r'$\delta_{rh}$', r'$T_i$'], psuffixes=['_T', '_Nu'],
+                       ylim=[(None),(None),(0.8,1)], labelsize=14,
+                       ylabels=['Nu', r'$\delta_0$', r'$T_i$'], psuffixes=['_T', '_Nu'],
                        postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], Ra_i=True,
                        compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
                        fig_fmt=fig_fmt, cmap='winter', fit=True)
+
+## plot scalings of other output parameters with Ra
+
+sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls, t1=t1_grid[:,3:], end=end_grid[:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
+                       fig_path=fig_path, load=load, save=True, fname='delta_rh', xlim=(2e7, 5e8),
+                       ylim=[(None)], labelsize=14,
+                       ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
+                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True,
+                      # compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
+                       fig_fmt=fig_fmt, cmap='winter', fit=True)
+
 
