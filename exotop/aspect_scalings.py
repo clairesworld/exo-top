@@ -761,7 +761,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             expon, const = fit_log(flatfitx, flatfith_rms)
             xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
             hprime = const * xprime ** expon
-            h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=1, zorder=100,
+            h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=0.5, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
             if legend:
                 ax.legend(fontsize=labelsize-8,
@@ -1111,7 +1111,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
             expon, const = fit_log(Ra_data, y_data)
             xprime = np.logspace(np.log10(np.min(Ra_data)), np.log10(np.max(Ra_data)))
             yprime = const * xprime ** expon
-            h3, = ax.plot(xprime, yprime, c=c_scatter, ls='--', lw=1, zorder=100,
+            h3, = ax.plot(xprime, yprime, c=c_scatter, ls='--', lw=0.5, zorder=100,
                           label='{:.2e} x^{:.3f}'.format(const, expon))
 
             if legend:

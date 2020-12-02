@@ -43,7 +43,7 @@ load = True
 # plot scalings of chaotic time-dependence T parameters - effective Ra_i
 
 sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls, t1=t1_grid[:,3:], end=end_grid[:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic-eff', xlim=(0.85e6, 4e7),
+                       fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic-eff', xlim=(0.7e6, 4e7),
                        ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
                        postprocess_functions=[sc.T_parameters_at_sol], Ra_i='eff',
@@ -63,17 +63,17 @@ sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1=t1_grid[:,:3], end=end_grid[:,:3], 
 # plot scalings of chaotic time-dependence T parameters - uncorrected Ra_i
 
 sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls, t1=t1_grid[:,3:], end=end_grid[:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic', xlim=(1e6, 4e7),
+                       fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic', xlim=(1e7, 2e8),
                        ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
-                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=False,
+                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True,
                       compare_label='', compare_pub=sc.moresi95,
                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 
 sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1=t1_grid[:,:3], end=end_grid[:,:3], keys=['delta_rh', 'dT_rh'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta_rh-steady', xlim=(1e5, 1e6),
+                       fig_path=fig_path, load=load, save=True, fname='delta_rh-steady', xlim=(0.7e6, 2e7),
                        ylim=[(None) , (None)], labelsize=14, title='Steady-state',
                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
-                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=False,
+                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True,
                       compare_label='', compare_pub=sc.moresi95,
                        fig_fmt=fig_fmt, cmap='winter', fit=True)
