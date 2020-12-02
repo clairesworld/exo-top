@@ -1062,7 +1062,9 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
             Ra_regime = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
             Ra_regime_idx = [j for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
 
-            if ir > 0 and ii > 0 and show_isoviscous:
+            if ir == 0 and show_isoviscous_flag:
+                show_isoviscous = True
+            else:
                 show_isoviscous = False
 
             if not (not Ra_regime):  # if this regime is not empty
