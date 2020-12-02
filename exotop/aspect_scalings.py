@@ -1089,7 +1089,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     handles1 = [ax.scatter([], [], label='peak', marker='d', edgecolors=highlight_colour, c='k'),
                 ax.scatter([], [], label='rms', marker='o', c='k')]
     if show_isoviscous_flag:
-        hplot, = ax.plot([], [], label='2D cartesian isoviscous', ls='--', c='k')
+        hplot, = ax.plot([], [], label='rms, 2D cartesian isoviscous', ls='--', c='k')
         handles1.append(hplot)
     outer_legend = ax.legend(handles=handles1,
                              borderaxespad=0., ncol=len(handles1), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
