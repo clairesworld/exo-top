@@ -6,7 +6,7 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
 from exotop import aspect_scalings as sc
 
 
-load = True # load_grid
+load = load_grid
 
 # ### plot h scalings with Ra
 
@@ -41,7 +41,7 @@ sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'del
 
 sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls, t1=t1_grid[:,3:], end=end_grid[:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
                        fig_path=fig_path, load=load, save=True, fname='delta_rh', xlim=(2e7, 5e8),
-                       ylim=[(None)], labelsize=14,
+                       ylim=[(None) , (None)], labelsize=14,
                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
                        postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True,
                       # compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
