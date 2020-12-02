@@ -1097,7 +1097,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
                     save=True, fname='claire', showallscatter=False,
                     labelsize=16, ylabel='', xlabel='Ra', title='', fig_fmt='.png',
                     c_scatter='xkcd:forest green', legend=True,
-                    fit=False, logx=True, logy=True,
+                    fit=False, logx=True, logy=True, legloc='lower left',
                     fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     if fig is None:
         fig = plt.figure()
@@ -1120,7 +1120,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
                 labels.append('{:.2e} x^{:.3f}'.format(const, expon))
                 leg = ax.legend(
                     handles=handles, labels=labels,
-                    loc='lower left', fontsize=labelsize-6)
+                    loc=legloc, fontsize=labelsize-6)
 
                 ax.add_artist(leg)
         else:
@@ -1150,7 +1150,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, data_path=data_path_bullard,
                         fig_path=fig_path_bullard, load='auto', Ra_i=False,
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
-                        postprocess_functions=[], xlim=None, ylim=None,
+                        postprocess_functions=[], xlim=None, ylim=None, legloc=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
                         fig=None, axes=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
@@ -1165,6 +1165,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         nkeys = 1
     if ylim is None:
         ylim = [None] * nkeys
+    if legloc is None:
+        legloc = ['lower left'] * nkeys
     if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if t1 is None:
@@ -1245,7 +1247,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     xlabel = r'Ra$_1$'
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key], xlim=xlim, ylim=ylim[k],
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
-                                           fig=fig, ax=axes[k], xlabel=xlabel, legend=True, **kwargs)
+                                           fig=fig, ax=axes[k], xlabel=xlabel, legend=True, legloc=legloc[k], **kwargs)
 
     if compare_pub is not None:  # add top legend
         ax = axes[0]
