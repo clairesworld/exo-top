@@ -1164,7 +1164,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
-        fig, axes = plt.subplots(nkeys, 1, figsize=(nkeys * 3, 8), sharex=True)
+        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys*2.5), sharex=True)
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
