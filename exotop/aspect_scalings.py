@@ -670,7 +670,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
               save=True, fname='h', showallscatter=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
-              fit=False, logx=True, logy=True, hscale=1,
+              fit=False, logx=True, logy=True, hscale=1, Ra_i=False,
               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     # either Ra or eta is 1D list of strings (other is singular), t1, end must match shape
     cases, cases_var = get_cases_list(Ra, eta, end)
@@ -720,7 +720,13 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             x = h_components
         elif which_x == 'Ra':
             x_key = 'Ra'
-            x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
+            if Ra_i == 'eff':
+                x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].values,
+                             T_l=df['T_l'].values, delta_L=df['delta_L'].values)
+            elif Ra_i:
+                x = Ra_i_fast(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].values)
+            else:
+                x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
         df[x_key] = x
 
         try:
@@ -1006,7 +1012,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1=None, nrows=2,
                           ncols=2, T_components=False, leftleg_bbox=(-0.05, 1),
                           load='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
-                          show_bounds=False, regimes_title='',
+                          show_bounds=False, regimes_title='', Ra_i=False,
                           labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
     if c_regimes is None:
         c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
@@ -1048,7 +1054,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
 
             if not (not Ra_regime):  # if this regime is not empty
                 fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
-                                    load_ii[Ra_regime_idx], which_x=which_x,
+                                    load_ii[Ra_regime_idx], which_x=which_x, Ra_i=Ra_i,
                                     fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir],
                                     save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
                 if show_bounds:
@@ -1314,9 +1320,9 @@ def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None, T1=1, dT=1,
 
 def Ra_i_fast(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0):
     theta = np.log(d_eta)  # gamma for this delta eta
-    gamma = theta/(T1 - T0)
-    eta_1 = np.exp(-gamma * T1)  # viscosity at bottom
-    eta_i = np.exp(-gamma * T_i)
+    gamma = theta/(np.array(T1) - np.array(T0))
+    eta_1 = np.exp(-gamma * np.array(T1))  # bottom viscosity
+    eta_i = np.exp(-gamma * np.array(T_i))
     Ra_i = np.array(Ra_1) * eta_1 / eta_i
     return Ra_i
 
@@ -1324,10 +1330,10 @@ def Ra_i_fast(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0):
 def Ra_i_eff(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0, T_l=None, Z=1, delta_L=None):
     # accounting for effective depth of convection with large lid
     theta = np.log(d_eta)  # gamma for this delta eta
-    gamma = theta/(T1 - T0)  # do you need effective gamma for smaller effective dT?
-    eta_1 = np.exp(-gamma * T1)
-    eta_i = np.exp(-gamma * T_i)
-    Ra_eff = Ra_1 * (T1 - T_l)/(T1 - T0) * ((Z - delta_L)/Z)**3 * eta_1 / eta_i
+    gamma = theta/(np.array(T1) - np.array(T0))  # do you need effective gamma for smaller effective dT?
+    eta_1 = np.exp(-gamma * np.array(T1))
+    eta_i = np.exp(-gamma * np.array(T_i))
+    Ra_eff = Ra_1 * (T1 - T_l)/(T1 - T0) * ((Z - np.array(delta_L))/Z)**3 * eta_1 / eta_i
     return Ra_eff
 
 
