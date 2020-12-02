@@ -1249,6 +1249,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                                  )
         ax.add_artist(outer_legend)
         bbox_extra_artists = (outer_legend,)
+    else:
+        bbox_extra_artists = None
 
     # colorbar proxy artist
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
