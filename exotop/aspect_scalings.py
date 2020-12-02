@@ -670,7 +670,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
               save=True, fname='h', showallscatter=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
-              fit=False, logx=True, logy=True, hscale=1, Ra_i=False,
+              fit=False, logx=True, logy=True, hscale=1, Ra_i=False, show_isoviscous=False,
               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     # either Ra or eta is 1D list of strings (other is singular), t1, end must match shape
     cases, cases_var = get_cases_list(Ra, eta, end)
@@ -779,6 +779,12 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     if showallscatter:
         ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.05, s=10)
         # ax.scatter(flatfitx, flatfith_peak, c=c_peak, alpha=0.1, s=20)
+
+    if show_isoviscous:
+        df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
+        Ra_iso = df_JFR['Ra']
+        h_rms_iso = df_JFR['RMS_topo']
+        ax.plot(Ra_iso, h_rms_iso, c='k', ls='--', lw=0.5)
 
     if logx:
         ax.set_xscale('log')
@@ -1012,7 +1018,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1=None, nrows=2,
                           ncols=2, T_components=False, leftleg_bbox=(-0.05, 1),
                           load='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
-                          show_bounds=False, regimes_title='', Ra_i=False,
+                          show_bounds=False, regimes_title='', Ra_i=False, show_isoviscous=False,
                           labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
     if c_regimes is None:
         c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
@@ -1054,7 +1060,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
 
             if not (not Ra_regime):  # if this regime is not empty
                 fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
-                                    load_ii[Ra_regime_idx], which_x=which_x, Ra_i=Ra_i,
+                                    load_ii[Ra_regime_idx], which_x=which_x, Ra_i=Ra_i, show_isoviscous=show_isoviscous,
                                     fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir],
                                     save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
                 if show_bounds:
@@ -1073,6 +1079,8 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     ax = bigax
     handles1 = [ax.scatter([], [], label='peak', marker='d', edgecolors=highlight_colour, c='k'),
                 ax.scatter([], [], label='rms', marker='o', c='k')]
+    if show_isoviscous:
+        handles1.append(ax.plot([], [], label='2D cartesian isoviscous', ls='--', c='k'))
     outer_legend = ax.legend(handles=handles1,
                              borderaxespad=0., ncol=len(handles1), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                              frameon=False,  # mode="expand"
@@ -1852,3 +1860,13 @@ def cmap_from_list(clist, n_bin=None, cmap_name=''):
         n_bin = len(clist)
     cm = LinearSegmentedColormap.from_list(cmap_name, clist, N=n_bin)
     return cm
+
+
+def read_JFR(fname, path='/raid1/cmg76/aspect/benchmarks/JFR/'):
+    df = pd.read_csv(path+fname, header=0, index_col=False)
+    print('Loaded', fname, df.columns)
+    Ra = np.array(df.Ra)
+    h_peak = np.array(df.peak_topo)
+    h_rms = np.array(df.RMS_topo)
+    Nu = np.array(df.Nu)
+    return df  # Ra, h_peak, h_rms, Nu
