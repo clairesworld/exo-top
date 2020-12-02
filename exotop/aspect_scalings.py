@@ -1035,6 +1035,10 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     else:
         print(r'Plotting h vs. Ra')
         which_x = 'Ra'
+    if show_isoviscous:
+        show_isoviscous_flag = True
+    else:
+        show_isoviscous_flag = False
 
     fig = plt.figure(figsize=(7, 7))
     bigax = fig.add_subplot(111)  # The big subplot
@@ -1058,6 +1062,9 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
             Ra_regime = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
             Ra_regime_idx = [j for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
 
+            if ir > 0 and ii > 0 and show_isoviscous:
+                show_isoviscous = False
+
             if not (not Ra_regime):  # if this regime is not empty
                 fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
                                     load_ii[Ra_regime_idx], which_x=which_x, Ra_i=Ra_i, show_isoviscous=show_isoviscous,
@@ -1079,8 +1086,9 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     ax = bigax
     handles1 = [ax.scatter([], [], label='peak', marker='d', edgecolors=highlight_colour, c='k'),
                 ax.scatter([], [], label='rms', marker='o', c='k')]
-    if show_isoviscous:
-        handles1.append(ax.plot([], [], label='2D cartesian isoviscous', ls='--', c='k'))
+    if show_isoviscous_flag:
+        hplot, = ax.plot([], [], label='2D cartesian isoviscous', ls='--', c='k')
+        handles1.append(hplot)
     outer_legend = ax.legend(handles=handles1,
                              borderaxespad=0., ncol=len(handles1), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                              frameon=False,  # mode="expand"
