@@ -1253,6 +1253,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         bbox_extra_artists = (outer_legend,)
         tight_layout = False
         bbox_inches = None
+        fig.subplots_adjust(left=0.2)
     else:
         bbox_extra_artists = None
         tight_layout = True
@@ -1262,6 +1263,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
                             vmin=vmin, vmax=vmax)  # dummy
     cbar = fig.colorbar(scat, ax=axes.ravel().tolist())
+    print('axes:', axes.ravel().tolist())
     cbar.set_label(r'log($\Delta \eta$)', fontsize=labelsize, rotation=270, labelpad=22)
     plt.suptitle(title, fontsize=labelsize, y=1.02)
 
