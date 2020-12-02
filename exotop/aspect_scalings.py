@@ -1232,6 +1232,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
             if k == len(keys) - 1:
                 if Ra_i:
                     xlabel = r'Ra$_i$'
+                elif Ra_i == 'eff':
+                    xlabel = r'Ra$_{i,eff}$'
                 else:
                     xlabel = r'Ra$_1$'
             fig, axes[k] = plot_Ra_scaling(Ra_data=plot_data['Ra'], y_data=plot_data[key], xlim=xlim, ylim=ylim[k],
@@ -1250,9 +1252,11 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         ax.add_artist(outer_legend)
         bbox_extra_artists = (outer_legend,)
         tight_layout = False
+        bbox_inches = None
     else:
         bbox_extra_artists = None
         tight_layout = True
+        bbox_inches = 'tight'
 
     # colorbar proxy artist
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
@@ -1262,7 +1266,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     plt.suptitle(title, fontsize=labelsize, y=1.02)
 
     if save:
-        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=None,
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, bbox_inches=bbox_inches,
                   bbox_extra_artists=bbox_extra_artists, tight_layout=tight_layout)
     return fig, axes
 
