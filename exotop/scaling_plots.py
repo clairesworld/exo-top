@@ -43,8 +43,8 @@ sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'del
 # plot scalings of chaotic time-dependence T parameters
 
 sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls, t1=t1_grid[:,3:], end=end_grid[:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta_rh', xlim=(2e7, 5e8),
-                       ylim=[(None) , (None)], labelsize=14,
+                       fig_path=fig_path, load=load, save=True, fname='delta_rh', #xlim=(2e7, 5e8),
+                       ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
                        postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True,
                       # compare_label='Moresi & Solomatov 1995', compare_pub=sc.moresi95,
