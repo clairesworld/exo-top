@@ -9,7 +9,7 @@ from exotop import aspect_scalings as sc
 #     sc.plot_velocity_profile(case, n=None, data_path=data_path, labelsize=16, fname=case+'_u-mean',
 #                              save=True, fig_path=fig_path+'case_profiles/', fig_fmt=fig_fmt)
 
-i_plot = list(range(len(eta_ls)))  # range(1)
+i_plot = range(3,4) # list(range(len(eta_ls)))  #
 for ii, eta in enumerate(eta_ls):  # eta_ls
     if ii in i_plot:
         for jj, Ra in enumerate(Ra_ls):

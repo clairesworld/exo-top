@@ -574,7 +574,7 @@ class Aspect_Data():
         # find inflection point for max core temperature
         z = y
         if spline:
-            spl = UnivariateSpline(T_av, z)
+            spl = UnivariateSpline(z, T_av, k=4, s=0)
             f_dprime = spl.derivative()
             y_inflections = f_dprime.roots()
             T_inflections = spl(y_inflections)
