@@ -763,6 +763,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     # flatfith_peak = [item for sublist in fith_peak for item in sublist]
 
     if fit:
+        print('n_sols_all', n_sols_all)
         if len(fitx) > 1:  # can only fit if at least 2 data
             expon, const = fit_log(flatfitx, flatfith_rms, weights=1/np.array(n_sols_all))
             xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
