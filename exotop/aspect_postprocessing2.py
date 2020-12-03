@@ -581,19 +581,19 @@ class Aspect_Data():
         else:
             f_prime = np.gradient(T_av) # differential approximation
             idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
-            y_infections = z[idx]
+            y_inflections = z[idx]
             T_inflections = T_av[idx]
         
         if plot:
-            print ('inflection point', y_infections) 
+            print ('inflection point', y_inflections)
             fig, ax = plt.subplots (figsize = (7, 7))
             ax.plot (z, T_av, 'bo-', ms = 2)
-            ax.plot (y_infections, T_inflections, 'ro', ms = 5)
+            ax.plot (y_inflections, T_inflections, 'ro', ms = 5)
             ax.set_xlabel('depth')
-            ax.set_ylabel('T')
+            ax.set_ylabel('T_av')
 
         if return_coords:
-            return T_inflections[-1], y_infections[-1]
+            return T_inflections[-1], y_inflections[-1]
         else:
             return T_inflections[-1]
         

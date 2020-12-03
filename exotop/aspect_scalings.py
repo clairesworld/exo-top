@@ -625,7 +625,7 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
     return qdict
 
 
-def fit_log(x, h):
+def fit_log(x, h, weights=None):
     try:
         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
         h1 = np.log10(np.array(h))
@@ -637,11 +637,15 @@ def fit_log(x, h):
         print('h', h, type(h))
         print('x', x, type(x))
         raise e
-    try:
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
-    except ValueError as e:
-        print('x', np.shape(x1), 'h', np.shape(h1))
-        raise e
+    if weights is None:
+        try:
+            slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
+        except ValueError as e:
+            print('x', np.shape(x1), 'h', np.shape(h1))
+            raise e
+    else:
+        # use np polyfit for weighted least squares
+        intercept, slope = np.polynomial.polynomial.polyfit(x1, h1, deg=1, w=weights)
     return slope, 10 ** intercept
 
 
@@ -694,6 +698,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     quants_x = np.zeros((len(cases_var), 3))
     yx_peak_all = []
     yx_rms_all = []
+    n_sols_all = []
 
     for ii, case in enumerate(cases):
         t1_ii = t1[ii]
@@ -739,6 +744,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             quants_x[ii, :] = qdict[x_key]
         except KeyError as e:  # e.g. no h at solutions yet
             print('Catching KeyError:', e)
+        n_sols_all.extend([len(df.index)]*len(df.index))
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
     yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
@@ -758,7 +764,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
     if fit:
         if len(fitx) > 1:  # can only fit if at least 2 data
-            expon, const = fit_log(flatfitx, flatfith_rms)
+            expon, const = fit_log(flatfitx, flatfith_rms, weights=1/np.array(n_sols_all))
             xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=0.5, zorder=100,
