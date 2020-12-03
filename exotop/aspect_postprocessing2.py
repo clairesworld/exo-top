@@ -7,6 +7,7 @@ from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import trapz
+from scipy.interpolate import UnivariateSpline
 import xml.etree.ElementTree
 import os
 import h5py
@@ -560,7 +561,7 @@ class Aspect_Data():
         return T_l
         
     def internal_temperature(self, n=None, T=None, T_av=None, plot=False, return_coords=False, verbose=False,
-                             **kwargs):
+                             spline=True, **kwargs):
         # almost-isothermal temperature of core of convecting cell
         # note: MS2000 define this as the maximal horizontally-averaged temperature in the layer
         x = self.x
@@ -572,10 +573,16 @@ class Aspect_Data():
 
         # find inflection point for max core temperature
         z = y
-        f_prime = np.gradient(T_av) # differential approximation
-        idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
-        y_infections = z[idx]
-        T_inflections = T_av[idx]
+        if spline:
+            spl = UnivariateSpline(T_av, z)
+            f_dprime = spl.derivative()
+            y_inflections = f_dprime.roots()
+            T_inflections = spl(y_inflections)
+        else:
+            f_prime = np.gradient(T_av) # differential approximation
+            idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
+            y_infections = z[idx]
+            T_inflections = T_av[idx]
         
         if plot:
             print ('inflection point', y_infections) 
