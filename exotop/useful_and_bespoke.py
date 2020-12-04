@@ -34,12 +34,21 @@ def colorize(vector,cmap='plasma', vmin=None, vmax=None):
     scalarmap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
     vcolors = scalarmap.to_rgba(vector)
     
-    return vcolors,scalarmap,cNorm
+    return vcolors, scalarmap, cNorm
 
+
+from collections import Iterable
+from six import string_types
 def iterable_not_string(obj):
-    from collections import Iterable
-    from six import string_types
     if isinstance(obj, Iterable) and not isinstance(obj, string_types):
         return True
     else:
         return False
+
+
+from matplotlib.colors import LinearSegmentedColormap
+def cmap_from_list(clist, n_bin=None, cmap_name=''):
+    if n_bin is None:
+        n_bin = len(clist)
+    cm = LinearSegmentedColormap.from_list(cmap_name, clist, N=n_bin)
+    return cm

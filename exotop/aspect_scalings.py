@@ -2,7 +2,7 @@ import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_postprocessing2 as post
-from exotop.useful_and_bespoke import colorize, iterable_not_string
+from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list
 import numpy as np
 import pandas as pd
 import pickle as pkl
@@ -12,7 +12,7 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg
-from matplotlib.colors import LinearSegmentedColormap, LogNorm, Normalize
+from matplotlib.colors import LogNorm, Normalize
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
@@ -669,11 +669,12 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
-def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_path_bullard, fig_path=fig_path_bullard,
+def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_path_bullard,
+              fig_path=fig_path_bullard,
               fig_fmt='.png', which_x=None,
-              save=True, fname='h', showallscatter=False,
+              save=True, fname='h',
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
-              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', legend=True,
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, Ra_i=False, show_isoviscous=False,
               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     # either Ra or eta is 1D list of strings (other is singular), t1, end must match shape
@@ -755,37 +756,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         fig = plt.figure()
         ax = plt.gca()
 
-    fitx = [a[1] for a in yx_rms_all]
-    fith_rms = [a[0] for a in yx_rms_all]
-    flatfitx = [item for sublist in fitx for item in sublist]
-    flatfith_rms = [item for sublist in fith_rms for item in sublist]
-    # fith_peak = [a[0] for a in yx_peak_all]
-    # flatfith_peak = [item for sublist in fith_peak for item in sublist]
-
-    if fit:
-        print('n_sols_all', n_sols_all)
-        if len(fitx) > 1:  # can only fit if at least 2 data
-            expon, const = fit_log(flatfitx, flatfith_rms, weights=1/np.array(n_sols_all))
-            xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
-            hprime = const * xprime ** expon
-            h3, = ax.plot(xprime, hprime, c=c_rms, ls='--', lw=0.5, zorder=100,
-                          label='{:.2e} x^{:.3f}'.format(const, expon))
-            if legend:
-                ax.legend(fontsize=labelsize-8,
-                          # handles=[h3], labels=[],
-                          # loc='lower left'
-                          )
-        else:
-            print('    Not enough points to fit')
-
     ax.errorbar(quants_x[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr, elinewidth=0.5,
                 fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
     ax.errorbar(quants_x[:, 1], quants_h_rms[:, 1], yerr=yerr_rms, xerr=xerr, elinewidth=0.5,
                 fmt='o', c=c_rms, capsize=5)
 
-    if showallscatter:
-        ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.05, s=10)
-        # ax.scatter(flatfitx, flatfith_peak, c=c_peak, alpha=0.1, s=20)
+    if fit:
+        ax = fit_cases(yx_rms_all, ax, labelsize=labelsize, weights=1/np.array(n_sols_all),
+                       c=c_rms, **kwargs)
 
     if show_isoviscous:
         df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
@@ -808,6 +786,31 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
+
+
+def fit_cases(yx_all, ax, legend=True, showallscatter=False, labelsize=16, weights=None,
+              c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
+    fitx = [a[1] for a in yx_all]
+    fity = [a[0] for a in yx_all]
+    flatfitx = [item for sublist in fitx for item in sublist]
+    flatfity = [item for sublist in fity for item in sublist]
+    if len(fitx) > 1:  # can only fit if at least 2 data
+        expon, const = fit_log(flatfitx, flatfity, weights=weights)
+        xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
+        hprime = const * xprime ** expon
+        h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
+                      label='{:.2e} x^{:.3f}'.format(const, expon))
+        if legend:
+            handles, labels = ax.get_legend_handles_labels()
+            handles.append(h3)
+            labels.append('{:.2e} x^{:.3f}'.format(const, expon))
+            leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
+            ax.add_artist(leg)
+    else:
+        print('    Not enough points to fit')
+    if showallscatter:
+        ax.scatter(flatfitx, flatfity, c=c, alpha=0.05, s=10)
+    return ax
 
 
 #
@@ -1119,10 +1122,10 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
 
 
 def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
-                    save=True, fname='claire', showallscatter=False,
+                    save=True, fname='claire',
                     labelsize=16, ylabel='', xlabel='Ra', title='', fig_fmt='.png',
-                    c_scatter='xkcd:forest green', legend=True,
-                    fit=False, logx=True, logy=True, legloc='lower left',
+                    c_scatter='xkcd:forest green',
+                    fit=False, logx=True, logy=True,
                     fig=None, ax=None, ylim=None, xlim=None, **kwargs):
     if fig is None:
         fig = plt.figure()
@@ -1131,29 +1134,9 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
     ax.plot(Ra_data, y_data, '-o', c=c_scatter)
 
     if fit:
-        if (len(Ra_data) > 1):  # can only fit if at least 2 data
-            # bl
-            expon, const = fit_log(Ra_data, y_data)
-            xprime = np.logspace(np.log10(np.min(Ra_data)), np.log10(np.max(Ra_data)))
-            yprime = const * xprime ** expon
-            h3, = ax.plot(xprime, yprime, c=c_scatter, ls='--', lw=0.5, zorder=100,
-                          label='{:.2e} x^{:.3f}'.format(const, expon))
-
-            if legend:
-                handles, labels = ax.get_legend_handles_labels()
-                handles.append(h3)
-                labels.append('{:.2e} x^{:.3f}'.format(const, expon))
-                leg = ax.legend(
-                    handles=handles, labels=labels,
-                    loc=legloc, fontsize=labelsize-6)
-
-                ax.add_artist(leg)
-        else:
-            print('    Not enough points to fit')
-
-    #     if showallscatter:
-    #         ax.scatter(flatfitx, flatfith_rms, c=c_rms, alpha=0.1, s=20)
-    #         ax.scatter(flatfitx, flatfith_peak, c=c_peak, alpha=0.1, s=20)
+        yx_all = [(y, r) for r, y in zip(Ra_data, y_data)]
+        ax = fit_cases(yx_all, ax, labelsize=labelsize, weights=None,
+                       c=c_scatter, **kwargs)
 
     if logx:
         ax.set_xscale('log')
@@ -1870,13 +1853,6 @@ def plot_topo_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=
         print('min:', np.min(h_norm))
     if save:
         plot_save(fig, case + '_h_' + '{:05}'.format(ts), fig_path=fig_path, fig_fmt=fig_fmt)
-
-
-def cmap_from_list(clist, n_bin=None, cmap_name=''):
-    if n_bin is None:
-        n_bin = len(clist)
-    cm = LinearSegmentedColormap.from_list(cmap_name, clist, N=n_bin)
-    return cm
 
 
 def read_JFR(fname, path='/raid1/cmg76/aspect/benchmarks/JFR/'):
