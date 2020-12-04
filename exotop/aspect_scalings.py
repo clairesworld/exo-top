@@ -745,8 +745,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key])  # remove any rows with nans
             if averagefirst:
                 yx_peak_all.append(
-                    (np.array(df['h_peak'].mean)*hscale, np.array(df[x_key].mean)))  # each xy point (y=h)
-                yx_rms_all.append((np.array(df['h_rms'].mean)*hscale, np.array(df[x_key].mean)))
+                    (np.array(df['h_peak'].mean())*hscale, np.array(df[x_key].mean())))  # each xy point (y=h)
+                yx_rms_all.append((np.array(df['h_rms'].mean())*hscale, np.array(df[x_key].mean())))
             else:
                 yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(df[x_key].values)))  # each xy point (y=h)
                 yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(df[x_key].values)))
