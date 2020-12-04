@@ -803,7 +803,7 @@ def fit_cases(yx_all, ax, legend=True, showallscatter=False, labelsize=16, weigh
               c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
-    print('x', np.shape(x), 'y', np.shape(y))
+    print('x', np.shape(x[0]), 'y', np.shape(y[0]))
     flatx = [item for sublist in x for item in sublist]
     flaty = [item for sublist in y for item in sublist]
     if len(x) > 1:  # can only fit if at least 2 data
