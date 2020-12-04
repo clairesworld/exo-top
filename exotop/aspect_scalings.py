@@ -713,14 +713,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
                            data_path=data_path, at_sol=at_sol, **kwargs)
             dfs.append(df1)
-        df = pd.concat(dfs, axis=0)
+        df = pd.concat(dfs, axis=1)
         df = df.loc[:, ~df.columns.duplicated()]
 
         if which_x == 'components':
             x_key = 'h_components'
             if averagefirst:
                 print('plot_h_vs(): Calculating T components using time-mean')
-                h_components = T_components_of_h(case, df=df.mean(axis=1), data_path=data_path, t1=t1_ii, load=load_ii,
+                h_components = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
                                                  update=False, **kwargs)
             else:
                 if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
