@@ -413,8 +413,11 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
                                    read_parameters=True)
         alpha_m = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
 
-    h_components = alpha_m * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
-            np.array(df['delta_rh']) / np.array(df['d_m']))
+    try:
+        h_components = alpha_m * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
+                np.array(df['delta_rh']) / np.array(df['d_m']))
+    except KeyError:
+        print(df)
 
     if update:
         df['h_components'] = h_components
