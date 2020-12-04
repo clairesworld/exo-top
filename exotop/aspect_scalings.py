@@ -420,8 +420,6 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
         df['h_components'] = h_components
         pkl.dump(df, open(data_path + 'output-' + case + '/pickle/' + case + psuffix + fend, 'wb'))
 
-    # print('-------> case: h components returned by T_components_of_h')
-    # print(h_components)
     return h_components
 
 
@@ -670,7 +668,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 
 def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_path_bullard,
-              fig_path=fig_path_bullard,
+              fig_path=fig_path_bullard, averagefirst=False,
               fig_fmt='.png', which_x=None,
               save=True, fname='h',
               labelsize=16, xlabel='', ylabel='dynamic topography', title='',
@@ -717,12 +715,17 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
         if which_x == 'components':
             x_key = 'h_components'
-            if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
-                print('plot_h_vs(): Calculating T components')
-                h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii, update=False,
-                                                 **kwargs)
+            if averagefirst:
+                print('plot_h_vs(): Calculating T components using time-mean')
+                h_components = T_components_of_h(case, df=df.mean(axis=1), data_path=data_path, t1=t1_ii, load=load_ii,
+                                                 update=False, **kwargs)
             else:
-                h_components = df['h_components']
+                if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
+                    print('plot_h_vs(): Calculating T components')
+                    h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii, update=False,
+                                                     **kwargs)
+                else:
+                    h_components = df['h_components']
             x = h_components
         elif which_x == 'Ra':
             x_key = 'Ra'
@@ -737,8 +740,13 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
         try:
             df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key])  # remove any rows with nans
-            yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(df[x_key].values)))  # each xy point (y=h)
-            yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(df[x_key].values)))
+            if averagefirst:
+                yx_peak_all.append(
+                    (np.array(df['h_peak'].mean)*hscale, np.array(df[x_key].mean)))  # each xy point (y=h)
+                yx_rms_all.append((np.array(df['h_rms'].mean)*hscale, np.array(df[x_key].mean)))
+            else:
+                yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(df[x_key].values)))  # each xy point (y=h)
+                yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(df[x_key].values)))
             qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
             quants_h_peak[ii, :] = qdict['h_peak'] * hscale
             quants_h_rms[ii, :] = qdict['h_rms'] * hscale
@@ -790,13 +798,13 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
 def fit_cases(yx_all, ax, legend=True, showallscatter=False, labelsize=16, weights=None,
               c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
-    fitx = [a[1] for a in yx_all]
-    fity = [a[0] for a in yx_all]
-    flatfitx = [item for sublist in fitx for item in sublist]
-    flatfity = [item for sublist in fity for item in sublist]
-    if len(fitx) > 1:  # can only fit if at least 2 data
-        expon, const = fit_log(flatfitx, flatfity, weights=weights)
-        xprime = np.linspace(np.min(flatfitx), np.max(flatfitx))
+    x = [a[1] for a in yx_all]
+    y = [a[0] for a in yx_all]
+    flatx = [item for sublist in x for item in sublist]
+    flaty = [item for sublist in y for item in sublist]
+    if len(x) > 1:  # can only fit if at least 2 data
+        expon, const = fit_log(flatx, flaty, weights=weights)
+        xprime = np.linspace(np.min(flatx), np.max(flatx))
         hprime = const * xprime ** expon
         h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
                       label='{:.2e} x^{:.3f}'.format(const, expon))
@@ -809,7 +817,7 @@ def fit_cases(yx_all, ax, legend=True, showallscatter=False, labelsize=16, weigh
     else:
         print('    Not enough points to fit')
     if showallscatter:
-        ax.scatter(flatfitx, flatfity, c=c, alpha=0.05, s=10)
+        ax.scatter(flatx, flaty, c=c, alpha=0.05, s=10)
     return ax
 
 
