@@ -803,9 +803,11 @@ def fit_cases(yx_all, ax, legend=True, showallscatter=False, labelsize=16, weigh
               c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
-    print('x', np.array(x[0]).ndim, 'y', np.array(x[0]).ndim)
-    flatx = [item for sublist in x for item in sublist]
-    flaty = [item for sublist in y for item in sublist]
+    if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
+        flatx = [item for sublist in x for item in sublist]
+        flaty = [item for sublist in y for item in sublist]
+    else:
+        flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
         expon, const = fit_log(flatx, flaty, weights=weights)
         xprime = np.linspace(np.min(flatx), np.max(flatx))
