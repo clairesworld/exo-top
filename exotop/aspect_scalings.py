@@ -713,7 +713,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
                            data_path=data_path, at_sol=at_sol, **kwargs)
             dfs.append(df1)
-        df = pd.concat(dfs, axis=1)
+        df = pd.concat(dfs, axis=0)
         df = df.loc[:, ~df.columns.duplicated()]
 
         if which_x == 'components':
