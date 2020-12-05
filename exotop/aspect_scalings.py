@@ -809,9 +809,9 @@ def fit_cases(yx_all, ax, legend=True, showallscatter=False, labelsize=16, weigh
     else:
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
-        printe('flatx')
-        printe('flaty')
-        printe('weights')
+        printe('flatx', flatx)
+        printe('flaty', flaty)
+        printe('weights', weights)
         expon, const = fit_log(flatx, flaty, weights=weights)
         xprime = np.linspace(np.min(flatx), np.max(flatx))
         hprime = const * xprime ** expon

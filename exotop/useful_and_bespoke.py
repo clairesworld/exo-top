@@ -54,11 +54,11 @@ def iterable_not_string(obj):
         return False
 
 
-def printe(name, showall=False):
+def printe(name, obj, showall=False):
     if showall:
-        print(name, '=', repr(eval(name)))
-    print(name, np.shape(eval(name)))
+        print(name, '=', repr(obj))
+    print(name, np.shape(obj))
     try:
-        print(name, '[0]', np.shape(eval(name[0])))
+        print(obj, '[0]', np.shape(obj[0]))
     except:
         pass
