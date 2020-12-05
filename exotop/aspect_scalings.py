@@ -710,7 +710,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         # load outputs
         dfs = []
         if Ra_i and ('_T' not in psuffixes):
-            psuffixes.append(['_T'])
+            psuffixes.append('_T')
             postprocess_functions.append(T_parameters_at_sol)
         for ip, ps in enumerate(psuffixes):
             print('case', case, 'suffix', ps, 'ip', ip)
