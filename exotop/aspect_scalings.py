@@ -835,9 +835,9 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
 def dimensionalise_h(hprime, p):
     try:
-        return hprime*(p['alpha_m']*p['deltaT_m']*p['d_m'])
+        return hprime*(p['alpha_m']*p['dT_m']*p['d_m'])
     except KeyError:
-        raise Exception('Need alpha_m, delta_T_m, and d_m in p_dimensionals to dimensionalise')
+        raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to dimensionalise')
 
 
 def nondimensionalise_h(h, p):
