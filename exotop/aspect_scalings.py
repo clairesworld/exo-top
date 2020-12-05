@@ -737,12 +737,21 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         elif which_x == 'Ra':
             x_key = 'Ra'
             if Ra_i == 'eff':  # calculate effective Ra using time-mean of T field params
-                x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
+                if averagefirst:
+                    x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
                              T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
+                else:
+                    if not h_components:
+                        raise Exception('Ra_i_eff not implemented yet if using h output over all timesteps')
+                    # x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'],
+                    #          T_l=df['T_l'], delta_L=df['delta_L'])
             elif Ra_i:
                 x = Ra_i(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
             else:
-                x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
+                if averagefirst:
+                    x = float(cases_var[ii])
+                else:
+                    x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
         df[x_key] = x
 
         try:
