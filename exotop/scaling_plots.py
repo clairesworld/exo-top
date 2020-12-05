@@ -21,7 +21,8 @@ load = True # load_grid
 # # same but just looking at each time point
 sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
                          T_components=True, averagefirst=False, legloc='top right',
-                         load=load, fig_path=fig_path, fname='h_T_all_outputs', fig_fmt=fig_fmt, end=end_grid,
+                         load=False,
+                         fig_path=fig_path, fname='h_T_all_outputs', fig_fmt=fig_fmt, end=end_grid,
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography $h^\prime$',
                          xlabelpad=8, ylabelpad=-2, fit=True, alpha_m=alpha_m, showallscatter=True,
                          xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2), logx=True, logy=True,
