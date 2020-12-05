@@ -709,6 +709,9 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
         # load outputs
         dfs = []
+        if Ra_i and ('_T' not in psuffixes:)
+            psuffixes.append(['_T'])
+            postprocess_functions.append(T_parameters_at_sol)
         for ip, ps in enumerate(psuffixes):
             df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
                            data_path=data_path, at_sol=at_sol, **kwargs)
@@ -733,11 +736,11 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
         elif which_x == 'Ra':
             x_key = 'Ra'
-            if Ra_i == 'eff':
-                x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].values,
-                             T_l=df['T_l'].values, delta_L=df['delta_L'].values)
+            if Ra_i == 'eff':  # calculate effective Ra using time-mean of T field params
+                x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
+                             T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
             elif Ra_i:
-                x = Ra_i(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].values)
+                x = Ra_i(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
             else:
                 x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
         df[x_key] = x

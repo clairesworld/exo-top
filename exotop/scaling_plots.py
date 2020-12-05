@@ -10,15 +10,15 @@ load = True # load_grid
 #
 # # plot h scalings - with dT_m*delta*alpha
 # #
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
-                         T_components=True, averagefirst=True, legloc='top right',
-                         load=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end=end_grid,
-                         labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h\prime$',
-                         xlabelpad=8, ylabelpad=-2, fit=True, alpha_m=alpha_m, showallscatter=False,
-                         xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2), logx=True, logy=True,
-                         regimes_title='Time-dependence', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
-
-# same but just looking at each time point
+# sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
+#                          T_components=True, averagefirst=True, legloc='top right',
+#                          load=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end=end_grid,
+#                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h\prime$',
+#                          xlabelpad=8, ylabelpad=-2, fit=True, alpha_m=alpha_m, showallscatter=False,
+#                          xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2), logx=True, logy=True,
+#                          regimes_title='Time-dependence', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
+#
+# # same but just looking at each time point
 sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
                          T_components=True, averagefirst=False, legloc='top right',
                          load=load, fig_path=fig_path, fname='h_T_all_outputs', fig_fmt=fig_fmt, end=end_grid,
@@ -54,14 +54,14 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
 #                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 
 # # plot scalings of chaotic time-dependence T parameters - effective Ra_i
-#
-sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls[1:], t1=t1_grid[1:,3:], end=end_grid[1:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic-eff', xlim=(0.7e6, 4e7),
-                       ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
-                       ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'], legloc=['lower left', 'upper left'],
-                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i='eff',
-                      compare_label='', compare_pub=sc.moresi95,
-                       fig_fmt=fig_fmt, cmap='winter', fit=True)
+# #
+# sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls[1:], t1=t1_grid[1:,3:], end=end_grid[1:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
+#                        fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic-eff', xlim=(0.7e6, 4e7),
+#                        ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
+#                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'], legloc=['lower left', 'upper left'],
+#                        postprocess_functions=[sc.T_parameters_at_sol], Ra_i='eff',
+#                       compare_label='', compare_pub=sc.moresi95,
+#                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 #
 # sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1=t1_grid[:,:3], end=end_grid[:,:3], keys=['delta_rh', 'dT_rh'], data_path=data_path,
 #                        fig_path=fig_path, load=load, save=True, fname='delta_rh-steady-eff', xlim=(0.3e5, 1e6),
@@ -75,13 +75,13 @@ sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls[1:], t1=t1_grid[1:,3:], end=end_grid[1:
 #
 # # plot scalings of chaotic time-dependence T parameters - uncorrected Ra_i
 #
-sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls[1:], t1=t1_grid[1:,3:], end=end_grid[1:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic', xlim=(1e7, 2e8),
-                       ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
-                       ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
-                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True, legloc=['lower left', 'upper left'],
-                      compare_label='', compare_pub=sc.moresi95,
-                       fig_fmt=fig_fmt, cmap='winter', fit=True)
+# sc.subplots_Ra_scaling(Ra_ls[3:], eta_ls[1:], t1=t1_grid[1:,3:], end=end_grid[1:,3:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
+#                        fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic', xlim=(1e7, 2e8),
+#                        ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
+#                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
+#                        postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True, legloc=['lower left', 'upper left'],
+#                       compare_label='', compare_pub=sc.moresi95,
+#                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 
 # sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1=t1_grid[:,:3], end=end_grid[:,:3], keys=['delta_rh', 'dT_rh'], data_path=data_path,
 #                        fig_path=fig_path, load=load, save=True, fname='delta_rh-steady', xlim=(0.1e6, 0.5e7),
