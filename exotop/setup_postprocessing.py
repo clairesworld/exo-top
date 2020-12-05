@@ -44,4 +44,4 @@ fig_fmt = '.png'
 c_rms = 'xkcd:forest green'
 c_peak = 'xkcd:periwinkle'
 
-p_Earth = {'alpha_m':1.35e-5, 'dT_m':2700, 'd_m':2890}   # dimensionalisation factors
+p_Earth = {'alpha_m':1.35e-5, 'dT_m':2700, 'd_m':2800}   # dimensionalisation factors
