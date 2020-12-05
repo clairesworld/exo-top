@@ -37,6 +37,14 @@ def colorize(vector,cmap='plasma', vmin=None, vmax=None):
     return vcolors, scalarmap, cNorm
 
 
+from matplotlib.colors import LinearSegmentedColormap
+def cmap_from_list(clist, n_bin=None, cmap_name=''):
+    if n_bin is None:
+        n_bin = len(clist)
+    cm = LinearSegmentedColormap.from_list(cmap_name, clist, N=n_bin)
+    return cm
+
+
 from collections import Iterable
 from six import string_types
 def iterable_not_string(obj):
@@ -46,9 +54,11 @@ def iterable_not_string(obj):
         return False
 
 
-from matplotlib.colors import LinearSegmentedColormap
-def cmap_from_list(clist, n_bin=None, cmap_name=''):
-    if n_bin is None:
-        n_bin = len(clist)
-    cm = LinearSegmentedColormap.from_list(cmap_name, clist, N=n_bin)
-    return cm
+def printe(name, all=False):
+    if all:
+        print(name, '=', repr(eval(name)))
+    print(name, np.shape(eval(name)))
+    try:
+        print(name, '[0]', np.shape(eval(name[0])))
+    except:
+        pass
