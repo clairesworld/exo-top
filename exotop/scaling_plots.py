@@ -22,7 +22,7 @@ load = True # load_grid
 sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
                          T_components=True, averagefirst=False, legloc='top right',
                          load=load, fig_path=fig_path, fname='h_T_all_outputs', fig_fmt=fig_fmt, end=end_grid,
-                         labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h\prime$',
+                         labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography $h^\prime$',
                          xlabelpad=8, ylabelpad=-2, fit=True, alpha_m=alpha_m, showallscatter=True,
                          xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2), logx=True, logy=True,
                          regimes_title='Time-dependence', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
@@ -33,7 +33,7 @@ load = True
 sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
                          load=load, show_isoviscous=True, averagefirst=True, alpha_m=alpha_m,
                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
-                         ylabel='dynamic topography, $h\prime$', y2label='dynamic topography, $h$ (km)',
+                         ylabel='dynamic topography $h^\prime$', y2label='dynamic topography $h$ (km)',
                          xlabelpad=8, ylabelpad=5, fit=True, showallscatter=False,
                          xlim=(0.6e6, 5e8), #ylim=(1, 12),
                          logx=True, logy=True,

@@ -817,11 +817,9 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     ax.set_title(title, fontsize=labelsize)
 
     if p_dimensionals is not None:
-        ax2 = ax.twiny()
+        ax2 = ax.twinx()
         ax2.set_ylabel(y2label, fontsize=labelsize)
 
-        # set twin scale (convert degree celsius to fahrenheit)
-        T_f = lambda T_c: T_c * 1.8 + 32.
         ymin, ymax = ax.get_ylim()
         # apply function and set transformed values to right axis limits
         ax2.set_ylim((dimensionalise_h(ymin, p_dimensionals), dimensionalise_h(ymax, p_dimensionals)))
