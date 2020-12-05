@@ -2,7 +2,7 @@ import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_postprocessing2 as post
-from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list
+from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe
 import numpy as np
 import pandas as pd
 import pickle as pkl
@@ -809,8 +809,9 @@ def fit_cases(yx_all, ax, legend=True, showallscatter=False, labelsize=16, weigh
     else:
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
-        print('flatx', np.shape(flatx), '[0], np.shape(flatx[0])')
-        print('flaty', np.shape)
+        printe('flatx')
+        printe('flaty')
+        printe('weights')
         expon, const = fit_log(flatx, flaty, weights=weights)
         xprime = np.linspace(np.min(flatx), np.max(flatx))
         hprime = const * xprime ** expon
