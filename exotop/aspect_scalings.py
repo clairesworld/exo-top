@@ -842,9 +842,9 @@ def dimensionalise_h(hprime, p):
 
 def nondimensionalise_h(h, p):
     try:
-        return h/(p['alpha_m']*p['deltaT_m']*p['d_m'])
+        return h/(p['alpha_m']*p['dT_m']*p['d_m'])
     except KeyError:
-        raise Exception('Need alpha_m, delta_T_m, and d_m in p_dimensionals to nondimensionalise')
+        raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to nondimensionalise')
 
 
 def fit_cases(yx_all, ax, legend=True, showallscatter=False, weights=None,
