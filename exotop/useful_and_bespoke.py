@@ -54,8 +54,8 @@ def iterable_not_string(obj):
         return False
 
 
-def printe(name, all=False):
-    if all:
+def printe(name, showall=False):
+    if showall:
         print(name, '=', repr(eval(name)))
     print(name, np.shape(eval(name)))
     try:
