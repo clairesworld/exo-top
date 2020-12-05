@@ -748,7 +748,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                     #          T_l=df['T_l'], delta_L=df['delta_L'])
             elif Ra_i:
                 if averagefirst:
-                    x = Ra_i(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
+                    x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
                 else:
                     if not h_components:
                         raise Exception('Ra_i not implemented yet if using h output over all timesteps without averaging')
