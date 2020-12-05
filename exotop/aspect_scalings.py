@@ -818,8 +818,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
     if p_dimensionals is not None:
         ax2 = ax.twinx()
-        ax2.set_ylabel(y2label, fontsize=labelsize)
-
+        # ax2.set_ylabel(y2label, fontsize=labelsize)
         ymin, ymax = ax.get_ylim()
         # apply function and set transformed values to right axis limits
         ax2.set_ylim((dimensionalise_h(ymin, p_dimensionals), dimensionalise_h(ymax, p_dimensionals)))
@@ -1089,9 +1088,9 @@ def fit_cases(yx_all, ax, legend=True, showallscatter=False, weights=None,
 
 
 def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1=None, nrows=2,
-                          ncols=2, T_components=False, leftleg_bbox=(-0.05, 1),
+                          ncols=2, T_components=False, leftleg_bbox=(-0.05, 1), p_dimensionals=None,
                           load='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
-                          show_bounds=False, regimes_title='', Ra_i=False, show_isoviscous=False,
+                          show_bounds=False, regimes_title='', Ra_i=False, show_isoviscous=False, y2label='',
                           labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
     if c_regimes is None:
         c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
@@ -1122,6 +1121,9 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     bigax.tick_params(labelcolor='w', which='both', bottom=False, left=False, right=False, top=False)
     bigax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
     bigax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
+    if p_dimensionals is not None:
+        bigax2 = bigax.twinx()
+        bigax2.set_ylabel(y2label, fontsize=labelsize)
 
     for ii, eta_ii in enumerate(eta_ls):
         print(r' $\Delta \eta$:', eta_ii, ' (', ii, '/', len(eta_ls) - 1, ')')
@@ -1143,8 +1145,8 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
             if not (not Ra_regime):  # if this regime is not empty
                 fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
                                     load_ii[Ra_regime_idx], which_x=which_x, Ra_i=Ra_i, show_isoviscous=show_isoviscous,
-                                    fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir],
-                                    save=False, ylabel='', xlabel='', labelsize=labelsize, **kwargs)
+                                    fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir], p_dimensionals=p_dimensionals,
+                                    save=False, ylabel='', xlabel='', labelsize=labelsize, y2label=y2label, **kwargs)
                 if show_bounds:
                     ax.axvline(float(Ra_regime[-1]) * 2, c='k', lw=0.5, alpha=0.6, ls='--')
                     # ax.text(ax.get_xlim()[0], ylim[0], regime_name, fontsize=8, va='bottom', ha='left')
