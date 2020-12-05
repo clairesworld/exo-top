@@ -747,16 +747,17 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 yx_peak_all.append(
                     (np.array(df['h_peak'].mean())*hscale, np.array(df[x_key].mean())))  # each xy point (y=h)
                 yx_rms_all.append((np.array(df['h_rms'].mean())*hscale, np.array(df[x_key].mean())))
+                n_sols_all.append(len(df.index))
             else:
                 yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(df[x_key].values)))  # each xy point (y=h)
                 yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(df[x_key].values)))
+                n_sols_all.extend([len(df.index)] * len(df.index))
             qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
             quants_h_peak[ii, :] = qdict['h_peak'] * hscale
             quants_h_rms[ii, :] = qdict['h_rms'] * hscale
             quants_x[ii, :] = qdict[x_key]
         except KeyError as e:  # e.g. no h at solutions yet
             print('Catching KeyError:', e)
-        n_sols_all.extend([len(df.index)]*len(df.index))
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
     yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
@@ -809,9 +810,9 @@ def fit_cases(yx_all, ax, legend=True, showallscatter=False, labelsize=16, weigh
     else:
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
-        printe('flatx', flatx)
-        printe('flaty', flaty)
-        printe('weights', weights)
+        # printe('flatx', flatx)
+        # printe('flaty', flaty)
+        # printe('weights', weights)
         expon, const = fit_log(flatx, flaty, weights=weights)
         xprime = np.linspace(np.min(flatx), np.max(flatx))
         hprime = const * xprime ** expon

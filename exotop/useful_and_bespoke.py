@@ -59,6 +59,6 @@ def printe(name, obj, showall=False):
         print(name, '=', repr(obj))
     print(name, np.shape(obj))
     try:
-        print(obj, '[0]', np.shape(obj[0]))
+        print(name, '[0]', np.shape(obj[0]))
     except:
         pass
