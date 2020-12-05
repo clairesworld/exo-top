@@ -1156,7 +1156,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
         ax.text(0.01, 0.98, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-4, ha='left', va='top',
                 transform=ax.transAxes)  # label
 
-        if ii % ncols != 0:
+        if ii % ncols != 0 and p_dimensionals is not None:
             ax.yaxis.tick_right()
 
     # add legends
