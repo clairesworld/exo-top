@@ -713,7 +713,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             psuffixes.append('_T')
             postprocess_functions.append(T_parameters_at_sol)
         for ip, ps in enumerate(psuffixes):
-            print('case', case, 'suffix', ps, 'ip', ip)
             df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
                            data_path=data_path, at_sol=at_sol, **kwargs)
             dfs.append(df1)
@@ -1156,7 +1155,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
         ax.text(0.01, 0.98, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-4, ha='left', va='top',
                 transform=ax.transAxes)  # label
 
-        if ii % ncols != 0 and p_dimensionals is not None:
+        if ii % ncols != 0 and p_dimensionals is None:
             ax.yaxis.tick_right()
 
     # add legends
@@ -1301,7 +1300,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     for k, key in enumerate(keys):
                         try:
                             axes[k].plot(d_compare['Ra_i'], d_compare[key], '^', c=c_scatter,
-                                         markeredgecolor=highlight_colour, alpha=0.8)
+                                         markeredgecolor=highlight_colour, alpha=0.8, zorder=100)
                         except KeyError:
                             print('Key', key, 'not returned by', compare_pub)
                         except Exception as e:

@@ -451,7 +451,7 @@ class Aspect_Data():
 
     def ubl_thickness(self, n=None, T_l=None, T_i=None, k=1, **kwargs):
         # get upper boundary layer thickness required to produce surface heat flux (F=Nu) between T_i and T_l
-        # corresponds to rheological sublayer delta_rh in Moresi & Solomatov 2000
+        # corresponds to rheological sublayer delta_rh in Solomatov & Moresi 2000
         if T_i is None:
             T_i = self.internal_temperature(self, n=n, **kwargs)
         if T_l is None:
