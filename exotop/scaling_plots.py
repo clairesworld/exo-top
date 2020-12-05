@@ -2,7 +2,7 @@ import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, c_regimes_td, fig_fmt, \
-    regime_grid_td, regime_names_td, load_grid, alpha_m
+    regime_grid_td, regime_names_td, load_grid, alpha_m, p_Earth
 from exotop import aspect_scalings as sc
 
 
@@ -31,11 +31,13 @@ load = True
 # # plot h scalings with Ra
 #
 sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
-                         load=load, show_isoviscous=True, averagefirst=True,
+                         load=load, show_isoviscous=True, averagefirst=True, alpha_m=alpha_m,
                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14, xlabel='Ra',
-                         ylabel='dynamic topography, $h\prime$', xlabelpad=8, ylabelpad=5, fit=True, showallscatter=False,
-                         xlim=(0.6e6, 5e8), #ylim=(1, 12), hscale=2e-5 * 2700 * 2890,
+                         ylabel='dynamic topography, $h\prime$', y2label='dynamic topography, $h$ (km)',
+                         xlabelpad=8, ylabelpad=5, fit=True, showallscatter=False,
+                         xlim=(0.6e6, 5e8), #ylim=(1, 12),
                          logx=True, logy=True,
+                         p_dimensionals=p_Earth, Ra_i=True,
                          regimes_title='Time-dependence', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
 
 

@@ -671,10 +671,10 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 
 def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_path_bullard,
-              fig_path=fig_path_bullard, averagefirst=False,
+              fig_path=fig_path_bullard, averagefirst=False, p_dimensionals=None,
               fig_fmt='.png', which_x=None,
               save=True, fname='h',
-              labelsize=16, xlabel='', ylabel='dynamic topography', title='',
+              labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, Ra_i=False, show_isoviscous=False,
               fig=None, ax=None, ylim=None, xlim=None, **kwargs):
@@ -730,13 +730,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 else:
                     h_components = df['h_components']
             x = h_components
+
         elif which_x == 'Ra':
             x_key = 'Ra'
             if Ra_i == 'eff':
                 x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].values,
                              T_l=df['T_l'].values, delta_L=df['delta_L'].values)
             elif Ra_i:
-                x = Ra_i_fast(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].values)
+                x = Ra_i(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].values)
             else:
                 x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
         df[x_key] = x
@@ -798,12 +799,38 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_title(title, fontsize=labelsize)
 
+    if p_dimensionals is not None:
+        ax2 = ax.twiny()
+        ax2.set_ylabel(y2label, fontsize=labelsize)
+
+        # set twin scale (convert degree celsius to fahrenheit)
+        T_f = lambda T_c: T_c * 1.8 + 32.
+        ymin, ymax = ax.get_ylim()
+        # apply function and set transformed values to right axis limits
+        ax2.set_ylim((dimensionalise_h(ymin, p_dimensionals), dimensionalise_h(ymax, p_dimensionals)))
+        # set an invisible artist to twin axes
+        # to prevent falling back to initial values on rescale events
+        ax2.plot([], [])
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, ax
 
 
-def fit_cases(yx_all, ax, legend=True, showallscatter=False, labelsize=16, weights=None,
+def dimensionalise_h(hprime, p):
+    try:
+        return hprime*(p['alpha_m']*p['deltaT_m']*p['d_m'])
+    except KeyError:
+        raise Exception('Need alpha_m, delta_T_m, and d_m in p_dimensionals to dimensionalise')
+
+
+def nondimensionalise_h(h, p):
+    try:
+        return h/(p['alpha_m']*p['deltaT_m']*p['d_m'])
+    except KeyError:
+        raise Exception('Need alpha_m, delta_T_m, and d_m in p_dimensionals to nondimensionalise')
+
+
+def fit_cases(yx_all, ax, legend=True, showallscatter=False, weights=None,
               c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
@@ -1247,7 +1274,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     plot_data['Ra'].append(Ra_i_eff(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i']),
                                                     T_l=np.median(df['T_l']), delta_L=np.median(df['delta_L'])))
                 elif Ra_i:
-                    plot_data['Ra'].append(Ra_i_fast(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i'])))
+                    plot_data['Ra'].append(Ra_i(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i'])))
                 else:
                     plot_data['Ra'].append(Ra_ii)
 
@@ -1349,7 +1376,7 @@ def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None, T1=1, dT=1,
     return {'Ra_i': Ra_i, 'delta_0': delta_0, 'Nu': Nu, 'T_i': T_i_scaling, 'delta_1': delta_1}
 
 
-def Ra_i_fast(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0):
+def Ra_interior(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0):
     theta = np.log(d_eta)  # gamma for this delta eta
     gamma = theta/(np.array(T1) - np.array(T0))
     eta_1 = np.exp(-gamma * np.array(T1))  # bottom viscosity
@@ -1358,14 +1385,15 @@ def Ra_i_fast(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0):
     return Ra_i
 
 
+def Ra_eff(Ra=None, T1=1, T0=0, T_l=None, Z=1, delta_L=None):
+    return Ra * (T1 - T_l)/(T1 - T0) * ((Z - np.array(delta_L))/Z)**3
+
+
 def Ra_i_eff(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0, T_l=None, Z=1, delta_L=None):
     # accounting for effective depth of convection with large lid
-    theta = np.log(d_eta)  # gamma for this delta eta
-    gamma = theta/(np.array(T1) - np.array(T0))  # do you need effective gamma for smaller effective dT?
-    eta_1 = np.exp(-gamma * np.array(T1))
-    eta_i = np.exp(-gamma * np.array(T_i))
-    Ra_eff = Ra_1 * (T1 - T_l)/(T1 - T0) * ((Z - np.array(delta_L))/Z)**3 * eta_1 / eta_i
-    return Ra_eff
+    # order of Ra_i and Ra_eff matters if updating T1 etc
+    Ra_i = Ra_interior(Ra_1, d_eta=d_eta, T_i=T_i, T1=T1, T0=T0)
+    return Ra_eff(Ra_i, T1=T1, T_l=T_l, Z=Z, delta_L=delta_L)
 
 
 def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
