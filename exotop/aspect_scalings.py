@@ -1142,7 +1142,6 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                 show_isoviscous = False
 
             if not (not Ra_regime):  # if this regime is not empty
-                print('load_ii[Ra_regime_idx]', load_ii[Ra_regime_idx])
                 fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
                                     load_ii[Ra_regime_idx], which_x=which_x, Ra_i=Ra_i, show_isoviscous=show_isoviscous,
                                     fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir], p_dimensionals=p_dimensionals,
@@ -1294,7 +1293,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     plot_data['Ra'].append(Ra_i_eff(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i']),
                                                     T_l=np.median(df['T_l']), delta_L=np.median(df['delta_L'])))
                 elif Ra_i:
-                    plot_data['Ra'].append(Ra_i(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i'])))
+                    print('Ra_i', Ra_i)
+                    plot_data['Ra'].append(Ra_interior(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i'])))
                 else:
                     plot_data['Ra'].append(Ra_ii)
 
