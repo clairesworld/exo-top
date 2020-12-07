@@ -43,7 +43,7 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          regimes_title='Time-dependence', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
 
 
-# load = load_grid
+load = True
 
 # compare scalings of other output parameters with Ra
 
