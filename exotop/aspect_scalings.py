@@ -1293,7 +1293,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                     plot_data['Ra'].append(Ra_i_eff(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i']),
                                                     T_l=np.median(df['T_l']), delta_L=np.median(df['delta_L'])))
                 elif Ra_i:
-                    print('Ra_i', Ra_i)
                     plot_data['Ra'].append(Ra_interior(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i'])))
                 else:
                     plot_data['Ra'].append(Ra_ii)
