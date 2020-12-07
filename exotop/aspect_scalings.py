@@ -1157,6 +1157,9 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
 
         if ii % ncols != 0 and p_dimensionals is None:
             ax.yaxis.tick_right()
+        elif ii % ncols != 0:
+            ax.set_yticklabels([])
+
 
     # add legends
     ax = bigax
