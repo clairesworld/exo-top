@@ -1938,3 +1938,4 @@ def read_JFR(fname, path='/raid1/cmg76/aspect/benchmarks/JFR/'):
 
 
 def Nu_eff(gamma=None, d_m=None, delta_L=None, alpha_m=None, g=None, b=None, kappa=None, T_i=None, n=1, k=1, **kwargs):
+    return None
