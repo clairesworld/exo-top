@@ -560,7 +560,6 @@ class Aspect_Data():
         T_l = T_av[find_nearest_idx(y, delta_L)]
         return T_l
 
-
     def max_Ty(self, n=None, T=None, T_av=None, verbose=False):
         x = self.x
         y = self.y
@@ -575,49 +574,55 @@ class Aspect_Data():
         except IndexError:
             return T_i, y_i
 
+
     def internal_temperature(self, n=None, T=None, T_av=None, plot=False, return_coords=False, verbose=False,
                              spline=True, usemax=False, **kwargs):
         # almost-isothermal temperature of core of convecting cell
-        # note: MS2000 define this as the maximal horizontally-averaged temperature in the layer (above)
+        # note: MS2000 define this as the maximal horizontally-averaged temperature in the (convecting) layer
         x = self.x
         y = self.y
         if T_av is None:
             if T is None:
                 _, _, _, T = self.read_temperature(n, verbose=verbose)
             T_av = horizontal_mean(T, x)
+        # find inflection point for max core temperature
+        if spline:
+            spl = UnivariateSpline(y, T_av, k=4, s=0)
+            f_dprime = spl.derivative()
+            y_i = f_dprime.roots()
+            T_i = spl(y_i)
+        else:
+            f_prime = np.gradient(T_av) # differential approximation
+            idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
+            y_i = y[idx]
+            T_i = T_av[idx]
 
         if usemax:
-            T_i, y_i = self.max_Ty(n=n, T_av=T_av, verbose=verbose)
-
+            i = np.where(T_i == T_i.max())
+            print('i', i)
         else:
-            # find inflection point for max core temperature
-            if spline:
-                spl = UnivariateSpline(y, T_av, k=4, s=0)
-                f_dprime = spl.derivative()
-                y_i = f_dprime.roots()
-                T_i = spl(y_i)
-            else:
-                f_prime = np.gradient(T_av) # differential approximation
-                idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
-                y_i = y[idx]
-                T_i = T_av[idx]
+            i = -1
+        try:
+            ans = T_i[i], y_i[i]
+        except IndexError:
+            ans = T_i, y_i
 
         if plot:
-            fig, ax = plt.subplots (figsize = (7, 7))
-            ax.plot (y, T_av, 'bo-', ms = 2)
-            ax.plot (y_i, T_i, 'ro', ms = 5)
+            fig, ax = plt.subplots(figsize=(7, 7))
+            if spline:
+                ys = np.linspace(y.min(), y.max(), 500)
+                ax.plot(ys, spl(ys), 'ko--', ms=2)
+            else:
+                ax.plot(y, T_av, 'ko--', ms=2, lw=0.5)
+            ax.plot(y_i, T_i, 'ro', ms=5)
+            ax.plot(ans[1], ans[0], 'bo', ms=5)
             ax.set_xlabel('depth')
             ax.set_ylabel('T_av')
-        try:
-            if return_coords:
-                return T_i[-1], y_i[-1]
-            else:
-                return T_i[-1]
-        except IndexError:
-            if return_coords:
-                return T_i, y_i
-            else:
-                return T_i
+        if return_coords:
+            return ans
+        else:
+            return ans[0]
+
 
     def dT_rh(self, T_l=None, T_i=None, **kwargs):
         # rheological temperature scale (temperature drop in unstable part of lid), e.g. eq. (A7) in SM2000
@@ -649,7 +654,7 @@ class Aspect_Data():
         d_m = p['Geometry model']['Box']['Y extent']
         dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
         if y_L is None:
-            y_L = self.lid_thickness(u=u, v=v, cut=cut, plot=plot)
+            y_L = self.lid_thickness(u=u, v=v, cut=cut, **kwargs)
         if T_i is None:
             T_i = self.internal_temperature(T_av=T_av, **kwargs)
         if T_l is None:
