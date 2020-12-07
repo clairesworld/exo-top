@@ -53,6 +53,12 @@ def iterable_not_string(obj):
     else:
         return False
 
+def not_iterable(obj):
+    if (not isinstance(obj, Iterable)) or (not isinstance(obj, string_types)):
+        return True
+    else:
+        return False
+
 
 def printe(name, obj, showall=False):
     if showall:

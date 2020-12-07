@@ -2,7 +2,7 @@ import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_postprocessing2 as post
-from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe
+from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable
 import numpy as np
 import pandas as pd
 import pickle as pkl
@@ -1098,7 +1098,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     if end is None:
         end = np.empty_like(t1, dtype=object)
         end[:] = ''
-    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable
+    if not_iterable(load):  # triggered if either a string, or a non-iterable
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if T_components:
         print(r'Plotting h vs. $\alpha \Delta T \delta$')
