@@ -1100,6 +1100,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
         end[:] = ''
     if not_iterable(load):  # triggered if either a string, or a non-iterable
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
+    print('load', load)
     if T_components:
         print(r'Plotting h vs. $\alpha \Delta T \delta$')
         which_x = 'components'
@@ -1142,6 +1143,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                 show_isoviscous = False
 
             if not (not Ra_regime):  # if this regime is not empty
+                print('load_ii[Ra_regime_idx]', load_ii[Ra_regime_idx])
                 fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
                                     load_ii[Ra_regime_idx], which_x=which_x, Ra_i=Ra_i, show_isoviscous=show_isoviscous,
                                     fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir], p_dimensionals=p_dimensionals,
