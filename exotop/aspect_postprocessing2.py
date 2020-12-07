@@ -559,11 +559,26 @@ class Aspect_Data():
         # find T at delta_L
         T_l = T_av[find_nearest_idx(y, delta_L)]
         return T_l
-        
+
+
+    def max_Ty(self, n=None, T=None, T_av=None, verbose=False):
+        x = self.x
+        y = self.y
+        if T_av is None:
+            if T is None:
+                _, _, _, T = self.read_temperature(n, verbose=verbose)
+            T_av = horizontal_mean(T, x)
+        idx = np.where(T_av == T_av.max())
+        T_i, y_i = T_av[idx], y[idx]
+        try:
+            return T_i[-1], y_i[-1]
+        except IndexError:
+            return T_i, y_i
+
     def internal_temperature(self, n=None, T=None, T_av=None, plot=False, return_coords=False, verbose=False,
-                             spline=True, **kwargs):
+                             spline=True, usemax=False, **kwargs):
         # almost-isothermal temperature of core of convecting cell
-        # note: MS2000 define this as the maximal horizontally-averaged temperature in the layer
+        # note: MS2000 define this as the maximal horizontally-averaged temperature in the layer (above)
         x = self.x
         y = self.y
         if T_av is None:
@@ -571,32 +586,39 @@ class Aspect_Data():
                 _, _, _, T = self.read_temperature(n, verbose=verbose)
             T_av = horizontal_mean(T, x)
 
-        # find inflection point for max core temperature
-        z = y
-        if spline:
-            spl = UnivariateSpline(z, T_av, k=4, s=0)
-            f_dprime = spl.derivative()
-            y_inflections = f_dprime.roots()
-            T_inflections = spl(y_inflections)
+        if usemax:
+            T_i, y_i = self.max_Ty(n=n, T_av=T_av, verbose=verbose)
+
         else:
-            f_prime = np.gradient(T_av) # differential approximation
-            idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
-            y_inflections = z[idx]
-            T_inflections = T_av[idx]
-        
+            # find inflection point for max core temperature
+            if spline:
+                spl = UnivariateSpline(y, T_av, k=4, s=0)
+                f_dprime = spl.derivative()
+                y_i = f_dprime.roots()
+                T_i = spl(y_i)
+            else:
+                f_prime = np.gradient(T_av) # differential approximation
+                idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
+                y_i = y[idx]
+                T_i = T_av[idx]
+
         if plot:
-            print ('inflection point', y_inflections)
             fig, ax = plt.subplots (figsize = (7, 7))
-            ax.plot (z, T_av, 'bo-', ms = 2)
-            ax.plot (y_inflections, T_inflections, 'ro', ms = 5)
+            ax.plot (y, T_av, 'bo-', ms = 2)
+            ax.plot (y_i, T_i, 'ro', ms = 5)
             ax.set_xlabel('depth')
             ax.set_ylabel('T_av')
+        try:
+            if return_coords:
+                return T_i[-1], y_i[-1]
+            else:
+                return T_i[-1]
+        except IndexError:
+            if return_coords:
+                return T_i, y_i
+            else:
+                return T_i
 
-        if return_coords:
-            return T_inflections[-1], y_inflections[-1]
-        else:
-            return T_inflections[-1]
-        
     def dT_rh(self, T_l=None, T_i=None, **kwargs):
         # rheological temperature scale (temperature drop in unstable part of lid), e.g. eq. (A7) in SM2000
         if T_i is None:
