@@ -6,7 +6,7 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
 from exotop import aspect_scalings as sc
 
 
-load = 'auto', load_grid
+load = 'auto'# load_grid
 #
 # # plot h scalings - with dT_m*delta*alpha
 #
