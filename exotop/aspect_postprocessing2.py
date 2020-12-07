@@ -497,7 +497,7 @@ class Aspect_Data():
     #         diff = abs(Ti - Ti_guess)
     #     return Ti, d0
 
-    def lid_thickness(self, u=None, v=None, n=None, tol=1, cut=False, plot=False, cutdiv=2, **kwargs):
+    def lid_thickness(self, u=None, v=None, n=None, tol=1, cut=False, plot=False, cutdiv=2, spline=False, **kwargs):
         # stagnant lid depth y_L from Moresi & Solomatov 2000 method - thickness delta_L = 1 - y_L
         x = self.x
         y = self.y
@@ -517,11 +517,17 @@ class Aspect_Data():
             yprime = y[int(len(y)/cutdiv):]
 
             # maximum gradient of averaged velocity profile
-            grad = np.diff(mag_avprime, axis=0) / np.diff(yprime)
-            grad_max = np.min(grad) # actually want the minimum because you expect a negative slope
-            i_max = np.nonzero(grad == grad_max)[0][0] # would add one to take right hand value
-            x_grad_max = mag_avprime[i_max]
-            y_grad_max = yprime[i_max]
+            if spline:
+                spl = UnivariateSpline(yprime, mag_avprime, k=4, s=0)
+                f_dprime = spl.derivative()
+                y_grad_max = f_dprime.roots()
+                x_grad_max = spl(y_grad_max)
+            else:
+                grad = np.diff(mag_avprime, axis=0) / np.diff(yprime)
+                grad_max = np.min(grad) # actually want the minimum because you expect a negative slope
+                i_max = np.nonzero(grad == grad_max)[0][0] # would add one to take right hand value
+                x_grad_max = mag_avprime[i_max]
+                y_grad_max = yprime[i_max]
             if plot:
                 plt.scatter(x_grad_max, y_grad_max, c='k', label='max grad: ({:04.1f}),({:04.1f})'.format(x_grad_max, 
                                                                                                           y_grad_max))

@@ -1122,6 +1122,11 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     bigax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     if p_dimensionals is not None:
         bigax2 = bigax.twinx()
+        bigax2.spines['top'].set_color('none')
+        bigax2.spines['bottom'].set_color('none')
+        bigax2.spines['left'].set_color('none')
+        bigax2.spines['right'].set_color('none')
+        bigax2.tick_params(labelcolor='w', which='both', bottom=False, left=False, right=False, top=False)
         bigax2.set_ylabel(y2label, fontsize=labelsize)
 
     for ii, eta_ii in enumerate(eta_ls):
@@ -1248,7 +1253,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
         fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys*2.5), sharex=True)
-        print('axes:', np.shape(axes), 'nkeys', nkeys)
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
@@ -1931,3 +1935,6 @@ def read_JFR(fname, path='/raid1/cmg76/aspect/benchmarks/JFR/'):
     h_rms = np.array(df.RMS_topo)
     Nu = np.array(df.Nu)
     return df  # Ra, h_peak, h_rms, Nu
+
+
+def Nu_eff(gamma=None, d_m=None, delta_L=None, alpha_m=None, g=None, b=None, kappa=None, T_i=None, n=1, k=1, **kwargs):
