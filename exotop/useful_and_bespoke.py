@@ -54,7 +54,9 @@ def iterable_not_string(obj):
         return False
 
 def not_iterable(obj):
-    if (not isinstance(obj, Iterable)) or (not isinstance(obj, string_types)):
+    if isinstance(obj, string_types):
+        return True
+    elif not isinstance(obj, Iterable):
         return True
     else:
         return False

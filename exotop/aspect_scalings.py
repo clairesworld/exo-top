@@ -1098,9 +1098,8 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
     if end is None:
         end = np.empty_like(t1, dtype=object)
         end[:] = ''
-    if not_iterable(load):  # triggered if either a string, or a non-iterable
+    if not_iterable(load):  # string or int/boolean etc
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
-    print('load', load)
     if T_components:
         print(r'Plotting h vs. $\alpha \Delta T \delta$')
         which_x = 'components'
