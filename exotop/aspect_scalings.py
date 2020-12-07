@@ -682,7 +682,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
     cases, cases_var = get_cases_list(Ra, eta, end)
     if t1 is None:
         t1 = [0] * len(cases)
-    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
+    if not_iterable(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
         load = np.array([load] * len(cases))
     if which_x == 'components':
         psuffixes = ['_T', '_h']
@@ -1243,7 +1243,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         ylim = [None] * nkeys
     if legloc is None:
         legloc = ['lower left'] * nkeys
-    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
+    if not_iterable(load):  #
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
@@ -1560,7 +1560,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 
     if t1 is None:
         t1 = np.zeros((len(eta), len(Ra)))
-    if not iterable_not_string(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
+    if not not_iterable(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
         load = [[load] * len(Ra)] * len(eta)
     fig, ax = plt.subplots(1, 1)
     plot_grid = np.zeros((len(eta), len(Ra)))
