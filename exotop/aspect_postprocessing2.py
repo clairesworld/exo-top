@@ -519,22 +519,26 @@ class Aspect_Data():
 
             # maximum gradient of averaged velocity profile
             if spline:
-                # get spline and find maxima - inverted from profile function
-                tck = interpolate.splrep(yprime, mag_avprime, k=5)
-                tck2 = interpolate.splder(tck, n=2)
-                y_grad_max = interpolate.sproot(tck2)
-                if np.size(y_grad_max > 1):
-                    y_grad_max = y_grad_max[0]
-                v_grad_max = interpolate.splev(y_grad_max, tck)
-                dvdy_0 = interpolate.splev(y_grad_max, tck, der=1)
-                dydv_0 = 1 / dvdy_0
-                y0 = y_grad_max
-                x0 = v_grad_max
-                tngnt = lambda x: dydv_0 * x + (y0 - dydv_0 * x0)
-                # intersection of this tangent with depth-axis
-                m1 = dydv_0
-                b = tngnt(0)
-            else:
+                try:
+                    # get spline and find maxima - inverted from profile function
+                    tck = interpolate.splrep(yprime, mag_avprime, k=5)
+                    tck2 = interpolate.splder(tck, n=2)
+                    y_grad_max = interpolate.sproot(tck2)
+                    if np.size(y_grad_max > 1):
+                        y_grad_max = y_grad_max[0]
+                    v_grad_max = interpolate.splev(y_grad_max, tck)
+                    dvdy_0 = interpolate.splev(y_grad_max, tck, der=1)
+                    dydv_0 = 1 / dvdy_0
+                    y0 = y_grad_max
+                    x0 = v_grad_max
+                    tngnt = lambda x: dydv_0 * x + (y0 - dydv_0 * x0)
+                    # intersection of this tangent with depth-axis
+                    m1 = dydv_0
+                    b = tngnt(0)
+                except Exception as e:
+                    print('Could not get lid thickness via spline:', e)
+                    spline = False
+            if not spline:
                 grad = np.diff(mag_avprime, axis=0) / np.diff(yprime)
                 grad_max = np.min(grad) # actually want the minimum because you expect a negative slope
                 i_max = np.nonzero(grad == grad_max)[0][0] # would add one to take right hand value

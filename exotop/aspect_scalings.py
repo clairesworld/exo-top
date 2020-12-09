@@ -1950,6 +1950,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
         for ii, case in enumerate(cases):
             t1_ii = t1[jj][ii]
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
+                print(case)
                 for ip, suffix in enumerate(psuffixes):
                     pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
                              data_path=data_path, at_sol=True, load=False, **kwargs)

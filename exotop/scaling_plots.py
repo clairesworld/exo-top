@@ -16,7 +16,7 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h^\prime$',
                          xlabelpad=8, ylabelpad=-2, fit=True, alpha_m=alpha_m, showallscatter=False,
                          xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2), logx=True, logy=True,
-                         regimes_title='Time-dependence', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
+                         regimes_title='Stationarity', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
 load = True
 
 # # same but just looking at each time point
@@ -27,7 +27,7 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography $h^\prime$',
                          xlabelpad=8, ylabelpad=-2, fit=True, alpha_m=alpha_m, showallscatter=True,
                          xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2), logx=True, logy=True,
-                         regimes_title='Time-dependence', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
+                         regimes_title='Stationarity', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
 load = True
 #
 # # plot h scalings with Ra
@@ -40,7 +40,7 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          xlim=(0.6e6, 5e8), #ylim=(1, 12),
                          logx=True, logy=True,
                          p_dimensionals=p_Earth,
-                         regimes_title='Time-dependence', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
+                         regimes_title='Stationarity', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
 
 #
 # load = 'auto'
