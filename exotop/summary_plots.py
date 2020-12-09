@@ -5,6 +5,10 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
 # from exotop import aspect_postprocessing2 as asp
 from exotop import aspect_scalings as sc
 
+## process all
+sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_Nu', '_h'],
+                 postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts, sc.h_at_ts], t1=t1_grid, end=end_grid,
+                 data_path=data_path)
 
 ## plot summaries across delta eta
 

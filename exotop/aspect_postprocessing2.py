@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import trapz
 from scipy.interpolate import UnivariateSpline
+from scipy import interpolate
 import xml.etree.ElementTree
 import os
 import h5py
@@ -497,7 +498,7 @@ class Aspect_Data():
     #         diff = abs(Ti - Ti_guess)
     #     return Ti, d0
 
-    def lid_thickness(self, u=None, v=None, n=None, tol=1, cut=False, plot=False, cutdiv=2, spline=False, **kwargs):
+    def lid_thickness(self, u=None, v=None, n=None, tol=1, cut=True, plot=False, cutdiv=2, spline=True, **kwargs):
         # stagnant lid depth y_L from Moresi & Solomatov 2000 method - thickness delta_L = 1 - y_L
         x = self.x
         y = self.y
@@ -518,34 +519,48 @@ class Aspect_Data():
 
             # maximum gradient of averaged velocity profile
             if spline:
-                spl = UnivariateSpline(yprime, mag_avprime, k=4, s=0)
-                f_dprime = spl.derivative()
-                y_grad_max = f_dprime.roots()
-                x_grad_max = spl(y_grad_max)
+                # get spline and find maxima - inverted from profile function
+                tck = interpolate.splrep(yprime, mag_avprime, k=5)
+                tck2 = interpolate.splder(tck, n=2)
+                y_grad_max = interpolate.sproot(tck2)
+                if np.size(y_grad_max > 1):
+                    y_grad_max = y_grad_max[0]
+                v_grad_max = interpolate.splev(y_grad_max, tck)
+                dvdy_0 = interpolate.splev(y_grad_max, tck, der=1)
+                dydv_0 = 1 / dvdy_0
+                y0 = y_grad_max
+                x0 = v_grad_max
+                tngnt = lambda x: dydv_0 * x + (y0 - dydv_0 * x0)
+                # intersection of this tangent with depth-axis
+                m1 = dydv_0
+                b = tngnt(0)
             else:
                 grad = np.diff(mag_avprime, axis=0) / np.diff(yprime)
                 grad_max = np.min(grad) # actually want the minimum because you expect a negative slope
                 i_max = np.nonzero(grad == grad_max)[0][0] # would add one to take right hand value
-                x_grad_max = mag_avprime[i_max]
+                v_grad_max = mag_avprime[i_max]
                 y_grad_max = yprime[i_max]
+                # intersection of this tangent with y-axis
+                x_grad_max0 = mag_avprime[np.nonzero(grad == grad_max)[0][0] - tol]
+                y_grad_max0 = yprime[np.nonzero(grad == grad_max)[0][0] - tol]
+                x_grad_max1 = mag_avprime[np.nonzero(grad == grad_max)[0][0] + tol]
+                y_grad_max1 = yprime[np.nonzero(grad == grad_max)[0][0] + tol]
+                m1 = (y_grad_max1 - y_grad_max0) / (x_grad_max1 - x_grad_max0)
+                print('m1', m1)
+                b = y_grad_max - m1 * v_grad_max
+
             if plot:
-                plt.scatter(x_grad_max, y_grad_max, c='k', label='max grad: ({:04.1f}),({:04.1f})'.format(x_grad_max, 
-                                                                                                          y_grad_max))
+                plt.scatter(v_grad_max, y_grad_max, c='k',
+                            label='max grad: ({:04.1f}),({:04.1f})'.format(float(v_grad_max), float(y_grad_max)))
                 plt.axhline(y=np.min(yprime), alpha=0.2, c='k', ls='--')
 
-            # intersection of this tangent with y-axis
-            x_vel = np.linspace(0, np.max(mag_avprime))
-            x_grad_max0 = mag_avprime[np.nonzero(grad == grad_max)[0][0]-tol]
-            y_grad_max0 = yprime[np.nonzero(grad == grad_max)[0][0]-tol]
-            x_grad_max1 = mag_avprime[np.nonzero(grad == grad_max)[0][0]+tol]
-            y_grad_max1 = yprime[np.nonzero(grad == grad_max)[0][0]+tol]
-            m1 = (y_grad_max1-y_grad_max0)/(x_grad_max1-x_grad_max0)
-            b = y_grad_max - m1*x_grad_max
             if b>1: # if this doesn't work it's probably because lid base is below 50% depth, need to recut profile
                 print('\n recutting')
                 cutdiv = cutdiv+0.2
-        y_tan = m1*x_vel + b
+
         if plot:  # overplot
+            x_vel = np.linspace(0, np.max(mag_avprime))
+            y_tan = m1 * x_vel + b
             plt.plot(x_vel, y_tan, c='g', ls='--', label='tangent to max gradient')
             plt.legend()
         return b   # y_L

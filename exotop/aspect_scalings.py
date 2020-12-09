@@ -1939,3 +1939,20 @@ def read_JFR(fname, path='/raid1/cmg76/aspect/benchmarks/JFR/'):
 
 def Nu_eff(gamma=None, d_m=None, delta_L=None, alpha_m=None, g=None, b=None, kappa=None, T_i=None, n=1, k=1, **kwargs):
     return None
+
+
+def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=None, end=None,
+                         data_path=data_path_bullard, **kwargs):
+    if t1 is None:
+        t1 = [[0] * len(Ra_ls)] * len(eta_ls)
+    for jj, eta_str in enumerate(eta_ls):
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
+        for ii, case in enumerate(cases):
+            t1_ii = t1[jj][ii]
+            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
+                for ip, suffix in enumerate(psuffixes):
+                    pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
+                             data_path=data_path, at_sol=True, load=False, **kwargs)
+
+
+
