@@ -1966,7 +1966,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     h_data_all = []
     x_data_all = []
     eta_data_all = []
-    fig, ax = plt.subplots(1, 1, figsize=(7,7))
+    fig, ax = plt.subplots(1, 1, figsize=(5,5))
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
         for ii, case in enumerate(cases):
@@ -2001,16 +2001,10 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                     eta_data_all.append(float(eta_str))
                 except KeyError as e:  # e.g. no h at solutions yet
                     print('    Catching KeyError:', e)
-
-    # print('x_data_all', x_data_all, np.shape(x_data_all))
-    # print('h_data_all', h_data_all, np.shape(h_data_all))
     x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort
-    # print('x_data', x_data, np.shape(x_data_all))
     expon, const = fit_log(x_data, h_data, weights=None)
-    # print('fit params', expon, const)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     h_fit = const * x_data ** expon
-    # print('h_fit')
     if not cbar:
         c = 'k'
         vmin, vmax = None, None
@@ -2021,7 +2015,6 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     if not (not cbar):
         cbar = fig.colorbar(scat, ax=ax)
         cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
-
 
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
