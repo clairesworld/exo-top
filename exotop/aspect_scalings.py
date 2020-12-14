@@ -2037,7 +2037,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     ax.plot([xlim[0] - 0.1 * xlim[0], xlim[1] - 0.1 * xlim[1]], [ylim[0], ylim[1]], c='k', lw=1, ls='--')
     # 5%
     ax.plot([xlim[0] + 0.05 * xlim[0], xlim[1] + 0.5 * xlim[1]], [ylim[0], ylim[1]], c='k', lw=1, ls='--')
-    ax.plot([xlim[0] - 0.05 * xlim[0], xlim[1] + 0.05 * xlim[1]], [ylim[0], ylim[1]], c='k', lw=1, ls='--')
+    ax.plot([xlim[0] - 0.05 * xlim[0], xlim[1] - 0.05 * xlim[1]], [ylim[0], ylim[1]], c='k', lw=1, ls='--')
 
     plt.axis('equal')
     if save:
