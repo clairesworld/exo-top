@@ -1977,7 +1977,6 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                     dfs.append(df1)
                 df = pd.concat(dfs, axis=1)
                 df = df.loc[:, ~df.columns.duplicated()]
-                print('df', df)
 
                 if averagefirst:
                     print('    plot_h_vs(): Calculating T components using time-mean')
