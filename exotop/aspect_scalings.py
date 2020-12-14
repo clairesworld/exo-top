@@ -2002,7 +2002,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort
     print('x_data', x_data, np.shape(x_data_all))
     expon, const = fit_log(x_data, h_data, weights=None)
-    print('fit params': expon, const)
+    print('fit params', expon, const)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     h_fit = const * x_data ** expon
     print('h_fit')
