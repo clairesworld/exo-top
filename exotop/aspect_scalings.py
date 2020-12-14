@@ -1956,7 +1956,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
                             c='k', averagefirst=True, ylim=None, xlim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', labelsize=16,
-                            cmap='magma', cbar='eta', **kwargs):
+                            cmap='magma', cbar='eta', vmin=0.9e5, vmax=1.1e8, **kwargs):
     psuffixes = ['_T', '_h']
     postprocess_functions = [T_parameters_at_sol, h_at_ts]
     if t1 is None:
@@ -2013,10 +2013,11 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     # print('h_fit')
     if not cbar:
         c = 'k'
+        vmin, vmax = None, None
     elif cbar == 'eta':
         c = [x for _, x in sorted(zip(x_data_all, eta_data_all))]
         clabel = r'$\Delta \eta$'
-    scat = ax.scatter(h_data, h_fit, s=20, zorder=100, c=c, cmap=cmap, norm=LogNorm())
+    scat = ax.scatter(h_data, h_fit, s=20, zorder=100, c=c, cmap=cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
     if not (not cbar):
         cbar = fig.colorbar(scat, ax=ax)
         cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
@@ -2024,7 +2025,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
 
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
-    title = 'Fit to h = {:.2e}'.format(const) + r'$\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
+    title = 'Fit to h = ({:.2e}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
     ax.set_title(title, fontsize=labelsize)
 
     ax.set_xscale('log')
