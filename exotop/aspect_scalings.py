@@ -1955,7 +1955,8 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
 
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
                             c='k', averagefirst=True, ylim=None, xlim=None, which_h='rms', data_path=data_path_bullard,
-                            save=True, fname='model-data', legsize=16, **kwargs):
+                            save=True, fname='model-data', legsize=16, title=r'Topography from fit to $\alpha \Delta T_{rh} \delta_{rh}$',
+                            **kwargs):
     psuffixes = ['_T', '_h']
     postprocess_functions = [T_parameters_at_sol, h_at_ts]
     if t1 is None:
@@ -1999,34 +2000,30 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                 except KeyError as e:  # e.g. no h at solutions yet
                     print('    Catching KeyError:', e)
 
-    print('x_data_all', x_data_all, np.shape(x_data_all))
-    print('h_data_all', h_data_all, np.shape(h_data_all))
+    # print('x_data_all', x_data_all, np.shape(x_data_all))
+    # print('h_data_all', h_data_all, np.shape(h_data_all))
     x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort
-    print('x_data', x_data, np.shape(x_data_all))
+    # print('x_data', x_data, np.shape(x_data_all))
     expon, const = fit_log(x_data, h_data, weights=None)
-    print('fit params', expon, const)
+    # print('fit params', expon, const)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     h_fit = const * x_data ** expon
-    print('h_fit')
+    # print('h_fit')
     ax.scatter(h_data, h_fit, c=c, s=20, zorder=100, label='Model: {:.2e} x^{:.3f}'.format(const, expon))
     if legend:
         leg = ax.legend(fontsize=legsize)
         ax.add_artist(leg)
 
-    ax.set_ylabel('Scaling heuristic', fontsize=legsize)
-    ax.set_xlabel('Numerical model', fontsize=legsize)
-    ax.set_title(r'Topography from $\alpha \Delta T_{rh} \delta_{rh}$')
+    ax.set_ylabel('Model', fontsize=legsize)
+    ax.set_xlabel('Data', fontsize=legsize)
+    ax.set_title(title, fontsize=legsize)
 
     ax.set_xscale('log')
     ax.set_yscale('log')
     if ylim is not None:
         ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
-    else:
-        ylim = ax.get_ylim()
     if xlim is not None:
         ax.set_xlim(xlim)
-    else:
-        xlim = ax.get_xlim()
     fig, ax = plot_error_contours(fig, ax)
 
     if save:
