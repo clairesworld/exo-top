@@ -1977,6 +1977,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                     dfs.append(df1)
                 df = pd.concat(dfs, axis=1)
                 df = df.loc[:, ~df.columns.duplicated()]
+                print('df', df)
 
                 if averagefirst:
                     print('    plot_h_vs(): Calculating T components using time-mean')
@@ -1996,11 +1997,15 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                 except KeyError as e:  # e.g. no h at solutions yet
                     print('    Catching KeyError:', e)
 
+    print('x_data_all', x_data_all, np.shape(x_data_all))
+    print('h_data_all', h_data_all, np.shape(h_data_all))
     x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort
-
+    print('x_data', x_data, np.shape(x_data_all))
     expon, const = fit_log(x_data, h_data, weights=None)
+    print('fit params': expon, const)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     h_fit = const * x_data ** expon
+    print('h_fit')
     ax.scatter(h_data, h_fit, c=c, s=20, zorder=100, label='Model: {:.2e} x^{:.3f}'.format(const, expon))
     if legend:
         leg = ax.legend(fontsize=legsize)
