@@ -2027,8 +2027,9 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         ax.set_ylim(ylim)  # for fair comparison
     if xlim is not None:
         ax.set_xlim(xlim)
-    fig, ax = plot_error_contours(fig, ax)
     plt.axis('equal')
+    fig, ax = plot_error_contours(fig, ax)
+
     if save:
         plot_save(fig, fname, tight_layout=False, **kwargs)
     return const, expon
