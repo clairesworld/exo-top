@@ -2017,7 +2017,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     elif cbar == 'eta':
         c = [x for _, x in sorted(zip(x_data_all, eta_data_all))]
         clabel = r'$\Delta \eta$'
-    scat = ax.scatter(h_data, h_fit, s=20, zorder=100, c=c, cmap=cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
+    scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
     if not (not cbar):
         cbar = fig.colorbar(scat, ax=ax)
         cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
@@ -2051,7 +2051,7 @@ def plot_error_contours(fig, ax, errs=None):
     for err in errs:
         ax.plot(xlim, ylim + err * ylim, c='k', lw=1, ls='--')
         ax.plot(xlim, ylim - err * ylim, c='k', lw=1, ls='--')
-    plt.axis('equal')
+    ax.set_axis('equal')
     return fig, ax
 
 
