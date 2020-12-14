@@ -2031,6 +2031,8 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     # set 1:1 line
     ax.plot([xlim[0], xlim[1]], [ylim[0], ylim[1]], c='k', lw=2)
     errs = [0.5, 0.1, 0.05]
+    xlim = np.array(xlim)
+    ylim = np.array(ylim)
     for err in errs:
         ax.plot(xlim, ylim + err*ylim, c='k', lw=1, ls='--')
         ax.plot(xlim, ylim - err*ylim, c='k', lw=1, ls='--')
