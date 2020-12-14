@@ -2020,14 +2020,14 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     ax.set_xlabel('Data', fontsize=labelsize)
     title = 'Fit to h = ({:.2e}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
     ax.set_title(title, fontsize=labelsize)
-
+    plt.axis('equal')
     ax.set_xscale('log')
     ax.set_yscale('log')
     if ylim is not None:
         ax.set_ylim(ylim)  # for fair comparison
     if xlim is not None:
         ax.set_xlim(xlim)
-    plt.axis('equal')
+
     fig, ax = plot_error_contours(fig, ax)
 
     if save:
