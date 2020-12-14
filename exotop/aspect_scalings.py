@@ -794,8 +794,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 fmt='o', c=c_rms, capsize=5)
 
     if fit:
-        ax = fit_cases(yx_rms_all, ax, labelsize=labelsize, weights=1/np.array(n_sols_all),
-                       c=c_rms, **kwargs)
+        ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all), c=c_rms, labelsize=labelsize, **kwargs)
 
     if show_isoviscous:
         df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
@@ -843,7 +842,7 @@ def nondimensionalise_h(h, p):
         raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to nondimensionalise')
 
 
-def fit_cases(yx_all, ax, legend=True, showallscatter=False, weights=None,
+def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=None,
               c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
@@ -853,9 +852,6 @@ def fit_cases(yx_all, ax, legend=True, showallscatter=False, weights=None,
     else:
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
-        # printe('flatx', flatx)
-        # printe('flaty', flaty)
-        # printe('weights', weights)
         expon, const = fit_log(flatx, flaty, weights=weights)
         xprime = np.linspace(np.min(flatx), np.max(flatx))
         hprime = const * xprime ** expon
@@ -872,6 +868,7 @@ def fit_cases(yx_all, ax, legend=True, showallscatter=False, weights=None,
     if showallscatter:
         ax.scatter(flatx, flaty, c=c, alpha=0.05, s=10)
     return ax
+
 
 
 #
@@ -1207,8 +1204,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
     if fit:
         yx_all = [(y, r) for r, y in zip(Ra_data, y_data)]
-        ax = fit_cases(yx_all, ax, labelsize=labelsize, weights=None,
-                       c=c_scatter, **kwargs)
+        ax = fit_cases_on_plot(yx_all, ax, weights=None, c=c_scatter, labelsize=labelsize, **kwargs)
 
     if logx:
         ax.set_xscale('log')
@@ -1755,10 +1751,10 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
     ax.axhline(1 - delta_0_n, label=r'$\delta_0$', c='xkcd:red orange', lw=0.5)
     try:
-        ax.text(0, 1 - delta_0_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n), ha='left', va='top',
+        ax.text(0, 1 - delta_0_n, r'$\delta_{rh} = $' + '{:04.3f}'.format(delta_rh_n), ha='left', va='top',
                 color='xkcd:red orange', fontsize=labelsize - 2)
     except TypeError:
-        ax.text(0, 1 - delta_0_n, r'$\delta_{rh} = $' + '{:04.2f}'.format(delta_rh_n.item()), ha='left', va='top',
+        ax.text(0, 1 - delta_0_n, r'$\delta_{rh} = $' + '{:04.3f}'.format(delta_rh_n.item()), ha='left', va='top',
                 color='xkcd:red orange', fontsize=labelsize - 2)
     ax.plot([T_l_n, T_l_n], [0, D_l_n], ls='--', alpha=0.5, lw=0.5, label=r'$T_L$', c='xkcd:tangerine')
     ax.plot([T_i_n, T_i_n], [0, 1 - delta_0_n], ls='--', alpha=0.5, lw=0.5,
@@ -1956,4 +1952,86 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
                              data_path=data_path, at_sol=True, load=False, **kwargs)
 
 
+
+def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
+                            c='k', averagefirst=True, ylim=None, xlim=None, which_h='rms', data_path=data_path_bullard,
+                            save=True, fname='model-data', legsize=16, **kwargs):
+    psuffixes = ['_T', '_h']
+    postprocess_functions = [T_parameters_at_sol, h_at_ts]
+    if t1 is None:
+        t1 = [[0] * len(Ra_ls)] * len(eta_ls)
+    h_data_all = []
+    x_data_all = []
+    fig, ax = plt.subplots(1, 1, figsize=(7,7))
+    for jj, eta_str in enumerate(eta_ls):
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
+        for ii, case in enumerate(cases):
+            t1_ii = t1[jj][ii]
+            load_ii = load[jj][ii]
+            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (regime_grid[jj][ii] != 'sluggish'):
+                # load outputs
+                dfs = []
+                for ip, ps in enumerate(psuffixes):
+                    df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
+                                   load=load_ii, data_path=data_path, at_sol=True, **kwargs)
+                    dfs.append(df1)
+                df = pd.concat(dfs, axis=1)
+                df = df.loc[:, ~df.columns.duplicated()]
+
+                if averagefirst:
+                    print('    plot_h_vs(): Calculating T components using time-mean')
+                    h_components = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii,
+                                                     load=load_ii, update=False, **kwargs)
+                else:
+                    if ('h_components' not in df.columns) or (('h_components' in df.columns) and df['h_components'].isnull().values.any()):
+                        print('    plot_h_vs(): Calculating T components')
+                        h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
+                                                         update=False,
+                                                         **kwargs)
+                    else:
+                        h_components = df['h_components']
+
+                if which_h == 'rms':
+                    h_data = np.array(df['h_rms'])
+                elif which_h == 'peak':
+                    h_data = np.array(df['h_peak'])
+
+                try:
+                    df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', 'h_components'])  # remove any rows with nans
+                    # fit to time-mean rather than all points
+                    h_data_all.append((np.mean(h_data)))
+                    x_data_all.append(np.mean(h_components))
+                except KeyError as e:  # e.g. no h at solutions yet
+                    print('    Catching KeyError:', e)
+
+    x_data, h_data = [list(tuple) for tuple in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort
+
+    expon, const = fit_log(x_data, h_data, weights=None)
+    xprime = np.linspace(np.min(x_data), np.max(x_data))
+    h_fit = const * x_data ** expon
+    ax.scatter(h_data, h_fit, c=c, s=20, zorder=100, label='Model: {:.2e} x^{:.3f}'.format(const, expon))
+    if legend:
+        leg = ax.legend(fontsize=legsize)
+        ax.add_artist(leg)
+
+    ax.set_ylabel('Scaling heuristic', fontsize=legsize)
+    ax.set_xlabel('Numerical model', fontsize=legsize)
+    ax.set_title(r'Topography from $\alpha \Delta T_{rh} \delta_{rh}$')
+
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    if ylim is not None:
+        ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
+    else:
+        ylim = ax.get_ylim()
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    else:
+        xlim = ax.get_xlim()
+    # set 1:1 line
+    ax.plot([xlim[0], xlim[1]], [ylim[0], ylim[1]], c='k', lw=1)
+    plt.axis('equal')
+    if save:
+        plot_save(fig, fname, **kwargs)
+    return const, expon
 
