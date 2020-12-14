@@ -2012,9 +2012,9 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         c = [x for _, x in sorted(zip(x_data_all, eta_data_all))]
         clabel = r'$\Delta \eta$'
     scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
-    # if not (not cbar):
-    #     cbar = fig.colorbar(scat, ax=ax)
-    #     cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
+    if not (not cbar):
+        cbar = fig.colorbar(scat, ax=ax)
+        cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
 
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
@@ -2031,7 +2031,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     fig, ax = plot_error_contours(fig, ax)
 
     if save:
-        plot_save(fig, fname, tight_layout=False, **kwargs)
+        plot_save(fig, fname, **kwargs)
     return const, expon
 
 
