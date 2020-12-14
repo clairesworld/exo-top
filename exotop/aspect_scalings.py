@@ -2044,7 +2044,7 @@ def plot_error_contours(fig, ax, errs=None):
     for err in errs:
         ax.plot(xlim, ylim + err * ylim, c='k', lw=1, ls='--')
         ax.plot(xlim, ylim - err * ylim, c='k', lw=1, ls='--')
-    ax.set_axis('equal')
+    ax.axis('equal')
     return fig, ax
 
 
