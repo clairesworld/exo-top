@@ -1956,7 +1956,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
                             c='k', averagefirst=True, ylim=None, xlim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', legsize=16, title=r'Topography from fit to $\alpha \Delta T_{rh} \delta_{rh}$',
-                            **kwargs):
+                            cmap='magma',**kwargs):
     psuffixes = ['_T', '_h']
     postprocess_functions = [T_parameters_at_sol, h_at_ts]
     if t1 is None:
@@ -1965,6 +1965,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     h_data_all = []
     x_data_all = []
+    eta_data_all = []
     fig, ax = plt.subplots(1, 1, figsize=(7,7))
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
@@ -1997,6 +1998,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                     # fit to time-mean rather than all points
                     h_data_all.append((np.mean(h)))
                     x_data_all.append(np.mean(h_components))
+                    eta_data_all.append(float(eta_str))
                 except KeyError as e:  # e.g. no h at solutions yet
                     print('    Catching KeyError:', e)
 
@@ -2009,14 +2011,11 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     h_fit = const * x_data ** expon
     # print('h_fit')
-    ax.scatter(h_data, h_fit, c=c, s=20, zorder=100, label='Model: {:.2e} x^{:.3f}'.format(const, expon))
-    if legend:
-        leg = ax.legend(fontsize=legsize)
-        ax.add_artist(leg)
+    ax.scatter(h_data, h_fit, s=20, zorder=100, c=[x for _,x in sorted(zip(x_data_all,eta_data_all))], cmap=cmap)
 
     ax.set_ylabel('Model', fontsize=legsize)
     ax.set_xlabel('Data', fontsize=legsize)
-    ax.set_title(title, fontsize=legsize)
+    ax.set_title('Fit to h = {:.2e}'.format())+r'$\alpha \Delta T_{rh} \delta_{rh}$'+'^{:.3f}'.format(const, expon), fontsize=legsize)
 
     ax.set_xscale('log')
     ax.set_yscale('log')
