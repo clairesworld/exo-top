@@ -1984,19 +1984,19 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                                                      load=load_ii, update=False, **kwargs)
 
                 if which_h == 'rms':
-                    h_data = np.array(df['h_rms'])
+                    h = np.array(df['h_rms'])
                 elif which_h == 'peak':
-                    h_data = np.array(df['h_peak'])
+                    h = np.array(df['h_peak'])
 
                 try:
                     df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', 'h_components'])  # remove any rows with nans
                     # fit to time-mean rather than all points
-                    h_data_all.append((np.mean(h_data)))
+                    h_data_all.append((np.mean(h)))
                     x_data_all.append(np.mean(h_components))
                 except KeyError as e:  # e.g. no h at solutions yet
                     print('    Catching KeyError:', e)
 
-    x_data, h_data = [list(tuple) for tuple in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort
+    x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort
 
     expon, const = fit_log(x_data, h_data, weights=None)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
