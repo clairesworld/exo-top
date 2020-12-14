@@ -2015,7 +2015,8 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
 
     ax.set_ylabel('Model', fontsize=legsize)
     ax.set_xlabel('Data', fontsize=legsize)
-    ax.set_title('Fit to h = {:.2e}'.format())+r'$\alpha \Delta T_{rh} \delta_{rh}$'+'^{:.3f}'.format(const, expon), fontsize=legsize)
+    title = 'Fit to h = {:.2e}'.format() + r'$\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(const, expon)
+    ax.set_title(title, fontsize=legsize)
 
     ax.set_xscale('log')
     ax.set_yscale('log')
