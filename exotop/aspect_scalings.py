@@ -1559,8 +1559,8 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
 
     if t1 is None:
         t1 = np.zeros((len(eta), len(Ra)))
-    if not not_iterable(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
-        load = [[load] * len(Ra)] * len(eta)
+    if not_iterable(load):  #
+        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     fig, ax = plt.subplots(1, 1)
     plot_grid = np.zeros((len(eta), len(Ra)))
 
@@ -1960,8 +1960,8 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     postprocess_functions = [T_parameters_at_sol, h_at_ts]
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
-    if not not_iterable(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
-        load = [[load] * len(Ra)] * len(eta)
+    if not_iterable(load):  #
+        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     h_data_all = []
     x_data_all = []
     fig, ax = plt.subplots(1, 1, figsize=(7,7))
