@@ -1560,7 +1560,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if t1 is None:
         t1 = np.zeros((len(eta), len(Ra)))
     if not_iterable(load):  #
-        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
+        load = np.array([[load] * len(Ra)] * len(eta))
     fig, ax = plt.subplots(1, 1)
     plot_grid = np.zeros((len(eta), len(Ra)))
 
@@ -2027,18 +2027,24 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         ax.set_xlim(xlim)
     else:
         xlim = ax.get_xlim()
+    fig, ax = plot_error_contours(fig, ax)
 
-    # set 1:1 line
-    ax.plot([xlim[0], xlim[1]], [ylim[0], ylim[1]], c='k', lw=2)
-    errs = [0.5, 0.1, 0.05]
-    xlim = np.array(xlim)
-    ylim = np.array(ylim)
-    for err in errs:
-        ax.plot(xlim, ylim + err*ylim, c='k', lw=1, ls='--')
-        ax.plot(xlim, ylim - err*ylim, c='k', lw=1, ls='--')
-
-    plt.axis('equal')
     if save:
         plot_save(fig, fname, **kwargs)
     return const, expon
+
+
+def plot_error_contours(fig, ax, errs=None):
+    if errs is None:
+        errs = [0.5, 0.1, 0.05]
+    xlim = np.array(ax.get_xlim())
+    ylim = np.array(ax.get_ylim())
+    # set 1:1 line
+    ax.plot([xlim[0], xlim[1]], [ylim[0], ylim[1]], c='k', lw=2)
+    for err in errs:
+        ax.plot(xlim, ylim + err * ylim, c='k', lw=1, ls='--')
+        ax.plot(xlim, ylim - err * ylim, c='k', lw=1, ls='--')
+    plt.axis('equal')
+    return fig, ax
+
 
