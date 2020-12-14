@@ -1982,14 +1982,6 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                     print('    plot_h_vs(): Calculating T components using time-mean')
                     h_components = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii,
                                                      load=load_ii, update=False, **kwargs)
-                else:
-                    if ('h_components' not in df.columns) or (('h_components' in df.columns) and df['h_components'].isnull().values.any()):
-                        print('    plot_h_vs(): Calculating T components')
-                        h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
-                                                         update=False,
-                                                         **kwargs)
-                    else:
-                        h_components = df['h_components']
 
                 if which_h == 'rms':
                     h_data = np.array(df['h_rms'])
