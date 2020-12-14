@@ -1956,7 +1956,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
                             c='k', averagefirst=True, ylim=None, xlim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', legsize=16, title=r'Topography from fit to $\alpha \Delta T_{rh} \delta_{rh}$',
-                            cmap='magma',**kwargs):
+                            cmap='magma', cbar='eta', **kwargs):
     psuffixes = ['_T', '_h']
     postprocess_functions = [T_parameters_at_sol, h_at_ts]
     if t1 is None:
@@ -2011,7 +2011,14 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     h_fit = const * x_data ** expon
     # print('h_fit')
-    ax.scatter(h_data, h_fit, s=20, zorder=100, c=[x for _,x in sorted(zip(x_data_all,eta_data_all))], cmap=cmap)
+    if not cbar:
+        c='k'
+    elif cbar == 'eta':
+        c = [x for _, x in sorted(zip(x_data_all, eta_data_all))]
+    scat = ax.scatter(h_data, h_fit, s=20, zorder=100, c=c, cmap=cmap, norm=LogNorm())
+    if not (not cbar):
+        cbar = fig.colorbar(scat, ax=ax)
+
 
     ax.set_ylabel('Model', fontsize=legsize)
     ax.set_xlabel('Data', fontsize=legsize)
