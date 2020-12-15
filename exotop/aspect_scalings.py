@@ -1974,7 +1974,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     elif cbar == 'regime':
         clabel = 'Stationarity'
         cticklabels = ['steady', 'transitional', 'chaotic']
-        vmin, vmax = 1, 4
+        vmin, vmax = 1, 3
         cnorm = None
         cmap = cmap_from_list(clist, cmap_name='regimes')
 
