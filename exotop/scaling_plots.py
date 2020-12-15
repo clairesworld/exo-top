@@ -15,17 +15,11 @@ load = load_grid
 #                             c='k', which_h='rms', data_path=data_path,
 #                             save=True, fname='model-data', ylim=[6e-3, 4e-2])
 
-# sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
-#                            literature_file=None, legend=True, cbar='regime', clist=c_regimes_td,
-#                            regime_names=regime_names_td,
-#                             c='k', which_h='rms', data_path=data_path,
-#                             save=True, fname='model-data-regimes', ylim=[6e-3, 4e-2])
-
-sc.plot_heuristic_scalings(Ra_ls, [eta_ls[2]], regime_grid=[regime_grid_td[2,:]], t1=[t1_grid[2,:]], load=True, end=[end_grid[2,:]],
+sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
                            literature_file=None, legend=True, cbar='regime', clist=c_regimes_td,
                            regime_names=regime_names_td,
                             c='k', which_h='rms', data_path=data_path,
-                            save=True, fname='model-data-regimes-eta1e7', ylim=[6e-3, 4e-2])
+                            save=True, fname='model-data-regimes', ylim=[6e-3, 4e-2])
 
 
 #

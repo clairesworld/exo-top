@@ -651,6 +651,67 @@ def fit_log(x, h, weights=None):
     return slope, 10 ** intercept
 
 
+# def fit_log2(x, y, h):
+#     try:
+#         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
+#         y1 = np.log10(np.array(y))
+#         h1 = np.log10(np.array(h))
+#     except Exception as e:
+#         print('h', h, type(h))
+#         print('x', x, type(x))
+#         print('y', y, type(y))
+#         raise e
+#
+#     try:
+#         slope_x, intercept_x, r_value_x, p_value_x, std_err_x = stats.linregress(x1, h1)
+#         slope_y, intercept_y, r_value_y, p_value_y, std_err_y = stats.linregress(y1, h1)
+#     except ValueError as e:
+#         print('x1', np.shape(x1),, 'y1', np.shape(y1) 'h1', np.shape(h1))
+#         raise e
+#
+#     intercept =
+#
+#     return slope_x, slope_y, 10 ** intercept
+
+
+from sklearn import linear_model
+def fit_2d_log(x, y, h):
+    try:
+        x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
+        y1 = np.log10(np.array(y))
+        h1 = np.log10(np.array(h))
+    except Exception as e:
+        print('h', h, type(h))
+        print('x', x, type(x))
+        print('y', y, type(y))
+        raise e
+
+    # define the data/predictors as the pre-set feature names
+    df = pd.DataFrame({'x1':x1, 'y1':y1})
+
+    # Put the target (housing value -- MEDV) in another DataFrame
+    target = pd.DataFrame({'h1':h1})
+
+    X = df
+    y = target['h1']
+    lm = linear_model.LinearRegression()
+    model = lm.fit(X, y)
+
+    coefs = lm.coef_
+    intercept = lm.intercept_
+
+    print('coefs', coefs)
+    print('intercept', intercept)
+
+    return coefs[0], coefs[1], 10**intercept
+
+    # def func(xdata_tuple, a, b, c):
+    #     (x, y) = xdata_tuple
+    #     g = a * x**b * y**c
+    #     return g.ravel()
+    # popt, pcov = curve_fit(func, (x1, x2), h.ravel())
+
+
 def fit_h_sigma(x, h, h_err=None, fn='line'):
     def line(x, a, b):
         return a * x + b
@@ -2004,12 +2065,10 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                     print('    plot_h_vs(): Calculating T components using time-mean')
                     h_components = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii,
                                                      load=load_ii, update=False, **kwargs)
-
                 if which_h == 'rms':
                     h = np.array(df['h_rms'])
                 elif which_h == 'peak':
                     h = np.array(df['h_peak'])
-
                 try:
                     df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', 'h_components'])  # remove any rows with nans
                     # fit to time-mean rather than all points
