@@ -2067,12 +2067,13 @@ def plot_error_contours(fig, ax, errs=None, c='k'):
     x = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], num=3)
     y = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], num=3)
     # set 1:1 line
-    ax.plot([x[0], x[-1]], [y[0], y[-1]], c=c, lw=2)
+    ax.plot(x, y, c=c, lw=2)
     for err in errs:
         l1, = ax.plot(x, y + err * y, c=c, lw=1, ls='--')
         l2, = ax.plot(x, y - err * y, c=c, lw=1, ls='--')
         line_string = str(err)
         pos = [(x[-2] + x[-1]) / 2., (y[-2] + y[-1]) / 2.]
+        print('err', err, 'pos', pos)
         # transform data points to screen space
         xscreen = ax.transData.transform(np.array((x[-2::],y[-2::])))
         rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
