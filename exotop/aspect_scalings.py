@@ -1970,14 +1970,14 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         clabel = r'$\Delta \eta$'
         cticklabels = None
         vmin, vmax = 0.9e5, 1.1e8
+        cnorm = LogNorm()
     elif cbar == 'regime':
         clabel = 'Stationarity'
         cticklabels = ['steady', 'transitional', 'chaotic', 'not stagnant lid'],
         vmin, vmax = 1, 4
-    if clist is None:
-        cmap = plt.cm.get_cmap(cmap)
-    else:
+        cnorm = None
         cmap = cmap_from_list(clist, cmap_name='regimes')
+
     h_data_all = []
     x_data_all = []
     c_data_all = []
@@ -2043,7 +2043,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     else:
         ax.axis('equal')
 
-    scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
+    scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
 
     print('xlim:', ax.get_xlim())
     print('ylim:', ax.get_ylim())
