@@ -2022,7 +2022,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
 
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.set_aspect('equal', 'box')
+    ax.axis('equal')
     if ylim is not None:
         ax.set_ylim(ylim)
         ax.set_xlim(ylim)
