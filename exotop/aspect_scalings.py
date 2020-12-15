@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm, Normalize
-from sklearn import linear_model
+import statsmodels.api as sm
+# from sklearn import linear_model
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
@@ -674,42 +675,42 @@ def fit_log(x, h, weights=None):
 #     return slope_x, slope_y, 10 ** intercept
 
 
-
-def fit_2d_log(x, y, h):
-    try:
-        x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
-        y1 = np.log10(np.array(y))
-        h1 = np.log10(np.array(h))
-    except Exception as e:
-        print('h', h, type(h))
-        print('x', x, type(x))
-        print('y', y, type(y))
-        raise e
-
-    # define the data/predictors as the pre-set feature names
-    df = pd.DataFrame({'x1':x1, 'y1':y1})
-
-    # Put the target (housing value -- MEDV) in another DataFrame
-    target = pd.DataFrame({'h1':h1})
-
-    X = df
-    y = target['h1']
-    lm = linear_model.LinearRegression()
-    model = lm.fit(X, y)
-
-    coefs = lm.coef_
-    intercept = lm.intercept_
-
-    print('coefs', coefs)
-    print('intercept', intercept)
-
-    return coefs[0], coefs[1], 10**intercept
-
-    # def func(xdata_tuple, a, b, c):
-    #     (x, y) = xdata_tuple
-    #     g = a * x**b * y**c
-    #     return g.ravel()
-    # popt, pcov = curve_fit(func, (x1, x2), h.ravel())
+#
+# def fit_2d_log(x, y, h):
+#     try:
+#         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
+#         y1 = np.log10(np.array(y))
+#         h1 = np.log10(np.array(h))
+#     except Exception as e:
+#         print('h', h, type(h))
+#         print('x', x, type(x))
+#         print('y', y, type(y))
+#         raise e
+#
+#     # define the data/predictors as the pre-set feature names
+#     df = pd.DataFrame({'x1':x1, 'y1':y1})
+#
+#     # Put the target (housing value -- MEDV) in another DataFrame
+#     target = pd.DataFrame({'h1':h1})
+#
+#     X = df
+#     y = target['h1']
+#     lm = linear_model.LinearRegression()
+#     model = lm.fit(X, y)
+#
+#     coefs = lm.coef_
+#     intercept = lm.intercept_
+#
+#     print('coefs', coefs)
+#     print('intercept', intercept)
+#
+#     return coefs[0], coefs[1], 10**intercept
+#
+#     # def func(xdata_tuple, a, b, c):
+#     #     (x, y) = xdata_tuple
+#     #     g = a * x**b * y**c
+#     #     return g.ravel()
+#     # popt, pcov = curve_fit(func, (x1, x2), h.ravel())
 
 
 def fit_h_sigma(x, h, h_err=None, fn='line'):
