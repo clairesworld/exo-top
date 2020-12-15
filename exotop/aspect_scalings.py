@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm, Normalize
-import statsmodels.api as sm
 # from sklearn import linear_model
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
@@ -674,43 +673,6 @@ def fit_log(x, h, weights=None):
 #
 #     return slope_x, slope_y, 10 ** intercept
 
-
-#
-# def fit_2d_log(x, y, h):
-#     try:
-#         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
-#         y1 = np.log10(np.array(y))
-#         h1 = np.log10(np.array(h))
-#     except Exception as e:
-#         print('h', h, type(h))
-#         print('x', x, type(x))
-#         print('y', y, type(y))
-#         raise e
-#
-#     # define the data/predictors as the pre-set feature names
-#     df = pd.DataFrame({'x1':x1, 'y1':y1})
-#
-#     # Put the target (housing value -- MEDV) in another DataFrame
-#     target = pd.DataFrame({'h1':h1})
-#
-#     X = df
-#     y = target['h1']
-#     lm = linear_model.LinearRegression()
-#     model = lm.fit(X, y)
-#
-#     coefs = lm.coef_
-#     intercept = lm.intercept_
-#
-#     print('coefs', coefs)
-#     print('intercept', intercept)
-#
-#     return coefs[0], coefs[1], 10**intercept
-#
-#     # def func(xdata_tuple, a, b, c):
-#     #     (x, y) = xdata_tuple
-#     #     g = a * x**b * y**c
-#     #     return g.ravel()
-#     # popt, pcov = curve_fit(func, (x1, x2), h.ravel())
 
 
 def fit_h_sigma(x, h, h_err=None, fn='line'):
@@ -2137,88 +2099,126 @@ def plot_error_contours(fig, ax, errs=None, c='k', labels=True):
     return fig, ax
 
 
-def subplots_h_fit_2D(Ra_ls=None, eta_ls=None, t1=None, end=None, load='auto', data_path=data_path_bullard,
-              fig_path=fig_path_bullard, alpha_m=1.35e-5,
-              fig_fmt='.png', regime_grid=None, nrows=2, ncols=2,
-              save=True, fname='h-2d', xlabelpad=10, ylabelpad=10,
-              labelsize=16, xlabel=r'$\delta_{rh}$', ylabel='$h_{rms}$',  title='',
-              c_rms='xkcd:periwinkle',
-               logx=True, logy=True,
-              ax=None, ylim=None, xlim=None, **kwargs):
+# def subplots_h_fit_2D(Ra_ls=None, eta_ls=None, t1=None, end=None, load='auto', data_path=data_path_bullard,
+#               fig_path=fig_path_bullard, alpha_m=1.35e-5,
+#               fig_fmt='.png', regime_grid=None, nrows=2, ncols=2,
+#               save=True, fname='h-2d', xlabelpad=10, ylabelpad=10,
+#               labelsize=16, xlabel=r'$\delta_{rh}$', ylabel='$h_{rms}$',  title='',
+#               c_rms='xkcd:periwinkle',
+#                logx=True, logy=True,
+#               ax=None, ylim=None, xlim=None, **kwargs):
+#
+#     if t1 is None:
+#         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
+#     if not_iterable(load):  #
+#         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
+#
+#     fig = plt.figure(figsize=(7, 7))
+#     bigax = fig.add_subplot(111)  # The big subplot
+#     bigax.spines['top'].set_color('none')
+#     bigax.spines['bottom'].set_color('none')
+#     bigax.spines['left'].set_color('none')
+#     bigax.spines['right'].set_color('none')
+#     bigax.tick_params(labelcolor='w', which='both', bottom=False, left=False, right=False, top=False)
+#     bigax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
+#     bigax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
+#
+#     psuffixes = ['_T', '_h']
+#     postprocess_functions = [T_parameters_at_sol, h_at_ts]
+#
+#     h_data = np.zeros_like(load)
+#     x_data = np.zeros_like(load)
+#     y_data = np.zeros_like(load)
+#
+#     for jj, eta_str in enumerate(eta_ls):
+#         cases, Ra = get_cases_list(Ra_ls, eta_str, end[jj])
+#         for ii, case in enumerate(cases):
+#             t1_ii = t1[jj][ii]
+#             load_ii = load[jj][ii]
+#             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (regime_grid[jj][ii] != 'sluggish'):
+#                 # load outputs
+#                 dfs = []
+#                 for ip, ps in enumerate(psuffixes):
+#                     df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
+#                                    load=load_ii, data_path=data_path, at_sol=True, **kwargs)
+#                     dfs.append(df1)
+#                 df = pd.concat(dfs, axis=1)
+#                 df = df.loc[:, ~df.columns.duplicated()]
+#                 df = df.dropna(axis=0, how='any', thresh=None, subset=['h_rms', 'dT_rh', 'delta_rh'])
+#                 h_data[jj,ii] = df.h_rms.mean()
+#                 x_data[jj,ii] = df.dT_rh.mean()
+#                 y_data[jj,ii] = df.delta_rh.mean()
+#
+#     coef_x, coef_y, C = fit_2d_log(x_data.flatten(), y_data.flatten(), h_data.flatten())
+#
+#     y_sample = np.mean(y_data, axis=0)
+#     print('y_sample', np.shape(y_sample))
+#     for jj, eta_ii in enumerate(eta_ls):
+#         z = int(str(nrows) + str(ncols) + str(jj + 1))
+#         ax = fig.add_subplot(z)
+#
+#         x_data = x_data[jj]
+#         print('jj', jj)
+#         print('x_data', np.shape(x_data))
+#         y_data = y_sample[jj]
+#         h_data = h_data[jj]
+#         h_model = C * x_data**coef_x * y_data**coef_y
+#
+#         ax.plot(x_data, h_model, label='model', c='k')
+#         ax.scatter(x_data, h_data, label='data', c=c_rms)
+#         ax.legend(frameon=False)
+#         ax.text(0.01, 0.98, r'$\Delta T_{rh}$=' + '{:.2f}'.format(y_data), fontsize=labelsize-4, ha='left', va='top',
+#                 transform=ax.transAxes)  # label
+#         if logx:
+#             ax.set_xscale('log')
+#         if logy:
+#             ax.set_yscale('log')
+#         if ylim is not None:
+#             ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
+#         if xlim is not None:
+#             ax.set_xlim(xlim)
+#         # ax.set_ylabel(ylabel, fontsize=labelsize)
+#         # ax.set_xlabel(xlabel, fontsize=labelsize)
+#         # ax.set_title(title, fontsize=labelsize)
+#
+#     if save:
+#         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+#     return fig, ax
 
-    if t1 is None:
-        t1 = [[0] * len(Ra_ls)] * len(eta_ls)
-    if not_iterable(load):  #
-        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
 
-    fig = plt.figure(figsize=(7, 7))
-    bigax = fig.add_subplot(111)  # The big subplot
-    bigax.spines['top'].set_color('none')
-    bigax.spines['bottom'].set_color('none')
-    bigax.spines['left'].set_color('none')
-    bigax.spines['right'].set_color('none')
-    bigax.tick_params(labelcolor='w', which='both', bottom=False, left=False, right=False, top=False)
-    bigax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
-    bigax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
-
-    psuffixes = ['_T', '_h']
-    postprocess_functions = [T_parameters_at_sol, h_at_ts]
-
-    h_data = np.zeros_like(load)
-    x_data = np.zeros_like(load)
-    y_data = np.zeros_like(load)
-
-    for jj, eta_str in enumerate(eta_ls):
-        cases, Ra = get_cases_list(Ra_ls, eta_str, end[jj])
-        for ii, case in enumerate(cases):
-            t1_ii = t1[jj][ii]
-            load_ii = load[jj][ii]
-            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (regime_grid[jj][ii] != 'sluggish'):
-                # load outputs
-                dfs = []
-                for ip, ps in enumerate(psuffixes):
-                    df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
-                                   load=load_ii, data_path=data_path, at_sol=True, **kwargs)
-                    dfs.append(df1)
-                df = pd.concat(dfs, axis=1)
-                df = df.loc[:, ~df.columns.duplicated()]
-                df = df.dropna(axis=0, how='any', thresh=None, subset=['h_rms', 'dT_rh', 'delta_rh'])
-                h_data[jj,ii] = df.h_rms.mean()
-                x_data[jj,ii] = df.dT_rh.mean()
-                y_data[jj,ii] = df.delta_rh.mean()
-
-    coef_x, coef_y, C = fit_2d_log(x_data.flatten(), y_data.flatten(), h_data.flatten())
-
-    y_sample = np.mean(y_data, axis=0)
-    print('y_sample', np.shape(y_sample))
-    for jj, eta_ii in enumerate(eta_ls):
-        z = int(str(nrows) + str(ncols) + str(jj + 1))
-        ax = fig.add_subplot(z)
-
-        x_data = x_data[jj]
-        print('jj', jj)
-        print('x_data', np.shape(x_data))
-        y_data = y_sample[jj]
-        h_data = h_data[jj]
-        h_model = C * x_data**coef_x * y_data**coef_y
-
-        ax.plot(x_data, h_model, label='model', c='k')
-        ax.scatter(x_data, h_data, label='data', c=c_rms)
-        ax.legend(frameon=False)
-        ax.text(0.01, 0.98, r'$\Delta T_{rh}$=' + '{:.2f}'.format(y_data), fontsize=labelsize-4, ha='left', va='top',
-                transform=ax.transAxes)  # label
-        if logx:
-            ax.set_xscale('log')
-        if logy:
-            ax.set_yscale('log')
-        if ylim is not None:
-            ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        # ax.set_ylabel(ylabel, fontsize=labelsize)
-        # ax.set_xlabel(xlabel, fontsize=labelsize)
-        # ax.set_title(title, fontsize=labelsize)
-
-    if save:
-        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
-    return fig, ax
+#
+# def fit_2d_log(x, y, h):
+#     try:
+#         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
+#         y1 = np.log10(np.array(y))
+#         h1 = np.log10(np.array(h))
+#     except Exception as e:
+#         print('h', h, type(h))
+#         print('x', x, type(x))
+#         print('y', y, type(y))
+#         raise e
+#
+#     # define the data/predictors as the pre-set feature names
+#     df = pd.DataFrame({'x1':x1, 'y1':y1})
+#
+#     # Put the target (housing value -- MEDV) in another DataFrame
+#     target = pd.DataFrame({'h1':h1})
+#
+#     X = df
+#     y = target['h1']
+#     lm = linear_model.LinearRegression()
+#     model = lm.fit(X, y)
+#
+#     coefs = lm.coef_
+#     intercept = lm.intercept_
+#
+#     print('coefs', coefs)
+#     print('intercept', intercept)
+#
+#     return coefs[0], coefs[1], 10**intercept
+#
+#     # def func(xdata_tuple, a, b, c):
+#     #     (x, y) = xdata_tuple
+#     #     g = a * x**b * y**c
+#     #     return g.ravel()
+#     # popt, pcov = curve_fit(func, (x1, x2), h.ravel())
