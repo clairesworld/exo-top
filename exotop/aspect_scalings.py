@@ -2073,7 +2073,7 @@ def plot_error_contours(fig, ax, errs=None, c='k', labels=True):
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
                 ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err*100), size=9, rotation=rot, color=l.get_color(),
-                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.1', ec='1', fc='1'))
+                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec='1', fc='1'))
     return fig, ax
 
 
