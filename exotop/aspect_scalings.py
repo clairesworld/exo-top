@@ -1973,7 +1973,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         crot = 0
         cnorm = LogNorm()
     elif cbar == 'regime':
-        clabel = 'Stationarity'
+        clabel = '' # 'Stationarity'
         cticklabels = ['steady', 'transitional', 'chaotic']
         vmin, vmax = 1, 3
         cnorm = None
@@ -1983,7 +1983,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     h_data_all = []
     x_data_all = []
     c_data_all = []
-    fig, ax = plt.subplots(1, 1, figsize=(3.5, 5))
+    fig, ax = plt.subplots(1, 1, figsize=(7, 5))
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
         for ii, case in enumerate(cases):
