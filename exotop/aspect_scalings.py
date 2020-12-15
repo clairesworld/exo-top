@@ -2074,7 +2074,7 @@ def plot_error_contours(fig, ax, errs=None, c='k'):
         line_string = str(err)
         pos = [(x[-2] + x[-1]) / 2., (y[-2] + y[-1]) / 2.]
         # transform data points to screen space
-        xscreen = ax.transData.transform(zip(x[-2::], y[-2::]))
+        xscreen = ax.transData.transform(np.array((x[-2::],y[-2::])))
         rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
         for l in [l1, l2]:
             ltex = plt.text(pos[0], pos[1], line_string, size=9, rotation=rot, color=l.get_color(),
