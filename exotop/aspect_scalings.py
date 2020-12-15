@@ -2059,7 +2059,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     return const, expon
 
 
-def plot_error_contours(fig, ax, errs=None, c='k'):
+def plot_error_contours(fig, ax, errs=None, c='k', labels=True):
     if errs is None:
         errs = [0.5, 0.25, 0.1]
     x0 = np.array(ax.get_xlim())
@@ -2073,13 +2073,13 @@ def plot_error_contours(fig, ax, errs=None, c='k'):
         y_minus = y0 - err * y0
         for y in [y_plus, y_minus]:
             l, = ax.plot(x0, y, c=c, lw=1, ls='--')
-            pos = [(x0[-2] + x0[-1]) / 2., (y[-2] + y[-1]) / 2.]
-            print('err', err, 'pos', pos)
-            # transform data points to screen space
-            xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
-            rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
-            ltex = ax.text(pos[0], pos[1], str(err), size=9, rotation=rot, color=l.get_color(),
-                            ha="center", va="center", bbox=dict(ec='1', fc='1'))
+            if labels:
+                pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
+                # transform data points to screen space
+                xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
+                rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
+                ltex = ax.text(pos[0], pos[1], str(err), size=9, rotation=rot, color=l.get_color(),
+                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.3', ec='1', fc='1'))
     return fig, ax
 
 
