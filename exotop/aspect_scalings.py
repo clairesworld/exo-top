@@ -2062,21 +2062,22 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
 def plot_error_contours(fig, ax, errs=None, c='k'):
     if errs is None:
         errs = [0.5, 0.25, 0.1]
-    x = np.array(ax.get_xlim())
-    y = np.array(ax.get_ylim())
-    x = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], num=3)
-    y = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], num=3)
+    x0 = np.array(ax.get_xlim())
+    y0 = np.array(ax.get_ylim())
+    # x = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], num=3)
+    # y = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], num=3)
     # set 1:1 line
-    ax.plot(x, y, c=c, lw=2)
+    ax.plot(x0, y0, c=c, lw=2)
     for err in errs:
-        l1, = ax.plot(x, y + err * y, c=c, lw=1, ls='--')
-        l2, = ax.plot(x, y - err * y, c=c, lw=1, ls='--')
-        pos = [(x[-2] + x[-1]) / 2., (y[-2] + y[-1]) / 2.]
-        print('err', err, 'pos', pos)
-        # transform data points to screen space
-        xscreen = ax.transData.transform(np.array((x[-2::],y[-2::])))
-        rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
-        for l in [l1, l2]:
+        y_plus = y0 + err * y0
+        y_minus = y - err * y
+        for y in [y_plus, y_minus]:
+            l, = ax.plot(x0, y, c=c, lw=1, ls='--')
+            pos = [(x0[-2] + x0[-1]) / 2., (y[-2] + y[-1]) / 2.]
+            print('err', err, 'pos', pos)
+            # transform data points to screen space
+            xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
+            rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
             ltex = ax.text(pos[0], pos[1], str(err), size=9, rotation=rot, color=l.get_color(),
                             ha="center", va="center", bbox=dict(ec='1', fc='1'))
     return fig, ax
