@@ -2051,11 +2051,8 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     fig, ax = plot_error_contours(fig, ax)
 
     if not (not cbar):
-        cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize)
-        if cbar == 'regime':
-            nlabels = len(cticklabels)
-            tick_locs = (np.arange(vmin, vmax + 1) + 0.5) * (nlabels - 1) / nlabels
-            cbar.set_ticks(tick_locs)
+        cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=True,
+                         vmin=vmin, vmax=vmax)
 
     if save:
         plot_save(fig, fname, **kwargs)
