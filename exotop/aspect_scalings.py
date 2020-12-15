@@ -2070,7 +2070,7 @@ def plot_error_contours(fig, ax, errs=None, c='k'):
     ax.plot(x0, y0, c=c, lw=2)
     for err in errs:
         y_plus = y0 + err * y0
-        y_minus = y - err * y
+        y_minus = y0 - err * y0
         for y in [y_plus, y_minus]:
             l, = ax.plot(x0, y, c=c, lw=1, ls='--')
             pos = [(x0[-2] + x0[-1]) / 2., (y[-2] + y[-1]) / 2.]
