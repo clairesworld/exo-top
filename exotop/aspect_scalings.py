@@ -2064,6 +2064,8 @@ def plot_error_contours(fig, ax, errs=None, c='k'):
         errs = [0.5, 0.1, 0.05]
     x = np.array(ax.get_xlim())
     y = np.array(ax.get_ylim())
+    x = np.linspace(ax.get_xlim(), num=5)
+    y = np.linspace(ax.get_ylim(), num=5)
     # set 1:1 line
     ax.plot([x[0], x[1]], [y[0], y[1]], c=c, lw=2)
     for err in errs:
