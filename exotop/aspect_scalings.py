@@ -1958,14 +1958,24 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
 
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
                             c='k', averagefirst=True, ylim=None, which_h='rms', data_path=data_path_bullard,
-                            save=True, fname='model-data', labelsize=16, regime_names=None,
-                            cmap='magma', cbar='eta', vmin=0.9e5, vmax=1.1e8, **kwargs):
+                            save=True, fname='model-data', labelsize=16, regime_names=None, clist=None,
+                            cmap='magma', cbar='eta', **kwargs):
     psuffixes = ['_T', '_h']
     postprocess_functions = [T_parameters_at_sol, h_at_ts]
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if not_iterable(load):  #
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
+    if cbar == 'eta':
+        clabel = r'$\Delta \eta$'
+        vmin, vmax = 0.9e5, 1.1e8
+    elif cbar == 'regime':
+        clabel = 'Stationarity'
+        vmin, vmax = 1, 4
+    if clist is None:
+        cmap = plt.cm.get_cmap(cmap, vmax - vmin)
+    else:
+        cmap = cmap_from_list(clist, cmap_name='regimes')
     h_data_all = []
     x_data_all = []
     c_data_all = []
@@ -2016,10 +2026,6 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         vmin, vmax = None, None
     else:
         c = [x for _, x in sorted(zip(x_data_all, c_data_all))]
-        if cbar == 'eta':
-            clabel = r'$\Delta \eta$'
-        elif cbar == 'regime':
-            clabel = 'Stationarity'
 
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
