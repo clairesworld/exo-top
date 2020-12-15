@@ -2031,15 +2031,12 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     else:
         c = [q for _, q in sorted(zip(x_data_all, c_data_all))]
         print('c', c)
-
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
     title = 'Fit to h = ({:.2e}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
     ax.set_title(title, fontsize=labelsize)
-
     ax.set_xscale('log')
     ax.set_yscale('log')
-
     if ylim is not None:
         ax.set_ylim(ylim)
         ax.set_xlim(ylim)
@@ -2047,9 +2044,6 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         ax.axis('equal')
 
     scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
-
-    print('xlim:', ax.get_xlim())
-    print('ylim:', ax.get_ylim())
 
     if not (not cbar):
         cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=True,
@@ -2079,7 +2073,7 @@ def plot_error_contours(fig, ax, errs=None, c='k', labels=True):
                 # transform data points to screen space
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
-                ltex = ax.text(pos[0], pos[1], str(err), size=9, rotation=rot, color=l.get_color(),
+                ltex = ax.text(pos[0], pos[1], str(err*100)+'%', size=9, rotation=rot, color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.1', ec='1', fc='1'))
     return fig, ax
 

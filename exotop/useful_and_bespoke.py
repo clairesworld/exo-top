@@ -58,8 +58,7 @@ def not_iterable(obj):
         return True
     elif not isinstance(obj, Iterable):
         return True
-    else:
-        return False
+    else:return False
 
 
 def printe(name, obj, showall=False):
