@@ -73,7 +73,8 @@ def printe(name, obj, showall=False):
 
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-def colourbar(mappable, vmin=None, vmax=None, label='', labelsize=16, ticks=None, ticklabels=None, labelpad=17, discrete=False):
+def colourbar(mappable, vmin=None, vmax=None, label='', labelsize=16, ticks=None, ticklabels=None, labelpad=17,
+              rot=None, discrete=False):
     # from https://joseph-long.com/writing/colorbars/
     ax = mappable.axes
     fig = ax.figure
@@ -88,5 +89,5 @@ def colourbar(mappable, vmin=None, vmax=None, label='', labelsize=16, ticks=None
         tick_locs = (np.arange(vmin, vmax + 1) + 0.5) * (nlabels - 1) / nlabels
         cbar.set_ticks(tick_locs)
     if ticklabels is not None:
-        cbar.ax.set_yticklabels(ticklabels)
+        cbar.ax.set_yticklabels(ticklabels, rotation=rot)
     return cbar

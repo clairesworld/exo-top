@@ -1970,18 +1970,20 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         clabel = r'$\Delta \eta$'
         cticklabels = None
         vmin, vmax = 0.9e5, 1.1e8
+        crot = 0
         cnorm = LogNorm()
     elif cbar == 'regime':
         clabel = 'Stationarity'
         cticklabels = ['steady', 'transitional', 'chaotic']
         vmin, vmax = 1, 3
         cnorm = None
+        crot = 70
         cmap = cmap_from_list(clist, cmap_name='regimes')
 
     h_data_all = []
     x_data_all = []
     c_data_all = []
-    fig, ax = plt.subplots(1, 1, figsize=(5,5))
+    fig, ax = plt.subplots(1, 1, figsize=(3.5, 5))
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
         for ii, case in enumerate(cases):
@@ -2050,7 +2052,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
 
     if not (not cbar):
         cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=True,
-                         vmin=vmin, vmax=vmax)
+                         vmin=vmin, vmax=vmax, rot=crot)
 
     fig, ax = plot_error_contours(fig, ax)
 
@@ -2064,8 +2066,6 @@ def plot_error_contours(fig, ax, errs=None, c='k', labels=True):
         errs = [0.5, 0.25, 0.1]
     x0 = np.array(ax.get_xlim())
     y0 = np.array(ax.get_ylim())
-    # x = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], num=3)
-    # y = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], num=3)
     # set 1:1 line
     ax.plot(x0, y0, c=c, lw=2)
     for err in errs:
