@@ -2034,8 +2034,8 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
 
     fig, ax = plot_error_contours(fig, ax)
 
-    # if not (not cbar):
-    #     colourbar(scat, label=clabel, labelsize=labelsize)
+    if not (not cbar):
+        colourbar(scat, label=clabel, labelsize=labelsize)
 
     if save:
         plot_save(fig, fname, **kwargs)
