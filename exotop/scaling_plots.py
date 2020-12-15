@@ -6,6 +6,16 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
 from exotop import aspect_scalings as sc
 
 
+# test 2d fit
+
+sc.subplots_h_fit_2D(Ra_ls, eta_ls, t1=t1_grid, load=True, end=end_grid, data_path=data_path,
+              fig_path=fig_path, alpha_m=1.35e-5,
+              fig_fmt='.png', regime_grid=regime_grid_td, nrows=2, ncols=2,
+              save=True, fname='h-2d', xlabelpad=10, ylabelpad=10,
+              labelsize=16, xlabel=r'$\delta_{rh}$', ylabel='$h_{rms}$',  title='',
+              c_rms='xkcd:periwinkle', ylim=None, xlim=None, )
+
+
 load = load_grid
 
 # heuristic scalings master
@@ -15,11 +25,11 @@ load = load_grid
 #                             c='k', which_h='rms', data_path=data_path,
 #                             save=True, fname='model-data', ylim=[6e-3, 4e-2])
 
-sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
-                           literature_file=None, legend=True, cbar='regime', clist=c_regimes_td,
-                           regime_names=regime_names_td,
-                            c='k', which_h='rms', data_path=data_path,
-                            save=True, fname='model-data-regimes', ylim=[6e-3, 4e-2])
+# sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
+#                            literature_file=None, legend=True, cbar='regime', clist=c_regimes_td,
+#                            regime_names=regime_names_td,
+#                             c='k', which_h='rms', data_path=data_path,
+#                             save=True, fname='model-data-regimes', ylim=[6e-3, 4e-2])
 
 
 #
