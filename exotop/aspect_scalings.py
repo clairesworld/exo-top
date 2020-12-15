@@ -2048,11 +2048,11 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     print('xlim:', ax.get_xlim())
     print('ylim:', ax.get_ylim())
 
-    fig, ax = plot_error_contours(fig, ax)
-
     if not (not cbar):
         cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=True,
                          vmin=vmin, vmax=vmax)
+
+    fig, ax = plot_error_contours(fig, ax)
 
     if save:
         plot_save(fig, fname, **kwargs)
@@ -2061,13 +2061,13 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
 
 def plot_error_contours(fig, ax, errs=None, c='k'):
     if errs is None:
-        errs = [0.5, 0.1, 0.05]
+        errs = [0.5, 0.25, 0.1]
     x = np.array(ax.get_xlim())
     y = np.array(ax.get_ylim())
-    x = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], num=5)
-    y = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], num=5)
+    x = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], num=3)
+    y = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], num=3)
     # set 1:1 line
-    ax.plot([x[0], x[1]], [y[0], y[1]], c=c, lw=2)
+    ax.plot([x[0], x[-1]], [y[0], y[-1]], c=c, lw=2)
     for err in errs:
         l1, = ax.plot(x, y + err * y, c=c, lw=1, ls='--')
         l2, = ax.plot(x, y - err * y, c=c, lw=1, ls='--')
@@ -2077,7 +2077,7 @@ def plot_error_contours(fig, ax, errs=None, c='k'):
         xscreen = ax.transData.transform(np.array((x[-2::],y[-2::])))
         rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
         for l in [l1, l2]:
-            ltex = plt.text(pos[0], pos[1], line_string, size=9, rotation=rot, color=l.get_color(),
+            ltex = ax.text(pos[0], pos[1], line_string, size=9, rotation=rot, color=l.get_color(),
                             ha="center", va="center", bbox=dict(ec='1', fc='1'))
     return fig, ax
 
