@@ -2021,7 +2021,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                         c_data_all.append(regime_to_digital(ii, jj, regime_grid=regime_grid, regime_names=regime_names))
                 except KeyError as e:  # e.g. no h at solutions yet
                     print('    Catching KeyError:', e)
-    x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort
+    x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
     expon, const = fit_log(x_data, h_data, weights=None)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     h_fit = const * x_data ** expon
@@ -2029,7 +2029,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         c = 'k'
         vmin, vmax = None, None
     else:
-        c = [x for _, x in sorted(zip(x_data_all, c_data_all))]
+        c = [q for _, q in sorted(zip(x_data_all, c_data_all))]
         print('c', c)
 
     ax.set_ylabel('Model', fontsize=labelsize)
@@ -2080,7 +2080,7 @@ def plot_error_contours(fig, ax, errs=None, c='k', labels=True):
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
                 ltex = ax.text(pos[0], pos[1], str(err), size=9, rotation=rot, color=l.get_color(),
-                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.3', ec='1', fc='1'))
+                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.1', ec='1', fc='1'))
     return fig, ax
 
 

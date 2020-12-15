@@ -86,7 +86,7 @@ def colourbar(mappable, vmin=None, vmax=None, label='', labelsize=16, ticks=None
         cbar.set_ticks(ticks)
     elif ticks is None and discrete:
         nlabels = len(ticklabels)
-        tick_locs = (np.arange(vmin, vmax + 1) + 0.5) * (nlabels - 1) / nlabels + 1
+        tick_locs = (np.arange(vmin, vmax + 1) + 0.5) * (nlabels - 1) / nlabels
         cbar.set_ticks(tick_locs)
     if ticklabels is not None:
         cbar.ax.set_yticklabels(ticklabels, rotation=rot)
