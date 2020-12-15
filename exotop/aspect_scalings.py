@@ -2030,6 +2030,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         vmin, vmax = None, None
     else:
         c = [x for _, x in sorted(zip(x_data_all, c_data_all))]
+        print('c', c)
 
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
