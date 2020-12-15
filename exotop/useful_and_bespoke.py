@@ -81,6 +81,6 @@ def colourbar(mappable, label='', labelsize=16, ticklabels=None, labelpad=17):
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cbar = fig.colorbar(mappable, cax=cax)
     cbar.set_label(label, rotation=270, labelpad=labelpad, fontsize=labelsize)
-    if ticklabels is not None:
-        cbar.ax.set_yticklabels(ticklabels)
+    # if ticklabels is not None:
+    #     cbar.ax.set_yticklabels(ticklabels)
     return cbar
