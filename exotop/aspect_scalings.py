@@ -1996,6 +1996,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         vmin, vmax = 0.9e5, 1.1e8
         crot = 0
         cnorm = LogNorm()
+        discrete=False
     elif cbar == 'regime':
         clabel = '' # 'Stationarity'
         cticklabels = ['steady', 'transitional', 'chaotic']
@@ -2003,6 +2004,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         cnorm = None
         crot = 0  # 70
         cmap = cmap_from_list(clist, cmap_name='regimes')
+        discrete=True
 
     h_data_all = []
     x_data_all = []
@@ -2067,7 +2069,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
 
     if not (not cbar):
-        cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=True,
+        cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=discrete,
                          vmin=vmin, vmax=vmax, rot=crot)
 
     fig, ax = plot_error_contours(fig, ax)
