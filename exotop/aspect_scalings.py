@@ -1968,9 +1968,11 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if cbar == 'eta':
         clabel = r'$\Delta \eta$'
+        cticklabels = None
         vmin, vmax = 0.9e5, 1.1e8
     elif cbar == 'regime':
         clabel = 'Stationarity'
+        cticklabels = ['steady', 'transitional', 'chaotic', 'not stagnant lid'],
         vmin, vmax = 1, 4
     if clist is None:
         cmap = plt.cm.get_cmap(cmap)
@@ -2011,7 +2013,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                     # fit to time-mean rather than all points
                     h_data_all.append((np.mean(h)))
                     x_data_all.append(np.mean(h_components))
-                    if cbar=='eta':
+                    if cbar == 'eta':
                         c_data_all.append(float(eta_str))
                     elif cbar == 'regime':
                         c_data_all.append(regime_to_digital(ii, jj, regime_grid=regime_grid, regime_names=regime_names))
@@ -2049,7 +2051,11 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     fig, ax = plot_error_contours(fig, ax)
 
     if not (not cbar):
-        colourbar(scat, label=clabel, labelsize=labelsize)
+        cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize)
+        if cbar == 'regime':
+            nlabels = len(cticklabels)
+            tick_locs = (np.arange(vmin, vmax + 1) + 0.5) * (nlabels - 1) / nlabels
+            cbar.set_ticks(tick_locs)
 
     if save:
         plot_save(fig, fname, **kwargs)
