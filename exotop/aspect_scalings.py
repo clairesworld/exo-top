@@ -2014,6 +2014,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     elif cbar == 'eta':
         c = [x for _, x in sorted(zip(x_data_all, eta_data_all))]
         clabel = r'$\Delta \eta$'
+
     scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
 
     ax.set_ylabel('Model', fontsize=labelsize)
@@ -2023,17 +2024,18 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
 
     ax.set_xscale('log')
     ax.set_yscale('log')
+    ax.axis('equal', 'box')
     if ylim is not None:
         ax.set_ylim(ylim)
         ax.set_xlim(ylim)
-    ax.axis('equal')
+
     print('xlim:', ax.get_xlim())
     print('ylim:', ax.get_ylim())
 
     fig, ax = plot_error_contours(fig, ax)
 
-    if not (not cbar):
-        colourbar(scat, label=clabel, labelsize=labelsize)
+    # if not (not cbar):
+    #     colourbar(scat, label=clabel, labelsize=labelsize)
 
     if save:
         plot_save(fig, fname, **kwargs)
