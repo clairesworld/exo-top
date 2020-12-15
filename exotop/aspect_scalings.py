@@ -2,7 +2,7 @@ import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop import aspect_postprocessing2 as post
-from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable
+from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, colourbar
 import numpy as np
 import pandas as pd
 import pickle as pkl
@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm, Normalize
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
@@ -1953,8 +1954,10 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
 
 
 
+
+
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
-                            c='k', averagefirst=True, ylim=None, xlim=None, which_h='rms', data_path=data_path_bullard,
+                            c='k', averagefirst=True, ylim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', labelsize=16,
                             cmap='magma', cbar='eta', vmin=0.9e5, vmax=1.1e8, **kwargs):
     psuffixes = ['_T', '_h']
@@ -2012,23 +2015,25 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         c = [x for _, x in sorted(zip(x_data_all, eta_data_all))]
         clabel = r'$\Delta \eta$'
     scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
-    if not (not cbar):
-        cbar = fig.colorbar(scat, ax=ax)
-        cbar.set_label(clabel, rotation=270, labelpad=17, fontsize=labelsize)
 
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
     title = 'Fit to h = ({:.2e}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
     ax.set_title(title, fontsize=labelsize)
-    plt.axis('equal')
+
     ax.set_xscale('log')
     ax.set_yscale('log')
     if ylim is not None:
-        ax.set_ylim(ylim)  # for fair comparison
-    if xlim is not None:
-        ax.set_xlim(xlim)
+        ax.set_ylim(ylim)
+        ax.set_xlim(ylim)
+    ax.axis('equal')
+    print('xlim:', ax.get_xlim())
+    print('ylim:', ax.get_ylim())
 
     fig, ax = plot_error_contours(fig, ax)
+
+    if not (not cbar):
+        colourbar(scat, label=clabel, labelsize=labelsize)
 
     if save:
         plot_save(fig, fname, **kwargs)
@@ -2045,7 +2050,6 @@ def plot_error_contours(fig, ax, errs=None):
     for err in errs:
         ax.plot(xlim, ylim + err * ylim, c='k', lw=1, ls='--')
         ax.plot(xlim, ylim - err * ylim, c='k', lw=1, ls='--')
-    # ax.axis('equal')
     return fig, ax
 
 
