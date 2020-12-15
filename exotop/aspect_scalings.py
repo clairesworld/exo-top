@@ -1973,7 +1973,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         clabel = 'Stationarity'
         vmin, vmax = 1, 4
     if clist is None:
-        cmap = plt.cm.get_cmap(cmap, vmax - vmin)
+        cmap = plt.cm.get_cmap(cmap)
     else:
         cmap = cmap_from_list(clist, cmap_name='regimes')
     h_data_all = []
