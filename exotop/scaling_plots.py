@@ -10,9 +10,16 @@ load = load_grid
 
 # heuristic scalings master
 
-sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid, literature_file=None, legend=True,
+sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
+                           literature_file=None, legend=True, cbar='eta',
                             c='k', which_h='rms', data_path=data_path,
                             save=True, fname='model-data', ylim=[6e-3, 4e-2])
+
+sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
+                           literature_file=None, legend=True, cbar='regime',
+                           regime_names=regime_names_td,
+                            c='k', which_h='rms', data_path=data_path,
+                            save=True, fname='model-data-regimes', ylim=[6e-3, 4e-2])
 
 
 #

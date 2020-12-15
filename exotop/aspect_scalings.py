@@ -1958,7 +1958,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
 
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
                             c='k', averagefirst=True, ylim=None, which_h='rms', data_path=data_path_bullard,
-                            save=True, fname='model-data', labelsize=16,
+                            save=True, fname='model-data', labelsize=16, regime_names=None,
                             cmap='magma', cbar='eta', vmin=0.9e5, vmax=1.1e8, **kwargs):
     psuffixes = ['_T', '_h']
     postprocess_functions = [T_parameters_at_sol, h_at_ts]
@@ -1968,7 +1968,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     h_data_all = []
     x_data_all = []
-    eta_data_all = []
+    c_data_all = []
     fig, ax = plt.subplots(1, 1, figsize=(5,5))
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
@@ -2001,7 +2001,10 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                     # fit to time-mean rather than all points
                     h_data_all.append((np.mean(h)))
                     x_data_all.append(np.mean(h_components))
-                    eta_data_all.append(float(eta_str))
+                    if cbar=='eta':
+                        c_data_all.append(float(eta_str))
+                    elif cbar == 'regime':
+                        c_data_all.append(regime_to_digital(ii, jj, regime_grid=regime_grid, regime_names=regime_names))
                 except KeyError as e:  # e.g. no h at solutions yet
                     print('    Catching KeyError:', e)
     x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort
@@ -2011,9 +2014,12 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     if not cbar:
         c = 'k'
         vmin, vmax = None, None
-    elif cbar == 'eta':
-        c = [x for _, x in sorted(zip(x_data_all, eta_data_all))]
-        clabel = r'$\Delta \eta$'
+    else:
+        c = [x for _, x in sorted(zip(x_data_all, c_data_all))]
+        if cbar == 'eta':
+            clabel = r'$\Delta \eta$'
+        elif cbar == 'regime':
+            clabel = 'Stationarity'
 
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
