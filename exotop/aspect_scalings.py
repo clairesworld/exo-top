@@ -2059,16 +2059,24 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     return const, expon
 
 
-def plot_error_contours(fig, ax, errs=None):
+def plot_error_contours(fig, ax, errs=None, c='k'):
     if errs is None:
         errs = [0.5, 0.1, 0.05]
-    xlim = np.array(ax.get_xlim())
-    ylim = np.array(ax.get_ylim())
+    x = np.array(ax.get_xlim())
+    y = np.array(ax.get_ylim())
     # set 1:1 line
-    ax.plot([xlim[0], xlim[1]], [ylim[0], ylim[1]], c='k', lw=2)
+    ax.plot([x[0], x[1]], [y[0], y[1]], c=c, lw=2)
     for err in errs:
-        ax.plot(xlim, ylim + err * ylim, c='k', lw=1, ls='--')
-        ax.plot(xlim, ylim - err * ylim, c='k', lw=1, ls='--')
+        l1, = ax.plot(x, y + err * y, c=c, lw=1, ls='--')
+        l2, = ax.plot(x, y - err * y, c=c, lw=1, ls='--')
+        line_string = str(err)
+        pos = [(x[-2] + x[-1]) / 2., (y[-2] + y[-1]) / 2.]
+        # transform data points to screen space
+        xscreen = ax.transData.transform(zip(x[-2::], y[-2::]))
+        rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
+        for l in [l1, l2]:
+            ltex = plt.text(pos[0], pos[1], line_string, size=9, rotation=rot, color=l.get_color(),
+                            ha="center", va="center", bbox=dict(ec='1', fc='1'))
     return fig, ax
 
 
