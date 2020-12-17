@@ -79,7 +79,7 @@ sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid
 #
 sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1=t1_grid[1:,4:], end=end_grid[1:,4:], keys=['delta_rh', 'dT_rh', 'Nu'], data_path=data_path,
                        fig_path=fig_path, load=load_grid[1:,4:], save=True, fname='delta_rh-Nu-chaotic-eff', xlim=(0.7e6, 4e7),
-                       ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
+                       ylim=[(None) , (None), (None)], labelsize=14, title='Chaotic time-dependence',
                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$', 'Nu'], psuffixes=['_T', '_Nu'], legloc=['lower left', 'upper left', 'upper left'],
                        postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], Ra_i='eff',
                        compare_label='', compare_pub=sc.moresi95,
