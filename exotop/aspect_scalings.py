@@ -645,7 +645,7 @@ def fit_log(x, h, intercept=False, weights=None, **kwargs):
     if intercept:
         popt, pcov = curve_fit(coefficient, x1, h1)
         print('popt', popt)
-        slope = 1
+        slope = 1.0
         intercept = popt[0]
     elif weights is None:
         try:
@@ -2059,7 +2059,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     expon, const = fit_log(x_data, h_data, weights=None, **kwargs)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     print('const', const, 'expon', expon)
-    h_fit = const * x_data ** expon
+    h_fit = const * np.array(x_data) ** expon
     if not cbar:
         c = 'k'
         vmin, vmax = None, None
