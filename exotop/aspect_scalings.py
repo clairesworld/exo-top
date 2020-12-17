@@ -403,7 +403,7 @@ def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
 
 
 def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path_bullard, update=False,
-                      fend='.pkl', alpha_m=None, **kwargs):
+                      fend='.pkl', alpha_m=1, **kwargs):
     # calculate T components in h heuristic for all processed solutions
     if df is None:
         df = pickleio(case, suffix=psuffix, postprocess_functions=[T_parameters_at_sol],
