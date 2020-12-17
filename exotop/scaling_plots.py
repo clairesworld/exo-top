@@ -12,17 +12,17 @@ load = load_grid
 
 # heuristic scalings master
 
-const, expon = sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
-                           literature_file=None, legend=True, cbar='eta', intercept=True,
-                            c='k', which_h='rms', data_path=data_path, include_regimes=['chaotic'],
-                            save=True, fname='model-data', ylim=[6e-3, 4e-2])
-print('fit parameters:', const, expon)
-
-sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
-                           literature_file=None, legend=True, cbar='regime', clist=c_regimes_td, intercept=True,
-                           regime_names=regime_names_td,
-                            c='k', which_h='rms', data_path=data_path, include_regimes=['chaotic'],
-                            save=True, fname='model-data-regimes', ylim=[6e-3, 4e-2])
+# const, expon = sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
+#                            literature_file=None, legend=True, cbar='eta', intercept=True,
+#                             c='k', which_h='rms', data_path=data_path, include_regimes=['chaotic'],
+#                             save=True, fname='model-data', ylim=[6e-3, 4e-2])
+# print('fit parameters:', const, expon)
+#
+# sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=True, end=end_grid,
+#                            literature_file=None, legend=True, cbar='regime', clist=c_regimes_td, intercept=True,
+#                            regime_names=regime_names_td,
+#                             c='k', which_h='rms', data_path=data_path, include_regimes=['chaotic'],
+#                             save=True, fname='model-data-regimes', ylim=[6e-3, 4e-2])
 
 
 #
@@ -77,13 +77,13 @@ sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid
 
 # # plot scalings of chaotic time-dependence T parameters - effective Ra_i
 #
-sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1=t1_grid[1:,4:], end=end_grid[1:,4:], keys=['delta_rh', 'dT_rh', 'Nu'], data_path=data_path,
-                       fig_path=fig_path, load=load_grid[1:,4:], save=True, fname='delta_rh-Nu-chaotic-eff', xlim=(0.7e6, 4e7),
-                       ylim=[(None) , (None), (None)], labelsize=14, title='Chaotic time-dependence',
-                       ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$', 'Nu'], psuffixes=['_T', '_Nu'], legloc=['lower left', 'upper left', 'upper left'],
-                       postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], Ra_i='eff',
-                       compare_label='', compare_pub=sc.moresi95,
-                       fig_fmt=fig_fmt, cmap='winter', fit=True)
+# sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1=t1_grid[1:,4:], end=end_grid[1:,4:], keys=['delta_rh', 'dT_rh', 'Nu'], data_path=data_path,
+#                        fig_path=fig_path, load=load_grid[1:,4:], save=True, fname='delta_rh-Nu-chaotic-eff', xlim=(0.7e6, 4e7),
+#                        ylim=[(None) , (None), (None)], labelsize=14, title='Chaotic time-dependence',
+#                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$', 'Nu'], psuffixes=['_T', '_Nu'], legloc=['lower left', 'upper left', 'upper left'],
+#                        postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], Ra_i='eff',
+#                        compare_label='', compare_pub=sc.moresi95,
+#                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 #
 # sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1=t1_grid[:,:3], end=end_grid[:,:3], keys=['delta_rh', 'dT_rh'], data_path=data_path,
 #                        fig_path=fig_path, load=load, save=True, fname='delta_rh-steady-eff', xlim=(0.3e5, 1e6),
@@ -97,13 +97,13 @@ sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1=t1_grid[1:,4:], end=end_grid[1:
 #
 # # plot scalings of chaotic time-dependence T parameters - uncorrected Ra_i
 #
-# sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1=t1_grid[1:,4:], end=end_grid[1:,4:], keys=['delta_rh', 'dT_rh'], data_path=data_path,
-#                        fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic', xlim=(1e7, 2e8),
-#                        ylim=[(None) , (None)], labelsize=14, title='Chaotic time-dependence',
-#                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'], psuffixes=['_T'],
-#                        postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True, legloc=['lower left', 'upper left'],
-#                       compare_label='', compare_pub=sc.moresi95,
-#                        fig_fmt=fig_fmt, cmap='winter', fit=True)
+sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1=t1_grid[1:,4:], end=end_grid[1:,4:], keys=['delta_rh', 'dT_rh', 'Nu'], data_path=data_path,
+                       fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic', xlim=(1e7, 2e8),
+                       ylim=[(None) , (None), (None)], labelsize=14, title='Chaotic time-dependence',
+                       ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$', 'Nu'], psuffixes=['_T', '_Nu'],
+                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True, legloc=['lower left', 'upper left', 'lower left'],
+                      compare_label='', compare_pub=sc.moresi95,
+                       fig_fmt=fig_fmt, cmap='winter', fit=True)
 #
 # sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1=t1_grid[:,:3], end=end_grid[:,:3], keys=['delta_rh', 'dT_rh'], data_path=data_path,
 #                        fig_path=fig_path, load=load, save=True, fname='delta_rh-steady', xlim=(0.1e6, 0.5e7),
