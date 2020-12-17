@@ -628,8 +628,8 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
 
 
 def fit_log(x, h, intercept=False, weights=None, **kwargs):
-    def coefficient(x, a):
-        return a * x
+    def coefficient(x, b):
+        return x + b
 
     try:
         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
@@ -2058,6 +2058,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
     expon, const = fit_log(x_data, h_data, weights=None, **kwargs)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
+    print('const', const, 'expon', expon)
     h_fit = const * x_data ** expon
     if not cbar:
         c = 'k'
