@@ -98,10 +98,10 @@ load = load_grid
 # # plot scalings of chaotic time-dependence T parameters - uncorrected Ra_i
 #
 sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1=t1_grid[1:,4:], end=end_grid[1:,4:], keys=['delta_rh', 'dT_rh', 'Nu'], data_path=data_path,
-                       fig_path=fig_path, load=load, save=True, fname='delta_rh-chaotic', xlim=(1e7, 2e8),
+                       fig_path=fig_path, load=load, save=True, fname='delta_rh-Nu-chaotic', xlim=(1e7, 2e8),
                        ylim=[(None) , (None), (None)], labelsize=14, title='Chaotic time-dependence',
                        ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$', 'Nu'], psuffixes=['_T', '_Nu'],
-                       postprocess_functions=[sc.T_parameters_at_sol], Ra_i=True, legloc=['lower left', 'upper left', 'lower left'],
+                       postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts], Ra_i=True, legloc=['lower left', 'upper left', 'lower left'],
                       compare_label='', compare_pub=sc.moresi95,
                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 #
