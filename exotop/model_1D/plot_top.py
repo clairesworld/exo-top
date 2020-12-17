@@ -32,10 +32,6 @@ rc('text', usetex=True) # turn on for latexy font
 
 
 
-
-
-
-
 ###### BUILD PLANETS IN BULK #####
 
 def bulk_planets(N=1, name=None, mini=None, maxi=None, like=None, visc_type='Thi', t_eval=None, random=False,
@@ -218,6 +214,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, ve
         print('q_sfc(t=0)', '%.2f'%(pl.q_sfc[0]*1e3), 'mW m^-3')
     return fig, axes
 
+
 def snaps(pl, plot_snapshots=None, fig_path=None, plots_save=False, fformat='.png', ident=None, **kwargs):
     if ident is None:
         ident = pl.ident
@@ -238,6 +235,7 @@ def snaps(pl, plot_snapshots=None, fig_path=None, plots_save=False, fformat='.pn
     if plots_save:
         fig2.plot_save(fig_path + pl.ident + '_profiles' + fformat, bbox_inches='tight')
     return fig2, axes2
+
 
 def plot_structure(ax=None, t=None, T_m=None, T_c=None, R_p=None, R_l=None, R_c=None, T_l=None, 
                    T_s=None, h_rad_m=None, d_lbl=None, d_ubl=None, q_ubl=None, a0=None, k_m=None,
@@ -285,11 +283,13 @@ def plot_structure(ax=None, t=None, T_m=None, T_c=None, R_p=None, R_l=None, R_c=
 
     return ax
 
+
 def interp_benchmark(path, yscale=1):
     df = pd.read_csv(path, header=None, names=['time', 'value'], index_col=False) 
     f = interpolate.interp1d(np.array(df['time']), np.array(df['value'])*yscale, kind='linear')
     times = df['time'] # in Gyr 
     return np.array(times), f
+
 
 def plot_qsfc_error(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, ident=None, fformat='.png', **kwargs):
     """ sanity check on q_sfc """
@@ -343,6 +343,7 @@ def plot_qsfc_error(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=Fa
         fig3.plot_save(fig_path + pl.ident + '_test_qsfc' + fformat)
         fig0.plot_save(fig_path + pl.ident + '_q_error' + fformat)
 
+
 def plot_Tavg(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, ident=None, fformat='.png', **kwargs):
     """ sanity check on T_avg """
     if ident is None:
@@ -378,7 +379,8 @@ def plot_Tavg(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, i
     plt.tight_layout()
     if plots_save:
         fig3.plot_save(fig_path + pl.ident + '_test_Tavg' + fformat)
-        
+
+
 def plot_one(ax, x, y, xlabel, ylabel, labelsize=15, legsize=16, ticksize=12, line_args=None,
              text=None, xticks=True, ylim=None, label=None,labelpad=None, fontname=None, **kwargs):
     if ax is None:
@@ -396,6 +398,7 @@ def plot_one(ax, x, y, xlabel, ylabel, labelsize=15, legsize=16, ticksize=12, li
     if text is not None:
         ax.text(0.05, 0.95, text, ha='left', va='top', transform=ax.transAxes, fontsize=legsize)
     return ax
+
 
 def plot_setxlabel(axes, label, style, labelsize=15, fontname=None, labelpad=None, **kwargs):
     try:
@@ -472,6 +475,7 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
         plot_Tavg(pl, **kwargs)
     return fig, axes
 
+
 def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=None, fig=None, axes=None,
               labels=False, labelsize=15, legsize=12, alpha=1, legend=False, snap=4.5,labelpad=None,
               plots_save=False, s=30, ls='-', lw=1, cmap='rainbow', marker='o', legtitle=None, legendtop=False,
@@ -544,6 +548,7 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
                 x, y = zip(*sorted(zip(x, [y]*np.ones_like(x))))    
 
             ax.plot(x, y, ls=ls, c=c, lw=lw, alpha=alpha, zorder=zorder_l, label=label_l)
+            print('range:', np.min(y), np.max(y))
         if ylabel:
             ax.set_ylabel(ylabels[ii][0], fontsize=labelsize, labelpad=labelpad)
             ax.tick_params(axis='y', labelsize=ticksize) 

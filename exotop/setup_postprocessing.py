@@ -5,7 +5,7 @@ matplotlibuse('Agg')
 default_load_value = True
 check_new = True  # always check for new timesteps with ongoing runs
 
-alpha_m = 1.35e-5
+alpha_m = 1
 Ra_ls = np.array(['1e6', '3e6', '1e7', '3e7', '1e8', '3e8'])  # 3e5 no convection
 eta_ls = np.array(['1e5', '1e6', '1e7', '1e8'])
 

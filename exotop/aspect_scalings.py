@@ -627,7 +627,10 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
     return qdict
 
 
-def fit_log(x, h, weights=None):
+def fit_log(x, h, intercept=False, weights=None, **kwargs):
+    def coefficient(x, a):
+        return a * x
+
     try:
         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
         h1 = np.log10(np.array(h))
@@ -639,7 +642,12 @@ def fit_log(x, h, weights=None):
         print('h', h, type(h))
         print('x', x, type(x))
         raise e
-    if weights is None:
+    if intercept:
+        popt, pcov = curve_fit(coefficient, x1, h1)
+        print('popt', popt)
+        slope = 1
+        intercept = popt[0]
+    elif weights is None:
         try:
             slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
         except ValueError as e:
@@ -1983,7 +1991,9 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
                             c='k', averagefirst=True, ylim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', labelsize=16, regime_names=None, clist=None,
-                            cmap='magma', cbar='eta', **kwargs):
+                            cmap='magma', cbar='eta', include_regimes=None, **kwargs):
+    if include_regimes is None:
+        include_regimes = ['steady', 'trans.', 'chaotic']
     psuffixes = ['_T', '_h']
     postprocess_functions = [T_parameters_at_sol, h_at_ts]
     if t1 is None:
@@ -2015,7 +2025,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         for ii, case in enumerate(cases):
             t1_ii = t1[jj][ii]
             load_ii = load[jj][ii]
-            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (regime_grid[jj][ii] != 'sluggish'):
+            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (regime_grid[jj][ii] in include_regimes):
                 # load outputs
                 dfs = []
                 for ip, ps in enumerate(psuffixes):
@@ -2046,7 +2056,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                 except KeyError as e:  # e.g. no h at solutions yet
                     print('    Catching KeyError:', e)
     x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
-    expon, const = fit_log(x_data, h_data, weights=None)
+    expon, const = fit_log(x_data, h_data, weights=None, **kwargs)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     h_fit = const * x_data ** expon
     if not cbar:
