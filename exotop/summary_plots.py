@@ -6,9 +6,9 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
 from exotop import aspect_scalings as sc
 
 # ## process all
-sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_Nu', '_h'],
-                 postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts, sc.h_at_ts], t1=t1_grid, end=end_grid,
-                 data_path=data_path, alpha_m=alpha_m)
+# sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_Nu', '_h'],
+#                  postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts, sc.h_at_ts], t1=t1_grid, end=end_grid,
+#                  data_path=data_path, alpha_m=alpha_m)
 
 ## plot summaries across delta eta
 #
@@ -24,19 +24,19 @@ sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_Nu', '_h'],
 #             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td[ii],
 #         )
 #
-# ## plot summaries across Ra
-#
-# i_plot = list(range(len(Ra_ls)))  # range(4,5)
-# for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
-#     if ii in i_plot:
-#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
-#         labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
-#         sc.subplots_cases(
-#             cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
-#             fname='all-Ra' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
-#             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td.T[ii],
-#         )
+## plot summaries across Ra
+
+i_plot = list(range(len(Ra_ls)))  # range(4,5)
+for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
+    if ii in i_plot:
+        cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
+        labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
+        sc.subplots_cases(
+            cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
+            fname='all-Ra' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
+            includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td.T[ii],
+        )
 
 # compare 64 and 129 resolution for Ra=3e7
 # fig, ax = sc.case_subplots(

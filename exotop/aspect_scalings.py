@@ -1256,7 +1256,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
 
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, data_path=data_path_bullard,
-                        fig_path=fig_path_bullard, load='auto', Ra_i=False,
+                        fig_path=fig_path_bullard, load='auto', Ra_i=False, compare_exponent=None,
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
                         postprocess_functions=[], xlim=None, ylim=None, legloc=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
@@ -1342,6 +1342,10 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                             print('d_compare[Ra_i]', d_compare['Ra_i'])
                             print('d_compare[keys]', d_compare[keys])
                             raise e
+                if compare_exponent is not None:
+                    for k, key in enumerate(keys):
+                        axes[k].plot(plot_data['Ra'], np.array(plot_data['Ra'])**compare_exponent[k],
+                                     label=key+'^'+str(compare_exponent[k]), c='k', lw=1)
 
         for k, key in enumerate(keys):
             xlabel = ''
