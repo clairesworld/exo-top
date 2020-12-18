@@ -12,8 +12,8 @@ load = True
 sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu'], data_path=data_path,
                        fig_path=fig_path, load=load, save=True, fname='Nu-compare', xlim=(1e5, 2e8),
                        ylim=[(None)], labelsize=14,
-                       ylabels=['Nu'], psuffixes=['_Nu'],
-                       postprocess_functions=[sc.Nu_at_ts], Ra_i=True,
+                       ylabels=['Nu'], psuffixes=['_Nu', '_T'],
+                       postprocess_functions=[sc.Nu_at_ts, sc.T_parameters_at_sol], Ra_i=True,
                        compare_label='', compare_pub=sc.moresi95, compare_exponent=[1/3],
                        # compare_data=[([10**10.0102, 10**11.9857, 10**14.0175], [2.54284, 2.10300, 1.73935]), # d_eta 1e5
                        #               (), (), ()],
