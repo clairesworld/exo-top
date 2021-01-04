@@ -9,20 +9,17 @@ def topography(pl, C='a_rh', **kwargs):
 
     pl.dyn_top_rms = dyn_topo_aspect(pl, **kwargs)
     pl.dyn_top_KH = dyn_topo_KH(pl)
-    pl.dyn_top_isoviscous = dyn_topo_Lees(pl)
+    pl.dyn_top_rms_isoviscous = dyn_topo_Lees(pl)
     
     return pl
 
 
-def dyn_topo_aspect(pl, dimensionalise=True, **kwargs):
-    delta_rh = pl.TBL_u/pl.d_m
-    deltaT_rh = pl.T_rh/pl.deltaT_m
+def dyn_topo_aspect(pl, **kwargs):
+    delta_rh = pl.TBL_u
+    deltaT_rh = pl.T_rh
     alpha_m = pl.alpha_m
-    h_prime = 193.319918227 * (delta_rh*deltaT_rh*alpha_m)**0.609486881111
-    if dimensionalise:
-        return h_prime*pl.deltaT_m*pl.d_m*alpha_m
-    else:
-        return h_prime
+    h_prime = 2.73 * (delta_rh*deltaT_rh*alpha_m)
+    return h_prime
 
 
 def dyn_topo_KH(pl=None, Ra_i=None, **kwargs): # Kiefer and Hager 1992 scaling

@@ -47,7 +47,7 @@ Venusbaseline_in = dict(
     nu_0 = 0.27e17, # use for constant visc case
     H_0 = 4.6e-12 # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
 )
-Venusbaseline_run = dict(T_m0=1750, T_c0=2250, D_l0=300e3, tf=4.5, visc_type='KW', complexity=3)  # model params
+Venusbaseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW', complexity=3)  # model params
 
 
 VenusHuang15_in = dict(
