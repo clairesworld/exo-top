@@ -1,8 +1,5 @@
-import sys
+""" ASPECT runs: functions for bulk postprocessing, storing/loading data, extracting scaling relationships, and plotting """
 
-sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop import aspect_postprocessing2 as post
-from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, colourbar
 import numpy as np
 import pandas as pd
 import pickle as pkl
@@ -14,6 +11,10 @@ import matplotlib.patches as patches
 import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm, Normalize
 # from sklearn import linear_model
+import sys
+sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+from exotop import aspect_postprocessing2 as post  # noqa: E402
+from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, colourbar  # noqa: E402
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'

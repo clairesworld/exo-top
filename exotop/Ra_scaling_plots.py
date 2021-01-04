@@ -1,11 +1,13 @@
+""" ASPECT runs: plot scalings of various parameters vs. Ra """
+
 import sys
-
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+from exotop import aspect_scalings as sc  # noqa: E402
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, c_regimes_td, fig_fmt, \
-    regime_grid_td, regime_names_td, load_grid, alpha_m, p_Earth
-from exotop import aspect_scalings as sc
+    regime_grid_td, regime_names_td, load_grid, alpha_m, p_Earth  # noqa: E402
 
-load = True
+
+load = load_grid
 
 # compare to Nu^1/3
 
@@ -20,7 +22,7 @@ sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu'], dat
                        fig_fmt=fig_fmt, cmap='winter', fit=True)
 
 
-# # compare scalings of other output parameters with Ra
+# compare scalings of other output parameters with Ra
 
 sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'delta_0', 'T_i'], data_path=data_path,
                        fig_path=fig_path, load=load, save=True, fname='delta-Nu-Ti', xlim=(1e5, 2e8),
@@ -32,7 +34,7 @@ sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1=t1_grid, end=end_grid, keys=['Nu', 'del
 
 
 
-# # plot scalings of chaotic time-dependence T parameters - effective Ra_i
+# plot scalings of chaotic time-dependence T parameters - effective Ra_i
 
 sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1=t1_grid[1:,4:], end=end_grid[1:,4:], keys=['delta_rh', 'dT_rh', 'Nu'], data_path=data_path,
                        fig_path=fig_path, load=load_grid[1:,4:], save=True, fname='delta_rh-Nu-chaotic-eff', xlim=(0.7e6, 4e7),
@@ -52,8 +54,8 @@ sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1=t1_grid[:,:3], end=end_grid[:,:3], 
 
 
 
-# # plot scalings of chaotic time-dependence T parameters - uncorrected Ra_i
-#
+# plot scalings of chaotic time-dependence T parameters - uncorrected Ra_i
+
 sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1=t1_grid[1:,4:], end=end_grid[1:,4:], keys=['delta_rh', 'dT_rh', 'Nu'], data_path=data_path,
                        fig_path=fig_path, load=load, save=True, fname='delta_rh-Nu-chaotic', xlim=(1e7, 2e8),
                        ylim=[(None) , (None), (None)], labelsize=14, title='Chaotic time-dependence',

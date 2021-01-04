@@ -1,15 +1,16 @@
-import sys
+""" ASPECT runs: plot scalings of h vs. Ra or T-heuristic, with subplots by eta """
 
+import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+from exotop import aspect_scalings as sc  # noqa: E402
 from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, c_regimes_td, fig_fmt, \
-    regime_grid_td, regime_names_td, load_grid, alpha_m, p_Earth
-from exotop import aspect_scalings as sc
+    regime_grid_td, regime_names_td, load_grid, alpha_m, p_Earth  # noqa: E402
+
 
 load = load_grid
 
-
 # plot h scalings - with dT_m*delta*alpha
-#
+
 sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
                          T_components=True, averagefirst=True, legloc='upper right',
                          load=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end=end_grid,
@@ -19,7 +20,8 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          regimes_title='Stationarity', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
 load = True
 
-# # same but just looking at each time point
+# same but just looking at each time point
+
 sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
                          T_components=True, averagefirst=False, legloc='upper right',
                          load=load,
@@ -29,8 +31,9 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2), logx=True, logy=True,
                          regimes_title='Stationarity', leftleg_bbox=(-0.01, 0.95), data_path=data_path)
 load = True
-#
-# # plot h scalings with Ra
+
+# plot h scalings with Ra
+
 sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
                          load=load, show_isoviscous=True, averagefirst=True, alpha_m=alpha_m,
                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14,

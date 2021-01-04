@@ -1,3 +1,5 @@
+""" ASPECT runs: setup for postprocessing, defining variables  """
+
 import numpy as np
 from matplotlib import use as matplotlibuse
 matplotlibuse('Agg')
@@ -44,4 +46,4 @@ fig_fmt = '.png'
 c_rms = 'xkcd:forest green'
 c_peak = 'xkcd:periwinkle'
 
-p_Earth = {'alpha_m':1.35e-5, 'dT_m':2700, 'd_m':2800}   # dimensionalisation factors
+p_Earth = {'alpha_m': 1.35e-5, 'dT_m': 2700, 'd_m': 2800}   # dimensionalisation factors
