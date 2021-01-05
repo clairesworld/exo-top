@@ -2,7 +2,7 @@
 
 import sys
 
-# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 sys.path.insert(0, '/home/claire/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, c_rms, c_peak, \
     c_regimes_td, fig_fmt, \
