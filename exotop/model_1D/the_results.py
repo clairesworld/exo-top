@@ -16,28 +16,28 @@ import six
 import pandas as pd
 import random as rand
 from scipy import interpolate
-
 sys.path.append("..")
-import exotop.asharms as harm
-
-
+import exotop.asharms as harm  # noqa: E402
+from exotop.useful_and_bespoke import age_index  # noqa: E402
 # np.seterr('raise')
 
 
 def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, visc_type='Thi', t_eval=None, random=False,
-                 T_m0=1750, T_c0=2250, D_l0=600e3, tf=4.5, postprocessors=None,
-                 update_kwargs=None, **kwargs):
-    """varying single parameter 'name' between mini and maxi, use default values otherwise."""
+                 initial_kwargs=None, postprocessors=None, update_kwargs=None, **kwargs):
+    """varying single parameter 'name' between mini and maxi, use default values otherwise.
+    update_kwargs can include any TerrestrialPlanet attribute
+    initial_kwargs can include T_m0, T_c0, D_l0, t0, tf"""
 
     if like is not None:
         pl_kwargs = eval('inputs.' + like + '_in')
         model_kwargs = eval('inputs.' + like + '_run')
     else:
-        pl_kwargs = {}
-        model_kwargs = dict(T_m0=T_m0, T_c0=T_c0, D_l0=D_l0, tf=tf, visc_type=visc_type)  # initial/model params
-
+        pl_kwargs = {}  # use defaults given in terrestrialplanet.py
+        model_kwargs = {}  # initial conditions defaults given in thermal.py
     if update_kwargs is not None:
         pl_kwargs.update(update_kwargs)
+    if initial_kwargs is not None:
+        model_kwargs.update(initial_kwargs)
 
     planets = []
     ii = 0
@@ -543,8 +543,7 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
             try:
                 for ip, pl in enumerate(lplanets):  # planets to plot as line
                     t = pl.t
-                    it = min(enumerate(t), key=lambda x: abs(snap - x[1] * parameters.sec2Gyr))[
-                        0]  # get time index nearest to desired snap given in Gyr
+                    it = age_index(t, snap, parameters.sec2Gyr)
                     data_x = eval('pl.' + xparam) * xlabels[1]
                     if isinstance(data_x, Iterable):
                         data_x = data_x[it]  # if an evolution model then take certain snap
@@ -614,14 +613,13 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
                                   fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
                                   pl_baseline=None, **kwargs):
     if x_vars is None:
-        x_vars = ['age', 'M_p', 'CMF', 'H', 'Ea']
+        x_vars = ['age', 'M_p', 'CMF', 'H0', 'Ea']
     if axes is None:
         fig, axes = plt.subplots(1, len(x_vars), figsize=(4 * len(x_vars), 4), sharey=True)
 
     model_baseline = eval('pl_baseline.' + model_param)
 
-    # get time index nearest to desired snap given in Gyr
-    it = min(enumerate(pl_baseline.t), key=lambda x: abs(age - x[1] * parameters.sec2Gyr))[0]
+    it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
     model_baseline = model_baseline[it]
     i_ax = 0
 
@@ -710,6 +708,7 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
                     horizontalalignment='right',
                     verticalalignment='top',
                     transform=ax.transAxes)
+
     for ax in axes:
         ax.xaxis.set_tick_params(width=tickwidth)
         ax.yaxis.set_tick_params(width=tickwidth)
@@ -747,15 +746,19 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol',
     # pl0 = oceans.max_ocean(pl0, phi0=phi0, vol_ref=1, age=age, **kwargs)
 
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0,
-                                              label_l=None, c=c, ylabel=ylabel, age=age, h_rms0=h_rms0,
+                                              label_l=None, c=c, ylabel=ylabel, age=age, h_rms0=h_rms0, legsize=legsize,
                                               postprocessors=['topography', 'ocean_capacity'], phi0=phi0, **kwargs)
 
     # how does actual vol scale assuming constant mass fraction of surface water (bad assumption)?
     mass_ax = axes[1]
     rho_w = 1000
-    X0 = rho_w * pl0.max_ocean[-1] / pl0.M_p  # mass fraction of water
-    masses = np.linspace(*mass_ax.get_xlim())
-    mass_ax.plot(masses, masses*X0, c='#749af3', alpha=1, lw=4, zorder=0,
+    vol_0 = pl0.max_ocean[-1]
+    M_w0 = rho_w * vol_0
+    X0 = M_w0 / pl0.M_p  # mass fraction of sfc water in kg/kg
+    masses = np.linspace(*mass_ax.get_xlim())  # mass in M_E
+    M_w = masses * parameters.M_E * X0  # mass of sfc water in kg
+    vol_w = M_w/rho_w  # volume of surface water if same mass fraction
+    mass_ax.plot(masses, vol_w/vol_0, c='#749af3', alpha=1, lw=4, zorder=0,
                  label='Relative water budget')
 
     # title and legend
@@ -766,6 +769,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol',
 
     if save:
         plot_save(fig, fname, **kwargs)
+    return fig, axes
 
 
 def read_JFR(fname='', path='benchmarks/JFR/'):

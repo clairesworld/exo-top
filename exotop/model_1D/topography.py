@@ -4,6 +4,7 @@ import numpy as np
 
 def topography(pl, **kwargs):
     # get all topography parameters for a planet (given its thermal history)
+    pl.heuristic_h = pl.TBL_u*pl.T_rh*pl.alpha_m
     pl.dyn_top_rms = dyn_topo_aspect(pl, **kwargs)
     pl.dyn_top_KH = dyn_topo_KH(pl)
     pl.dyn_top_rms_isoviscous = dyn_topo_Lees(pl)
@@ -12,10 +13,7 @@ def topography(pl, **kwargs):
 
 
 def dyn_topo_aspect(pl, **kwargs):
-    delta_rh = pl.TBL_u
-    deltaT_rh = pl.T_rh
-    alpha_m = pl.alpha_m
-    h_prime = 2.73 * (delta_rh*deltaT_rh*alpha_m)  # fit to chaotic regime
+    h_prime = 2.73 * pl.heuristic_h  # fit to chaotic regime
     return h_prime
 
 

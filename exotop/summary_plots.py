@@ -1,9 +1,9 @@
 import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid_td, \
+from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid_td, \
     load_grid, alpha_m
 # from exotop import aspect_postprocessing2 as asp
-from exotop import aspect_scalings as sc
+from exotop.postaspect import aspect_scalings as sc
 
 # ## process all
 # sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_Nu', '_h'],

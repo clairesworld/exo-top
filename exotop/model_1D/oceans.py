@@ -1,16 +1,16 @@
 from . import parameters
 import numpy as np
 import sys
-
 sys.path.append("..")
-import exotop.asharms as harm
+from exotop.useful_and_bespoke import age_index  # noqa: E402
+import exotop.asharms as harm  # noqa: E402
 
 
 def max_ocean(pl, n_stats=10, age=None, name_rms='dyn_top_rms', **kwargs):
     # get time index nearest to desired snap given in Gyr
     h_rms1 = eval('pl.' + name_rms)
     if age is not None:
-        it = min(enumerate(pl.t), key=lambda x: abs(age - x[1] * parameters.sec2Gyr))[0]
+        it = age_index(pl.t, age, parameters.sec2Gyr)
         it = range(it, it + 1)
     else:
         it = range(len(pl.t))

@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm, Normalize
 # from sklearn import linear_model
 import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop import aspect_postprocessing2 as post  # noqa: E402
+from exotop.postaspect import aspect_postprocessing2 as post  # noqa: E402
 from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, colourbar  # noqa: E402
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
@@ -425,6 +425,7 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
         df['h_components'] = h_components
         pkl.dump(df, open(data_path + 'output-' + case + '/pickle/' + case + psuffix + fend, 'wb'))
 
+    print('alpha_m', alpha_m)
     return h_components
 
 

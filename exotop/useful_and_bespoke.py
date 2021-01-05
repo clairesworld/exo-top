@@ -90,3 +90,9 @@ def colourbar(mappable, vmin=None, vmax=None, label='', labelsize=16, ticks=None
     if ticklabels is not None:
         cbar.ax.set_yticklabels(ticklabels, rotation=rot)
     return cbar
+
+
+def age_index(times, age, age_scale=1):
+    # get index of age in times with optional scaling for age
+    return min(enumerate(times), key=lambda x: abs(age - x[1] * age_scale))[0]
+

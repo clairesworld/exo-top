@@ -184,9 +184,11 @@ def LHS(t, y, pl=None, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
         return [dTdt_m, dTdt_c, 0]
 
 
-def solve(pl, t0=0, tf=None, T_m0=None, T_c0=None, D_l0=None, complexity=3, t_eval=None, **kwargs):
+def solve(pl, t0=0, tf=4.5, T_m0=1750, T_c0=2250, D_l0=100e3, complexity=3, t_eval=None, verbose=False, **kwargs):
     # scale any model input values as necessary
-    t0 = t0*1e9*p.years2sec
+    if verbose:
+        print('Solving 1D thermal history with T_m0 =', T_m0, 'K, T_c0 =', T_c0, 'K, D_l0 =', D_l0, 'm, tf =', tf, 'Gyr')
+    t0 = t0*1e9*p.years2sec  # input times in Gyr
     tf = tf*1e9*p.years2sec
     if complexity==1:
         T_c0 = T_m0
