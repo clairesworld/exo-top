@@ -2,11 +2,8 @@
 from . import parameters as p
 import numpy as np
 
-def topography(pl, C='a_rh', **kwargs):
+def topography(pl, **kwargs):
     # get all topography parameters for a planet (given its thermal history)
-    if C=='a_rh':
-        C = pl.a_rh
-
     pl.dyn_top_rms = dyn_topo_aspect(pl, **kwargs)
     pl.dyn_top_KH = dyn_topo_KH(pl)
     pl.dyn_top_rms_isoviscous = dyn_topo_Lees(pl)
@@ -18,7 +15,7 @@ def dyn_topo_aspect(pl, **kwargs):
     delta_rh = pl.TBL_u
     deltaT_rh = pl.T_rh
     alpha_m = pl.alpha_m
-    h_prime = 2.73 * (delta_rh*deltaT_rh*alpha_m)
+    h_prime = 2.73 * (delta_rh*deltaT_rh*alpha_m)  # fit to chaotic regime
     return h_prime
 
 
@@ -30,7 +27,7 @@ def dyn_topo_KH(pl=None, Ra_i=None, **kwargs): # Kiefer and Hager 1992 scaling
 
 def dyn_topo_Lees(pl=None, F=None, rho_m=None, rho_w=0, alpha_m=None, eta_m=None, kappa_m=None, g_sfc=None, l=None,
              k_m=None, C=5.4, deltaT_m = None, **kwargs):
-    # root mean square dynamic topography
+    # root mean square dynamic topography from isoviscous model
     
     if pl is not None:
         rho_m = pl.rho_m
@@ -53,38 +50,11 @@ def dyn_topo_Lees(pl=None, F=None, rho_m=None, rho_w=0, alpha_m=None, eta_m=None
    # print('original value', C*rho_m/(rho_m-rho_w) * ((alpha_m*F[-1]*eta_m[-1]*kappa_m)/(rho_m*g_sfc*k_m))**(1/2))
 
     Ra_F = g_sfc * rho_m * alpha_m * l**4 * F / (kappa_m * k_m * eta_m)
-
-    
     #Ra_F = a_rh*dT_rh/(dT_m*Ra_crit**(1/3)) * Ra**(4/3)   
 
     RMS = C* eta_m*kappa_m / (rho_m*g_sfc*l**2) * (Ra_F)**(1/2) # eqn 33 Parsons & Daly
     RMS = C*rho_m/(rho_m-rho_w) * ((alpha_m*F*eta_m*kappa_m)/(rho_m*g_sfc*k_m))**(1/2)
     #RMS = C * alpha_m * l * (a_rh*dT_m*dT_rh / Ra_crit**(1/3))**(1/2) * Ra**(-1/3) # Ra version
-    
-#     print('RMS', RMS[-1])
-    
-#     if pl is not None:
-#         print('going into module')
-#         Ea = pl.Ea
-#         T_m = pl.T_m
-#         l = pl.d_m
-#         Ra_i = pl.Ra_i
-#         Ra_crit_u = pl.Ra_crit_u
-#         dT_m = pl.deltaT_m
-#         dT_rh = p.R_b*T_m**2/Ea
-
-#         print('C=', C)
-#         print('alpha_m', alpha_m)
-#         print('dT_rh', dT_rh[-1])
-#         print('dT_m', dT_m[-1])
-#         print('l', l[-1])
-#         print('Ra_i', Ra_i[-1])
-#         print('Ra_crit', Ra_crit_u)
-#         print('T_m', T_m[-1])
-#         print('Ea', Ea)
-#         print('RMS', RMS[-1])
-        
-#         print('RMS, Ra version', C*alpha_m*l[-1]*(a_rh*dT_rh[-1]*dT_m[-1]/Ra_crit_u**(1/3))**0.5 * Ra_i[-1]**(-1/3))
     return RMS
 
 

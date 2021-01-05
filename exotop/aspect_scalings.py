@@ -2061,7 +2061,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                 except KeyError as e:  # e.g. no h at solutions yet
                     print('    Catching KeyError:', e)
     x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
-    print('x_data:', x_data, '(n =', len(x_data), ')')
+    print('x_data: min', np.min(x_data), 'max', np.max(x_data), '(n =', len(x_data), ')')
     expon, const = fit_log(x_data, h_data, weights=None, **kwargs)
     xprime = np.linspace(np.min(x_data), np.max(x_data))
     h_fit = const * np.array(x_data) ** expon

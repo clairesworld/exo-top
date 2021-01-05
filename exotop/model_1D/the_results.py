@@ -3,7 +3,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from . import inputs as ins
+import sys
+from . import inputs
 from . import terrestrialplanet as tp
 from . import parameters
 from . import thermal
@@ -16,6 +17,8 @@ import pandas as pd
 import random as rand
 from scipy import interpolate
 
+sys.path.append("..")
+import exotop.asharms as harm
 
 
 # np.seterr('raise')
@@ -53,14 +56,15 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, visc_type='Thi
     return planets
 
 
-def build_planet_from_id(ident='Earthbaseline', run_args=None, update_args=None, postprocessors=None, t_eval=None):
+def build_planet_from_id(ident='Earthbaseline', run_args=None, update_args=None, postprocessors=None, t_eval=None,
+                         **kwargs):
     planet_kwargs = eval('inputs.' + ident + '_in')
     model_kwargs = eval('inputs.' + ident + '_run')
     if run_args is not None:
         model_kwargs.update(run_args)
     if update_args is not None:
         planet_kwargs.update(update_args)
-    pl = build_planet(planet_kwargs, model_kwargs, postprocessors, t_eval)
+    pl = build_planet(planet_kwargs, model_kwargs, postprocessors, t_eval, **kwargs)
     return pl
 
 
@@ -441,19 +445,6 @@ def Tl_from_Tmean(R_c=None, R_l=None, R_p=None, T_avg=None, T_s=None, a0=None, k
                    4 * R_l ** 4 - 4 * R_l ** 3 * R_p - 3 * R_l ** 2 * R_p ** 2 + 2 * R_l * R_p ** 3 + R_p ** 4))
 
 
-def powerspectrum_RMS(path, amplitude=False):  # try to calcuate RMS from digitized power spectrum
-    df = pd.read_csv(path, header=None, names=['degree', 'value'], index_col=False)
-    ls = np.array(df['degree'])
-    S = np.array(df['value'])
-    RMS_l = []
-    for ii, l in enumerate(ls):
-        val = np.sqrt(S[ii] / (2 * l + 1))
-        if amplitude:
-            val = val ** 2
-        RMS_l.append(val)
-    return sum(RMS_l)
-
-
 def eta_from_Ra(rho=None, g=None, alpha=None, dT=None, d=None, kappa=None, Ra=None):
     return rho * g * alpha * dT * d ** 3 / (kappa * Ra)
 
@@ -598,8 +589,8 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
         if legend:
             if legendtop:
                 legend = ax.legend(frameon=False, fontsize=legsize,
-                                       borderaxespad=0, title=legtitle,  # mode="expand",
-                                       loc='lower left', bbox_to_anchor=(0.0, 1.01), ncol=2, )
+                                   borderaxespad=0, title=legtitle,  # mode="expand",
+                                   loc='lower left', bbox_to_anchor=(0.0, 1.01), ncol=2, )
             else:
                 legend = ax.legend(frameon=False, fontsize=legsize, loc='upper left',
                                    bbox_to_anchor=(1.05, 0.9),
@@ -618,27 +609,28 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
     return fig, axes
 
 
-def plot_change_with_observeables(plots_save=False, defaults='Earthbaseline', fname='fig', fig_path='figs/', wspace=None,
-                    age=4.5, ftype='png', x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ',
-                    fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
-                    pl_baseline=None, **plot_kwargs):
+def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidth=1,
+                                  age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ',
+                                  fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
+                                  pl_baseline=None, **kwargs):
     if x_vars is None:
         x_vars = ['age', 'M_p', 'CMF', 'H', 'Ea']
     if axes is None:
-        fig, axes = plt.subplots(1, len(x_vars), figsize=(4 * len(x_vars), 4), sharey=True
-                                 )
+        fig, axes = plt.subplots(1, len(x_vars), figsize=(4 * len(x_vars), 4), sharey=True)
 
-    h_baseline = eval('pl_baseline.' + model_param)
+    model_baseline = eval('pl_baseline.' + model_param)
+
     # get time index nearest to desired snap given in Gyr
     it = min(enumerate(pl_baseline.t), key=lambda x: abs(age - x[1] * parameters.sec2Gyr))[0]
+    model_baseline = model_baseline[it]
     i_ax = 0
 
     if 'age' in x_vars:
         # time/age variation
         fig, ax = plot_vs_x(legend=legend, legsize=legsize,
                             lplanets=pl_baseline, xname={'t': ('Age (Gyr)', parameters.sec2Gyr)}, set_xlim=True,
-                            ynames={model_param: (ylabel, h_baseline[it] ** -1)}, ylabel=True,
-                            plots_save=False, fig=fig, axes=axes[i_ax], xmin=1.5, xmax=4.5, **plot_kwargs)
+                            ynames={model_param: (ylabel, model_baseline ** -1)}, ylabel=True,
+                            plots_save=False, fig=fig, axes=axes[i_ax], xmin=1.5, xmax=4.5, **kwargs)
         ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
         if legend:
             ax.text(0.95, 0.95,
@@ -652,11 +644,11 @@ def plot_change_with_observeables(plots_save=False, defaults='Earthbaseline', fn
     if 'M_p' in x_vars:
         # mass variation
         planets_mass = bulk_planets(n=50, name='M_p', mini=0.1 * parameters.M_E, maxi=6 * parameters.M_E, like=defaults,
-                                    t_eval=pl_baseline.t, random=False)
+                                    t_eval=pl_baseline.t, random=False, **kwargs)
         fig, ax = plot_vs_x(
             lplanets=planets_mass, xname={'M_p': ('$M_p$ ($M_E$)', parameters.M_E ** -1)},
-            ynames={model_param: ('', h_baseline ** -1)}, snap=age,
-            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=False, **plot_kwargs)
+            ynames={model_param: ('', model_baseline ** -1)}, snap=age,
+            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=False, **kwargs)
         ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
         if legend:
             ax.text(0.95, 0.95, str(age) + ' Gyr \n 0.3 CMF \n 4.6 pW kg$^{-1}$', fontsize=legsize,
@@ -668,11 +660,11 @@ def plot_change_with_observeables(plots_save=False, defaults='Earthbaseline', fn
     if 'CMF' in x_vars:
         # CMF variation
         planets_CMF = bulk_planets(n=50, name='CMF', mini=0.07829, maxi=0.544, like=defaults, t_eval=pl_baseline.t,
-                                   random=False)
+                                   random=False, **kwargs)
         fig, ax = plot_vs_x(
             lplanets=planets_CMF, xname={'CMF': ('Core Mass Fraction', 1)},
-            ynames={model_param: ('', h_baseline ** -1)}, snap=age,
-            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=False, **plot_kwargs)
+            ynames={model_param: ('', model_baseline ** -1)}, snap=age,
+            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=False, **kwargs)
         ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
         if legend:
             ax.text(0.95, 0.95,
@@ -687,11 +679,11 @@ def plot_change_with_observeables(plots_save=False, defaults='Earthbaseline', fn
     if 'H0' in x_vars:
         # H0 variation
         planets_H0 = bulk_planets(n=50, name='H_0', mini=1e-12, maxi=10e-12, like=defaults, t_eval=pl_baseline.t,
-                                  random=False)
+                                  random=False, **kwargs)
         fig, ax = plot_vs_x(xmin=0.3, xmax=10.3, set_xlim=True,
                             lplanets=planets_H0, xname={'H_0': ('$H$ (pW kg$^{-1}$)', 1e12)},
-                            ynames={model_param: ('', h_baseline ** -1)}, snap=age,
-                            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=False, **plot_kwargs)
+                            ynames={model_param: ('', model_baseline ** -1)}, snap=age,
+                            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=False, **kwargs)
         ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
         if legend:
             ax.text(0.95, 0.95,
@@ -705,11 +697,11 @@ def plot_change_with_observeables(plots_save=False, defaults='Earthbaseline', fn
     if 'Ea' in x_vars:
         # Ea variation
         planets_Ea = bulk_planets(n=50, name='Ea', mini=250e3, maxi=400e3, like=defaults, t_eval=pl_baseline.t,
-                                  random=False)
+                                  random=False, **kwargs)
         fig, ax = plot_vs_x(xmin=250, xmax=400, set_xlim=True,
                             lplanets=planets_Ea, xname={'Ea': ('$E_a$ (kJ mol$^{-1}$)', 1e-3)},
-                            ynames={model_param: ('', h_baseline ** -1)}, snap=age,
-                            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=False, **plot_kwargs)
+                            ynames={model_param: ('', model_baseline ** -1)}, snap=age,
+                            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=False, **kwargs)
         ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
         if legend:
             ax.text(0.95, 0.95,
@@ -718,57 +710,68 @@ def plot_change_with_observeables(plots_save=False, defaults='Earthbaseline', fn
                     horizontalalignment='right',
                     verticalalignment='top',
                     transform=ax.transAxes)
-
+    for ax in axes:
+        ax.xaxis.set_tick_params(width=tickwidth)
+        ax.yaxis.set_tick_params(width=tickwidth)
     plt.subplots_adjust(wspace=wspace)
-    if plots_save:
-        plt.savefig(fig_path + fname + '.' + ftype, bbox_inches='tight')
     return fig, axes
 
 
-def plot_h_relative_multi(defaults='Earthbaseline', plots_save=False, fig_path='figs/', fname='relative_h', ftype='png',
-                          models=None, labels=None, c=None, fig=None, axes=None, tickwidth=1, age=4.5, **plot_kwargs):
+def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_h',
+                          models=None, labels=None, c=None, fig=None, axes=None, age=4.5,
+                          ylabel='$\Delta h$ / $\Delta h_0$  ', **kwargs):
     pl_baseline = bulk_planets(n=1, name='M_p', mini=1 * parameters.M_E, maxi=1 * parameters.M_E, like=defaults,
-                               t_eval=None, random=False)[0]
-
+                               postprocessors=['topography'], t_eval=None, random=False)[0]
     legend = False
     for ii, h_param in enumerate(models):
         if ii == len(models) - 1:
             legend = True
         fig, axes = plot_change_with_observeables(defaults=defaults, fig=fig, axes=axes, model_param=models[ii],
                                                   legend=legend, pl_baseline=pl_baseline, label_l=labels[ii], c=c[ii],
-                                                  **plot_kwargs)
+                                                  age=age, ylabel=ylabel, **kwargs)
 
-    for ax in axes:
-        ax.xaxis.set_tick_params(width=tickwidth)
-        ax.yaxis.set_tick_params(width=tickwidth)
+    if save:
+        plot_save(fig, fname, **kwargs)
 
-    if plots_save:
-        fig.savefig(fig_path + fname + '.' + ftype, bbox_inches='tight', rasterized=True, dpi=600)
     return fig, axes
 
 
-def plot_ocean_capacity_relative(n_stats=1000, wspace=0.5, fig_path='figs/', snap=4.5, legsize=16, fname='ocean_vol',
-                ftype='png', titlesize=24, plots_save=False, spectrum_fname='', spectrum_fpath='', c='#81f79f', title='',
-                defaults='Venusbaseline', **plot_kwargs):
+def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol',
+                                 titlesize=24, save=False, spectrum_fname='', spectrum_fpath='', c='#81f79f', title='',
+                                 defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
+    phi0 = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
+    h_rms0 = harm.powerspectrum_RMS(power_lm=phi0)
     pl0 = bulk_planets(n=1, name='M_p', mini=1 * parameters.M_E, maxi=1 * parameters.M_E, like=defaults, t_eval=None,
-                       random=False)[0]
-    pl0.max_ocean = ocean_vol_from_spectrum(spectrum_fname, spectrum_fpath=spectrum_fpath, n_stats=n_stats)
+                       random=False, phi0=phi0, h_rms0=h_rms0, postprocessors=['topography', 'ocean_capacity'], **kwargs)[0]
+    # v0 = harm.vol_from_spectrum(phi0=phi0, r0=pl0.R_p, **kwargs)
+    # pl0 = oceans.max_ocean(pl0, phi0=phi0, vol_ref=1, age=age, **kwargs)
 
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0,
-                                              label_l=None, c=c, **plot_kwargs)
+                                              label_l=None, c=c, ylabel=ylabel, age=age, h_rms0=h_rms0,
+                                              postprocessors=['topography', 'ocean_capacity'], phi0=phi0, **kwargs)
 
-    # how does ocean volume scale assuming constant mass fraction?
+    # how does actual vol scale assuming constant mass fraction of surface water (bad assumption)?
+    mass_ax = axes[1]
     rho_w = 1000
-    X = rho_w*pl0.max_ocean/pl0.M_p # mass fraction of water
-    M_p_list = np.linspace(0.01*parameters.M_E, 6*parameters.M_E)
-    axes[1].plot(M_p_list/4.867e24, M_p_list/pl0.M_p, c='#749af3', alpha=1, lw=4, zorder=0,
+    X0 = rho_w * pl0.max_ocean[-1] / pl0.M_p  # mass fraction of water
+    masses = np.linspace(*mass_ax.get_xlim())
+    mass_ax.plot(masses, masses*X0, c='#749af3', alpha=1, lw=4, zorder=0,
                  label='Relative water budget')
 
     # title and legend
-    legend = axes[1].legend(frameon=False, fontsize=legsize,
-                 borderaxespad=0, #mode="expand",
-                 loc='lower left', bbox_to_anchor= (1.6, 1.01), ncol=1)
+    legend = mass_ax.legend(frameon=False, fontsize=legsize,
+                            borderaxespad=0,  # mode="expand",
+                            loc='lower left', bbox_to_anchor=(1.6, 1.01), ncol=1)
     fig.suptitle(title, fontsize=titlesize, y=1.1, x=0.365)
 
-    if plots_save:
-        fig.savefig(fig_path + fname + '.' + ftype, bbox_inches='tight', rasterized=True, dpi=600)
+    if save:
+        plot_save(fig, fname, **kwargs)
+
+
+def read_JFR(fname='', path='benchmarks/JFR/'):
+    df = pd.read_csv(path + fname, header=0, index_col=False)
+    Ra = np.array(df.Ra)
+    h_peak = np.array(df.peak_topo)
+    h_rms = np.array(df.RMS_topo)
+    Nu = np.array(df.Nu)
+    return Ra, h_peak, h_rms, Nu

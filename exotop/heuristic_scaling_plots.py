@@ -8,7 +8,7 @@ from exotop.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_p
 from exotop import aspect_scalings as sc  # noqa: E402
 
 
-load = load_grid
+load = True #load_grid
 
 # heuristic scalings master
 
