@@ -30,8 +30,8 @@ def scale_spectrum(h_rms, h_rms0=None, phi0=None, pl=None, pl0=None, h_func=None
         # here you are trying to scale dynamic topography spectrum by ratio of h_rms derived from known 1D params
         # get time index nearest to desired snap given in Gyr
         # it = min(enumerate(pl_baseline.t), key=lambda x: abs(age - x[1] * parameters.sec2Gyr))[0]
-        # ratio = (pl.d_m * pl.T_m ** 2 * pl.Ra_i ** (-1 / 3)) / (
-        #         pl0.d_m * pl0.T_m ** 2 * pl0.Ra_i ** (-1 / 3))  # = phi / phi0
+        # ratio = (pl.d_m * pl.T_m ** 2 * pl.Ra_i_eff ** (-1 / 3)) / (
+        #         pl0.d_m * pl0.T_m ** 2 * pl0.Ra_i_eff ** (-1 / 3))  # = phi / phi0
         # ratio = ratio[it]
     if h_rms0 is None:
         h_rms0 = powerspectrum_RMS(power_lm=phi0)  # I hope this is a power spectrum, but this probably needs to be multipled by R or something

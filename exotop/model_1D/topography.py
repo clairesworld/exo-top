@@ -4,7 +4,7 @@ import numpy as np
 
 def topography(pl, **kwargs):
     # get all topography parameters for a planet (given its thermal history)
-    pl.heuristic_h = pl.TBL_u*pl.T_rh*pl.alpha_m
+    pl.heuristic_h = pl.delta_rh * pl.dT_rh * pl.alpha_m
     pl.dyn_top_rms = dyn_topo_aspect(pl, **kwargs)
     pl.dyn_top_KH = dyn_topo_KH(pl)
     pl.dyn_top_rms_isoviscous = dyn_topo_Lees(pl)
@@ -19,7 +19,7 @@ def dyn_topo_aspect(pl, **kwargs):
 
 def dyn_topo_KH(pl=None, Ra_i=None, **kwargs): # Kiefer and Hager 1992 scaling
     if pl is not None:
-        Ra_i = pl.Ra_i
+        Ra_i = pl.Ra_i_eff
     return 66*Ra_i**-0.121
                 
 
@@ -36,14 +36,14 @@ def dyn_topo_Lees(pl=None, F=None, rho_m=None, rho_w=0, alpha_m=None, eta_m=None
         g_sfc = pl.g_sfc
         k_m = pl.k_m
         l = pl.d_m
-        dT_m = pl.deltaT_m
+        dT_m = pl.dT_m
         T_m = pl.T_m
         Ea = pl.Ea
         Ra_crit = pl.Ra_crit_u
         dT_rh = p.R_b*T_m**2/Ea
-        TBL_u = pl.TBL_u
+        TBL_u = pl.delta_rh
         a_rh = pl.a_rh
-        Ra = pl.Ra_i
+        Ra = pl.Ra_i_eff
     
    # print('original value', C*rho_m/(rho_m-rho_w) * ((alpha_m*F[-1]*eta_m[-1]*kappa_m)/(rho_m*g_sfc*k_m))**(1/2))
 
@@ -71,5 +71,5 @@ def convective_stress(pl=None, where='lid', rho_m=None, alpha_m=None, g_sfc=None
         k_m = pl.k_m
         T_m = pl.T_m
         Ea = pl.Ea
-        d_bl = pl.TBL_u
+        d_bl = pl.delta_rh
     return C* rho_m*alpha_m*g_sfc*(p.R_b*T_m**2/Ea)**2 * k_m/q_ubl

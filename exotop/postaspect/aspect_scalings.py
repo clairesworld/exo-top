@@ -39,7 +39,7 @@ def read_topo_stats(case, ts, data_path=data_path_bullard):
 
 def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None, at_sol=True,
              data_path=data_path_bullard, fend='.pkl', **kwargs):
-    # do pickling strategy
+    # do pickling strategy. only saving processed data for runs in quasi-steady state (past their t1 value)
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     df = pd.DataFrame()

@@ -125,3 +125,29 @@ class TerrestrialPlanet():
         self_args.update(kwargs)
         new = TerrestrialPlanet(self_args)
         return new
+
+    def nondimensionalise(self, **kwargs):
+        # set natural scales
+        T = np.maximum(self.T_c, self.T_m) - self.T_s  # fucked for cases where T_c < T_m
+        L = self.R_p - self.R_c
+
+        self.dT_m_prime = self.dT_m/T
+        self.dT_rh_prime = self.dT_rh/T
+        self.T_l_prime = self.T_l/T
+
+        self.d_m_prime = self.d_m/L
+        self.D_l_prime = self.D_l/L
+        self.delta_rh_prime = self.delta_rh/L
+
+        self.alpha_m_prime = 1
+        self.rho_m_prime = 1
+        self.g_sfc_prime = 1
+        self.k_m_prime = 1
+        self.kappa_m_prime = 1
+
+        # Ra = self.rho_m*self.g_sfc*self.alpha_m*T*L**3 / (self.kappa_m*self.eta_m)
+        # self.eta_m_prime = self.rho_m_prime*self.g_sfc_prime*self.alpha_m_prime/(self.kappa_m_prime*Ra) # from Ra
+        self.dyn_top_rms_prime = self.dyn_top_rms/(self.alpha_m_prime*T*L)
+        self.heuristic_h_prime = self.heuristic_h/(self.alpha_m_prime*T*L)
+
+        # incomplete

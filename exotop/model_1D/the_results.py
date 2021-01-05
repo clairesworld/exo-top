@@ -68,7 +68,7 @@ def build_planet_from_id(ident='Earthbaseline', run_args=None, update_args=None,
     return pl
 
 
-def build_planet(planet_kwargs, model_kwargs, postprocessors=None, t_eval=None, **kwargs):
+def build_planet(planet_kwargs, model_kwargs, postprocessors=None, t_eval=None, nondimensional=False, **kwargs):
     if postprocessors is None:
         postprocessors = ['topography']
     pl = tp.TerrestrialPlanet(**planet_kwargs)
@@ -77,6 +77,9 @@ def build_planet(planet_kwargs, model_kwargs, postprocessors=None, t_eval=None, 
         pl = topography.topography(pl, **kwargs)
     if 'ocean_capacity' in postprocessors:
         pl = oceans.max_ocean(pl, **kwargs)
+
+    if nondimensional:
+        pl.nondimensionalise()
     return pl
 
 
@@ -145,7 +148,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
             #             print('y', y)
             # if the name of the parameter you want to plot exists
             yl = str(ylabels[n][0])
-            if (par == 'eta_m') or (par == 'Ra_i'):  # always log scale for viscosity, Ra
+            if (par == 'eta_m') or (par == 'Ra_i_eff'):  # always log scale for viscosity, Ra
                 y = np.log10(y)
             plot_one(ax, t * 1e-9 / parameters.years2sec, y * ylabels[n][1], xlabel='', ylabel=yl, ticksize=ticksize,
                      labelpad=labelpad,
@@ -243,7 +246,7 @@ def snaps(pl, plot_snapshots=None, fig_path=None, plots_save=False, fformat='.pn
         ii = min(enumerate(t), key=lambda x: abs(tx - x[1] * parameters.sec2Gyr))[0]
         plot_structure(ax=axes2[iax], t=t[ii], T_m=pl.T_m[ii], T_c=pl.T_c[ii], T_s=pl.T_s,
                        T_l=pl.T_l[ii], R_l=pl.R_l[ii], R_p=pl.R_p, R_c=pl.R_c, h_rad_m=pl.h_rad_m[ii],
-                       d_lbl=pl.TBL_c[ii], d_ubl=pl.TBL_u[ii], q_ubl=pl.q_ubl[ii], a0=pl.a0[ii],
+                       d_lbl=pl.TBL_c[ii], d_ubl=pl.delta_rh[ii], q_ubl=pl.q_ubl[ii], a0=pl.a0[ii],
                        k_m=pl.k_m, legsize=10, **kwargs)
     plt.tight_layout()
     if plots_save:
@@ -575,9 +578,9 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
         ax.tick_params(axis='x', labelsize=ticksize)
 
         # log scale for viscosity
-        if (yparam[ii] is 'eta_m') or (yparam[ii] is 'nu_m') or (yparam is 'Ra_i'):
+        if (yparam[ii] is 'eta_m') or (yparam[ii] is 'nu_m') or (yparam is 'Ra_i_eff'):
             ax.set_yscale('log')
-        if (xparam is 'eta_m') or (xparam is 'nu_m') or (xparam is 'eta_0') or (xparam is 'Ra_i'):
+        if (xparam is 'eta_m') or (xparam is 'nu_m') or (xparam is 'eta_0') or (xparam is 'Ra_i_eff'):
             ax.set_xscale('log')
 
         if set_ylim:

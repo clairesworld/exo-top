@@ -173,7 +173,8 @@ def LHS(t, y, pl=None, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     else:
         dTdt_c = 0
     dTdt_m =  dTdt(-pl.Q_ubl + pl.H_rad_m + pl.Q_core, pl.M_conv, pl.c_m)
-    dDdt = lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l, rho_m=pl.rho_m,T_s=pl.T_s,
+    dDdt = lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l, rho_m=pl.rho_m,
+                      T_s=pl.T_s,
                       c_m=pl.c_m, k_m=pl.k_m, **kwargs)
 
     if complexity==3:
@@ -219,11 +220,11 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
     
     pl.R_l = pl.R_p - pl.D_l
     pl.T_l = T_lid(T_m=pl.T_m, a_rh=pl.a_rh, Ea=pl.Ea)
-    pl.T_rh = pl.a_rh*(p.R_b*pl.T_m**2/pl.Ea)
+    pl.dT_rh = pl.a_rh * (p.R_b * pl.T_m ** 2 / pl.Ea)
     V_lid = 4/3*np.pi*(pl.R_p**3 - pl.R_l**3)
     pl.M_lid = V_lid*pl.rho_m # should use another density?
     pl.M_conv = pl.M_m - pl.M_lid
-    if not hasattr(pl, 'd_m_const'):  # if exploring a constant convecting region height
+    if not hasattr(pl, 'd_m_const'):  # if not exploring a constant convecting region height
         pl.d_m = pl.R_l - pl.R_c
     else:
         pl.d_m = [pl.d_m_const]*np.ones_like(t)
@@ -239,34 +240,39 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
 #     ('upper bl')
 
     if hasattr(pl, 'dT_m_const'):
-        pl.deltaT_m = pl.dT_m_const
+        pl.dT_m = pl.dT_m_const
     else:
-        pl.deltaT_m = pl.T_c - pl.T_l
-    if (not isinstance(pl.deltaT_m, Iterable)) and (abs(pl.deltaT_m) < 1e-9):
+        pl.dT_m = pl.T_c - pl.T_l
+    if (not isinstance(pl.dT_m, Iterable)) and (abs(pl.dT_m) < 1e-9):
 #         print('catching small dT', pl.T_c, '-', pl.T_l)
-        pl.deltaT_m = pl.T_m - pl.T_l
-    if (not isinstance(pl.deltaT_m, Iterable)) and (pl.deltaT_m < 0):
-        pl.deltaT_m = 1e-5
+        pl.dT_m = pl.T_m - pl.T_l
+    if (not isinstance(pl.dT_m, Iterable)) and (pl.dT_m < 0):
+        pl.dT_m = 1e-5
         
-    pl.Ra_i = Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, deltaT=abs(pl.deltaT_m), l=pl.d_m, kappa=pl.kappa_m, 
-                 alpha=pl.alpha_m)
+    pl.Ra_i_eff = Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, deltaT=abs(pl.dT_m), l=pl.d_m, kappa=pl.kappa_m,
+                     alpha=pl.alpha_m)
+
+    pl.Ra_i = Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, kappa=pl.kappa_m, alpha=pl.alpha_m,
+                 deltaT=abs(pl.dT_m) + (pl.T_l - pl.T_s),
+                 l=pl.R_p - pl.R_c)
+
     
-    if (not isinstance(pl.Ra_i, Iterable)) and (abs(pl.Ra_i) < 1e-9):
-        print('Ra', pl.Ra_i, 'eta', pl.eta_m, 'deltaT', pl.deltaT_m, 'l', pl.d_m, 'T_c - T-l', pl.T_c, '-', pl.T_l)
-    elif (not isinstance(pl.Ra_i, Iterable)) and (pl.Ra_i < 0):
-        print('NEGATIVE: Ra', pl.Ra_i, 'eta', pl.eta_m, 'deltaT', pl.deltaT_m, 'l', pl.d_m, 'T_c - T-l', pl.T_c, '-', pl.T_l)
+    if (not isinstance(pl.Ra_i_eff, Iterable)) and (abs(pl.Ra_i_eff) < 1e-9):
+        print('Ra', pl.Ra_i_eff, 'eta', pl.eta_m, 'deltaT', pl.dT_m, 'l', pl.d_m, 'T_c - T-l', pl.T_c, '-', pl.T_l)
+    elif (not isinstance(pl.Ra_i_eff, Iterable)) and (pl.Ra_i_eff < 0):
+        print('NEGATIVE: Ra', pl.Ra_i_eff, 'eta', pl.eta_m, 'deltaT', pl.dT_m, 'l', pl.d_m, 'T_c - T-l', pl.T_c, '-', pl.T_l)
             
-    pl.TBL_u = bdy_thickness_beta(d_m=pl.d_m, Ra_crit=pl.Ra_crit_u, Ra_rh = pl.Ra_i, beta=pl.beta_u, **kwargs)
+    pl.delta_rh = bdy_thickness_beta(d_m=pl.d_m, Ra_crit=pl.Ra_crit_u, Ra_rh = pl.Ra_i_eff, beta=pl.beta_u, **kwargs)
     
-    if (not isinstance(pl.TBL_u, Iterable)) and (abs(pl.TBL_u) > 1e9):
-        print('Ra', pl.Ra_i, 'eta', pl.eta_m, 'deltaT', pl.deltaT_m, 'l', pl.d_m, 'T_c - T-l', pl.T_c, '-', pl.T_l)
+    if (not isinstance(pl.delta_rh, Iterable)) and (abs(pl.delta_rh) > 1e9):
+        print('Ra', pl.Ra_i_eff, 'eta', pl.eta_m, 'deltaT', pl.dT_m, 'l', pl.d_m, 'T_c - T-l', pl.T_c, '-', pl.T_l)
     
-    pl.q_ubl = q_bl(deltaT=pl.T_m-pl.T_l, k=pl.k_m, d_bl=pl.TBL_u, beta=pl.beta_u, **kwargs)
+    pl.q_ubl = q_bl(deltaT=pl.T_m-pl.T_l, k=pl.k_m, d_bl=pl.delta_rh, beta=pl.beta_u, **kwargs)
     pl.Q_ubl = Q_bl(q=pl.q_ubl, R=pl.R_l)
-    pl.Ra_crit_c = 0.28*pl.Ra_i**0.21  
+    pl.Ra_crit_c = 0.28 * pl.Ra_i_eff ** 0.21
     
     if pl.SA_c>0: 
-        TBL_c_inv = inv_bdy_thickness(dT=pl.deltaT_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c, 
+        TBL_c_inv = inv_bdy_thickness(dT=pl.dT_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c,
                                       kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, rho_m=pl.rho_m, **kwargs)  
         if hasattr(pl, 'q_core_const'):
             pl.q_core = pl.q_core_const
