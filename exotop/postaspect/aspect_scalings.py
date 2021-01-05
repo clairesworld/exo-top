@@ -2009,18 +2009,18 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     if cbar == 'eta':
         clabel = r'$\Delta \eta$'
         cticklabels = None
-        vmin, vmax = 0.9e5, 1.1e8
+        vmin, vmax = 0.9e5, 2e8
         crot = 0
         cnorm = LogNorm()
-        discrete=False
+        discrete = False
     elif cbar == 'regime':
-        clabel = '' # 'Stationarity'
+        clabel = ''  # 'Stationarity'
         cticklabels = ['steady', 'transitional', 'chaotic']
         vmin, vmax = 1, 3
         cnorm = None
         crot = 0  # 70
         cmap = cmap_from_list(clist, cmap_name='regimes')
-        discrete=True
+        discrete = True
 
     h_data_all = []
     x_data_all = []
