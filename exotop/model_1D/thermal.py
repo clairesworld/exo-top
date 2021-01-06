@@ -1,7 +1,5 @@
 import numpy as np
 from scipy import integrate
-import six
-import math
 from . import parameters as p
 # import astroenvironment as ast
 # import geometry as geom
@@ -185,17 +183,28 @@ def LHS(t, y, pl=None, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
         return [dTdt_m, dTdt_c, 0]
 
 
+def LHS_oldwrapper(y, t, **kwargs):
+    return LHS(t, y, **kwargs)
+
+
 def solve(pl, t0=0, tf=4.5, T_m0=1750, T_c0=2250, D_l0=100e3, complexity=3, t_eval=None, verbose=False, **kwargs):
     # scale any model input values as necessary
     if verbose:
         print('Solving 1D thermal history with T_m0 =', T_m0, 'K, T_c0 =', T_c0, 'K, D_l0 =', D_l0, 'm, tf =', tf, 'Gyr')
-    t0 = t0*1e9*p.years2sec  # input times in Gyr
+    t0 = t0*1e9*p.years2sec  # convert input times to Gyr
     tf = tf*1e9*p.years2sec
     if complexity==1:
         T_c0 = T_m0
-    f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(pl=pl, tf=tf, complexity=complexity, **kwargs)), 
-                            t_span=(t0,tf), y0=[T_m0, T_c0, D_l0], t_eval=t_eval, max_step=100e6*p.years2sec,
-                            method='RK45', dense_output=False)
+    try:
+        f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(pl=pl, tf=tf, complexity=complexity, **kwargs)),
+                                t_span=(t0,tf), y0=[T_m0, T_c0, D_l0], t_eval=t_eval, max_step=100e6*p.years2sec,
+                                method='RK45', dense_output=False)
+    except AttributeError as e: # probably old scipy
+        print(e)
+        if t_eval is None:
+            t_eval = np.linspace(t0, tf, num=50)
+        f = integrate.odeint(func=LHS_oldwrapper, y0=[T_m0, T_c0, D_l0], t=t_eval, mxstep=100e6*p.years2sec,
+                             args=(pl=pl, tf=tf, complexity=complexity, **kwargs))
     
     # return planet object with iteratives for evolving variables
     pl.T_m = f.y[0] 
