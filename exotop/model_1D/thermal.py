@@ -199,19 +199,24 @@ def solve(pl, t0=0, tf=4.5, T_m0=1750, T_c0=2250, D_l0=100e3, complexity=3, t_ev
         f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(pl=pl, tf=tf, complexity=complexity, **kwargs)),
                                 t_span=(t0,tf), y0=[T_m0, T_c0, D_l0], t_eval=t_eval, max_step=100e6*p.years2sec,
                                 method='RK45', dense_output=False)
+        # return planet object with iteratives for evolving variables
+        pl.T_m = f.y[0]
+        pl.T_c = f.y[1]
+        pl.D_l = f.y[2]
+        pl.t = f.t
     except AttributeError as e: # probably old scipy
         print(e)
         if t_eval is None:
             t_eval = np.linspace(t0, tf, num=50)
         f = integrate.odeint(func=LHS_oldwrapper, y0=[T_m0, T_c0, D_l0], t=t_eval, mxstep=100e6*p.years2sec,
                              args=(pl, tf, complexity, *kwargs))
-    
-    # return planet object with iteratives for evolving variables
-    pl.T_m = f.y[0] 
-    pl.T_c = f.y[1]
-    pl.D_l = f.y[2]
-    pl.t = f.t
-    pl = recalculate(f.t, pl, tf=tf, **kwargs)
+        # return planet object with iteratives for evolving variables
+        pl.T_m = f[:,0]
+        pl.T_c = f[:,1]
+        pl.D_l = f[:,2]
+        pl.t = t_eval
+
+    pl = recalculate(pl.t, pl, tf=tf, **kwargs)
     return pl
 
 
