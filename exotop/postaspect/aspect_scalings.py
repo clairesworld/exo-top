@@ -1977,7 +1977,7 @@ def Nu_eff(gamma=None, d_m=None, delta_L=None, alpha_m=None, g=None, b=None, kap
 
 
 def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=None, end=None,
-                         data_path=data_path_bullard, **kwargs):
+                         data_path=data_path_bullard, redo=True, load_grid=None, **kwargs):
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     for jj, eta_str in enumerate(eta_ls):
@@ -1986,9 +1986,14 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
             t1_ii = t1[jj][ii]
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 print(case)
+                if redo:
+                    # for recalculating everything if you fucked up or are redoing
+                    load = False
+                else:
+                    load = load_grid[jj][ii]
                 for ip, suffix in enumerate(psuffixes):
                     pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
-                             data_path=data_path, at_sol=True, load=False, **kwargs)
+                             data_path=data_path, at_sol=True, load=load, **kwargs)
 
 
 

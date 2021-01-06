@@ -184,6 +184,7 @@ def LHS(t, y, pl=None, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
 
 
 def LHS_oldwrapper(y, t, pl, tf, complexity, *kwargs):
+    # this doesn't work fuck it
     return LHS(t, y, pl=pl, tf=tf, complexity=complexity, **kwargs)
 
 

@@ -1,14 +1,15 @@
 import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, fig_fmt, regime_grid_td, \
-    load_grid, alpha_m
-# from exotop import aspect_postprocessing2 as asp
-from exotop.postaspect import aspect_scalings as sc
+from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
+    fig_fmt, regime_grid_td, \
+    load_grid, alpha_m   # noqa: E402
+# from exotop import aspect_postprocessing2 as asp  # noqa: E402
+from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
-# ## process all
-# sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_Nu', '_h'],
-#                  postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts, sc.h_at_ts], t1=t1_grid, end=end_grid,
-#                  data_path=data_path, alpha_m=alpha_m)
+## process all
+sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_Nu', '_h'], redo=False,
+                        postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts, sc.h_at_ts], t1=t1_grid,
+                        end=end_grid, data_path=data_path, alpha_m=alpha_m, load_grid=load_grid)
 
 ## plot summaries across delta eta
 #
@@ -26,17 +27,17 @@ from exotop.postaspect import aspect_scalings as sc
 #
 ## plot summaries across Ra
 
-i_plot = list(range(len(Ra_ls)))  # range(4,5)
-for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
-    if ii in i_plot:
-        cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
-        labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
-        sc.subplots_cases(
-            cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
-            fname='all-Ra' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
-            includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td.T[ii],
-        )
+# i_plot = list(range(len(Ra_ls)))  # range(4,5)
+# for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
+#     if ii in i_plot:
+#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
+#         labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
+#         sc.subplots_cases(
+#             cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
+#             fname='all-Ra' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
+#             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
+#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td.T[ii],
+#         )
 
 # compare 64 and 129 resolution for Ra=3e7
 # fig, ax = sc.case_subplots(
@@ -70,7 +71,6 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
 # sc.pickleio(case, '_h', [sc.h_at_ts], t1=0.0590015, load=False, at_sol=True, data_path=data_path)
 # sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
 # #
-
 
 
 print('Summary plots complete')
