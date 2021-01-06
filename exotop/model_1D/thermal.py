@@ -204,7 +204,7 @@ def solve(pl, t0=0, tf=4.5, T_m0=1750, T_c0=2250, D_l0=100e3, complexity=3, t_ev
         if t_eval is None:
             t_eval = np.linspace(t0, tf, num=50)
         f = integrate.odeint(func=LHS_oldwrapper, y0=[T_m0, T_c0, D_l0], t=t_eval, mxstep=100e6*p.years2sec,
-                             args=(pl=pl, tf=tf, complexity=complexity, **kwargs))
+                             args=(pl, tf, complexity, *kwargs))
     
     # return planet object with iteratives for evolving variables
     pl.T_m = f.y[0] 
