@@ -15,8 +15,16 @@ fig_path_home = '/home/claire/Works/exo-top/exotop/figs_scratch/'
 combo.plot_h_heuristic_variations(default='Earthbaseline', x_param='M_p', x_min=0.1 * M_E, x_max=5 * M_E, y_params=None,
                                   xlabel=r'$M_p$ ($M_E$)', save=True, fig_path=fig_path_home, fig_fmt=fig_fmt,
                                   legend=True,
-                                  fname='heuristic_mass_dependence', nondimensional=True,
+                                  fname='heuristic_mass_dependence_nondim', nondimensional=True,
                                   c='xkcd:drab green', lw=3, labelsize=30, ticksize=12,
-                                  overplot_aspect_cases=['Ra3e8-eta1e8-wide-ascii', 'Ra3e8-eta1e7-wide-ascii',
-                                                         'Ra3e8-eta1e6-wide-ascii', 'Ra1e8-eta1e8-wide-ascii',
-                                                         'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e6-wide'])
+                                  # overplot_aspect_cases=['Ra3e8-eta1e8-wide-ascii', 'Ra3e8-eta1e7-wide-ascii',
+                                  #                        'Ra3e8-eta1e6-wide-ascii', 'Ra1e8-eta1e8-wide-ascii',
+                                  #                        'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e6-wide']
+                                  )
+
+combo.plot_h_heuristic_variations(default='Earthbaseline', x_param='M_p', x_min=0.1 * M_E, x_max=5 * M_E, y_params=None,
+                                  xlabel=r'$M_p$ ($M_E$)', save=True, fig_path=fig_path_home, fig_fmt=fig_fmt,
+                                  legend=True,
+                                  fname='heuristic_mass_dependence', nondimensional=False,
+                                  c='xkcd:drab green', lw=3, labelsize=30, ticksize=12)
+

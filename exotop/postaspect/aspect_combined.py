@@ -40,7 +40,7 @@ def overplot_aspect_data(ax, case, x_param=None, y_param=None, pkl_suffix=None, 
             df = pd.concat(dfs, axis=1)
             df = df.loc[:, ~df.columns.duplicated()]
 
-    if not_iterable(x_param):
+    if not isinstance(x_param, Iterable):
         x_data = x_param
     elif x_param =='Ra_i_eff':
         x_data = Ra_i_eff(Ra_1=float(Ra_str), d_eta=float(eta_str), T_i=np.median(df['T_i']),
@@ -53,7 +53,7 @@ def overplot_aspect_data(ax, case, x_param=None, y_param=None, pkl_suffix=None, 
     else:
         raise Exception('Must provide numerical x value or dataframe column')
 
-    if not_iterable(y_param):
+    if not isinstance(y_param, Iterable):
         y_data = y_param
     elif isinstance(y_param, string_types):
         try:
@@ -63,6 +63,8 @@ def overplot_aspect_data(ax, case, x_param=None, y_param=None, pkl_suffix=None, 
     else:
         raise Exception('Must provide numerical y value or dataframe column')
 
+    print('x_data', x_data)
+    print('y_data', y_data)
     ax.scatter(x_data, y_data, c=c, s=20, marker='*', label=label)
     if label is not None:
         ax.legend(frameon=False, fontsize=legsize)
@@ -129,7 +131,7 @@ def plot_h_heuristic_variations(default='Earthbaseline', x_param='M_p', x_min=0.
             else:
                 aspectlabel = None
             for case in overplot_aspect_cases:
-                ax2 = overplot_aspect_data(ax2, case, x_param=x2_param, y_param=y_params[iax],
+                ax2 = overplot_aspect_data(ax2, case, x_param=x2_param, y_param=y_params[iax][:-5], # remove prime
                                      pkl_suffix=['_T', '_h'], c=c2, label=aspectlabel, legsize=legsize, **kwargs)
 
         for a in [ax, ax2]:

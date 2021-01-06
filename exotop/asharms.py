@@ -1,4 +1,4 @@
-import pyshtools
+# import pyshtools
 # import cartopy.crs as ccrs
 import numpy as np
 import pandas as pd
