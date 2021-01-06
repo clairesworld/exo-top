@@ -183,8 +183,8 @@ def LHS(t, y, pl=None, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
         return [dTdt_m, dTdt_c, 0]
 
 
-def LHS_oldwrapper(y, t, **kwargs):
-    return LHS(t, y, **kwargs)
+def LHS_oldwrapper(y, t, pl, tf, complexity, *kwargs):
+    return LHS(t, y, pl=pl, tf=tf, complexity=complexity, **kwargs)
 
 
 def solve(pl, t0=0, tf=4.5, T_m0=1750, T_c0=2250, D_l0=100e3, complexity=3, t_eval=None, verbose=False, **kwargs):
