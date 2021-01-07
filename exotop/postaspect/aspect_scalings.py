@@ -17,7 +17,7 @@ import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect import aspect_postprocessing2 as post  # noqa: E402
 from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, \
-    colourbar  # noqa: E402
+    colourbar, not_string  # noqa: E402
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
@@ -38,6 +38,39 @@ def read_topo_stats(case, ts, data_path=data_path_bullard):
     df = pd.read_csv(data_path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
                      names=['x', 'y', 'h'], skiprows=1, index_col=False, delimiter=r"\s+", engine='python')
     return df['x'], df['h']
+
+
+def reshape_one_input(A, proper, default):
+    if not_iterable(A) and not_string(A):
+        B = np.empty_like(proper, dtype=object)
+        if A is None:
+            B[:] = default
+        else:
+            B[:] = A
+    elif not np.shape(A) == np.shape(proper):
+        B = np.reshape(A, np.shape(proper))
+    else:
+        B = A
+    return B
+
+
+def reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid,
+                   t1_default=0, load_default='auto', end_default=''):
+
+    n_Ra = np.size(Ra_ls)
+    n_eta = np.size(eta_ls)
+    proper = np.zeros((n_eta, n_Ra))  # model for arrays with the right shapeRa
+
+    t1_grid = reshape_one_input(t1_grid, proper, t1_default)
+    load_grid = reshape_one_input(load_grid, proper, load_default)
+    end_grid = reshape_one_input(end_grid, proper, end_default)
+
+    if not not_string(Ra_ls):  # if a string
+        Ra_ls = [Ra_ls]
+    if not not_string(eta_ls):
+        eta_ls = [eta_ls]
+
+    return Ra_ls, eta_ls, t1_grid, load_grid, end_grid
 
 
 def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None, at_sol=True,
@@ -1120,20 +1153,15 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=Non
 #     return fig, ax
 
 
-def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1=None, nrows=2,
+def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1_grid=None, nrows=2,
                           ncols=2, T_components=False, leftleg_bbox=(-0.05, 1), p_dimensionals=None,
-                          load='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end=None,
+                          load_grid='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end_grid=None,
                           show_bounds=False, regimes_title='', Ra_i=False, show_isoviscous=False, y2label='',
                           labelsize=14, xlabel='Ra', ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
+
+    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
     if c_regimes is None:
         c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
-    if t1 is None:
-        t1 = np.zeros((len(eta_ls), len(Ra_ls)))
-    if end is None:
-        end = np.empty_like(t1, dtype=object)
-        end[:] = ''
-    if not_iterable(load):  # string or int/boolean etc
-        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
     if T_components:
         print(r'Plotting h vs. $\alpha \Delta T \delta$')
         which_x = 'components'
@@ -1167,9 +1195,9 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
         print(r' $\Delta \eta$:', eta_ii, ' (', ii, '/', len(eta_ls) - 1, ')')
         z = int(str(nrows) + str(ncols) + str(ii + 1))
         ax = fig.add_subplot(z)
-        t1_ii = t1[ii]
-        end_ii = end[ii]
-        load_ii = load[ii]
+        t1_ii = t1_grid[ii]
+        end_ii = end_grid[ii]
+        load_ii = load_grid[ii]
 
         for ir, regime_name in enumerate(regime_names):
             Ra_regime = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
@@ -1260,14 +1288,16 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
     return fig, ax
 
 
-def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, data_path=data_path_bullard,
-                        fig_path=fig_path_bullard, load='auto', Ra_i=False, compare_exponent=None,
+def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys=None, data_path=data_path_bullard,
+                        fig_path=fig_path_bullard, load_grid='auto', Ra_i=False, compare_exponent=None,
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
                         postprocess_functions=[], xlim=None, ylim=None, legloc=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
                         fig=None, axes=None, fig_fmt='.png', **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
+
+    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
     if ylabels is None:
         ylabels = keys
     if iterable_not_string(keys):
@@ -1280,10 +1310,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
         ylim = [None] * nkeys
     if legloc is None:
         legloc = ['lower left'] * nkeys
-    if not_iterable(load):  #
-        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
-    if t1 is None:
-        t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
         fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys * 2.5), sharex=True)
         if nkeys == 1:
@@ -1292,7 +1318,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
     for jj, eta_str in enumerate(eta_ls):
-        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
         c_scatter = c_list[jj]
 
         plot_data = {'Ra': []}
@@ -1300,8 +1326,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
             plot_data[key] = []
 
         for ii, case in enumerate(cases):
-            t1_ii = t1[jj][ii]
-            load_ii = load[jj][ii]
+            t1_ii = t1_grid[jj][ii]
+            load_ii = load_grid[jj][ii]
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 Ra_ii = float(Ra_var[ii])
@@ -1911,14 +1937,16 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 #     return np.percentile(x_list, qs), fig, ax
 
 
-def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
-                         load='auto', psuffixes=['_T'], postprocess_functions=[T_parameters_at_sol],
-                         fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end=None, normtime=True,
+def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None,
+                         load_grid='auto', psuffixes=['_T'], postprocess_functions=[T_parameters_at_sol],
+                         fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end_grid=None, normtime=True,
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=10,
                          xlabelpad=8, ylabelpad=-2, markers=None, markersize=20, alpha=0.5,
                          fig=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
                          data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
+
+    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
     if include_regimes is None:
         include_regimes = ['steady', 'trans.', 'chaotic']
     if markers is None:
@@ -1931,10 +1959,6 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
         raise Exception('No y-axis keys provided!')
     else:
         nkeys = 1
-    if not_iterable(load):  #
-        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
-    if t1 is None:
-        t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
         fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys * 2), sharex=True)
         if nkeys == 1:
@@ -1943,12 +1967,12 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
     c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
     for jj, eta_str in enumerate(eta_ls):
-        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
         c_jj = c_list[jj]
 
         for ii, case in enumerate(cases):
-            t1_ii = t1[jj][ii]
-            load_ii = load[jj][ii]
+            t1_ii = t1_grid[jj][ii]
+            load_ii = load_grid[jj][ii]
             marker_ii = markers[ii]
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
@@ -2085,22 +2109,14 @@ def Nu_eff(gamma=None, d_m=None, delta_L=None, alpha_m=None, g=None, b=None, kap
     return None
 
 
-def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=None, end=None,
+def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_grid=None, end_grid=None,
                          data_path=data_path_bullard, redo=True, load_grid=None, **kwargs):
-    if t1 is None:
-        t1 = [[0] * len(Ra_ls)] * len(eta_ls)
+    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
+
     for jj, eta_str in enumerate(eta_ls):
-        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
         for ii, case in enumerate(cases):
-            try:
-                t1_ii = t1[jj][ii]
-            except IndexError:
-                if np.size(Ra_ls) == 1:
-                    t1_ii = t1[jj]
-                elif np.size(eta_ls) == 1:
-                    t1_ii = t1[ii]
-                else:
-                    raise Exception('something wrong with t1 shape')
+            t1_ii = t1_grid[jj][ii]
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 print(case)
                 if redo:
@@ -2115,19 +2131,19 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
                              data_path=data_path, at_sol=True, load=load, **kwargs)
 
 
-def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None,
+def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
+                            literature_file=None,
                             legend=True,
                             c='k', averagefirst=True, ylim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', labelsize=16, regime_names=None, clist=None,
                             cmap='magma', cbar='eta', include_regimes=None, **kwargs):
+
+    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
     if include_regimes is None:
         include_regimes = ['steady', 'trans.', 'chaotic']
     psuffixes = ['_T', '_h']
     postprocess_functions = [T_parameters_at_sol, h_at_ts]
-    if t1 is None:
-        t1 = [[0] * len(Ra_ls)] * len(eta_ls)
-    if not_iterable(load):  #
-        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
+
     if cbar == 'eta':
         clabel = r'$\Delta \eta$'
         cticklabels = None
@@ -2149,10 +2165,10 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
     c_data_all = []
     fig, ax = plt.subplots(1, 1, figsize=(7, 5))
     for jj, eta_str in enumerate(eta_ls):
-        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
         for ii, case in enumerate(cases):
-            t1_ii = t1[jj][ii]
-            load_ii = load[jj][ii]
+            t1_ii = t1_grid[jj][ii]
+            load_ii = load_grid[jj][ii]
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
                     regime_grid[jj][ii] in include_regimes):
                 # load outputs

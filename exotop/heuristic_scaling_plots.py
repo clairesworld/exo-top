@@ -8,22 +8,19 @@ from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_g
     regime_grid_td, regime_names_td, load_grid, p_Earth  # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
-load = True  # load_grid
+load = load_grid
 
 # heuristic scalings master
 
-const, expon = sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=load,
-                                          end=end_grid,
-                                          literature_file=None, legend=True, cbar='eta',
-                                          intercept=True,
-                                          c='k', which_h='rms', data_path=data_path, include_regimes=['chaotic'],
-                                          save=True, fname='model-data-chaotic', ylim=[4e-3, 4e-2],
-                                          postprocess_kwargs=postprocess_kwargs, fig_fmt=fig_fmt )
+const, expon = sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
+                                          end_grid=end_grid, literature_file=None, legend=True, c='k',
+                                          ylim=[4e-3, 4e-2], which_h='rms', data_path=data_path, save=True,
+                                          fname='model-data-chaotic', cbar='eta', include_regimes=['chaotic'],
+                                          intercept=True, postprocess_kwargs=postprocess_kwargs, fig_fmt=fig_fmt)
 print('fit parameters:', const, expon)
 
-sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1=t1_grid, load=load, end=end_grid,
-                           literature_file=None, legend=True, cbar='regime', clist=c_regimes_td, intercept=True,
-                           regime_names=regime_names_td,
-                           c='k', which_h='rms', data_path=data_path,  # include_regimes=['chaotic'],
-                           save=True, fname='model-data-regimes', ylim=[2e-3, 4e-2],
+sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
+                           end_grid=end_grid, literature_file=None, legend=True, c='k', ylim=[2e-3, 4e-2],
+                           which_h='rms', data_path=data_path, save=True, fname='model-data-regimes',
+                           regime_names=regime_names_td, clist=c_regimes_td, cbar='regime', intercept=True,
                            postprocess_kwargs=postprocess_kwargs, fig_fmt=fig_fmt)

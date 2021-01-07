@@ -3,22 +3,19 @@ sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     fig_fmt, regime_grid_td, postprocess_kwargs, \
     load_grid    # noqa: E402
-# from exotop import aspect_postprocessing2 as asp  # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
 # (re)process all
 
-sc.pickleio('Ra1e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.3,
-            load=False, at_sol=True, data_path=data_path, postprocess_kwargs=postprocess_kwargs,)
-
-sc.pickleio('Ra3e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.055083,
-            load=False, at_sol=True, data_path=data_path, postprocess_kwargs=postprocess_kwargs,)
-
-sc.reprocess_all_at_sol(Ra_ls, eta_ls[2:], psuffixes=['_T'], #'_Nu', '_h'],
-                        redo=True, data_path=data_path,
-                        postprocess_functions=[sc.T_parameters_at_sol], #, sc.Nu_at_ts, sc.h_at_ts],
-                        postprocess_kwargs=postprocess_kwargs,
-                        end=end_grid[2:,:], load_grid=load_grid[2:,:], t1=t1_grid[2:,:])
+# sc.pickleio('Ra1e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.3,
+#             load=False, at_sol=True, data_path=data_path, postprocess_kwargs=postprocess_kwargs,)
+#
+# sc.pickleio('Ra3e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.055083,
+#             load=False, at_sol=True, data_path=data_path, postprocess_kwargs=postprocess_kwargs,)
+#
+# sc.reprocess_all_at_sol(Ra_ls, eta_ls[2:], psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol],
+#                         t1_grid=t1_grid[2:, :], end_grid=end_grid[2:, :], data_path=data_path, redo=True,
+#                         load_grid=load_grid[2:, :], postprocess_kwargs=postprocess_kwargs)
 
 ## plot summaries across delta eta
 
