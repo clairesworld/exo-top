@@ -11,7 +11,7 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 load = load_grid
 
 # plot evolutions for debugging T components
-sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td, save=True, t1_grid=t1_grid, load_grid=load,
+sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td, save=True, t1_grid=t1_grid, load_grid=True,
                         psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol], fig_path=fig_path,
                         fname='evol', fig_fmt=fig_fmt, end_grid=end_grid, normtime=True, labelsize=14, xlabel=r'Time',
                         ylabels=None, keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh'], title='', xlabelpad=8,
@@ -21,9 +21,9 @@ sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td, save=True, t1
 
 # plot h scalings - with dT_m*delta*alpha
 
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
+sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
                          T_components=True, averagefirst=True, legloc='upper right',
-                         load=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end=end_grid,
+                         load_grid=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end_grid=end_grid,
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h^\prime$',
                          xlabelpad=8, ylabelpad=-2, fit=True, showallscatter=False,
                          xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2), logx=True, logy=True,
@@ -33,10 +33,10 @@ load = True
 
 # same but just looking at each time point
 
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
+sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
                          T_components=True, averagefirst=False, legloc='upper right',
-                         load=load,
-                         fig_path=fig_path, fname='h_T_all_scatter', fig_fmt=fig_fmt, end=end_grid,
+                         load_grid=load,
+                         fig_path=fig_path, fname='h_T_all_scatter', fig_fmt=fig_fmt, end_grid=end_grid,
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography $h^\prime$',
                          xlabelpad=8, ylabelpad=-2, fit=True, showallscatter=True,
                          xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2), logx=True, logy=True,
@@ -46,9 +46,9 @@ load = True
 
 # plot h scalings with Ra
 
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1=t1_grid,
-                         load=load, show_isoviscous=True, averagefirst=True,
-                         fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end=end_grid, labelsize=14,
+sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
+                         load_grid=load, show_isoviscous=True, averagefirst=True,
+                         fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end_grid=end_grid, labelsize=14,
                          xlabel='Ra_i', Ra_i=True,
                          ylabel='dynamic topography $h^\prime$', y2label='dynamic topography $h$ (km)',
                          xlabelpad=8, ylabelpad=5, fit=True, showallscatter=False,
