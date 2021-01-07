@@ -2092,7 +2092,15 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
         for ii, case in enumerate(cases):
-            t1_ii = t1[jj][ii]
+            try:
+                t1_ii = t1[jj][ii]
+            except IndexError:
+                if np.size(Ra_ls) == 1:
+                    t1_ii = t1[jj]
+                elif np.size(eta_ls) == 1:
+                    t1_ii = t1[ii]
+                else:
+                    raise Exception('something wrong with t1 shape')
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 print(case)
                 if redo:
