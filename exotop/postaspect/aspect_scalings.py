@@ -1916,15 +1916,15 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
                          load='auto', psuffixes=['_T'], postprocess_functions=[T_parameters_at_sol],
                          fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end=None, normtime=True,
-                         labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=12,
-                         xlabelpad=8, ylabelpad=-2, markers=None, markersize=20,
+                         labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=10,
+                         xlabelpad=8, ylabelpad=-2, markers=None, markersize=20, alpha=0.5,
                          fig=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
                          data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
     if include_regimes is None:
         include_regimes = ['steady', 'trans.', 'chaotic']
     if markers is None:
-        markers = ['o', '^', 's', 'P', 'D', 'v', '*', 'X']
+        markers = ['o', '^', 's', 'D', 'v', 'X']
     if ylabels is None:
         ylabels = keys
     if iterable_not_string(keys):
@@ -1987,8 +1987,8 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
                     ax.set_ylabel(ylabels[k], fontsize=labelsize, labelpad=ylabelpad)
                     if k == len(keys) - 1:
                         ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
-                    ax.scatter(x_data, y_data, c=c_jj, s=markersize, marker=marker_ii)
-                    ax.plot(x_data, y_data, c=c_jj, lw=0.8, alpha=0.8)
+                    ax.scatter(x_data, y_data, c=c_jj, s=markersize, marker=marker_ii, alpha=alpha)
+                    ax.plot(x_data, y_data, c=c_jj, lw=0.8, alpha=alpha)
 
     # legend proxy artist
     ax = axes[0]
@@ -1998,7 +1998,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
     #                     loc="upper left", title=r"log $\Delta \eta$", fontsize=legsize)
     lines = []
     for jj, leta in enumerate(logeta_fl):
-        p = mlines.Line2D([], [], lw=0, color=c_list[jj], marker='o', markersize=markersize/4, label=leta)
+        p = mlines.Line2D([], [], lw=0, color=c_list[jj], marker='o', markersize=markersize/4, label=leta, alpha=alpha)
         lines.append(p)
     legend1 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="upper left",
                         title=r"log $\Delta \eta$",)
@@ -2007,7 +2007,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
     ax = axes[-1]
     lines = []
     for ii, Ra in enumerate(Ra_ls):
-        p = mlines.Line2D([], [], lw=0, color='k', marker=markers[ii], markersize=markersize/4, label=Ra)
+        p = mlines.Line2D([], [], lw=0, color='k', marker=markers[ii], markersize=markersize/4, label=Ra, alpha=alpha)
         lines.append(p)
     legend2 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="lower right",
                         title="Ra", )
