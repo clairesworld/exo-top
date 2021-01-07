@@ -6,12 +6,13 @@ from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_g
 # from exotop import aspect_postprocessing2 as asp  # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
-## (re)process all
-sc.reprocess_all_at_sol(Ra_ls[-2:], eta_ls[1], psuffixes=['_T'], #'_Nu', '_h'],
-                        redo=True, data_path=data_path,
-                        postprocess_functions=[sc.T_parameters_at_sol], #, sc.Nu_at_ts, sc.h_at_ts],
-                        postprocess_kwargs=postprocess_kwargs,
-                        end=end_grid[1,-2:], load_grid=load_grid[1,-2:], t1=t1_grid[1,-2:])
+# (re)process all
+
+sc.pickleio('Ra1e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.3,
+            load=False, at_sol=True, data_path=data_path)
+
+sc.pickleio('Ra3e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.055083,
+            load=False, at_sol=True, data_path=data_path)
 
 sc.reprocess_all_at_sol(Ra_ls, eta_ls[2:], psuffixes=['_T'], #'_Nu', '_h'],
                         redo=True, data_path=data_path,
