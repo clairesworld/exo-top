@@ -1974,6 +1974,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid_td=None, regime_names_td=Non
                     raise e
 
                 # do the plotting on each axis
+                print(df.keys())
                 x_data = df['time']
                 if normtime:
                     # Normalised [0,1]
