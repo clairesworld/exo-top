@@ -1917,7 +1917,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
                          load='auto', psuffixes=['_T'], postprocess_functions=[T_parameters_at_sol],
                          fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end=None, normtime=True,
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=16,
-                         xlabelpad=8, ylabelpad=-2, alpha_m=1, markers=None, markersize=20,
+                         xlabelpad=8, ylabelpad=-2, markers=None, markersize=20,
                          fig=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
                          data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
@@ -1977,7 +1977,6 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
                     raise e
 
                 # do the plotting on each axis
-                print(df.keys())
                 x_data = df['time']
                 if normtime:
                     # Normalised [0,1]
@@ -1992,10 +1991,16 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
 
     # legend proxy artist
     ax = axes[-1]
-    scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, s=markersize,
-                      vmin=vmin, vmax=vmax)  # dummy
-    legend1 = ax.legend(*scat.legend_elements(num=len(logeta_fl)),
-                        loc="upper left", title=r"log $\Delta \eta$", fontsize=legsize)
+    # scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, s=markersize,
+    #                   vmin=vmin, vmax=vmax)  # dummy - neeeds matplotlib 3.1.1
+    # legend1 = ax.legend(*scat.legend_elements(num=len(logeta_fl)),
+    #                     loc="upper left", title=r"log $\Delta \eta$", fontsize=legsize)
+    lines = []
+    for jj, leta in enumerate(logeta_fl):
+        p = mlines.Line2D([], [], lw=0, color=c_list[jj], marker='o', markersize=markersize, label=leta)
+        lines.append(p)
+    legend1 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="upper left",
+                        title=r"log $\Delta \eta$",)
     ax.add_artist(legend1)
 
     lines = []

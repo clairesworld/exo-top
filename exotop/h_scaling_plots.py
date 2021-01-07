@@ -1,26 +1,26 @@
 """ ASPECT runs: plot scalings of h vs. Ra or T-heuristic, with subplots by eta """
 
 import sys
+
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     c_regimes_td, fig_fmt, \
     regime_grid_td, regime_names_td, load_grid, alpha_m, p_Earth  # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
-load = load_grid
+load = True  # load_grid
 
 # plot evolutions for debugging T components
 sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td,
                         save=True, t1=t1_grid, end=end_grid,
-                        load=load_grid, psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol],
-                         fig_path=fig_path, fname='evol', fig_fmt='.png', normtime=True,
-                         labelsize=14, xlabel=r'Time', ylabels=None,
+                        load=load, psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol],
+                        fig_path=fig_path, fname='evol', fig_fmt=fig_fmt, normtime=True,
+                        labelsize=14, xlabel=r'Time', ylabels=None,
                         keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh'],
-                        title='', legsize=16,
-                         xlabelpad=8, ylabelpad=2, alpha_m=1, markers=None, markersize=20,
-                        cmap='magma', vmin=5, vmax=8.5,
-                         regimes_title='Stationarity', data_path=data_path)
-    # plot time-evolution of list of keys for all cases in given regime
+                        title='', legsize=16, include_regimes=['chaotic'],
+                        xlabelpad=8, ylabelpad=2, alpha_m=1, markers=None, markersize=20,
+                        cmap='magma', vmin=5, vmax=8.5, data_path=data_path)
+# plot time-evolution of list of keys for all cases in given regime
 
 # # plot h scalings - with dT_m*delta*alpha
 #
