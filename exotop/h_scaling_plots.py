@@ -10,7 +10,7 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 load = load_grid
 
 # plot evolutions for debugging T components
-sc.subplots_evol_at_sol(Ra_ls=['1e8', '3e8'], eta_ls=['1e6', '1e7', '1e8'], regime_grid_td=None, regime_names_td=None, c_regimes=None,
+sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td,
                         save=True, t1=t1_grid, end=end_grid,
                         load=load_grid, psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol],
                          fig_path=fig_path, fname='evol', fig_fmt='.png', normtime=True,

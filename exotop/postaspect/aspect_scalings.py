@@ -1913,14 +1913,16 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 #     return np.percentile(x_list, qs), fig, ax
 
 
-def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid_td=None, regime_names_td=None, c_regimes=None, save=True, t1=None,
+def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
                          load='auto', psuffixes=['_T'], postprocess_functions=[T_parameters_at_sol],
                          fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end=None, normtime=True,
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=16,
                          xlabelpad=8, ylabelpad=-2, alpha_m=1, markers=None, markersize=20,
-                         fig=None, cmap='magma', vmin=None, vmax=None,
-                         regimes_title='Stationarity', data_path=data_path_bullard, **kwargs):
+                         fig=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
+                         data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
+    if include_regimes is None:
+        include_regimes = ['steady', 'trans.', 'chaotic']
     if markers is None:
         markers = ['o', '^', 's', 'P', 'D', 'v', '*', 'X']
     if ylabels is None:
@@ -1951,7 +1953,8 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid_td=None, regime_names_td=Non
             load_ii = load[jj][ii]
             marker_ii = markers[ii]
 
-            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
+            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
+                    regime_grid[jj][ii] in include_regimes):
                 Ra_ii = float(Ra_var[ii])
 
                 # load data
