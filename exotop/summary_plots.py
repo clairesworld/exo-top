@@ -7,9 +7,10 @@ from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_g
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
 ## process all
-sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_Nu', '_h'], redo=False,
-                        postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts, sc.h_at_ts], t1=t1_grid,
-                        end=end_grid, data_path=data_path, alpha_m=alpha_m, load_grid=load_grid)
+sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T'], #'_Nu', '_h'],
+                        redo=True,
+                        postprocess_functions=[sc.T_parameters_at_sol], #, sc.Nu_at_ts, sc.h_at_ts],
+                        end=end_grid, data_path=data_path, alpha_m=alpha_m, load_grid=load_grid, t1=t1_grid)
 
 ## plot summaries across delta eta
 
@@ -19,7 +20,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
         cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
         labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
         sc.subplots_cases(
-            cases_ii, labels=labels_ii, t1=t1_grid[ii], save=True, load=True, #load_grid[ii],
+            cases_ii, labels=labels_ii, t1=t1_grid[ii], save=True, load=load_grid[ii],
             fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta, c_rms=c_rms, c_peak=c_peak,
             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td[ii],

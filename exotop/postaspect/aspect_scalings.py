@@ -412,11 +412,6 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
     if df is None:
         df = pickleio(case, suffix=psuffix, postprocess_functions=[T_parameters_at_sol],
                       dat_new=dat, data_path=data_path, at_sol=True, fend=fend, **kwargs)
-    if alpha_m is None:
-        if dat is None:
-            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
-                                   read_parameters=True)
-        alpha_m = dat.parameters['Material model']['Simple model']['Thermal expansion coefficient']
 
     try:
         h_components = alpha_m * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
@@ -428,7 +423,6 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
         df['h_components'] = h_components
         pkl.dump(df, open(data_path + 'output-' + case + '/pickle/' + case + psuffix + fend, 'wb'))
 
-    print('alpha_m', alpha_m)
     return h_components
 
 
@@ -438,7 +432,7 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
                                read_statistics=True, read_parameters=True)
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
-    d_n = dat.T_components(n, T=T, u=u, v=v, cut=True)  # dict of components just at solution n
+    d_n = dat.T_components(n, T=T, u=u, v=v)  # dict of components just at solution n
     d_n['h_components'] = T_components_of_h(case, df=d_n, dat=dat, data_path=data_path, **kwargs)
 
     # for key in d_n.keys():
@@ -1535,7 +1529,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                     if not show_sols:
                         sol_df = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol], t1=t1_ii,
                                           dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
-                    # n=-1 for final timestep only
+
                     fig, ax = plot_T_profile(case, T_params=sol_df, n='mean', data_path=data_path, setylabel=False,
                                              setxlabel=setxlabel, save=False, fig_path=fig_path, fig=fig, ax=ax,
                                              legend=legend, labelsize=labelsize)
@@ -1938,7 +1932,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1=None,
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
-        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys * 2.5), sharex=True)
+        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys * 2), sharex=True)
         if nkeys == 1:
             axes = np.array([axes])
     logeta_fl = [np.log10(float(a)) for a in eta_ls]

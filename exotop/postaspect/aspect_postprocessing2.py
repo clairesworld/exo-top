@@ -498,76 +498,108 @@ class Aspect_Data():
     #         diff = abs(Ti - Ti_guess)
     #     return Ti, d0
 
-    def lid_thickness(self, u=None, v=None, n=None, tol=1, cut=True, plot=False, cutdiv=2, spline=True, **kwargs):
+    def lid_thickness(self, u=None, v=None, n=None, tol=1e-3, plot=False, spline=True, **kwargs):
         # stagnant lid depth y_L from Moresi & Solomatov 2000 method - thickness delta_L = 1 - y_L
-        x = self.x
-        y = self.y
+        try:
+            x = self.x
+            y = self.y
+        except AttributeError:
+            self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
+            x = self.x
+            y = self.y
         if (u is None) or (v is None):
             _, _, _, u, v, _ = self.read_velocity(n, verbose=False)
+
         # get horizontal average of vertical velocity
-        mag = np.sqrt(u**2 + v**2)
+        mag = np.sqrt(u ** 2 + v ** 2)
         mag_av = horizontal_mean(mag, x)
         if plot:
-            self.plot_profile(mag, xlabel='velocity magnitude')
-        if not cut:
-            cutdiv=1
-        b=1.1
-        while b>1:
-            # take upper half by defualt (cutdiv=2) but need to inspect each case individually
-            mag_avprime = mag_av[int(len(mag_av)/cutdiv):]
-            yprime = y[int(len(y)/cutdiv):]
+            self.plot_profile(mag, xlabel='velocity magnitude', title='solution ' + str(n))
+            ax = plt.gca()
 
-            # maximum gradient of averaged velocity profile
-            if spline:
+        # find peak velocity in interior (coincident with inflection point)
+        if spline:
+            try:
+                spl = UnivariateSpline(y, mag_av, k=4, s=0)
+                f_dprime = spl.derivative()
+                y_i = f_dprime.roots()
+                mag_i = spl(y_i)
+
+                # inflection point with max velocity should be interior
+                idx = np.argmax(mag_i)
+                y_i_max, mag_i_max = y_i[idx], mag_i[idx]
+                if plot:
+                    ax.scatter(mag_i, y_i, c='xkcd:magenta', marker='.', s=30, label='inflection points')
+                    ax.scatter(mag_i_max, y_i_max, c='xkcd:magenta', marker='*', s=50, label='max inflection point')
+
+                # now get 5th-degree spline and find maxima - inverted from profile function
+                spl2 = UnivariateSpline(y, mag_av, k=5, s=0)
+                f_dprime2 = spl2.derivative(n=2)
+                y_grad_max = f_dprime2.roots()
+
+                # isolate to points above interior max velocity
                 try:
-                    # get spline and find maxima - inverted from profile function
-                    tck = interpolate.splrep(yprime, mag_avprime, k=5)
-                    tck2 = interpolate.splder(tck, n=2)
-                    y_grad_max = interpolate.sproot(tck2)
-                    if np.size(y_grad_max > 1):
-                        y_grad_max = y_grad_max[0]
-                    v_grad_max = interpolate.splev(y_grad_max, tck)
-                    dvdy_0 = interpolate.splev(y_grad_max, tck, der=1)
-                    dydv_0 = 1 / dvdy_0
-                    y0 = y_grad_max
-                    x0 = v_grad_max
-                    tngnt = lambda x: dydv_0 * x + (y0 - dydv_0 * x0)
-                    # intersection of this tangent with depth-axis
-                    m1 = dydv_0
-                    b = tngnt(0)
-                except Exception as e:
-                    print('Could not get lid thickness via spline:', e)
-                    spline = False
-            if not spline:
-                grad = np.diff(mag_avprime, axis=0) / np.diff(yprime)
-                grad_max = np.min(grad) # actually want the minimum because you expect a negative slope
-                i_max = np.nonzero(grad == grad_max)[0][0] # would add one to take right hand value
-                v_grad_max = mag_avprime[i_max]
-                y_grad_max = yprime[i_max]
-                # intersection of this tangent with y-axis
-                x_grad_max0 = mag_avprime[np.nonzero(grad == grad_max)[0][0] - tol]
-                y_grad_max0 = yprime[np.nonzero(grad == grad_max)[0][0] - tol]
-                x_grad_max1 = mag_avprime[np.nonzero(grad == grad_max)[0][0] + tol]
-                y_grad_max1 = yprime[np.nonzero(grad == grad_max)[0][0] + tol]
-                m1 = (y_grad_max1 - y_grad_max0) / (x_grad_max1 - x_grad_max0)
-                print('m1', m1)
-                b = y_grad_max - m1 * v_grad_max
+                    y_grad_max = y_grad_max[y_grad_max > y_i_max]
+                except TypeError:  # single root
+                    pass
+                mag_grad_max = spl2(y_grad_max)
+                if np.size(y_grad_max) > 1:
+                    y_grad_max, mag_grad_max = y_grad_max[-1], mag_grad_max[-1]
+                    # print('solution', n, ': velocity magnitude has too many roots! using topmost')
+                    if plot:
+                        ax.scatter(mag_grad_max, y_grad_max, c='k', marker='.', label='max grad')
+                        fig2, ax2 = plt.subplots(figsize=(4, 4))
+                        ax2.plot(f_dprime(y), y, c='k', ls='--', label='dv/dy')
+                        ax2.scatter(f_dprime(y_grad_max), y_grad_max, c='xkcd:orange', label='roots of d2v/dy2')
+                        ax2.legend()
+                        ax2.set_title('solution ' + str(n))
+                elif np.size(y_grad_max) == 0:
+                    raise Exception('solution', n, ': no roots above max inflection point!')
 
-            if plot:
-                plt.scatter(v_grad_max, y_grad_max, c='k',
-                            label='max grad: ({:04.1f}),({:04.1f})'.format(float(v_grad_max), float(y_grad_max)))
-                plt.axhline(y=np.min(yprime), alpha=0.2, c='k', ls='--')
+                dvdy = spl2.derivative(n=1)
+                dvdy_0 = dvdy(y_grad_max)
+                dydv_0 = 1 / dvdy_0
+                y0 = y_grad_max
+                x0 = mag_grad_max
+                tngnt = lambda x: dydv_0 * x + (y0 - dydv_0 * x0)
 
-            if b>1: # if this doesn't work it's probably because lid base is below 50% depth, need to recut profile
-                print('\n recutting')
-                cutdiv = cutdiv+0.2
+                # intersection of this tangent with depth-axis
+                m1 = dydv_0
+                b = tngnt(0)
+            except Exception as e:
+                print('Could not get lid thickness via spline:\n', e)
+                spline = False
 
-        if plot:  # overplot
-            x_vel = np.linspace(0, np.max(mag_avprime))
+        if not spline:
+            # find index of max interior velocity
+            f_prime = np.gradient(mag_av)  # differential approximation
+            idx = np.where(np.diff(np.sign(f_prime)))[0]  # Find the inflection point.
+            y_prime, mag_av_prime = y[idx:], mag_av[idx:]
+
+            grad = np.diff(mag_av_prime, axis=0) / np.diff(y_prime)
+            grad_max = np.min(grad)  # actually want the minimum because you expect a negative slope
+            i_max = np.nonzero(grad == grad_max)[0][0]  # would add one to take right hand value
+            mag_grad_max = mag_av[i_max]
+            y_grad_max = y_prime[i_max]
+            # intersection of this tangent with y-axis
+            x_grad_max0 = mag_av_prime[np.nonzero(grad == grad_max)[0][0] - tol]
+            y_grad_max0 = y_prime[np.nonzero(grad == grad_max)[0][0] - tol]
+            x_grad_max1 = mag_av_prime[np.nonzero(grad == grad_max)[0][0] + tol]
+            y_grad_max1 = y_prime[np.nonzero(grad == grad_max)[0][0] + tol]
+            m1 = (y_grad_max1 - y_grad_max0) / (x_grad_max1 - x_grad_max0)
+            b = y_grad_max - m1 * mag_grad_max
+
+        if plot:
+            ax.scatter(mag_grad_max, y_grad_max, c='k',
+                       label='max grad: ({:04.1f}),({:04.1f})'.format(float(mag_grad_max), float(y_grad_max)))
+            x_vel = np.linspace(0, np.max(mag_av))
             y_tan = m1 * x_vel + b
-            plt.plot(x_vel, y_tan, c='g', ls='--', label='tangent to max gradient')
-            plt.legend()
-        return b   # y_L
+            ax.plot(x_vel, y_tan, c='g', ls='--', label='tangent to max gradient')
+            ax.legend()
+        try:
+            return b[0]  # y_L
+        except IndexError:
+            return b
     
     def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, u=None, v=None, cut=False, plot=False,
                              verbose=False, **kwargs):
@@ -617,17 +649,16 @@ class Aspect_Data():
             y_i = f_dprime.roots()
             T_i = spl(y_i)
         else:
-            f_prime = np.gradient(T_av) # differential approximation
-            idx = np.where(np.diff(np.sign(f_prime)))[0] # Find the inflection point.
+            f_prime = np.gradient(T_av)  # differential approximation
+            idx = np.where(np.diff(np.sign(f_prime)))[0]  # Find the inflection point.
             y_i = y[idx]
             T_i = T_av[idx]
 
-        if usemax:
-            i = np.where(T_i == T_i.max())
-            print('i', i)
-        else:
-            i = -1
         try:
+            if usemax:  # if multiple inflection points, use maximum instead of uppermost
+                i = np.where(T_i == T_i.max())
+            else:
+                i = -1
             ans = T_i[i], y_i[i]
         except IndexError:
             ans = T_i, y_i
@@ -657,7 +688,7 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
     
-    def T_components(self, n, T=None, T_i=None, T_l=None, delta_rh=None, y_L=None, u=None, v=None, cut=False, plot=False,
+    def T_components(self, n, T=None, T_i=None, T_l=None, delta_rh=None, y_L=None, u=None, v=None, d_m=1, dT_m=1,
                      verbose=False, **kwargs):
         if n is None:
             n = self.final_step()
@@ -671,19 +702,20 @@ class Aspect_Data():
         if T is None:
             _, _, _, T = self.read_temperature(n, verbose=verbose)
         T_av = horizontal_mean(T, x)
-        try:
-            p = self.parameters
-        except AttributeError:
-            self.read_parameters(verbose=verbose)
-            p = self.parameters
-        d_m = p['Geometry model']['Box']['Y extent']
-        dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
+        if d_m is None or dT_m is None:
+            try:
+                p = self.parameters
+            except AttributeError:
+                self.read_parameters(verbose=verbose)
+                p = self.parameters
+            d_m = p['Geometry model']['Box']['Y extent']
+            dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
         if y_L is None:
-            y_L = self.lid_thickness(u=u, v=v, cut=cut, **kwargs)
+            y_L = self.lid_thickness(u=u, v=v, **kwargs)
         if T_i is None:
             T_i = self.internal_temperature(T_av=T_av, **kwargs)
         if T_l is None:
-            T_l = self.lid_base_temperature(T_av=T_av, delta_L=y_L, cut=cut, **kwargs)
+            T_l = self.lid_base_temperature(T_av=T_av, delta_L=y_L, **kwargs)
         if delta_rh is None:
             delta_rh = self.ubl_thickness(n=n, T_l=T_l, T_i=T_i, **kwargs)
         delta_L = y[-1] - y_L
@@ -756,7 +788,7 @@ class Aspect_Data():
         
         return xu, yu, topo
     
-    def plot_profile(self, s, n=None, y=None, xlabel='', ylabel='depth', fig=None, ax=None, **plotkwargs):
+    def plot_profile(self, s, n=None, y=None, xlabel='', ylabel='depth', title=None, fig=None, ax=None, **plotkwargs):
         # s is a 2D or 1D array
         try:
             x = self.x
@@ -780,6 +812,7 @@ class Aspect_Data():
         ax.set_xlabel(xlabel, fontsize=18)
         ax.set_ylabel(ylabel, fontsize=18)
         ax.set_ylim(y.min(), y.max())
+        ax.set_title(title, fontsize=18)
         return fig, ax
         
     def plot_mesh(self, s, vlabel=None, cmap='coolwarm'):
