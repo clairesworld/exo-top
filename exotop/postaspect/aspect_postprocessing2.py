@@ -472,7 +472,6 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, n=n, **kwargs)
         ts = self.find_time_at_sol(n)
         F = self.stats_heatflux_top[ts]/X_extent
-        print('X_extent in ubl_thickness:', X_extent)
         return k*(T_i - T_l)/F
 
     def delta_0(self, delta_rh=None, delta_L=None, **kwargs):
