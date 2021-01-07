@@ -13,9 +13,9 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 # sc.pickleio('Ra3e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.055083,
 #             load=False, at_sol=True, data_path=data_path, postprocess_kwargs=postprocess_kwargs,)
 #
-# sc.reprocess_all_at_sol(Ra_ls, eta_ls[2:], psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol],
-#                         t1_grid=t1_grid[2:, :], end_grid=end_grid[2:, :], data_path=data_path, redo=True,
-#                         load_grid=load_grid[2:, :], postprocess_kwargs=postprocess_kwargs)
+sc.reprocess_all_at_sol(Ra_ls[-2], eta_ls[1:3], psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol],
+                        t1_grid=t1_grid[1:3, -2], end_grid=end_grid[1:3, -2], data_path=data_path, redo=True,
+                        load_grid=load_grid[1:3, -2], postprocess_kwargs=postprocess_kwargs)
 
 ## plot summaries across delta eta
 
