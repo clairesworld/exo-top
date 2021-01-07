@@ -11,7 +11,7 @@ check_new = True  # always check for new timesteps with ongoing runs
 alpha_m = 1
 X_extent = 8
 Y_extent = 1
-postprocess_kwargs={'X_extent':X_extent, 'Y_extent':Y_extent, 'alpha_m':alpha_m},
+postprocess_kwargs = {'X_extent':X_extent, 'Y_extent':Y_extent, 'alpha_m':alpha_m}
 
 Ra_ls = np.array(['1e6', '3e6', '1e7', '3e7', '1e8', '3e8'])  # 3e5 no convection
 eta_ls = np.array(['1e5', '1e6', '1e7', '1e8'])
