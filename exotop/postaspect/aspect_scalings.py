@@ -407,8 +407,12 @@ def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
 
 
 def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path_bullard, update=False,
-                      fend='.pkl', alpha_m=1, **kwargs):
+                      fend='.pkl', alpha_m=None, postprocess_kwargs={}, **kwargs):
     # calculate T components in h heuristic for all processed solutions
+    if 'alpha_m' in postprocess_kwargs:
+        if (alpha_m is not None) and (alpha_m != postprocess_kwargs['alpha_m']):
+            raise Exception('Error: competing alpha_m values passed to T_componenents_of_h. What the heck is going on!')
+        alpha_m = postprocess_kwargs['alpha_m']
     if df is None:
         df = pickleio(case, suffix=psuffix, postprocess_functions=[T_parameters_at_sol],
                       dat_new=dat, data_path=data_path, at_sol=True, fend=fend, **kwargs)
@@ -429,7 +433,7 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
 def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
-                               read_statistics=True, read_parameters=True)
+                               read_statistics=True, read_parameters=False)
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
     d_n = dat.T_components(n, T=T, u=u, v=v, **kwargs)  # dict of components just at solution n

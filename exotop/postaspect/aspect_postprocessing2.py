@@ -534,10 +534,10 @@ class Aspect_Data():
         # find peak velocity in interior (coincident with inflection point)
         if spline:
             try:
-                spl = UnivariateSpline(y, mag_av, k=4, s=0)
-                f_dprime = spl.derivative()
-                y_i = f_dprime.roots()
-                mag_i = spl(y_i)
+                spl4 = UnivariateSpline(y, mag_av, k=4, s=0)
+                f_dprime4 = spl4.derivative()
+                y_i = f_dprime4.roots()
+                mag_i = spl4(y_i)
 
                 # inflection point with max velocity should be interior
                 idx = np.argmax(mag_i)
@@ -547,30 +547,30 @@ class Aspect_Data():
                     ax.scatter(mag_i_max, y_i_max, c='xkcd:magenta', marker='*', s=50, label='max inflection point')
 
                 # now get 5th-degree spline and find maxima - inverted from profile function
-                spl2 = UnivariateSpline(y, mag_av, k=5, s=0)
-                f_dprime2 = spl2.derivative(n=2)
-                y_grad_max = f_dprime2.roots()
+                spl5 = UnivariateSpline(y, mag_av, k=5, s=0)
+                f_dprime5 = spl5.derivative(n=2)
+                y_grad_max = f_dprime5.roots()
 
                 # isolate to points above interior max velocity
                 try:
                     y_grad_max = y_grad_max[y_grad_max > y_i_max]
                 except TypeError:  # single root
                     pass
-                mag_grad_max = spl2(y_grad_max)
+                mag_grad_max = spl5(y_grad_max)
                 if np.size(y_grad_max) > 1:
                     y_grad_max, mag_grad_max = y_grad_max[-1], mag_grad_max[-1]
                     # print('solution', n, ': velocity magnitude has too many roots! using topmost')
                     if plot:
                         ax.scatter(mag_grad_max, y_grad_max, c='k', marker='.', label='max grad')
                         fig2, ax2 = plt.subplots(figsize=(4, 4))
-                        ax2.plot(f_dprime(y), y, c='k', ls='--', label='dv/dy')
-                        ax2.scatter(f_dprime(y_grad_max), y_grad_max, c='xkcd:orange', label='roots of d2v/dy2')
+                        ax2.plot(f_dprime4(y), y, c='k', ls='--', label='dv/dy')
+                        ax2.scatter(f_dprime4(y_grad_max), y_grad_max, c='xkcd:orange', label='roots of d2v/dy2')
                         ax2.legend()
                         ax2.set_title('solution ' + str(n))
                 elif np.size(y_grad_max) == 0:
                     raise Exception('solution', n, ': no roots above max inflection point!')
 
-                dvdy = spl2.derivative(n=1)
+                dvdy = spl5.derivative(n=1)
                 dvdy_0 = dvdy(y_grad_max)
                 dydv_0 = 1 / dvdy_0
                 y0 = y_grad_max
