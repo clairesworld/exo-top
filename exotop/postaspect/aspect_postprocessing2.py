@@ -432,33 +432,47 @@ class Aspect_Data():
         self.Ra_i = Ra_i
         return Ra_i
 
-    def nusselt(self, k=1):
+    def nusselt(self, X_extent=1, k=1, d=1, dT=1, **kwargs):
         # Nusselt number with no internal heating
+        if X_extent is None or d is None or dT is None:
+            try:
+                p = self.parameters
+            except AttributeError:
+                self.read_parameters(verbose=False)
+                p = self.parameters
+            d = p['Geometry model']['Box']['Y extent']
+            dT = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box'][
+                'Top temperature']
+            X_extent = p['Geometry model']['Box']['X extent']
+
         try:
-            p = self.parameters
-        except AttributeError:
-            self.read_parameters(verbose=False)
-            p = self.parameters
-        try:
-            F = self.stats_heatflux_top/p['Geometry model']['Box']['X extent']
+            F = self.stats_heatflux_top / X_extent
         except AttributeError:
             self.read_statistics(verbose=False)
-            F = self.stats_heatflux_top / p['Geometry model']['Box']['X extent']
-        d = p['Geometry model']['Box']['Y extent']
-        dT = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
+            F = self.stats_heatflux_top / X_extent
+
         Nu = d*F/(k*dT)
         self.Nu = Nu
         return Nu
 
-    def ubl_thickness(self, n=None, T_l=None, T_i=None, k=1, **kwargs):
+    def ubl_thickness(self, n=None, T_l=None, T_i=None, k=1, X_extent=1,  **kwargs):
         # get upper boundary layer thickness required to produce surface heat flux (F=Nu) between T_i and T_l
         # corresponds to rheological sublayer delta_rh in Solomatov & Moresi 2000
+        if X_extent is None:
+            try:
+                p = self.parameters
+            except AttributeError:
+                self.read_parameters(verbose=False)
+                p = self.parameters
+            X_extent = p['Geometry model']['Box']['X extent']
+
         if T_i is None:
             T_i = self.internal_temperature(self, n=n, **kwargs)
         if T_l is None:
             T_l = self.lid_base_temperature(self, n=n, **kwargs)
         ts = self.find_time_at_sol(n)
-        F = self.stats_heatflux_top[ts]/self.parameters['Geometry model']['Box']['X extent']
+        F = self.stats_heatflux_top[ts]/X_extent
+        print('X_extent in ubl_thickness:' X_extent)
         return k*(T_i - T_l)/F
 
     def delta_0(self, delta_rh=None, delta_L=None, **kwargs):

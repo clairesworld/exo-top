@@ -285,7 +285,7 @@ def read_evol(case, col, dat=None, data_path=data_path_bullard):
 
 
 def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
-                         df_to_extend=None, sol_files=None, **kwargs):
+                         df_to_extend=None, sol_files=None, postprocess_kwargs={}, **kwargs):
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
     if dat is None:
@@ -314,7 +314,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
             ts = n_ts[ii]  # timestep at this solution
             # print(ts, 'timestep at solution', n)
             for fn in postprocess_functions:
-                new_params_dict = fn(case, n=n, ts=ts, dat=dat, **kwargs)
+                new_params_dict = fn(case, n=n, ts=ts, dat=dat, **postprocess_kwargs, **kwargs)
                 new_params_dict['sol'] = int(n)
                 new_params_dict['time'] = time[ts]
                 new_params_dict['ts'] = int(ts)
@@ -347,7 +347,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
 
 
 def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
-                        df_to_extend=None, **kwargs):
+                        df_to_extend=None, postprocess_kwargs={}, **kwargs):
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
 
@@ -364,7 +364,7 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
         for ii in range(i_time, len(time)):
             ts = ii  # timestep at this solution
             for fn in postprocess_functions:
-                new_params_dict = fn(case, n=None, ts=ts, dat=dat, **kwargs)
+                new_params_dict = fn(case, n=None, ts=ts, dat=dat, **postprocess_kwargs, **kwargs)
                 new_params_dict['time'] = time[ts]
                 new_params = pd.DataFrame(new_params_dict, index=[ts])
                 df_to_extend = pd.concat([df_to_extend, new_params])
@@ -402,7 +402,7 @@ def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=True)
-    N = dat.nusselt(k=1)
+    N = dat.nusselt(k=1, **kwargs)
     return {'Nu': N[ts]}
 
 
@@ -432,7 +432,7 @@ def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs
                                read_statistics=True, read_parameters=True)
     x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
     x, y, z, T = dat.read_temperature(n, verbose=False)
-    d_n = dat.T_components(n, T=T, u=u, v=v)  # dict of components just at solution n
+    d_n = dat.T_components(n, T=T, u=u, v=v, **kwargs)  # dict of components just at solution n
     d_n['h_components'] = T_components_of_h(case, df=d_n, dat=dat, data_path=data_path, **kwargs)
 
     # for key in d_n.keys():

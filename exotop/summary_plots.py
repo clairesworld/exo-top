@@ -1,8 +1,8 @@
 import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
-    fig_fmt, regime_grid_td, \
-    load_grid, alpha_m   # noqa: E402
+    fig_fmt, regime_grid_td, postprocess_kwargs, \
+    load_grid,    # noqa: E402
 # from exotop import aspect_postprocessing2 as asp  # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
@@ -10,7 +10,8 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T'], #'_Nu', '_h'],
                         redo=True,
                         postprocess_functions=[sc.T_parameters_at_sol], #, sc.Nu_at_ts, sc.h_at_ts],
-                        end=end_grid, data_path=data_path, alpha_m=alpha_m, load_grid=load_grid, t1=t1_grid)
+                        postprocess_kwargs=postprocess_kwargs,
+                        end=end_grid, data_path=data_path, load_grid=load_grid, t1=t1_grid)
 
 ## plot summaries across delta eta
 
@@ -24,6 +25,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
             fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta, c_rms=c_rms, c_peak=c_peak,
             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td[ii],
+            postprocess_kwargs=postprocess_kwargs,
         )
 
 ## plot summaries across Ra
@@ -38,6 +40,7 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
             fname='all-Ra' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td.T[ii],
+            postprocess_kwargs=postprocess_kwargs,
         )
 
 # compare 64 and 129 resolution for Ra=3e7
