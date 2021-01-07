@@ -17,8 +17,8 @@ sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td,
                         fig_path=fig_path, fname='evol', fig_fmt=fig_fmt, normtime=True,
                         labelsize=14, xlabel=r'Time', ylabels=None,
                         keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh'],
-                        title='', legsize=16, include_regimes=['chaotic'],
-                        xlabelpad=8, ylabelpad=2, alpha_m=1, markers=None, markersize=20,
+                        title='', include_regimes=['chaotic'],
+                        xlabelpad=8, ylabelpad=8, alpha_m=1, markers=None, markersize=20,
                         cmap='magma', vmin=5, vmax=8.5, data_path=data_path)
 # plot time-evolution of list of keys for all cases in given regime
 
