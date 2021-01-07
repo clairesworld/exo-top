@@ -1506,7 +1506,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
         icol = 0
         sol_df = None  # make sure these are blanked
         ts_df = None
-        if os.path.exists(data_path + 'output-' + case):
+        if os.path.exists(data_path + 'output-' + case) and not (regime_grid[ii] == 'no convection'):
             print('Plotting summary for', case, 'using t1 =', t1[ii])
             t1_ii = t1[ii]
             if iterable_not_string(load):
