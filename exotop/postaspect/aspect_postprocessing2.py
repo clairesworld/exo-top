@@ -534,52 +534,62 @@ class Aspect_Data():
         # find peak velocity in interior (coincident with inflection point)
         if spline:
             try:
-                spl4 = UnivariateSpline(y, mag_av, k=4, s=0)
-                f_dprime4 = spl4.derivative()
-                y_i = f_dprime4.roots()
-                mag_i = spl4(y_i)
+                flag = True
+                root_idx = -1
+                while flag:
+                    spl = UnivariateSpline(y, mag_av, k=4, s=0)
+                    f_dprime = spl.derivative()
+                    y_i = f_dprime.roots()
+                    mag_i = spl(y_i)
 
-                # inflection point with max velocity should be interior
-                idx = np.argmax(mag_i)
-                y_i_max, mag_i_max = y_i[idx], mag_i[idx]
-                if plot:
-                    ax.scatter(mag_i, y_i, c='xkcd:magenta', marker='.', s=30, label='inflection points')
-                    ax.scatter(mag_i_max, y_i_max, c='xkcd:magenta', marker='*', s=50, label='max inflection point')
-
-                # now get 5th-degree spline and find maxima - inverted from profile function
-                spl5 = UnivariateSpline(y, mag_av, k=5, s=0)
-                f_dprime5 = spl5.derivative(n=2)
-                y_grad_max = f_dprime5.roots()
-
-                # isolate to points above interior max velocity
-                try:
-                    y_grad_max = y_grad_max[y_grad_max > y_i_max]
-                except TypeError:  # single root
-                    pass
-                mag_grad_max = spl5(y_grad_max)
-                if np.size(y_grad_max) > 1:
-                    y_grad_max, mag_grad_max = y_grad_max[-1], mag_grad_max[-1]
-                    # print('solution', n, ': velocity magnitude has too many roots! using topmost')
+                    # inflection point with max velocity should be interior
+                    idx = np.argmax(mag_i)
+                    y_i_max, mag_i_max = y_i[idx], mag_i[idx]
                     if plot:
-                        ax.scatter(mag_grad_max, y_grad_max, c='k', marker='.', label='max grad')
-                        fig2, ax2 = plt.subplots(figsize=(4, 4))
-                        ax2.plot(f_dprime4(y), y, c='k', ls='--', label='dv/dy')
-                        ax2.scatter(f_dprime4(y_grad_max), y_grad_max, c='xkcd:orange', label='roots of d2v/dy2')
-                        ax2.legend()
-                        ax2.set_title('solution ' + str(n))
-                elif np.size(y_grad_max) == 0:
-                    raise Exception('solution', n, ': no roots above max inflection point!')
+                        ax.scatter(mag_i, y_i, c='xkcd:magenta', marker='.', s=30, label='inflection points')
+                        ax.scatter(mag_i_max, y_i_max, c='xkcd:magenta', marker='*', s=50,
+                                   label='max inflection point')
 
-                dvdy = spl5.derivative(n=1)
-                dvdy_0 = dvdy(y_grad_max)
-                dydv_0 = 1 / dvdy_0
-                y0 = y_grad_max
-                x0 = mag_grad_max
-                tngnt = lambda x: dydv_0 * x + (y0 - dydv_0 * x0)
+                    # now get 5th-degree spline and find maxima - inverted from profile function
+                    spl2 = UnivariateSpline(y, mag_av, k=5, s=0)
+                    f_dprime2 = spl2.derivative(n=2)
+                    y_grad_max = f_dprime2.roots()
 
-                # intersection of this tangent with depth-axis
-                m1 = dydv_0
-                b = tngnt(0)
+                    # isolate to points above interior max velocity
+                    try:
+                        y_grad_max = y_grad_max[y_grad_max > y_i_max]
+                    except TypeError:  # single root
+                        pass
+                    mag_grad_max = spl2(y_grad_max)
+                    if np.size(y_grad_max) > 1:
+                        #                     print('solution', n, ': velocity magnitude has too many roots! using', root_idx)
+                        if plot:
+                            ax.scatter(mag_grad_max, y_grad_max, c='k', marker='.', label='max grad')
+                            fig2, ax2 = plt.subplots(figsize=(4, 4))
+                            ax2.plot(f_dprime(y), y, c='k', ls='--', label='dv/dy')
+                            ax2.scatter(f_dprime(y_grad_max), y_grad_max, c='xkcd:orange', label='roots of d2v/dy2')
+                            ax2.legend()
+                            ax2.set_title('solution ' + str(n))
+                        y_grad_max, mag_grad_max = y_grad_max[root_idx], mag_grad_max[root_idx]
+                    elif np.size(y_grad_max) == 0:
+                        raise Exception('solution', n, ': no roots above max inflection point!')
+
+                    dvdy = spl2.derivative(n=1)
+                    dvdy_0 = dvdy(y_grad_max)
+                    dydv_0 = 1 / dvdy_0
+                    y0 = y_grad_max
+                    x0 = mag_grad_max
+                    tngnt = lambda x: dydv_0 * x + (y0 - dydv_0 * x0)
+
+                    # intersection of this tangent with depth-axis
+                    m1 = dydv_0
+                    b = tngnt(0)
+
+                    if b > 1 or b < 0:  # invalid answer
+                        root_idx = root_idx - 1
+                    else:
+                        flag = False
+
             except Exception as e:
                 print('Could not get lid thickness via spline:\n', e)
                 spline = False
@@ -610,6 +620,9 @@ class Aspect_Data():
             y_tan = m1 * x_vel + b
             ax.plot(x_vel, y_tan, c='g', ls='--', label='tangent to max gradient')
             ax.legend()
+
+        if b < 0 or b > 1:
+            raise Exception('ERROR in lid thickness: y_l ='+str(b))
         try:
             return b[0]  # y_L
         except IndexError:
