@@ -2,7 +2,7 @@ import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     fig_fmt, regime_grid_td, postprocess_kwargs, \
-    load_grid,    # noqa: E402
+    load_grid    # noqa: E402
 # from exotop import aspect_postprocessing2 as asp  # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
