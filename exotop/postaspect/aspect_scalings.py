@@ -13,9 +13,11 @@ from matplotlib.colors import LogNorm, Normalize
 import matplotlib.lines as mlines  # noqa: E402
 # from sklearn import linear_model
 import sys
+
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect import aspect_postprocessing2 as post  # noqa: E402
-from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, colourbar  # noqa: E402
+from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, \
+    colourbar  # noqa: E402
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
@@ -684,7 +686,6 @@ def fit_log(x, h, intercept=False, weights=None, **kwargs):
 #     return slope_x, slope_y, 10 ** intercept
 
 
-
 def fit_h_sigma(x, h, h_err=None, fn='line'):
     def line(x, a, b):
         return a * x + b
@@ -763,7 +764,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             else:
                 if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
                     print('    plot_h_vs(): Calculating T components')
-                    h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii, update=False,
+                    h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
+                                                     update=False,
                                                      **kwargs)
                 else:
                     h_components = df['h_components']
@@ -774,10 +776,11 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             if Ra_i == 'eff':  # calculate effective Ra using time-mean of T field params
                 if averagefirst:
                     x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
-                             T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
+                                 T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
                 else:
                     if not h_components:
-                        raise Exception('Ra_i_eff not implemented yet if using h output over all timesteps without averaging')
+                        raise Exception(
+                            'Ra_i_eff not implemented yet if using h output over all timesteps without averaging')
                     # x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'],
                     #          T_l=df['T_l'], delta_L=df['delta_L'])
             elif Ra_i:
@@ -785,12 +788,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                     x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
                 else:
                     if not h_components:
-                        raise Exception('Ra_i not implemented yet if using h output over all timesteps without averaging')
+                        raise Exception(
+                            'Ra_i not implemented yet if using h output over all timesteps without averaging')
             else:
                 if averagefirst:
                     x = float(cases_var[ii])
                 else:
-                    x = float(cases_var[ii]) * np.ones(len(df.index))  # normally this is equal to Ra (constant along index)
+                    x = float(cases_var[ii]) * np.ones(
+                        len(df.index))  # normally this is equal to Ra (constant along index)
         df[x_key] = x
 
         try:
@@ -798,8 +803,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             if averagefirst:
                 # fit to time-mean rather than all points
                 yx_peak_all.append(
-                    (np.array(df['h_peak'].mean())*hscale, np.array(df[x_key].mean())))  # each xy point (y=h)
-                yx_rms_all.append((np.array(df['h_rms'].mean())*hscale, np.array(df[x_key].mean())))
+                    (np.array(df['h_peak'].mean()) * hscale, np.array(df[x_key].mean())))  # each xy point (y=h)
+                yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, np.array(df[x_key].mean())))
                 n_sols_all.append(len(df.index))
             else:
                 # use each xy point (y=h) for fitting to
@@ -865,20 +870,20 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
 def dimensionalise_h(hprime, p):
     try:
-        return hprime*(p['alpha_m']*p['dT_m']*p['d_m'])
+        return hprime * (p['alpha_m'] * p['dT_m'] * p['d_m'])
     except KeyError:
         raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to dimensionalise')
 
 
 def nondimensionalise_h(h, p):
     try:
-        return h/(p['alpha_m']*p['dT_m']*p['d_m'])
+        return h / (p['alpha_m'] * p['dT_m'] * p['d_m'])
     except KeyError:
         raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to nondimensionalise')
 
 
 def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=None,
-              c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
+                      c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
     if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
@@ -903,7 +908,6 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=Non
     if showallscatter:
         ax.scatter(flatx, flaty, c=c, alpha=0.05, s=10)
     return ax
-
 
 
 #
@@ -1181,7 +1185,8 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
             if not (not Ra_regime):  # if this regime is not empty
                 fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
                                     load_ii[Ra_regime_idx], which_x=which_x, Ra_i=Ra_i, show_isoviscous=show_isoviscous,
-                                    fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir], p_dimensionals=p_dimensionals,
+                                    fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir],
+                                    p_dimensionals=p_dimensionals,
                                     save=False, ylabel='', xlabel='', labelsize=labelsize, y2label=y2label, **kwargs)
                 if show_bounds:
                     ax.axvline(float(Ra_regime[-1]) * 2, c='k', lw=0.5, alpha=0.6, ls='--')
@@ -1189,14 +1194,13 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                 # print('Plotted', len(Ra_regime), regime_name, 'case(s)')
 
         # ax.set_title(r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-2)
-        ax.text(0.01, 0.98, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-4, ha='left', va='top',
+        ax.text(0.01, 0.98, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize - 4, ha='left', va='top',
                 transform=ax.transAxes)  # label
 
         if ii % ncols != 0 and p_dimensionals is None:
             ax.yaxis.tick_right()
         elif ii % ncols != 0:
             ax.set_yticklabels([])
-
 
     # add legends
     ax = bigax
@@ -1283,8 +1287,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
-        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys*2.5), sharex=True)
-        if nkeys==1:
+        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys * 2.5), sharex=True)
+        if nkeys == 1:
             axes = np.array([axes])
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
     c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
@@ -1348,8 +1352,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1=None, end='', keys=None, dat
                             raise e
                 if compare_exponent is not None:
                     for k, key in enumerate(keys):
-                        axes[k].plot(plot_data['Ra'], np.array(plot_data['Ra'])**compare_exponent[k],
-                                     label=key+'^'+str(compare_exponent[k]), c='k', lw=1)
+                        axes[k].plot(plot_data['Ra'], np.array(plot_data['Ra']) ** compare_exponent[k],
+                                     label=key + '^' + str(compare_exponent[k]), c='k', lw=1)
 
         for k, key in enumerate(keys):
             xlabel = ''
@@ -1437,7 +1441,7 @@ def moresi95(Ra=None, d_eta=None, df=None, dat=None, case=None, T1=1, dT=1,
 
 def Ra_interior(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0):
     theta = np.log(d_eta)  # gamma for this delta eta
-    gamma = theta/(np.array(T1) - np.array(T0))
+    gamma = theta / (np.array(T1) - np.array(T0))
     eta_1 = np.exp(-gamma * np.array(T1))  # bottom viscosity
     eta_i = np.exp(-gamma * np.array(T_i))
     Ra_i = np.array(Ra_1) * eta_1 / eta_i
@@ -1445,7 +1449,7 @@ def Ra_interior(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0):
 
 
 def Ra_eff(Ra=None, T1=1, T0=0, T_l=None, Z=1, delta_L=None):
-    return Ra * (T1 - T_l)/(T1 - T0) * ((Z - np.array(delta_L))/Z)**3
+    return Ra * (T1 - T_l) / (T1 - T0) * ((Z - np.array(delta_L)) / Z) ** 3
 
 
 def Ra_i_eff(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0, T_l=None, Z=1, delta_L=None):
@@ -1651,7 +1655,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     if lognorm:
         im_norm = LogNorm(vmin=vmin, vmax=vmax, clip=False)
     else:
-        im_norm = None #Normalize(vmin=vmin, vmax=vmax, clip=False)
+        im_norm = None  # Normalize(vmin=vmin, vmax=vmax, clip=False)
 
     im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax,
                    norm=im_norm)
@@ -1932,7 +1936,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid_td=None, regime_names_td=Non
     if t1 is None:
         t1 = [[0] * len(Ra_ls)] * len(eta_ls)
     if fig is None:
-        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys*2.5), sharex=True)
+        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys * 2.5), sharex=True)
         if nkeys == 1:
             axes = np.array([axes])
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
@@ -1980,12 +1984,12 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid_td=None, regime_names_td=Non
                     ax.set_ylabel(ylabels[k], fontsize=labelsize, labelpad=ylabelpad)
                     if k == len(keys) - 1:
                         ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
-                    ax.scatter(x_data, y_data, c=c_jj, markersize=markersize, marker=marker_ii)
+                    ax.scatter(x_data, y_data, c=c_jj, s=markersize, marker=marker_ii)
 
     # legend proxy artist
     ax = axes[-1]
-    scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, markersize=markersize,
-                            vmin=vmin, vmax=vmax)  # dummy
+    scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, s=markersize,
+                      vmin=vmin, vmax=vmax)  # dummy
     legend1 = ax.legend(*scat.legend_elements(num=len(logeta_fl)),
                         loc="upper left", title=r"log $\Delta \eta$", fontsize=legsize)
     ax.add_artist(legend1)
@@ -1995,14 +1999,13 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid_td=None, regime_names_td=Non
         p = mlines.Line2D([], [], lw=0, color='k', marker=markers[ii], markersize=markersize, label=Ra)
         lines.append(p)
     legend2 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="lower right",
-                        title="Ra",)
+                        title="Ra", )
     ax.add_artist(legend2)
 
     plt.suptitle(title, fontsize=labelsize, y=1.02)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return fig, axes
-
 
 
 def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=True, t1=0, dat=None, show_sols=False,
@@ -2060,7 +2063,7 @@ def plot_topo_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=
 
 
 def read_JFR(fname, path='/raid1/cmg76/aspect/benchmarks/JFR/'):
-    df = pd.read_csv(path+fname, header=0, index_col=False)
+    df = pd.read_csv(path + fname, header=0, index_col=False)
     print('Loaded', fname, df.columns)
     Ra = np.array(df.Ra)
     h_peak = np.array(df.peak_topo)
@@ -2095,7 +2098,8 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
                              data_path=data_path, at_sol=True, load=load, **kwargs)
 
 
-def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,
+def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None,
+                            legend=True,
                             c='k', averagefirst=True, ylim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', labelsize=16, regime_names=None, clist=None,
                             cmap='magma', cbar='eta', include_regimes=None, **kwargs):
@@ -2132,7 +2136,8 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
         for ii, case in enumerate(cases):
             t1_ii = t1[jj][ii]
             load_ii = load[jj][ii]
-            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (regime_grid[jj][ii] in include_regimes):
+            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
+                    regime_grid[jj][ii] in include_regimes):
                 # load outputs
                 dfs = []
                 for ip, ps in enumerate(psuffixes):
@@ -2152,7 +2157,8 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None,
                 elif which_h == 'peak':
                     h = np.array(df['h_peak'])
                 try:
-                    df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', 'h_components'])  # remove any rows with nans
+                    df = df.dropna(axis=0, how='any',
+                                   subset=['h_peak', 'h_rms', 'h_components'])  # remove any rows with nans
                     # fit to time-mean rather than all points
                     h_data_all.append((np.mean(h)))
                     x_data_all.append(np.mean(h_components))
@@ -2215,10 +2221,9 @@ def plot_error_contours(fig, ax, errs=None, c='k', labels=True):
                 # transform data points to screen space
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
-                ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err*100), size=9, rotation=rot, color=l.get_color(),
+                ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=9, rotation=rot, color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec='1', fc='1'))
     return fig, ax
-
 
 # def subplots_h_fit_2D(Ra_ls=None, eta_ls=None, t1=None, end=None, load='auto', data_path=data_path_bullard,
 #               fig_path=fig_path_bullard, alpha_m=1.35e-5,
