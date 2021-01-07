@@ -11,9 +11,9 @@ load = load_grid
 
 # plot evolutions for debugging T components
 sc.subplots_evol_at_sol(Ra_ls=['1e8', '3e8'], eta_ls=['1e6', '1e7', '1e8'], regime_grid_td=None, regime_names_td=None, c_regimes=None,
-                        save=True, t1=t1_grid,
+                        save=True, t1=t1_grid, end=end_grid,
                         load=load_grid, psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol],
-                         fig_path=fig_path, fname='evol', fig_fmt='.png', end=None, normtime=True,
+                         fig_path=fig_path, fname='evol', fig_fmt='.png', normtime=True,
                          labelsize=14, xlabel=r'Time', ylabels=None,
                         keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh'],
                         title='', legsize=16,
