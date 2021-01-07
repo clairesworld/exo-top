@@ -664,7 +664,7 @@ class Aspect_Data():
         try:
             x = self.x
             y = self.y
-        except:
+        except AttributeError:
             self.read_mesh(n)  # mesh should be the same for all timesteps in steady state?
             x = self.x
             y = self.y
@@ -673,7 +673,7 @@ class Aspect_Data():
         T_av = horizontal_mean(T, x)
         try:
             p = self.parameters
-        except:
+        except AttributeError:
             self.read_parameters(verbose=verbose)
             p = self.parameters
         d_m = p['Geometry model']['Box']['Y extent']

@@ -22,8 +22,8 @@ from exotop.useful_and_bespoke import age_index  # noqa: E402
 # np.seterr('raise')
 
 
-def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, visc_type='Thi', t_eval=None, random=False,
-                 initial_kwargs=None, postprocessors=None, update_kwargs=None, **kwargs):
+def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, t_eval=None, random=False,
+                 initial_kwargs=None, postprocessors=None, update_kwargs=None, logscale=False, **kwargs):
     """varying single parameter 'name' between mini and maxi, use default values otherwise.
     update_kwargs can include any TerrestrialPlanet attribute
     initial_kwargs can include T_m0, T_c0, D_l0, t0, tf"""
@@ -41,7 +41,10 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, visc_type='Thi
 
     planets = []
     ii = 0
-    arr = np.linspace(mini, maxi, num=n)
+    if logscale:
+        arr = np.logspace(np.log10(mini), np.log10(maxi), num=n)
+    else:
+        arr = np.linspace(mini, maxi, num=n)
     while ii < n:
         if random:
             val = rand.uniform(mini, maxi)
@@ -72,7 +75,8 @@ def build_planet(planet_kwargs, model_kwargs, postprocessors=None, t_eval=None, 
     if postprocessors is None:
         postprocessors = ['topography']
     pl = tp.TerrestrialPlanet(**planet_kwargs)
-    pl = thermal.solve(pl, t_eval=t_eval, **model_kwargs)  # T_m, T_c, D_l
+    pl = thermal.solve(pl, t_eval=t_eval, **model_kwargs, **kwargs)  # T_m, T_c, D_l
+
     if 'topography' in postprocessors:
         pl = topography.topography(pl, **kwargs)
     if 'ocean_capacity' in postprocessors:
@@ -148,8 +152,8 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
             #             print('y', y)
             # if the name of the parameter you want to plot exists
             yl = str(ylabels[n][0])
-            if (par == 'eta_m') or (par == 'Ra_i_eff'):  # always log scale for viscosity, Ra
-                y = np.log10(y)
+            if (par == 'eta_m') or (par == 'Ra_i') or (par == 'Ra_i_eff') or (par == 'delta_eta'):  # always log scale for viscosity, Ra
+                ax.set_yscale('log')  #y = np.log10(y)
             plot_one(ax, t * 1e-9 / parameters.years2sec, y * ylabels[n][1], xlabel='', ylabel=yl, ticksize=ticksize,
                      labelpad=labelpad,
                      label=label, fontname=fontname, labelsize=labelsize, legsize=legsize, line_args=line_args)

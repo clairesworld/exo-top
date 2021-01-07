@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm, Normalize
+import matplotlib.lines as mlines  # noqa: E402
 # from sklearn import linear_model
 import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
@@ -28,7 +29,7 @@ def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches
     if tight_layout:
         fig.tight_layout()
     fig.savefig(path, bbox_inches=bbox_inches, **kwargs)
-    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  saved to ', path, '!')
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  saved to ', path, '!\n')
 
 
 def read_topo_stats(case, ts, data_path=data_path_bullard):
@@ -1908,6 +1909,102 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 #     return np.percentile(x_list, qs), fig, ax
 
 
+def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid_td=None, regime_names_td=None, c_regimes=None, save=True, t1=None,
+                         load='auto', psuffixes=['_T'], postprocess_functions=[T_parameters_at_sol],
+                         fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end=None, normtime=True,
+                         labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=16,
+                         xlabelpad=8, ylabelpad=-2, alpha_m=1, markers=None, markersize=20,
+                         fig=None, cmap='magma', vmin=None, vmax=None,
+                         regimes_title='Stationarity', data_path=data_path_bullard, **kwargs):
+    # plot time-evolution of list of keys for all cases in given regime
+    if markers is None:
+        markers = ['o', '^', 's', 'P', 'D', 'v', '*', 'X']
+    if ylabels is None:
+        ylabels = keys
+    if iterable_not_string(keys):
+        nkeys = len(keys)
+    elif keys is None:
+        raise Exception('No y-axis keys provided!')
+    else:
+        nkeys = 1
+    if not_iterable(load):  #
+        load = np.array([[load] * len(Ra_ls)] * len(eta_ls))
+    if t1 is None:
+        t1 = [[0] * len(Ra_ls)] * len(eta_ls)
+    if fig is None:
+        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys*2.5), sharex=True)
+        if nkeys == 1:
+            axes = np.array([axes])
+    logeta_fl = [np.log10(float(a)) for a in eta_ls]
+    c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+
+    for jj, eta_str in enumerate(eta_ls):
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end[jj])
+        c_jj = c_list[jj]
+
+        for ii, case in enumerate(cases):
+            t1_ii = t1[jj][ii]
+            load_ii = load[jj][ii]
+            marker_ii = markers[ii]
+
+            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
+                Ra_ii = float(Ra_var[ii])
+
+                # load data
+                if load_ii == 'auto':
+                    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
+                                           read_statistics=True)
+                else:
+                    dat = None
+                dfs = []
+                for ip, suffix in enumerate(psuffixes):
+                    df1 = pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
+                                   dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
+                    dfs.append(df1)
+                try:
+                    df = pd.concat(dfs, axis=1)
+                    df = df.loc[:, ~df.columns.duplicated()]
+                except Exception as e:
+                    for dfi in dfs:
+                        print(dfi)
+                    raise e
+
+                # do the plotting on each axis
+                x_data = df['time']
+                if normtime:
+                    # Normalised [0,1]
+                    x_data = (x_data - np.min(x_data)) / np.ptp(x_data)
+                for k, key in enumerate(keys):
+                    ax = axes[k]
+                    y_data = df[key]
+                    ax.set_ylabel(ylabels[k], fontsize=labelsize, labelpad=ylabelpad)
+                    if k == len(keys) - 1:
+                        ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
+                    ax.scatter(x_data, y_data, c=c_jj, markersize=markersize, marker=marker_ii)
+
+    # legend proxy artist
+    ax = axes[-1]
+    scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, markersize=markersize,
+                            vmin=vmin, vmax=vmax)  # dummy
+    legend1 = ax.legend(*scat.legend_elements(num=len(logeta_fl)),
+                        loc="upper left", title=r"log $\Delta \eta$", fontsize=legsize)
+    ax.add_artist(legend1)
+
+    lines = []
+    for ii, Ra in enumerate(Ra_ls):
+        p = mlines.Line2D([], [], lw=0, color='k', marker=markers[ii], markersize=markersize, label=Ra)
+        lines.append(p)
+    legend2 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="lower right",
+                        title="Ra",)
+    ax.add_artist(legend2)
+
+    plt.suptitle(title, fontsize=labelsize, y=1.02)
+    if save:
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+    return fig, axes
+
+
+
 def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=True, t1=0, dat=None, show_sols=False,
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True, fig_fmt='.png',
               setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, sol_df=None,
@@ -1989,14 +2086,13 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1=Non
                 if redo:
                     # for recalculating everything if you fucked up or are redoing
                     load = False
-                else:
+                elif load_grid is not None:
                     load = load_grid[jj][ii]
+                else:
+                    load = 'auto'
                 for ip, suffix in enumerate(psuffixes):
                     pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
                              data_path=data_path, at_sol=True, load=load, **kwargs)
-
-
-
 
 
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1=None, load=None, end=None, literature_file=None, legend=True,

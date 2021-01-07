@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import interpolate
 from . import parameters
 from . import astroenvironment as ast
 from . import geometry as geom
@@ -47,7 +46,8 @@ class TerrestrialPlanet():
                             X_K = 250, # initial abundance of K in wt ppm in Treatise on Geophysics
                             X_U = 2e-2, # initial abundane of U in wt ppm ""
                             X_Th = 7e-2, # initial abundance of Th in wt ppm ""
-                            H_0 = 4.6e-12, # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999), CI chondrites
+                            H_f = 4.6e-12, # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999), CI chondrites
+                            H_0=22.65771894e-12,  # radiogenic heating at t0 based on above
                             
                             # viscosity defaults
                             a_rh=2.44, # for beta=1/3 from Thiriet+ (2019)
@@ -130,10 +130,13 @@ class TerrestrialPlanet():
         # set natural scales
         T = np.maximum(self.T_c, self.T_m) - self.T_s  # fucked for cases where T_c < T_m
         L = self.R_p - self.R_c
+        T0 = T[0]
 
-        self.dT_m_prime = self.dT_m/T
-        self.dT_rh_prime = self.dT_rh/T
-        self.T_l_prime = self.T_l/T
+        self.T_m_prime = self.T_m/T0
+        self.T_c_prime = self.T_c/T0
+        self.dT_m_prime = self.dT_m/T0
+        self.dT_rh_prime = self.dT_rh/T0
+        self.T_l_prime = self.T_l/T0
 
         self.d_m_prime = self.d_m/L
         self.D_l_prime = self.D_l/L
@@ -144,10 +147,13 @@ class TerrestrialPlanet():
         self.g_sfc_prime = 1
         self.k_m_prime = 1
         self.kappa_m_prime = 1
+        self.c_m_prime = 1
+        self.c_c_prime = 1
 
-        # Ra = self.rho_m*self.g_sfc*self.alpha_m*T*L**3 / (self.kappa_m*self.eta_m)
-        # self.eta_m_prime = self.rho_m_prime*self.g_sfc_prime*self.alpha_m_prime/(self.kappa_m_prime*Ra) # from Ra
-        self.dyn_top_rms_prime = self.dyn_top_rms/(self.alpha_m_prime*T*L)
-        self.heuristic_h_prime = self.heuristic_h/(self.alpha_m_prime*T*L)
+        self.eta_m_prime = 1/self.Ra_i * np.exp(-np.log(self.delta_eta) * self.T_m_prime)
+        self.dyn_top_rms_prime = self.dyn_top_rms/(self.alpha_m*T0*L)
+        self.heuristic_h_prime = self.heuristic_h/(self.alpha_m*T0*L)
 
+        self.T_scale = T
+        self.L_scale = L
         # incomplete
