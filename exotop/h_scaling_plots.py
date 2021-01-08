@@ -14,8 +14,8 @@ load = True #load_grid
 sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td, save=True, t1_grid=t1_grid, load_grid=True,
                         psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol], fig_path=fig_path,
                         fname='evol', fig_fmt=fig_fmt, end_grid=end_grid, normtime=True, labelsize=14, xlabel=r'Time',
-                        ylabels=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_components'],
-                        keys=['y_L', 'T_L', 'T_i', 'dT_rh', 'delta_rh', r'$\alpha \Delta T{_{rh} \delta_{rh}$'], title='', xlabelpad=8,
+                        keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_components'],
+                        ylabels=['y_L', 'T_L', 'T_i', 'dT_rh', 'delta_rh', r'$\alpha \Delta T{_{rh} \delta_{rh}$'], title='', xlabelpad=8,
                         ylabelpad=8, markers=None, markersize=24, cmap='magma', vmin=5, vmax=8.5,
                         include_regimes=['chaotic'], data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 # plot time-evolution of list of keys for all cases in given regime
