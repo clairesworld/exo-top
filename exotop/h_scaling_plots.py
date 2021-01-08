@@ -54,7 +54,7 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          xlabelpad=8, ylabelpad=20, fit=True, showallscatter=False,
                          #xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2),
                          logx=True, logy=True,
-                         regimes_title='Stationarity', leftleg_bbox=(-0.5, 0.95), data_path=data_path,
+                         regimes_title='Stationarity', leftleg_bbox=(-0.1, 0.95), data_path=data_path,
                          postprocess_kwargs=postprocess_kwargs,)
 load = True
 
@@ -68,7 +68,7 @@ sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regim
                          xlabelpad=8, ylabelpad=20, fit=True, showallscatter=True,
                          #xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2),
                          logx=True, logy=True,
-                         regimes_title='Stationarity', leftleg_bbox=(-0.5, 0.95), data_path=data_path,
+                         regimes_title='Stationarity', leftleg_bbox=(-0.1, 0.95), data_path=data_path,
                          postprocess_kwargs=postprocess_kwargs,)
 load = True
 
