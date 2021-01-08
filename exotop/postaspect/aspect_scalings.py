@@ -1402,12 +1402,14 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
     if compare_pub is None:
         outer_handles = []
         outer_labels = []
+        ncol = None
     else:
         outer_handles = [ax.scatter([], [], marker='^', c=c_scatter, edgecolors=highlight_colour),
                          ax.scatter([], [], marker='o', c=c_scatter)]
         outer_labels = [compare_label, 'This work']
+        ncol = len(outer_handles)
     outer_legend = ax.legend(handles=outer_handles, labels=outer_labels,
-                             borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                             borderaxespad=0., ncol=ncol, bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                              frameon=False,  # mode="expand"
                              )
     ax.add_artist(outer_legend)
