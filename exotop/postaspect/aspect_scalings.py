@@ -865,7 +865,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 fmt='o', c=c_rms, capsize=5)
 
     if fit:
-        if h_components:
+        if which_x == 'components':
             intercept=True
         else:
             intercept=False
