@@ -13,7 +13,7 @@ def topography(pl, **kwargs):
 
 
 def dyn_topo_aspect(pl, **kwargs):
-    h_prime = 2.73 * pl.heuristic_h  # fit to chaotic regime
+    h_prime = 2.26 * pl.heuristic_h  # fit to chaotic regime
     return h_prime
 
 

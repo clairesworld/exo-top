@@ -865,7 +865,12 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 fmt='o', c=c_rms, capsize=5)
 
     if fit:
-        ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all), c=c_rms, labelsize=labelsize, **kwargs)
+        if h_components:
+            intercept=True
+        else:
+            intercept=False
+        ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all), c=c_rms, labelsize=labelsize,
+                               intercept=intercept, **kwargs)
 
     if show_isoviscous:
         df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
@@ -923,7 +928,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=Non
     else:
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
-        expon, const = fit_log(flatx, flaty, weights=weights)
+        expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
         xprime = np.linspace(np.min(flatx), np.max(flatx))
         hprime = const * xprime ** expon
         h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
