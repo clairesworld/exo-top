@@ -1402,7 +1402,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
     if compare_pub is None:
         outer_handles = []
         outer_labels = []
-        ncol = None
+        ncol = 1
     else:
         outer_handles = [ax.scatter([], [], marker='^', c=c_scatter, edgecolors=highlight_colour),
                          ax.scatter([], [], marker='o', c=c_scatter)]
