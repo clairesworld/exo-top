@@ -628,7 +628,7 @@ class Aspect_Data():
         except IndexError:
             return b
     
-    def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, u=None, v=None, cut=False, plot=False,
+    def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, u=None, v=None, plot=False,
                              verbose=False, **kwargs):
         x = self.x
         y = self.y
@@ -639,9 +639,12 @@ class Aspect_Data():
         if (delta_L is None):
             if (u is None) or (v is None):
                 _, _, _, u, v, _ = self.read_velocity(n, verbose=verbose, **kwargs)
-            delta_L = self.lid_thickness(u=u, v=v, cut=cut, plot=plot, **kwargs)
+            delta_L = self.lid_thickness(u=u, v=v, plot=plot, **kwargs)
         # find T at delta_L
-        T_l = T_av[find_nearest_idx(y, delta_L)]
+        # fit spline
+        spl = UnivariateSpline(y, T_av, k=3, s=0)
+        T_l = spl(delta_L)
+        # T_l = T_av[find_nearest_idx(y, delta_L)]
         return T_l
 
     def max_Ty(self, n=None, T=None, T_av=None, verbose=False):

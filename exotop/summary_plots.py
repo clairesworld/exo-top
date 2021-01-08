@@ -17,10 +17,10 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 #                         t1_grid=t1_grid[1:3, -2], end_grid=end_grid[1:3, -2], data_path=data_path, redo=True,
 #                         load_grid=load_grid[1:3, -2], postprocess_kwargs=postprocess_kwargs)
 
-sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_Nu'], postprocess_functions=[sc.T_parameters_at_sol,
-                                                                                             sc.h_at_ts, sc.Nu_at_ts],
-                        t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
-                        load_grid=load_grid, postprocess_kwargs=postprocess_kwargs)
+sc.reprocess_all_at_sol(Ra_ls[-2:], eta_ls, psuffixes=['_T'],#'_h', '_Nu'],
+                        postprocess_functions=[sc.T_parameters_at_sol], #sc.h_at_ts, sc.Nu_at_ts],
+                        t1_grid=t1_grid[:,-2:], end_grid=end_grid[:,-2:], data_path=data_path, redo=True,
+                        load_grid=load_grid[:,-2:], postprocess_kwargs=postprocess_kwargs)
 
 ## plot summaries across delta eta
 
