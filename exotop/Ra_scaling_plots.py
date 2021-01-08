@@ -35,7 +35,8 @@ sc.subplots_Ra_scaling(Ra_ls, eta_ls, t1_grid=t1_grid, end_grid=end_grid, keys=[
 
 sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1_grid=t1_grid[1:, 4:], end_grid=end_grid[1:, 4:],
                        keys=['delta_rh', 'dT_rh', 'Nu'], data_path=data_path, fig_path=fig_path,
-                       load_grid=load_grid[1:, 4:], Ra_i='eff', save=True, fname='delta_rh-Nu-chaotic-eff',
+                       load_grid=load,# load_grid[1:, 4:],
+                       Ra_i='eff', save=True, fname='delta_rh-Nu-chaotic-eff',
                        labelsize=14, ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$', 'Nu'], psuffixes=['_T', '_Nu'],
                        title='Chaotic time-dependence', postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts],
                        xlim=(0.7e6, 4e7), ylim=[(None), (None), (None)],
