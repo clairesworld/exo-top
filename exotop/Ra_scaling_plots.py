@@ -60,8 +60,9 @@ sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1_grid=t1_grid[1:, 4:], end_grid=
                        Ra_i=True, save=True, fname='delta_rh-Nu-chaotic', compare_label='Moresi & Solomatov 1995', labelsize=14,
                        ylabels=[r'$\delta_{0}$', r'$\delta_{rh}$', r'$\Delta T_{rh}$', 'Nu'], psuffixes=['_T', '_Nu'],
                        title='Chaotic time-dependence', postprocess_functions=[sc.T_parameters_at_sol, sc.Nu_at_ts],
-                       xlim=(1e7, 2e8), ylim=[(None), (None), (None)],
-                       legloc=['lower left', 'upper left', 'lower left'], cmap='winter', compare_pub=sc.moresi95,
+                       xlim=(1e7, 2e8), #ylim=[(None), (None), (None)],
+                      # legloc=['lower left', 'upper left', 'lower left'],
+                       cmap='winter', compare_pub=sc.moresi95,
                        fig_fmt=fig_fmt, fit=True, postprocess_kwargs=postprocess_kwargs)
 
 # sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1_grid=t1_grid[:, :3], end_grid=end_grid[:, :3], keys=['delta_rh', 'dT_rh'],
