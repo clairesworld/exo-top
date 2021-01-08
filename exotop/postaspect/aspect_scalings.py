@@ -1397,24 +1397,28 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
                                            save=False, labelsize=labelsize, ylabel=ylabels[k], c_scatter=c_scatter,
                                            fig=fig, ax=axes[k], xlabel=xlabel, legend=True, legloc=legloc[k], **kwargs)
 
-    if compare_pub is not None:  # add top legend
-        ax = axes[0]
-        outer_handles = [ax.scatter([], [], label=compare_label, marker='^', c=c_scatter,
-                                    edgecolors=highlight_colour),
-                         ax.scatter([], [], label='This work', marker='o', c=c_scatter)]
-        outer_legend = ax.legend(handles=outer_handles, labels=[compare_label, 'This work'],
-                                 borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                                 frameon=False,  # mode="expand"
-                                 )
-        ax.add_artist(outer_legend)
-        bbox_extra_artists = (outer_legend,)
-        tight_layout = False
-        bbox_inches = None
-        fig.subplots_adjust(left=0.2)
+    # if compare_pub is not None:  # add top legend
+    ax = axes[0]
+    if compare_pub is None:
+        outer_handles = []
+        outer_labels = []
     else:
-        bbox_extra_artists = None
-        tight_layout = True
-        bbox_inches = 'tight'
+        outer_handles = [ax.scatter([], [], marker='^', c=c_scatter, edgecolors=highlight_colour),
+                         ax.scatter([], [], marker='o', c=c_scatter)]
+        outer_labels = [compare_label, 'This work']
+    outer_legend = ax.legend(handles=outer_handles, labels=outer_labels,
+                             borderaxespad=0., ncol=len(outer_handles), bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                             frameon=False,  # mode="expand"
+                             )
+    ax.add_artist(outer_legend)
+    bbox_extra_artists = (outer_legend,)
+    tight_layout = False
+    bbox_inches = None
+    fig.subplots_adjust(left=0.2)
+    # else:
+    #     bbox_extra_artists = None
+    #     tight_layout = True
+    #     bbox_inches = 'tight'
 
     # colorbar proxy artist
     scat = axes[-1].scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap,
