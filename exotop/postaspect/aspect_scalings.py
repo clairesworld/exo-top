@@ -1400,8 +1400,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
     # if compare_pub is not None:  # add top legend
     ax = axes[0]
     if compare_pub is None:
-        outer_handles = []
-        outer_labels = []
+        outer_handles = [None]
+        outer_labels = [None]
         ncol = 1
     else:
         outer_handles = [ax.scatter([], [], marker='^', c=c_scatter, edgecolors=highlight_colour),

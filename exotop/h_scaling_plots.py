@@ -14,7 +14,7 @@ load = True #load_grid
 
 # plot h scalings - with dT_m*delta*alpha
 
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
+_ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
                          T_components=True, averagefirst=True, legloc='upper right',
                          load_grid=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end_grid=end_grid,
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h^\prime$',
@@ -27,7 +27,7 @@ load = True
 
 # same but just looking at each time point
 
-sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
+_ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
                          T_components=True, averagefirst=False, legloc='upper right',
                          load_grid=load,
                          fig_path=fig_path, fname='h_T_all_scatter', fig_fmt=fig_fmt, end_grid=end_grid,
@@ -41,7 +41,7 @@ load = True
 
 # # plot h scalings with Ra
 #
-# sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
+# _ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
 #                          load_grid=load, show_isoviscous=True, averagefirst=True,
 #                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end_grid=end_grid, labelsize=14,
 #                          xlabel='Ra_i', Ra_i=True,
