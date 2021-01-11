@@ -294,23 +294,8 @@ class Aspect_Data():
             print("Reading statistics from", filename)
 
         start_time = time.time()
-        data = np.genfromtxt(filename, comments='#')
-        all_data = np.genfromtxt(filename, comments='#', dtype=None)
-        self.stats_timestep = np.array([d[0] for d in all_data])
-        self.stats_time = data[:,1]
-        self.stats_rms_velocity = data[:,10]
-        self.stats_average_T = data[:,13]
-        self.stats_heatflux_left = data[:,16]
-        self.stats_heatflux_right = data[:,17]
-        self.stats_heatflux_bottom = data[:,18]
-        self.stats_heatflux_top = data[:,19]
-        self.stats_average_viscosity = data[:,22]
-        print(self.stats_timestep)
-        print('np.genfromtxt took %s seconds' % (time.time() - start_time))
-
-        start_time = time.time()
         fp = open(filename)
-        data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=map(str, np.arange(0, 26)),
+        data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=[str(r) for r in np.arange(0, 26)]),
                               delimiter='\t')
         for row in data:
             print(row)
@@ -325,6 +310,23 @@ class Aspect_Data():
         self.stats_average_viscosity = np.array([np.float(s) for s in data['22']])
         print(self.stats_timestep)
         print("csv.DictReader took %s seconds" % (time.time() - start_time))
+
+        start_time = time.time()
+        data = np.genfromtxt(filename, comments='#')
+        all_data = np.genfromtxt(filename, comments='#', dtype=None)
+        self.stats_timestep = np.array([d[0] for d in all_data])
+        self.stats_time = data[:,1]
+        self.stats_rms_velocity = data[:,10]
+        self.stats_average_T = data[:,13]
+        self.stats_heatflux_left = data[:,16]
+        self.stats_heatflux_right = data[:,17]
+        self.stats_heatflux_bottom = data[:,18]
+        self.stats_heatflux_top = data[:,19]
+        self.stats_average_viscosity = data[:,22]
+        print(self.stats_timestep)
+        print('np.genfromtxt took %s seconds' % (time.time() - start_time))
+
+
 
         # start_time = time.time()
         # data = dask.dataframe.read_csv(filename, sep='\t', comments='#', header=None, names=map(str, np.arange(0, 26)),
