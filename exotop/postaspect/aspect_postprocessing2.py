@@ -781,12 +781,12 @@ class Aspect_Data():
             x = self.x
             y = self.y
         if T_av is None:
-                if T is None:
-                    _, _, _, T = self.read_temperature(n, verbose=verbose)
+            if T is None:
+                _, _, _, T = self.read_temperature(n, verbose=verbose)
             T_av = horizontal_mean(T, x)
         if uv_mag_av is None:
-                if uv_mag is None:
-                    _, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=verbose)
+            if uv_mag is None:
+                _, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=verbose)
             uv_mag_av = horizontal_mean(uv_mag, x)
         if d_m is None or dT_m is None:
             try:
@@ -808,7 +808,7 @@ class Aspect_Data():
         delta_0 = self.delta_0(delta_rh=delta_rh, delta_L=delta_L)  # mechanical boundary layer MS95
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
         self.T_params = {'dT_rh':dT_rh, 'dT_m':dT_m, 'delta_rh':delta_rh, 'd_m':d_m, 'y_L':y_L, 'T_l':T_l, 'T_i':T_i,
-                         'delta_L':delta_L, 'delta_0':delta_0, 'T_av':T_av, 'y':y}
+                         'delta_L':delta_L, 'delta_0':delta_0, 'T_av':T_av, 'uv_mag_av':uv_mag_av, 'y':y}
         return self.T_params
     
     def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, uv_mag=None, **kwargs):

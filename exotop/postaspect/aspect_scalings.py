@@ -74,7 +74,7 @@ def reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid,
 
 
 def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None, at_sol=True,
-             data_path=data_path_bullard, fend='.pkl', time_average=False, averages_only=False, **kwargs):
+             data_path=data_path_bullard, fend='.pkl', time_average=False, **kwargs):
     # do pickling strategy. only saving processed data for runs in quasi-steady state (past their t1 value)
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
@@ -170,7 +170,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 pkl.dump(df2, open(case_path + 'pickle/' + fname + '_average', "wb"))
     else:
         print('Skipping case', case, 'for t1 <= 1')
-    return df
+    return df2
 
 
 def pickle_and_postprocess(cases, suffix, postprocess_functions, t1=0, **kwargs):
@@ -325,6 +325,7 @@ def time_averaged_profile(case, n0, nf, which='temperature', dat=None, data_path
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, verbose=False)
     for n in range(n0, nf + 1):
+        print('Loading', which, 'profile at n =', n)
         if which == 'temperature':
             x, y, _, T = dat.read_temperature(n, verbose=verbose)
             prof = post.horizontal_mean(T, x)
@@ -416,13 +417,9 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
 
 def process_at_average(case, postprocess_functions, n0, nf, data_path=data_path_bullard, dat=None,
                        df_old=None, postprocess_kwargs={}, **kwargs):
+    print('nf', nf)
+    print('n0', n0)
     n_sols_new = nf - n0
-    if df_old is None:
-        n_sols_old = 0
-    else:
-        n_sols_old = df_old['n_sols']
-        T_av_old = df_old['T_av']
-        uv_mag_av_old = df_old['uv_mag_av']
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
                                read_parameters=False)
@@ -430,6 +427,16 @@ def process_at_average(case, postprocess_functions, n0, nf, data_path=data_path_
     # get time averages for new solutions
     T_av, y = time_averaged_profile(case, n0, nf, which='temperature', dat=dat, data_path=data_path, verbose=False, **kwargs)
     uv_mag_av, y = time_averaged_profile(case, n0, nf, which='velocity', dat=dat, data_path=data_path, verbose=False, **kwargs)
+
+    if df_old is None:
+        n_sols_old = 0
+        T_av_old = T_av
+        uv_mag_av_old = uv_mag_av
+
+    else:
+        n_sols_old = df_old['n_sols']
+        T_av_old = df_old['T_av']
+        uv_mag_av_old = df_old['uv_mag_av']
 
     # find overall average including older timesteps
     T_av = np.average(np.vstack((T_av_old, T_av)), axis=0, weights=(n_sols_old, n_sols_new))
@@ -814,7 +821,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 
 def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_path_bullard,
-              fig_path=fig_path_bullard, averagefirst=False, p_dimensionals=None,
+              fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
               fig_fmt='.png', which_x=None,
               save=True, fname='h',
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
@@ -864,24 +871,30 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
         if which_x == 'components':
             x_key = 'h_components'
-            if averagefirst:
-                print('    plot_h_vs(): Calculating T components using time-mean')
+            if averagescheme == 'timelast':
+                print('    plot_h_vs(): Averaging T components calcualted at each timestep')
                 h_components = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
                                                  update=False, **kwargs)
-            else:
-                if (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
+            elif averagescheme == 'timefirst':
+                print('    plot_h_vs(): Calculating T components using time-averaged profiles')
+                # T_av =
+                # uv_mag_av =
+                # dic = T_parameters_at_sol(case, n=None, dat=None, T_av=None, uv_mag_av=None, data_path=data_path)
+                # h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
+                #                                      update=False, **kwargs)
+            elif (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
                     print('    plot_h_vs(): Calculating T components')
                     h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
                                                      update=False,
                                                      **kwargs)
-                else:
-                    h_components = df['h_components']
+            else:
+                h_components = df['h_components']
             x = h_components
 
         elif which_x == 'Ra':
             x_key = 'Ra'
             if Ra_i == 'eff':  # calculate effective Ra using time-mean of T field params
-                if averagefirst:
+                if averagescheme == 'timelast':
                     x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
                                  T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
                 else:
@@ -891,14 +904,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                     # x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'],
                     #          T_l=df['T_l'], delta_L=df['delta_L'])
             elif Ra_i:
-                if averagefirst:
+                if averagescheme == 'timelast':
                     x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
                 else:
                     if not h_components:
                         raise Exception(
                             'Ra_i not implemented yet if using h output over all timesteps without averaging')
             else:
-                if averagefirst:
+                if averagescheme == 'timelast':
                     x = float(cases_var[ii])
                 else:
                     x = float(cases_var[ii]) * np.ones(
@@ -907,7 +920,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
 
         try:
             df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key])  # remove any rows with nans
-            if averagefirst:
+            if averagescheme == 'timelast':
                 # fit to time-mean rather than all points
                 yx_peak_all.append(
                     (np.array(df['h_peak'].mean()) * hscale, np.array(df[x_key].mean())))  # each xy point (y=h)
