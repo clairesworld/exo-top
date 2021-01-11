@@ -170,7 +170,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 pkl.dump(df2, open(case_path + 'pickle/' + fname + '_average', "wb"))
     else:
         print('Skipping case', case, 'for t1 <= 1')
-    return df2
+    return df
 
 
 def pickle_and_postprocess(cases, suffix, postprocess_functions, t1=0, **kwargs):
