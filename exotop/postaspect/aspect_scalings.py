@@ -148,15 +148,15 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                                                   t1=np.maximum(t1, t1_new),  # whichever comes later in time
                                                   data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
                         dump_flag = True  # always save if you did something
-                    if time_average or time_average == 'only':
-                        try:
-                            df2 = pkl.load(open(case_path + 'pickle/' + fname + '_average', "rb"))
-                        except FileNotFoundError:
-                            df2 = None
-                        df2 = process_at_average(case, postprocess_functions=postprocess_functions,
-                                                 n0=sol1_new, nf=sol_new[-1], dat=dat_new,
-                                                 data_path=data_path, df_old=df2, **kwargs)
-                        dump_flag2 = True
+                    # if time_average or time_average == 'only':
+                    #     try:
+                    #         df2 = pkl.load(open(case_path + 'pickle/' + fname + '_average', "rb"))
+                    #     except FileNotFoundError:
+                    #         df2 = None
+                    #     df2 = process_at_average(case, postprocess_functions=postprocess_functions,
+                    #                              n0=sol1_new, nf=sol_new[-1], dat=dat_new,
+                    #                              data_path=data_path, df_old=df2, **kwargs)
+                    #     dump_flag2 = True
                 else:
                     df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                              t1=np.maximum(t1, t1_new),
@@ -166,8 +166,8 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
             if dump_flag:
                 pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
-            if dump_flag2:
-                pkl.dump(df2, open(case_path + 'pickle/' + fname + '_average', "wb"))
+            # if dump_flag2:
+            #     pkl.dump(df2, open(case_path + 'pickle/' + fname + '_average', "wb"))
     else:
         print('Skipping case', case, 'for t1 <= 1')
     return df
@@ -2274,7 +2274,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
                                  data_path=data_path, at_sol=True, load=load, **kwargs)
 
 
-def pickleio_average(case, postprocess_function=None, t1=0, load=True, suffix='', data_path=data_path_bullard, fend='.pkl', **kwargs):
+def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', data_path=data_path_bullard, fend='.pkl', **kwargs):
     # for these time-average ones 'auto' counts as reprocess
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
@@ -2285,8 +2285,8 @@ def pickleio_average(case, postprocess_function=None, t1=0, load=True, suffix=''
         i_time = np.argmax(time >= t1)  # index of first timestep to process
         ts0 = i_time
         tsf = len(time) - 1
-        df = postprocess_function(case, ts0, tsf, **kwargs)
-        print('Processed', postprocess_function, 'for time steps', ts0, 'to', tsf)
+        df = postprocess_fn(case, ts0, tsf, **kwargs)
+        print('Processed', postprocess_fn, 'for time steps', ts0, 'to', tsf)
         pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
     else:
         df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
