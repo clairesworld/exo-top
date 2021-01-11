@@ -295,7 +295,7 @@ class Aspect_Data():
 
         start_time = time.time()
         fp = open(filename)
-        data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=[str(r) for r in np.arange(0, 26)]),
+        data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=[str(r) for r in np.arange(0, 26)],
                               delimiter='\t')
         for row in data:
             print(row)
