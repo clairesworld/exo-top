@@ -4,24 +4,18 @@ from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_g
     fig_fmt, regime_grid_td, postprocess_kwargs, \
     load_grid    # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
-import pstats
+# import pstats
 
 # (re)process all
 
-# sc.pickleio('Ra1e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.3,
-#             load=False, at_sol=True, data_path=data_path, postprocess_kwargs=postprocess_kwargs,)
-#
-# sc.pickleio('Ra3e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.055083,
-#             load=False, at_sol=True, data_path=data_path, postprocess_kwargs=postprocess_kwargs,)
-#
 # sc.reprocess_all_at_sol(Ra_ls[-2], eta_ls[1:3], psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol],
 #                         t1_grid=t1_grid[1:3, -2], end_grid=end_grid[1:3, -2], data_path=data_path, redo=True,
 #                         load_grid=load_grid[1:3, -2], postprocess_kwargs=postprocess_kwargs)
 
-sc.reprocess_all_at_sol(Ra_ls[-2:], eta_ls[1:], psuffixes=['_T', '_h', '_Nu'],
+sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_Nu'],
                         postprocess_functions=[sc.T_parameters_at_sol, sc.h_at_ts, sc.Nu_at_ts],
-                        t1_grid=t1_grid[1:,-2:], end_grid=end_grid[1:,-2:], data_path=data_path, redo=True,
-                        load_grid=load_grid[1:,-2:], postprocess_kwargs=postprocess_kwargs)
+                        t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
+                        load_grid=load_grid, postprocess_kwargs=postprocess_kwargs)
 
 ## plot summaries across delta eta
 
@@ -54,14 +48,15 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
         )
 
 
-# plot evolutions for debugging T components
-sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td, save=True, t1_grid=t1_grid, load_grid=True,
-                        psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol], fig_path=fig_path,
-                        fname='evol', fig_fmt=fig_fmt, end_grid=end_grid, normtime=True, labelsize=14, xlabel=r'Time',
-                        keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_components'],
-                        ylabels=['y_L', 'T_L', 'T_i', 'dT_rh', 'delta_rh', r'$\alpha \Delta T{_{rh} \delta_{rh}$'], title='', xlabelpad=8,
-                        ylabelpad=8, markers=None, markersize=24, cmap='magma', vmin=5, vmax=8.5,
-                        include_regimes=['chaotic'], data_path=data_path, postprocess_kwargs=postprocess_kwargs)
+# # plot evolutions for debugging T components
+# sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td, save=True, t1_grid=t1_grid, load_grid=True,
+#                         psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol], fig_path=fig_path,
+#                         fname='evol', fig_fmt=fig_fmt, end_grid=end_grid, normtime=True, labelsize=14, xlabel=r'Time',
+#                         keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_components'],
+#                         ylabels=['y_L', 'T_L', 'T_i', 'dT_rh', 'delta_rh', r'$\alpha \Delta T{_{rh} \delta_{rh}$'], title='', xlabelpad=8,
+#                         ylabelpad=8, markers=None, markersize=24, cmap='magma', vmin=5, vmax=8.5,
+#                         include_regimes=['chaotic'], data_path=data_path, postprocess_kwargs=postprocess_kwargs)
+
 # plot time-evolution of list of keys for all cases in given regime
 
 # # plot evolutions for debugging T components
@@ -122,6 +117,14 @@ sc.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td, save=True, t1
 # sc.pickleio(case, '_h', [sc.h_at_ts], t1=0.0590015, load=False, at_sol=True, data_path=data_path)
 # sc.print_solution_data(case, suffix='_h', keys=['h_rms', 'sol'], data_path=data_path)
 # #
+
+
+# sc.pickleio('Ra1e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.3,
+#             load=False, at_sol=True, data_path=data_path, postprocess_kwargs=postprocess_kwargs,)
+#
+# sc.pickleio('Ra3e8-eta1e6-wide', suffix='_T', postprocess_functions=[sc.T_parameters_at_sol], t1=0.055083,
+#             load=False, at_sol=True, data_path=data_path, postprocess_kwargs=postprocess_kwargs,)
+#
 
 
 print('Summary plots complete')

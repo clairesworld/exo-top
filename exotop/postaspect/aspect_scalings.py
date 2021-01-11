@@ -2131,7 +2131,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 print(case)
                 if redo:
-                    # for recalculating everything if you fucked up or are redoing
+                    # for recalculating everything if you fucked up e.g.
                     load = False
                 elif load_grid is not None:
                     load = load_grid[jj][ii]
