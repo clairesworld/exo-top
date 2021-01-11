@@ -548,7 +548,7 @@ class Aspect_Data():
     #         diff = abs(Ti - Ti_guess)
     #     return Ti, d0
 
-    def lid_thickness(self, uv_mag=None, n=None, tol=1e-3, plot=False, spline=True, **kwargs):
+    def lid_thickness(self, n=None, uv_mag=None, uv_mag_av=None, tol=1e-3, plot=False, spline=True, **kwargs):
         # stagnant lid depth y_L from Moresi & Solomatov 2000 method - thickness delta_L = 1 - y_L
         try:
             x = self.x
@@ -557,13 +557,13 @@ class Aspect_Data():
             self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
             x = self.x
             y = self.y
-        if uv_mag is None:
-            _, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=False)
-
-        # get horizontal average
-        mag_av = horizontal_mean(uv_mag, x)
+        if uv_mag_av is None:
+            if uv_mag is None:
+                _, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=False)
+            # get horizontal average
+            uv_mag_av = horizontal_mean(uv_mag, x)
         if plot:
-            self.plot_profile(uv_mag, xlabel='velocity magnitude', title='solution ' + str(n))
+            self.plot_profile(uv_mag_av, xlabel='velocity magnitude', title='solution ' + str(n))
             ax = plt.gca()
 
         # find peak velocity in interior (coincident with inflection point)
@@ -572,7 +572,7 @@ class Aspect_Data():
                 flag = True
                 root_idx = -1
                 while flag:
-                    spl = UnivariateSpline(y, mag_av, k=4, s=0)
+                    spl = UnivariateSpline(y, uv_mag_av, k=4, s=0)
                     f_dprime = spl.derivative()
                     y_i = f_dprime.roots()
                     mag_i = spl(y_i)
@@ -586,7 +586,7 @@ class Aspect_Data():
                                    label='max inflection point')
 
                     # now get 5th-degree spline and find maxima - inverted from profile function
-                    spl2 = UnivariateSpline(y, mag_av, k=5, s=0)
+                    spl2 = UnivariateSpline(y, uv_mag_av, k=5, s=0)
                     f_dprime2 = spl2.derivative(n=2)
                     y_grad_max = f_dprime2.roots()
 
@@ -631,14 +631,14 @@ class Aspect_Data():
 
         if not spline:
             # find index of max interior velocity
-            f_prime = np.gradient(mag_av)  # differential approximation
+            f_prime = np.gradient(uv_mag_av)  # differential approximation
             idx = np.where(np.diff(np.sign(f_prime)))[0]  # Find the inflection point.
-            y_prime, mag_av_prime = y[idx:], mag_av[idx:]
+            y_prime, mag_av_prime = y[idx:], uv_mag_av[idx:]
 
             grad = np.diff(mag_av_prime, axis=0) / np.diff(y_prime)
             grad_max = np.min(grad)  # actually want the minimum because you expect a negative slope
             i_max = np.nonzero(grad == grad_max)[0][0]  # would add one to take right hand value
-            mag_grad_max = mag_av[i_max]
+            mag_grad_max = uv_mag_av[i_max]
             y_grad_max = y_prime[i_max]
             # intersection of this tangent with y-axis
             x_grad_max0 = mag_av_prime[np.nonzero(grad == grad_max)[0][0] - tol]
@@ -651,7 +651,7 @@ class Aspect_Data():
         if plot:
             ax.scatter(mag_grad_max, y_grad_max, c='k',
                        label='max grad: ({:04.1f}),({:04.1f})'.format(float(mag_grad_max), float(y_grad_max)))
-            x_vel = np.linspace(0, np.max(mag_av))
+            x_vel = np.linspace(0, np.max(uv_mag_av))
             y_tan = m1 * x_vel + b
             ax.plot(x_vel, y_tan, c='g', ls='--', label='tangent to max gradient')
             ax.legend()
@@ -797,13 +797,13 @@ class Aspect_Data():
             d_m = p['Geometry model']['Box']['Y extent']
             dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
         if y_L is None:
-            y_L = self.lid_thickness(uv_mag_av=uv_mag_av, **kwargs)
+            y_L = self.lid_thickness(n, uv_mag_av=uv_mag_av, **kwargs)
         if T_i is None:
-            T_i = self.internal_temperature(T_av=T_av, **kwargs)
+            T_i = self.internal_temperature(n, T_av=T_av, **kwargs)
         if T_l is None:
-            T_l = self.lid_base_temperature(T_av=T_av, delta_L=y_L, **kwargs)
+            T_l = self.lid_base_temperature(n, T_av=T_av, delta_L=y_L, **kwargs)
         if delta_rh is None:
-            delta_rh = self.ubl_thickness(n=n, T_l=T_l, T_i=T_i, **kwargs)
+            delta_rh = self.ubl_thickness(n, T_l=T_l, T_i=T_i, **kwargs)
         delta_L = y[-1] - y_L
         delta_0 = self.delta_0(delta_rh=delta_rh, delta_L=delta_L)  # mechanical boundary layer MS95
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
