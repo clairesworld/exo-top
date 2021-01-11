@@ -288,28 +288,26 @@ class Aspect_Data():
 
         return self.x, self.y, self.z, u, v, w
     
-    def read_statistics(self, verbose=True):
+    def read_statistics(self, verbose=True, timing=False):
         filename = self.directory + "statistics"
         if verbose:
             print("Reading statistics from", filename)
 
-        start_time = time.time()
-        fp = open(filename)
-        data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=[str(r) for r in np.arange(0, 26)],
-                              delimiter='\t')
-        for row in data:
-            print(row)
-        self.stats_timestep = np.array([np.float(s) for s in data['0']])
-        self.stats_time = np.array([np.float(s) for s in data['1']])
-        self.stats_rms_velocity = np.array([np.float(s) for s in data['10']])
-        self.stats_average_T = np.array([np.float(s) for s in data['13']])
-        self.stats_heatflux_left = np.array([np.float(s) for s in data['16']])
-        self.stats_heatflux_right = np.array([np.float(s) for s in data['17']])
-        self.stats_heatflux_bottom = np.array([np.float(s) for s in data['18']])
-        self.stats_heatflux_top = np.array([np.float(s) for s in data['19']])
-        self.stats_average_viscosity = np.array([np.float(s) for s in data['22']])
-        print(self.stats_timestep)
-        print("csv.DictReader took %s seconds" % (time.time() - start_time))
+        # start_time = time.time()
+        # fp = open(filename)
+        # data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=[str(r) for r in np.arange(0, 26)],
+        #                       delimiter='\t')
+        # self.stats_timestep = np.array([np.float(s) for s in data['0']])
+        # self.stats_time = np.array([np.float(s) for s in data['1']])
+        # self.stats_rms_velocity = np.array([np.float(s) for s in data['10']])
+        # self.stats_average_T = np.array([np.float(s) for s in data['13']])
+        # self.stats_heatflux_left = np.array([np.float(s) for s in data['16']])
+        # self.stats_heatflux_right = np.array([np.float(s) for s in data['17']])
+        # self.stats_heatflux_bottom = np.array([np.float(s) for s in data['18']])
+        # self.stats_heatflux_top = np.array([np.float(s) for s in data['19']])
+        # self.stats_average_viscosity = np.array([np.float(s) for s in data['22']])
+        # print(self.stats_timestep)
+        # print("csv.DictReader took %s seconds" % (time.time() - start_time))
 
         start_time = time.time()
         data = np.genfromtxt(filename, comments='#')
@@ -323,8 +321,9 @@ class Aspect_Data():
         self.stats_heatflux_bottom = data[:,18]
         self.stats_heatflux_top = data[:,19]
         self.stats_average_viscosity = data[:,22]
-        print(self.stats_timestep)
-        print('np.genfromtxt took %s seconds' % (time.time() - start_time))
+        if timing:
+            print(self.stats_timestep)
+            print('np.genfromtxt took %s seconds' % (time.time() - start_time))
 
 
 
