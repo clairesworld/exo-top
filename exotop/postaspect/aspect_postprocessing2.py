@@ -14,6 +14,10 @@ import os
 import h5py
 import re
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import pandas as pd
+import time
+import csv
+import dask.dataframe
 rasterized = True
 
 def unique_rows(a):
@@ -285,11 +289,12 @@ class Aspect_Data():
 
         return self.x, self.y, self.z, u, v, w
     
-    def read_statistics(self, skip_header=26, verbose=True):
+    def read_statistics(self, verbose=True):
         filename = self.directory + "statistics"
         if verbose:
             print("Reading statistics from", filename)
-        
+
+        start_time = time.time()
         data = np.genfromtxt(filename, comments='#')
         all_data = np.genfromtxt(filename, comments='#', dtype=None)
         self.stats_timestep = np.array([d[0] for d in all_data])
@@ -301,6 +306,38 @@ class Aspect_Data():
         self.stats_heatflux_bottom = data[:,18]
         self.stats_heatflux_top = data[:,19]
         self.stats_average_viscosity = data[:,22]
+        print(self.stats_timestep)
+        print('np.genfromtxt took %s seconds' % (time.time() - start_time))
+
+        start_time = time.time()
+        fp = open(filename)
+        data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=map(str, np.arange(0, 26)), delimiter='\t')
+        self.stats_timestep = np.array([np.float(s) for s in data['0']])
+        self.stats_time = np.array([np.float(s) for s in data['1']])
+        self.stats_rms_velocity = np.array([np.float(s) for s in data['10']])
+        self.stats_average_T = np.array([np.float(s) for s in data['13']])
+        self.stats_heatflux_left = np.array([np.float(s) for s in data['16']])
+        self.stats_heatflux_right = np.array([np.float(s) for s in data['17']])
+        self.stats_heatflux_bottom = np.array([np.float(s) for s in data['18']])
+        self.stats_heatflux_top = np.array([np.float(s) for s in data['19']])
+        self.stats_average_viscosity = np.array([np.float(s) for s in data['22']])
+        print(self.stats_timestep)
+        print("csv.DictReader took %s seconds" % (time.time() - start_time))
+
+        start_time = time.time()
+        data = dask.dataframe.read_csv(filename, sep='\t', comments='#', header=None, names=map(str, np.arange(0, 26)),
+                                       index_col=False)
+        self.stats_timestep = data['0']
+        self.stats_time = data['1']
+        self.stats_rms_velocity = data['10']
+        self.stats_average_T = data['13']
+        self.stats_heatflux_left = data['16']
+        self.stats_heatflux_right = data['17']
+        self.stats_heatflux_bottom = data['18']
+        self.stats_heatflux_top = data['19']
+        self.stats_average_viscosity = data['22']
+        print(self.stats_timestep)
+        print("dask.dataframe took %s seconds" % (time.time() - start_time))
 
     def read_stats_sol_files(self, col_vis=20, skip_header=26):
         filename = self.directory + "statistics"
