@@ -2209,7 +2209,7 @@ def Nu_eff(gamma=None, d_m=None, delta_L=None, alpha_m=None, g=None, b=None, kap
 
 
 def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_grid=None, end_grid=None,
-                         data_path=data_path_bullard, redo=True, load_grid=None, **kwargs):
+                         data_path=data_path_bullard, redo=True, load_grid=None, regime_grid=None, include_regimes=None, **kwargs):
     Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
 
     for jj, eta_str in enumerate(eta_ls):
@@ -2217,17 +2217,18 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
         for ii, case in enumerate(cases):
             t1_ii = t1_grid[jj][ii]
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
-                print(case)
-                if redo:
-                    # for recalculating everything if you fucked up e.g.
-                    load = False
-                elif load_grid is not None:
-                    load = load_grid[jj][ii]
-                else:
-                    load = 'auto'
-                for ip, suffix in enumerate(psuffixes):
-                    pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
-                             data_path=data_path, at_sol=True, load=load, **kwargs)
+                if include_regimes is not None and (regime_grid[jj][ii] in include_regimes):
+                    print(case)
+                    if redo:
+                        # for recalculating everything if you fucked up e.g.
+                        load = False
+                    elif load_grid is not None:
+                        load = load_grid[jj][ii]
+                    else:
+                        load = 'auto'
+                    for ip, suffix in enumerate(psuffixes):
+                        pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
+                                 data_path=data_path, at_sol=True, load=load, **kwargs)
 
 
 # def reprocess_time_averages(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_grid=None, end_grid=None,
