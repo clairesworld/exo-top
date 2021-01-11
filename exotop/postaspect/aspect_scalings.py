@@ -525,10 +525,9 @@ def h_timeaverage(case, ts0, tsf=1e50):
     h_params = {}
     h_all = []
     flag = True
-    print('Calculating average dynanic topography starting at time step', ts0)
+    print('Reading', tsf - ts0, 'files')
     while flag and ts0 <= tsf:
         try:
-            print('  Reading', ts0, '/', tsf)
             x, h = read_topo_stats(case, ts0)
             h_norm = trapznorm(h)
             h_all.append(h_norm)
