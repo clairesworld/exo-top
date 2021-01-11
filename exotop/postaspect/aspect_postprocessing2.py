@@ -13,7 +13,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pandas as pd
 import time
 import csv
-import dask.dataframe
+# import dask.dataframe
 rasterized = True
 
 def unique_rows(a):
@@ -352,11 +352,11 @@ class Aspect_Data():
         self.sol_files = files
         return files
 
-    def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, verbose=False, i_vis=20, skip_header=26):
+    def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, verbose=False, i_vis=20):
         # input solution file and get first timestep - for n or all solutions
         # n is the number in the solution filename
         if sol_files is None:
-            sol_files = self.read_stats_sol_files(col_vis=i_vis, skip_header=skip_header)
+            sol_files = self.read_stats_sol_files(col_vis=i_vis)
         u, indices = np.unique(sol_files, return_index=True)
         if return_indices:
             if n is None:
@@ -468,7 +468,7 @@ class Aspect_Data():
         self.Ra_i = Ra_i
         return Ra_i
 
-    def nusselt(self, X_extent=1, k=1, d=1, dT=1, **kwargs):
+    def nusselt(self, X_extent=8, k=1, d=1, dT=1, **kwargs):
         # Nusselt number with no internal heating
         if X_extent is None or d is None or dT is None:
             try:
@@ -491,7 +491,7 @@ class Aspect_Data():
         self.Nu = Nu
         return Nu
 
-    def ubl_thickness(self, n=None, T_l=None, T_i=None, k=1, X_extent=1, ts=None, **kwargs):
+    def ubl_thickness(self, n=None, T_l=None, T_i=None, k=1, X_extent=8, ts=None, **kwargs):
         # get upper boundary layer thickness required to produce surface heat flux (F=Nu) between T_i and T_l
         # corresponds to rheological sublayer delta_rh in Solomatov & Moresi 2000
         if X_extent is None:
@@ -508,7 +508,11 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, n=n, **kwargs)
         if ts is None:
             ts = self.find_time_at_sol(n)
-        F = self.stats_heatflux_top[ts]/X_extent
+        try:
+            F = self.stats_heatflux_top[ts]/X_extent
+        except AttributeError:
+            self.read_statistics(verbose=False)
+            F = self.stats_heatflux_top[ts] / X_extent
         return k*(T_i - T_l)/F
 
     def delta_0(self, delta_rh=None, delta_L=None, **kwargs):

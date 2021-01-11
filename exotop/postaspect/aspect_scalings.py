@@ -338,6 +338,17 @@ def time_averaged_profile(case, n0, nf, which='temperature', dat=None, data_path
     return profs_mean, y
 
 
+def time_averaged_profile_from_df(df, col):
+    nsols = len(df)
+    srs = df[col].to_numpy()
+    y = df.y.to_numpy()[0]
+    profs = np.zeros((nsols, len(srs[0])))
+    for ii in range(nsols):
+        profs[ii, :] = srs[ii]
+    av = np.mean(profs, axis=0)
+    return av, y
+
+
 def read_evol(case, col, dat=None, data_path=data_path_bullard):
     # return time, column i, (from statistics file)
     if dat is None:
@@ -414,48 +425,48 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
             print('    Skipping case with t1 > 1')
     return df_to_extend
 
-
-def process_at_average(case, postprocess_functions, n0, nf, data_path=data_path_bullard, dat=None,
-                       df_old=None, postprocess_kwargs={}, **kwargs):
-    print('nf', nf)
-    print('n0', n0)
-    n_sols_new = nf - n0
-    if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
-                               read_parameters=False)
-
-    # get time averages for new solutions
-    T_av, y = time_averaged_profile(case, n0, nf, which='temperature', dat=dat, data_path=data_path, verbose=False, **kwargs)
-    uv_mag_av, y = time_averaged_profile(case, n0, nf, which='velocity', dat=dat, data_path=data_path, verbose=False, **kwargs)
-
-    if df_old is None:
-        n_sols_old = 0
-        T_av_old = T_av
-        uv_mag_av_old = uv_mag_av
-
-    else:
-        n_sols_old = df_old['n_sols']
-        T_av_old = df_old['T_av']
-        uv_mag_av_old = df_old['uv_mag_av']
-
-    # find overall average including older timesteps
-    T_av = np.average(np.vstack((T_av_old, T_av)), axis=0, weights=(n_sols_old, n_sols_new))
-    uv_mag_av = np.average(np.vstack((uv_mag_av_old, uv_mag_av)), axis=0, weights=(n_sols_old, n_sols_new))
-
-    dfs = []
-    for fn in postprocess_functions:
-        try:
-            new_params_dict = fn(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, dat=dat, **postprocess_kwargs, **kwargs)
-        except Exception:
-            print('         Could not process time-average for', fn, 'getting stats average instead (TODO)')
-        new_params_dict['n_sols'] = n_sols_old + nf - n0
-        dfs.append(pd.from_dict(new_params_dict))
-        print('        Processed', fn, 'for time-average, solutions', n0, 'to', nf)
-    df = pd.concat(dfs, axis=1)
-    df = df.loc[:, ~df.columns.duplicated()]
-
-    print(df)
-    return df
+#
+# def process_at_average(case, postprocess_functions, n0, nf, data_path=data_path_bullard, dat=None,
+#                        df_old=None, postprocess_kwargs={}, **kwargs):
+#     print('nf', nf)
+#     print('n0', n0)
+#     n_sols_new = nf - n0
+#     if dat is None:
+#         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
+#                                read_parameters=False)
+#
+#     # get time averages for new solutions
+#     T_av, y = time_averaged_profile(case, n0, nf, which='temperature', dat=dat, data_path=data_path, verbose=False, **kwargs)
+#     uv_mag_av, y = time_averaged_profile(case, n0, nf, which='velocity', dat=dat, data_path=data_path, verbose=False, **kwargs)
+#
+#     if df_old is None:
+#         n_sols_old = 0
+#         T_av_old = T_av
+#         uv_mag_av_old = uv_mag_av
+#
+#     else:
+#         n_sols_old = df_old['n_sols']
+#         T_av_old = df_old['T_av']
+#         uv_mag_av_old = df_old['uv_mag_av']
+#
+#     # find overall average including older timesteps
+#     T_av = np.average(np.vstack((T_av_old, T_av)), axis=0, weights=(n_sols_old, n_sols_new))
+#     uv_mag_av = np.average(np.vstack((uv_mag_av_old, uv_mag_av)), axis=0, weights=(n_sols_old, n_sols_new))
+#
+#     dfs = []
+#     for fn in postprocess_functions:
+#         try:
+#             new_params_dict = fn(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, dat=dat, **postprocess_kwargs, **kwargs)
+#         except Exception:
+#             print('         Could not process time-average for', fn, 'getting stats average instead (TODO)')
+#         new_params_dict['n_sols'] = n_sols_old + nf - n0
+#         dfs.append(pd.from_dict(new_params_dict))
+#         print('        Processed', fn, 'for time-average, solutions', n0, 'to', nf)
+#     df = pd.concat(dfs, axis=1)
+#     df = df.loc[:, ~df.columns.duplicated()]
+#
+#     print(df)
+#     return df
 
 
 def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
@@ -510,6 +521,29 @@ def h_at_ts(case, ts=None, **kwargs):
     return h_params_n
 
 
+def h_timeaverage(case, ts0, tsf=1e50):
+    h_params = {}
+    h_all = []
+    flag = True
+    while flag and ts0 <= tsf:
+        try:
+            x, h = read_topo_stats(case, ts0)
+            h_norm = trapznorm(h)
+            h_all.append(h_norm)
+            ts0 = ts0 + 1
+        except FileNotFoundError:
+            print('    No dynamic topography found at ts =', ts0)
+            flag = False
+    if not h_all:
+        raise Exception(case+'ts0 does not catch topography')
+    h_all = np.vstack(h_all)
+    peak, rms = peak_and_rms(np.mean(h_all, axis=0))
+    h_params['h_peak'] = peak
+    h_params['h_rms'] = rms
+    h_params['n'] = np.shape(h_all)[0]
+    return pd.from_dict(h_params)
+
+
 def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
@@ -552,7 +586,7 @@ def T_parameters_at_sol(case, n, dat=None, T_av=None, uv_mag_av=None, data_path=
     if T_av is None:
         x, y, z, T = dat.read_temperature(n, verbose=False)
         T_av = post.horizontal_mean(T, x)
-    d_n = dat.T_components(n, T_av=T_av, uv_mag_av=uv_mag_av, **kwargs)  # dict of components just at solution n
+    d_n = dat.T_components(n, T_av=T_av, uv_mag_av=uv_mag_av, data_path=data_path, **kwargs)  # dict of components just at solution n
     d_n['h_components'] = T_components_of_h(case, df=d_n, dat=dat, data_path=data_path, **kwargs)
 
     # for key in d_n.keys():
@@ -827,7 +861,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, Ra_i=False, show_isoviscous=False,
-              fig=None, ax=None, ylim=None, xlim=None, **kwargs):
+              fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs={}, **kwargs):
     # either Ra or eta is 1D list of strings (other is singular), t1, end must match shape
     cases, cases_var = get_cases_list(Ra, eta, end)
     if t1 is None:
@@ -874,18 +908,18 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             if averagescheme == 'timelast':
                 print('    plot_h_vs(): Averaging T components calcualted at each timestep')
                 h_components = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
-                                                 update=False, **kwargs)
+                                                 update=False, **postprocess_kwargs, **kwargs)
             elif averagescheme == 'timefirst':
                 print('    plot_h_vs(): Calculating T components using time-averaged profiles')
-                # T_av =
-                # uv_mag_av =
-                # dic = T_parameters_at_sol(case, n=None, dat=None, T_av=None, uv_mag_av=None, data_path=data_path)
-                # h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
-                #                                      update=False, **kwargs)
+                T_av, y = time_averaged_profile_from_df(df, 'T_av')
+                uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+                df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs, **kwargs)
+                h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
+                                                 update=False,  **postprocess_kwargs, **kwargs)
             elif (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
                     print('    plot_h_vs(): Calculating T components')
                     h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
-                                                     update=False,
+                                                     update=False,  **postprocess_kwargs,
                                                      **kwargs)
             else:
                 h_components = df['h_components']
@@ -897,6 +931,9 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 if averagescheme == 'timelast':
                     x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
                                  T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
+                elif averagescheme == 'timefirst':
+                    x = x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'],
+                                 T_l=df_av['T_l'], delta_L=df_av['delta_L'])
                 else:
                     if not h_components:
                         raise Exception(
@@ -906,12 +943,14 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             elif Ra_i:
                 if averagescheme == 'timelast':
                     x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
+                elif averagescheme == 'timefirst':
+                    x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'])
                 else:
                     if not h_components:
                         raise Exception(
                             'Ra_i not implemented yet if using h output over all timesteps without averaging')
             else:
-                if averagescheme == 'timelast':
+                if averagescheme == 'timelast' or averagescheme == 'timefirst':
                     x = float(cases_var[ii])
                 else:
                     x = float(cases_var[ii]) * np.ones(
@@ -921,11 +960,15 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         try:
             df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key])  # remove any rows with nans
             if averagescheme == 'timelast':
-                # fit to time-mean rather than all points
                 yx_peak_all.append(
                     (np.array(df['h_peak'].mean()) * hscale, np.array(df[x_key].mean())))  # each xy point (y=h)
                 yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, np.array(df[x_key].mean())))
                 n_sols_all.append(len(df.index))
+            elif averagescheme == 'timefirst':
+                yx_peak_all.append(
+                    (np.array(df['h_peak'].mean()) * hscale, np.array(df_av[x_key])))  # each xy point (y=h)
+                yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, np.array(df_av[x_key])))
+                n_sols_all.append(1)
             else:
                 # use each xy point (y=h) for fitting to
                 yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(df[x_key].values)))
@@ -2229,6 +2272,46 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
                     for ip, suffix in enumerate(psuffixes):
                         pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
                                  data_path=data_path, at_sol=True, load=load, **kwargs)
+
+
+def pickleio_average(case, postprocess_function=None, t1=0, load=True, suffix='', data_path=data_path_bullard, fend='.pkl', **kwargs):
+    # for these time-average ones 'auto' counts as reprocess
+    case_path = data_path + 'output-' + case + '/'
+    fname = case + suffix + fend
+    if load is not True:
+        dat = post.Aspect_Data(directory=case_path, verbose=False,
+                               read_statistics=True, read_parameters=False)
+        time = dat.stats_time
+        i_time = np.argmax(time >= t1)  # index of first timestep to process
+        ts0 = i_time
+        tsf = len(time) - 1
+        df = postprocess_function(case, ts0, tsf, **kwargs)
+        print('Processed', postprocess_function, 'for time steps', ts0, 'to', tsf)
+        pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
+    else:
+        df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
+    return df
+
+
+def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
+                          data_path=data_path_bullard, redo=True, load_grid=None, regime_grid=None, include_regimes=None, **kwargs):
+    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
+
+    for jj, eta_str in enumerate(eta_ls):
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
+        for ii, case in enumerate(cases):
+            t1_ii = t1_grid[jj][ii]
+            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
+                if include_regimes is not None and (regime_grid[jj][ii] in include_regimes):
+                    print('Found', case)
+                    if redo:
+                        # for recalculating everything if you fucked up e.g.
+                        load = False
+                    elif load_grid is not None:
+                        load = load_grid[jj][ii]
+                    else:
+                        load = 'auto'
+                    pickleio_average(case, t1=t1_ii, load=load, data_path=data_path, **kwargs)
 
 
 # def reprocess_time_averages(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_grid=None, end_grid=None,
