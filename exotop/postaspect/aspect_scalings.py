@@ -74,63 +74,67 @@ def reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid,
 
 
 def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None, at_sol=True,
-             data_path=data_path_bullard, fend='.pkl', **kwargs):
+             data_path=data_path_bullard, fend='.pkl', time_average=False, averages_only=False, **kwargs):
     # do pickling strategy. only saving processed data for runs in quasi-steady state (past their t1 value)
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     df = pd.DataFrame()
     dump_flag = False
+    dump_flag2 = False
     reprocess_flag = False
     t1_new = t1
 
     if t1 < 1:
         if os.path.exists(case_path):  # do nothing if case doesn't exist
             os.makedirs(case_path + 'pickle/', exist_ok=True)
-            if load == 'auto' or load:
-                if os.path.exists(case_path + 'pickle/' + fname):
-                    # open pickled file
+            if (load == 'auto' or load) and os.path.exists(case_path + 'pickle/' + fname):
+                # open pickled file
+                try:
+                    df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
+                except ValueError:  # python 2?
+                    df = pkl.load(open(case_path + 'pickle/' + fname, "rb"), protocol=2)
+                print('    Found', fname)
+
+                if load == 'auto':  # check for additional timesteps
+                    if dat_new is None:
+                        dat_new = post.Aspect_Data(directory=case_path, verbose=False,
+                                                   read_statistics=True, read_parameters=False)
                     try:
-                        df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))
-                    except ValueError:  # python 2?
-                        df = pkl.load(open(case_path + 'pickle/' + fname, "rb"), protocol=2)
-                    print('    Found', fname)
+                        if at_sol:
+                            print('      Checking for new solutions...')
+                            sol_f_old = df.sol.iat[-1]
+                            sol_new = dat_new.read_stats_sol_files()
+                            sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
+                            t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
+                        else:
+                            print('      Checking for new timesteps...')
+                            time_f_old = df.time.iat[-1]
+                            time_new = dat_new.stats_time
+                            t1_new = time_new[
+                                np.argmax(time_new > time_f_old)]  # first time after latest saved time
+                    except AttributeError as e:  # i.e. sol not found in df (because it's empty?)
+                        reprocess_flag = True
+                    if t1_new > 0:  # new timesteps
+                        reprocess_flag = True
+                        print('      Updating', fname, 'from t = {:4f}'.format(t1_new))
 
-                    if load == 'auto':  # check for additional timesteps
-                        if dat_new is None:
-                            dat_new = post.Aspect_Data(directory=case_path, verbose=False,
-                                                       read_statistics=True, read_parameters=False)
-                        try:
-                            if at_sol:
-                                print('      Checking for new solutions...')
-                                sol_f_old = df.sol.iat[-1]
-                                sol_new = dat_new.read_stats_sol_files()
-                                sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
-                                t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
-                            else:
-                                print('      Checking for new timesteps...')
-                                time_f_old = df.time.iat[-1]
-                                time_new = dat_new.stats_time
-                                t1_new = time_new[
-                                    np.argmax(time_new > time_f_old)]  # first time after latest saved time
-                        except AttributeError as e:  # i.e. sol not found in df (because it's empty?)
-                            reprocess_flag = True
-                        if t1_new > 0:  # new timesteps
-                            reprocess_flag = True
-                            print('      Updating', fname, 'from t = {:4f}'.format(t1_new))
-
-                elif load == 'auto':  # pkl file not found
-                    reprocess_flag = True
-                    dat_new = post.Aspect_Data(directory=case_path, verbose=False,
-                                               read_statistics=True, read_parameters=False)
-
+            elif load:
+                print('    File', fname, 'not found')
+            else:
+                if not load:  # load is False so automatically calculate shit
+                    print('    Declined to load', fname, ', processing afresh...')
+                elif load == 'auto':
                     print('    File', fname, 'not found, processing...')
-
-            elif not load:  # load is False so automatically calculate shit
+                else:
+                    raise Exception('load value not understood:', load, type(load))
                 reprocess_flag = True
                 dat_new = post.Aspect_Data(directory=case_path, verbose=False,
                                            read_statistics=True, read_parameters=False)
-            else:
-                raise Exception('load value not understood:', load, type(load))
+                if time_average:
+                    # some necessary things u don't have yet
+                    i_time = np.argmax(dat_new.stats_time >= t1)
+                    sol_new = dat_new.read_stats_sol_files()
+                    sol1_new = sol_new[i_time]  # n0 in process_at_average
 
             if reprocess_flag:
                 if not hasattr(dat_new, 'stats_time'):
@@ -139,18 +143,31 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                     if not hasattr(dat_new, 'sol_files'):
                         dat_new.read_stats_sol_files()
                     sol_new = dat_new.sol_files
-                    df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
-                                              t1=np.maximum(t1, t1_new),  # whichever comes later in time
-                                              data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
-                    # print('re-indexed df returned by process_at_solutions\n', df)
+                    if time_average is not 'only':
+                        df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
+                                                  t1=np.maximum(t1, t1_new),  # whichever comes later in time
+                                                  data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
+                        dump_flag = True  # always save if you did something
+                    if time_average or time_average == 'only':
+                        try:
+                            df2 = pkl.load(open(case_path + 'pickle/' + fname + '_average', "rb"))
+                        except FileNotFoundError:
+                            df2 = None
+                        df2 = process_at_average(case, postprocess_functions=postprocess_functions,
+                                                 n0=sol1_new, nf=sol_new[-1], dat=dat_new,
+                                                 data_path=data_path, df_old=df2, **kwargs)
+                        dump_flag2 = True
                 else:
                     df = process_steadystate(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                              t1=np.maximum(t1, t1_new),
                                              data_path=data_path, df_to_extend=df, **kwargs)
-                dump_flag = True  # always save if you did something
+                    dump_flag = True  # always save if you did something
+
 
             if dump_flag:
                 pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
+            if dump_flag2:
+                pkl.dump(df2, open(case_path + 'pickle/' + fname + '_average', "wb"))
     else:
         print('Skipping case', case, 'for t1 <= 1')
     return df
@@ -302,6 +319,24 @@ def peak_and_rms(h):
     return np.max(h), np.sqrt(trapzmean(h ** 2))
 
 
+def time_averaged_profile(case, n0, nf, which='temperature', dat=None, data_path=data_path_bullard, verbose=False, **kwargs):
+    " get time-averaged profile for T, u, v etc. "
+    profs_time = []
+    if dat is None:
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, verbose=False)
+    for n in range(n0, nf + 1):
+        if which == 'temperature':
+            x, y, _, T = dat.read_temperature(n, verbose=verbose)
+            prof = post.horizontal_mean(T, x)
+        elif which == 'velocity':
+            x, y, _, _, _, _, uv_mag = dat.read_velocity(n, verbose=verbose)
+            prof = post.horizontal_mean(uv_mag, x)
+        profs_time.append(prof)
+    profs_time = np.array(profs_time)
+    profs_mean = np.mean(profs_time, axis=0)
+    return profs_mean, y
+
+
 def read_evol(case, col, dat=None, data_path=data_path_bullard):
     # return time, column i, (from statistics file)
     if dat is None:
@@ -377,6 +412,43 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         else:
             print('    Skipping case with t1 > 1')
     return df_to_extend
+
+
+def process_at_average(case, postprocess_functions, n0, nf, data_path=data_path_bullard, dat=None,
+                       df_old=None, postprocess_kwargs={}, **kwargs):
+    n_sols_new = nf - n0
+    if df_old is None:
+        n_sols_old = 0
+    else:
+        n_sols_old = df_old['n_sols']
+        T_av_old = df_old['T_av']
+        uv_mag_av_old = df_old['uv_mag_av']
+    if dat is None:
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
+                               read_parameters=False)
+
+    # get time averages for new solutions
+    T_av, y = time_averaged_profile(case, n0, nf, which='temperature', dat=dat, data_path=data_path, verbose=False, **kwargs)
+    uv_mag_av, y = time_averaged_profile(case, n0, nf, which='velocity', dat=dat, data_path=data_path, verbose=False, **kwargs)
+
+    # find overall average including older timesteps
+    T_av = np.average(np.vstack((T_av_old, T_av)), axis=0, weights=(n_sols_old, n_sols_new))
+    uv_mag_av = np.average(np.vstack((uv_mag_av_old, uv_mag_av)), axis=0, weights=(n_sols_old, n_sols_new))
+
+    dfs = []
+    for fn in postprocess_functions:
+        try:
+            new_params_dict = fn(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, dat=dat, **postprocess_kwargs, **kwargs)
+        except Exception:
+            print('         Could not process time-average for', fn, 'getting stats average instead (TODO)')
+        new_params_dict['n_sols'] = n_sols_old + nf - n0
+        dfs.append(pd.from_dict(new_params_dict))
+        print('        Processed', fn, 'for time-average, solutions', n0, 'to', nf)
+    df = pd.concat(dfs, axis=1)
+    df = df.loc[:, ~df.columns.duplicated()]
+
+    print(df)
+    return df
 
 
 def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
@@ -463,13 +535,17 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
     return h_components
 
 
-def T_parameters_at_sol(case, n, dat=None, data_path=data_path_bullard, **kwargs):
+def T_parameters_at_sol(case, n, dat=None, T_av=None, uv_mag_av=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                read_statistics=True, read_parameters=False)
-    x, y, z, u, v, _ = dat.read_velocity(n, verbose=False)
-    x, y, z, T = dat.read_temperature(n, verbose=False)
-    d_n = dat.T_components(n, T=T, u=u, v=v, **kwargs)  # dict of components just at solution n
+    if uv_mag_av is None:
+        x, y, z, u, v, _, uv_mag = dat.read_velocity(n, verbose=False)
+        uv_mag_av = post.horizontal_mean(uv_mag, x)
+    if T_av is None:
+        x, y, z, T = dat.read_temperature(n, verbose=False)
+        T_av = post.horizontal_mean(T, x)
+    d_n = dat.T_components(n, T_av=T_av, uv_mag_av=uv_mag_av, **kwargs)  # dict of components just at solution n
     d_n['h_components'] = T_components_of_h(case, df=d_n, dat=dat, data_path=data_path, **kwargs)
 
     # for key in d_n.keys():
@@ -1786,8 +1862,7 @@ def plot_velocity_profile(case, dat=None, n=None, xlabel='rms velocity', ylabel=
     if n is None:
         n = dat.final_step()
 
-    x, y, _, u, v, _ = dat.read_velocity(n=n, verbose=False)
-    mag = np.sqrt(u ** 2 + v ** 2)
+    x, y, _, u, v, _, mag = dat.read_velocity(n=n, verbose=False)
     mag_av = post.horizontal_mean(mag, x)
     fig, ax = dat.plot_profile(mag_av, n=n, y=y, label='', ylabel=None, fig=fig, ax=ax, **kwargs)
     ax.set_xlabel(xlabel, fontsize=labelsize)
@@ -2140,6 +2215,28 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
                 for ip, suffix in enumerate(psuffixes):
                     pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
                              data_path=data_path, at_sol=True, load=load, **kwargs)
+
+
+# def reprocess_time_averages(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_grid=None, end_grid=None,
+#                             data_path=data_path_bullard, redo=True, load_grid=None, **kwargs):
+#     Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
+#
+#     for jj, eta_str in enumerate(eta_ls):
+#         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
+#         for ii, case in enumerate(cases):
+#             t1_ii = t1_grid[jj][ii]
+#             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
+#                 print(case)
+#                 if redo:
+#                     # for recalculating everything if you fucked up e.g.
+#                     load = False
+#                 elif load_grid is not None:
+#                     load = load_grid[jj][ii]
+#                 else:
+#                     load = 'auto'
+#                 for ip, suffix in enumerate(psuffixes):
+#                     pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
+#                              data_path=data_path, at_sol=True, load=load, **kwargs)
 
 
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,

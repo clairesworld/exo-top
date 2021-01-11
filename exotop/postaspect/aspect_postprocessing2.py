@@ -1,7 +1,3 @@
-import sys
-src_paths = ['/usr/lib/python36.zip', 'usr/lib/python3.6', '/usr/lib/python3.6/lib-dynload', '/usr/local/lib/python3.6/dist-packages', '/usr/lib/python3/dist-packages']
-for s in src_paths:
-    sys.path.insert(0, s)
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
@@ -17,6 +13,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pandas as pd
 import time
 import csv
+import dask.dataframe
 rasterized = True
 
 def unique_rows(a):
@@ -286,7 +283,9 @@ class Aspect_Data():
         w = w[self.indices]
         w.shape = self.array_shape
 
-        return self.x, self.y, self.z, u, v, w
+        mag = np.sqrt(u ** 2 + v ** 2 + w ** 2)
+
+        return self.x, self.y, self.z, u, v, w, mag
     
     def read_statistics(self, verbose=True, timing=False):
         filename = self.directory + "statistics"
@@ -295,8 +294,7 @@ class Aspect_Data():
 
         # start_time = time.time()
         # fp = open(filename)
-        # data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=[str(r) for r in np.arange(0, 26)],
-        #                       delimiter='\t')
+        # data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=[str(r) for r in np.arange(0, 26)], delimiter='\t')
         # self.stats_timestep = np.array([np.float(s) for s in data['0']])
         # self.stats_time = np.array([np.float(s) for s in data['1']])
         # self.stats_rms_velocity = np.array([np.float(s) for s in data['10']])
@@ -311,8 +309,8 @@ class Aspect_Data():
 
         start_time = time.time()
         data = np.genfromtxt(filename, comments='#')
-        all_data = np.genfromtxt(filename, comments='#', dtype=None)
-        self.stats_timestep = np.array([d[0] for d in all_data])
+        # all_data = np.genfromtxt(filename, comments='#', dtype=None)
+        self.stats_timestep = np.array([int(d) for d in data[:,0]])  # np.array([d[0] for d in all_data])
         self.stats_time = data[:,1]
         self.stats_rms_velocity = data[:,10]
         self.stats_average_T = data[:,13]
@@ -326,10 +324,8 @@ class Aspect_Data():
             print('np.genfromtxt took %s seconds' % (time.time() - start_time))
 
 
-
         # start_time = time.time()
-        # data = dask.dataframe.read_csv(filename, sep='\t', comments='#', header=None, names=map(str, np.arange(0, 26)),
-        #                                index_col=False)
+        # data = dask.dataframe.read_csv(filename, sep='\t', comment='#', header=None, names=[str(r) for r in np.arange(0, 26)])
         # self.stats_timestep = data['0']
         # self.stats_time = data['1']
         # self.stats_rms_velocity = data['10']
@@ -342,14 +338,14 @@ class Aspect_Data():
         # print(self.stats_timestep)
         # print("dask.dataframe took %s seconds" % (time.time() - start_time))
 
-    def read_stats_sol_files(self, col_vis=20, skip_header=26):
+    def read_stats_sol_files(self, col_vis=20):
         filename = self.directory + "statistics"
-        all_data = np.genfromtxt(filename, skip_header=skip_header, dtype=None)
+        data = np.genfromtxt(filename, comments='#', dtype=None, usecols=col_vis)
         last = 0
-        files = np.zeros(len(all_data), dtype=np.int64)
+        files = np.zeros(len(data), dtype=np.int64)
         #  find last instance that's not ""
-        for n, d in enumerate(all_data):
-            s = d[col_vis][-14:]
+        for n, d in enumerate(data):
+            s = d[-14:]
             if not s.decode()=='""':
                 last = int(re.search(r'\d+', s.decode()).group(0))
             files[n] = last
@@ -552,7 +548,7 @@ class Aspect_Data():
     #         diff = abs(Ti - Ti_guess)
     #     return Ti, d0
 
-    def lid_thickness(self, u=None, v=None, n=None, tol=1e-3, plot=False, spline=True, **kwargs):
+    def lid_thickness(self, uv_mag=None, n=None, tol=1e-3, plot=False, spline=True, **kwargs):
         # stagnant lid depth y_L from Moresi & Solomatov 2000 method - thickness delta_L = 1 - y_L
         try:
             x = self.x
@@ -561,14 +557,13 @@ class Aspect_Data():
             self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
             x = self.x
             y = self.y
-        if (u is None) or (v is None):
-            _, _, _, u, v, _ = self.read_velocity(n, verbose=False)
+        if uv_mag is None:
+            _, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=False)
 
-        # get horizontal average of vertical velocity
-        mag = np.sqrt(u ** 2 + v ** 2)
-        mag_av = horizontal_mean(mag, x)
+        # get horizontal average
+        mag_av = horizontal_mean(uv_mag, x)
         if plot:
-            self.plot_profile(mag, xlabel='velocity magnitude', title='solution ' + str(n))
+            self.plot_profile(uv_mag, xlabel='velocity magnitude', title='solution ' + str(n))
             ax = plt.gca()
 
         # find peak velocity in interior (coincident with inflection point)
@@ -668,18 +663,23 @@ class Aspect_Data():
         except IndexError:
             return b
     
-    def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, u=None, v=None, plot=False,
+    def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, uv_mag=None, plot=False,
                              verbose=False, **kwargs):
-        x = self.x
-        y = self.y
+        try:
+            x = self.x
+            y = self.y
+        except AttributeError:
+            self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
+            x = self.x
+            y = self.y
         if T_av is None:
             if T is None:
                 _, _, _, T = self.read_temperature(n, verbose=verbose, **kwargs)
             T_av = horizontal_mean(T, x)
-        if (delta_L is None):
-            if (u is None) or (v is None):
-                _, _, _, u, v, _ = self.read_velocity(n, verbose=verbose, **kwargs)
-            delta_L = self.lid_thickness(u=u, v=v, plot=plot, **kwargs)
+        if delta_L is None:
+            if uv_mag is None:
+                _, _, _, _, _, _, uv_mag = self.read_velocity(n, verbose=verbose, **kwargs)
+            delta_L = self.lid_thickness(uv_mag=uv_mag, plot=plot, **kwargs)
         # find T at delta_L
         # fit spline
         spl = UnivariateSpline(y, T_av, k=3, s=0)
@@ -688,8 +688,13 @@ class Aspect_Data():
         return T_l
 
     def max_Ty(self, n=None, T=None, T_av=None, verbose=False):
-        x = self.x
-        y = self.y
+        try:
+            x = self.x
+            y = self.y
+        except AttributeError:
+            self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
+            x = self.x
+            y = self.y
         if T_av is None:
             if T is None:
                 _, _, _, T = self.read_temperature(n, verbose=verbose)
@@ -706,8 +711,13 @@ class Aspect_Data():
                              spline=True, usemax=False, **kwargs):
         # almost-isothermal temperature of core of convecting cell
         # note: MS2000 define this as the maximal horizontally-averaged temperature in the (convecting) layer
-        x = self.x
-        y = self.y
+        try:
+            x = self.x
+            y = self.y
+        except AttributeError:
+            self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
+            x = self.x
+            y = self.y
         if T_av is None:
             if T is None:
                 _, _, _, T = self.read_temperature(n, verbose=verbose)
@@ -758,7 +768,8 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
     
-    def T_components(self, n, T=None, T_i=None, T_l=None, delta_rh=None, y_L=None, u=None, v=None, d_m=1, dT_m=1,
+    def T_components(self, n=None, T=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
+                     uv_mag=None, uv_mag_av=None, d_m=1, dT_m=1,
                      verbose=False, **kwargs):
         if n is None:
             n = self.final_step()
@@ -769,9 +780,14 @@ class Aspect_Data():
             self.read_mesh(n)  # mesh should be the same for all timesteps in steady state?
             x = self.x
             y = self.y
-        if T is None:
-            _, _, _, T = self.read_temperature(n, verbose=verbose)
-        T_av = horizontal_mean(T, x)
+        if T_av is None:
+                if T is None:
+                    _, _, _, T = self.read_temperature(n, verbose=verbose)
+            T_av = horizontal_mean(T, x)
+        if uv_mag_av is None:
+                if uv_mag is None:
+                    _, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=verbose)
+            uv_mag_av = horizontal_mean(uv_mag, x)
         if d_m is None or dT_m is None:
             try:
                 p = self.parameters
@@ -781,7 +797,7 @@ class Aspect_Data():
             d_m = p['Geometry model']['Box']['Y extent']
             dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
         if y_L is None:
-            y_L = self.lid_thickness(u=u, v=v, **kwargs)
+            y_L = self.lid_thickness(uv_mag_av=uv_mag_av, **kwargs)
         if T_i is None:
             T_i = self.internal_temperature(T_av=T_av, **kwargs)
         if T_l is None:
@@ -795,19 +811,18 @@ class Aspect_Data():
                          'delta_L':delta_L, 'delta_0':delta_0, 'T_av':T_av, 'y':y}
         return self.T_params
     
-    def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, u=None, v=None, **kwargs):
+    def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, uv_mag=None, **kwargs):
         # stagnant lid criterion S << 1 from Moresi & Solomatov 2000
-        if (u is None) or (v is None):
-            x, _, _, u, v, _ = self.read_velocity(n, verbose=False)
-        mag = np.sqrt(u ** 2 + v ** 2)
-        mag_av = horizontal_mean(mag, x)
+        if uv_mag is None:
+            x, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=False)
+        mag_av = horizontal_mean(uv_mag, x)
         u_0 = mag_av[-1]
         # u_0 = horizontal_mean(u, x)[-1]  # surface velocity
         if delta_0 is None:
             if delta_rh is None:
                 delta_rh = self.ubl_thickness(n=n, **kwargs)
             if delta_l is None:
-                delta_l = self.lid_thickness(n=n, u=u, **kwargs)
+                delta_l = self.lid_thickness(n=n, uv_mag=uv_mag, **kwargs)
             delta_0 = delta_rh + delta_l
         print('u_0', u_0, 'delta_0', delta_0, 'S =', np.array(delta_0)**2 * np.array(abs(u_0)))
         return np.array(delta_0)**2 * np.array(abs(u_0))
