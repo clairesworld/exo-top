@@ -33,7 +33,7 @@ c_regimes_td = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure']
 load_grid = np.empty_like(t1_grid, dtype=object)
 load_grid[:] = default_load_value
 if check_new:
-    load_grid[:, 5] = 'auto'   # ongoing runs: Ra3e8
+    load_grid[1:, 5] = 'auto'   # ongoing runs: Ra3e8
     load_grid[3, 4] = 'auto'  # ongoing runs: Ra1e8 eta1e8
 
 # string endings for case names

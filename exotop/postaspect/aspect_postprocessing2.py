@@ -310,7 +310,9 @@ class Aspect_Data():
 
         start_time = time.time()
         fp = open(filename)
-        data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=map(str, np.arange(0, 26)), delimiter='\t')
+        data = csv.DictReader((row for row in fp if not row.startswith('#')), fieldnames=map(str, np.arange(0, 26)),
+                              delimiter='\t')
+        print(data)
         self.stats_timestep = np.array([np.float(s) for s in data['0']])
         self.stats_time = np.array([np.float(s) for s in data['1']])
         self.stats_rms_velocity = np.array([np.float(s) for s in data['10']])
