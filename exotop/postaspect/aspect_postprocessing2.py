@@ -17,7 +17,6 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pandas as pd
 import time
 import csv
-import dask.dataframe
 rasterized = True
 
 def unique_rows(a):
@@ -324,20 +323,20 @@ class Aspect_Data():
         print(self.stats_timestep)
         print("csv.DictReader took %s seconds" % (time.time() - start_time))
 
-        start_time = time.time()
-        data = dask.dataframe.read_csv(filename, sep='\t', comments='#', header=None, names=map(str, np.arange(0, 26)),
-                                       index_col=False)
-        self.stats_timestep = data['0']
-        self.stats_time = data['1']
-        self.stats_rms_velocity = data['10']
-        self.stats_average_T = data['13']
-        self.stats_heatflux_left = data['16']
-        self.stats_heatflux_right = data['17']
-        self.stats_heatflux_bottom = data['18']
-        self.stats_heatflux_top = data['19']
-        self.stats_average_viscosity = data['22']
-        print(self.stats_timestep)
-        print("dask.dataframe took %s seconds" % (time.time() - start_time))
+        # start_time = time.time()
+        # data = dask.dataframe.read_csv(filename, sep='\t', comments='#', header=None, names=map(str, np.arange(0, 26)),
+        #                                index_col=False)
+        # self.stats_timestep = data['0']
+        # self.stats_time = data['1']
+        # self.stats_rms_velocity = data['10']
+        # self.stats_average_T = data['13']
+        # self.stats_heatflux_left = data['16']
+        # self.stats_heatflux_right = data['17']
+        # self.stats_heatflux_bottom = data['18']
+        # self.stats_heatflux_top = data['19']
+        # self.stats_average_viscosity = data['22']
+        # print(self.stats_timestep)
+        # print("dask.dataframe took %s seconds" % (time.time() - start_time))
 
     def read_stats_sol_files(self, col_vis=20, skip_header=26):
         filename = self.directory + "statistics"
