@@ -525,7 +525,7 @@ def h_timeaverage(case, ts0, tsf=1e50):
     h_params = {}
     h_all = []
     flag = True
-    print('Reading', tsf - ts0, 'files')
+    print('  Reading', tsf - ts0, 'files...')
     while flag and ts0 <= tsf:
         try:
             x, h = read_topo_stats(case, ts0)
@@ -542,7 +542,7 @@ def h_timeaverage(case, ts0, tsf=1e50):
     h_params['h_peak'] = peak
     h_params['h_rms'] = rms
     h_params['n'] = np.shape(h_all)[0]
-    return pd.from_dict(h_params)
+    return pd.DataFrame.from_dict(h_params)
 
 
 def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
@@ -966,9 +966,11 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, np.array(df[x_key].mean())))
                 n_sols_all.append(len(df.index))
             elif averagescheme == 'timefirst':
+                df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                                        data_path=data_path, **kwargs)
                 yx_peak_all.append(
-                    (np.array(df['h_peak'].mean()) * hscale, np.array(df_av[x_key])))  # each xy point (y=h)
-                yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, np.array(df_av[x_key])))
+                    (np.array(df_h['h_peak']) * hscale, np.array(df_av[x_key])))  # each xy point (y=h)
+                yx_rms_all.append((np.array(df['h_rms']) * hscale, np.array(df_av[x_key])))
                 n_sols_all.append(1)
             else:
                 # use each xy point (y=h) for fitting to
