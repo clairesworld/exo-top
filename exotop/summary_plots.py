@@ -8,13 +8,15 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
 # (re)process all
 
-sc.reprocess_all_average(Ra_ls, eta_ls, t1_grid=t1_grid, end_grid=end_grid, suffix='_h_mean', postprocess_fn=sc.h_timeaverage,
-                         data_path=data_path, redo=True, load_grid=load_grid, regime_grid=regime_grid_td, include_regimes=['chaotic'])
+sc.reprocess_all_average(Ra_ls, eta_ls, suffix='_h_mean', postprocess_fn=sc.h_timeaverage, redo=True,
+                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, load_grid=load_grid,
+                         regime_grid=regime_grid_td, include_regimes=['steady', 'trans.'])
 
-# sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol],
-#                         t1_grid=t1_grid, end_grid=end_grid, regime_grid=regime_grid_td, include_regimes=['chaotic'],
-#                         data_path=data_path, redo=True,
-#                         load_grid=load_grid, postprocess_kwargs=postprocess_kwargs)
+sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol], redo=True,
+                        t1_grid=t1_grid, end_grid=end_grid, load_grid=load_grid, regime_grid=regime_grid_td,
+                        include_regimes=['steady', 'trans.'],
+                        data_path=data_path,
+                        postprocess_kwargs=postprocess_kwargs)
 
 # sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_Nu'],
 #                         postprocess_functions=[sc.T_parameters_at_sol, sc.h_at_ts, sc.Nu_at_ts],

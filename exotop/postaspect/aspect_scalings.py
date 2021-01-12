@@ -973,9 +973,11 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             elif averagescheme == 'timefirst':
                 df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
                                         data_path=data_path, **kwargs)
-                print('df_h', df_h)
                 df['h_rms'] = df_h['h_rms']
                 df['h_peak'] = df_h['h_peak']
+                print('df_h[h_rms]', df_h['h_rms'])
+                print('df[h_rms]', df['h_rms'])
+                print('df[h_rms].mean()', df['h_rms'].mean())
                 print('(np.array(df[h_rms].mean())', np.array(df['h_rms'].mean()))
                 yx_peak_all.append(
                     (np.array(df['h_peak'].mean()) * hscale, x))  # each xy point (y=h)
@@ -1013,7 +1015,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             intercept=True
         else:
             intercept=False
-        print('yx_rms_all', yx_rms_all)
         ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all), c=c_rms, labelsize=labelsize,
                                intercept=intercept, **kwargs)
 
