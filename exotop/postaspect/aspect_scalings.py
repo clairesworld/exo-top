@@ -883,7 +883,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra, eta, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
-    if which_x == 'components':
+    if which_x in ['h_components', 'Ra_i', 'Ra_i_eff']:
         psuffixes = ['_T', '_h']
         at_sol = True
         postprocess_functions = [T_parameters_at_sol, h_at_ts]
@@ -911,9 +911,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
 
                 # load outputs
                 dfs = []
-                if which_x == 'Ra_i' and ('_T' not in psuffixes):  # need to load T info for getting Ra_i
-                    psuffixes.append('_T')
-                    postprocess_functions.append(T_parameters_at_sol)
                 for ip, ps in enumerate(psuffixes):
                     df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
                                    data_path=data_path, at_sol=at_sol, **kwargs)
