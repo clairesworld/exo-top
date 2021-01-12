@@ -11,7 +11,8 @@ import matplotlib.patches as patches
 import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm, Normalize
 import matplotlib.lines as mlines  # noqa: E402
-# from sklearn import linear_model
+from sklearn import linear_model
+# import statsmodels.api as sm
 import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
@@ -54,23 +55,25 @@ def reshape_one_input(A, proper, default):
     return B
 
 
-def reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid,
-                   t1_default=0, load_default='auto', end_default=''):
+def reshape_inputs(Ra_ls, eta_ls, grids, defaults=None):
+    if defaults is None:
+        defaults = (0, 'auto', '', '')
 
     n_Ra = np.size(Ra_ls)
     n_eta = np.size(eta_ls)
     proper = np.zeros((n_eta, n_Ra))  # model for arrays with the right shapeRa
 
-    t1_grid = reshape_one_input(t1_grid, proper, t1_default)
-    load_grid = reshape_one_input(load_grid, proper, load_default)
-    end_grid = reshape_one_input(end_grid, proper, end_default)
+    grids_new = []
+    for grid, default in zip(grids, defaults):
+        grids_new.append(reshape_one_input(grid, proper, default))
 
+    # make sure Ra and eta are iterable the right way
     if not not_string(Ra_ls):  # if a string
         Ra_ls = [Ra_ls]
     if not not_string(eta_ls):
         eta_ls = [eta_ls]
 
-    return Ra_ls, eta_ls, t1_grid, load_grid, end_grid
+    return Ra_ls, eta_ls, grids_new
 
 
 def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None, at_sol=True,
@@ -290,7 +293,13 @@ def print_solution_data(case, suffix='_T', keys=None, data_path=data_path_bullar
 
 def get_cases_list(Ra, eta, end=None):
     # either Ra or eta is iterable
-    if iterable_not_string(Ra):
+    if iterable_not_string(Ra) and iterable_not_string(eta):
+        # end is 2d grid
+        x_var = None
+        cases = []
+        for jj, e in eta:
+            cases.extend(['Ra' + r + '-eta' + e + en for r, en in zip(Ra, end[jj])])
+    elif iterable_not_string(Ra):
         x_var = Ra
         if end is None:
             end = [''] * len(x_var)
@@ -301,7 +310,7 @@ def get_cases_list(Ra, eta, end=None):
             end = [''] * len(x_var)
         cases = ['Ra' + Ra + '-eta' + eta + en for e, en in zip(eta, end)]
     else:
-        raise Exception('Ra or eta must be iterable')
+        raise Exception('At least one of Ra or eta must be iterable')
     return cases, x_var
 
 
@@ -760,6 +769,7 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
     else:
         print('Unrecognized sigma value')
     qdict = {}
+    df.dropna(axis=0, inplace=True, subset=keys)
     for key in keys:
         vals = df[key].values
         try:
@@ -817,27 +827,28 @@ def fit_log(x, h, intercept=False, weights=None, **kwargs):
     return slope, 10 ** intercept
 
 
-# def fit_log2(x, y, h):
-#     try:
-#         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
-#         y1 = np.log10(np.array(y))
-#         h1 = np.log10(np.array(h))
-#     except Exception as e:
-#         print('h', h, type(h))
-#         print('x', x, type(x))
-#         print('y', y, type(y))
-#         raise e
-#
-#     try:
-#         slope_x, intercept_x, r_value_x, p_value_x, std_err_x = stats.linregress(x1, h1)
-#         slope_y, intercept_y, r_value_y, p_value_y, std_err_y = stats.linregress(y1, h1)
-#     except ValueError as e:
-#         print('x1', np.shape(x1),, 'y1', np.shape(y1) 'h1', np.shape(h1))
-#         raise e
-#
-#     intercept =
-#
-#     return slope_x, slope_y, 10 ** intercept
+def fit_2log(x, y, h, intercept=False, weights=None, **kwargs):
+
+    try:
+        df = pd.DataFrame({'x':np.log10(np.array(x)), 'y': np.log10(np.array(y)), 'h': np.log10(np.array(h))})
+    except (ValueError, TypeError) as e:
+        print('h', h, type(h))
+        print('x', x, type(x))
+        print('y', y, type(y))
+        raise e
+
+    X = df[['x','y']]
+    Y = df['h']
+
+    # with sklearn
+    regr = linear_model.LinearRegression()
+    regr.fit(X, Y)
+
+    print('Intercept: \n', regr.intercept_)
+    print('Coefficients: \n', regr.coef_)
+
+    return regr.coef_, 10 ** regr.intercept_
+
 
 
 def fit_h_sigma(x, h, h_err=None, fn='line'):
@@ -860,20 +871,18 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
-def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_path_bullard,
+def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
-              fig_fmt='.png', which_x=None,
+              fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
               save=True, fname='h',
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, Ra_i=False, show_isoviscous=False,
-              fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs={}, **kwargs):
+              fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs={}, regime_names=None, **kwargs):
     # either Ra or eta is 1D list of strings (other is singular), t1, end must match shape
-    cases, cases_var = get_cases_list(Ra, eta, end)
-    if t1 is None:
-        t1 = [0] * len(cases)
-    if not_iterable(load):  # triggered if either a string, or a non-iterable (e.g. float), assume not latter
-        load = np.array([load] * len(cases))
+    Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra, eta, (t1_grid, load_grid, end_grid, regime_grid))
+    if include_regimes is None:
+        include_regimes = regime_names
     if which_x == 'components':
         psuffixes = ['_T', '_h']
         at_sol = True
@@ -884,55 +893,58 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         postprocess_functions = [h_at_ts]
     else:
         raise Exception('plot_h_vs(): Invalid variable for x-axis')
+    if ax is None:
+        fig = plt.figure()
+        ax = plt.gca()
 
-    quants_h_peak = np.zeros((len(cases_var), 3))
-    quants_h_rms = np.zeros((len(cases_var), 3))
-    quants_x = np.zeros((len(cases_var), 3))
-    yx_peak_all = []
-    yx_rms_all = []
-    n_sols_all = []
+    cases, cases_var = get_cases_list(Ra, eta, end_grid)
+    quants = {'h_rms':None, 'h_peak':None, which_x:None}
+    yx_peak_all, yx_rms_all, n_sols_all = [], [], []
 
     for ii, case in enumerate(cases):
-        t1_ii = t1[ii]
-        load_ii = load[ii]
-        # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+        if regime_grid[ii] in include_regimes:
+            t1_ii = t1_grid[ii]
+            load_ii = load_grid[ii]
+            # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
-        # load outputs
-        dfs = []
-        if Ra_i and ('_T' not in psuffixes):
-            psuffixes.append('_T')
-            postprocess_functions.append(T_parameters_at_sol)
-        for ip, ps in enumerate(psuffixes):
-            df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
-                           data_path=data_path, at_sol=at_sol, **kwargs)
-            dfs.append(df1)
-        df = pd.concat(dfs, axis=1)
-        df = df.loc[:, ~df.columns.duplicated()]
+            # load outputs
+            dfs = []
+            if Ra_i and ('_T' not in psuffixes):
+                psuffixes.append('_T')
+                postprocess_functions.append(T_parameters_at_sol)
+            for ip, ps in enumerate(psuffixes):
+                df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
+                               data_path=data_path, at_sol=at_sol, **kwargs)
+                dfs.append(df1)
+            df = pd.concat(dfs, axis=1)
+            df = df.loc[:, ~df.columns.duplicated()]
 
-        if which_x == 'components':
-            x_key = 'h_components'
-            if averagescheme == 'timelast':
-                print('    plot_h_vs(): Averaging T components calcualted at each timestep')
-                x = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
-                                                 update=False, **postprocess_kwargs, **kwargs)
-            elif averagescheme == 'timefirst':
-                print('    plot_h_vs(): Calculating T components using time-averaged profiles')
-                T_av, y = time_averaged_profile_from_df(df, 'T_av')
-                uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-                df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs, **kwargs)
-                x = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
-                                                 update=False,  **postprocess_kwargs, **kwargs)
-            elif (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
+            # extract x values for plotting
+            if which_x == 'h_components':
+                if averagescheme == 'timelast':
+                    print('    plot_h_vs(): Averaging T components calcualted at each timestep')
+                    x = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
+                                                     update=False, **postprocess_kwargs, **kwargs)
+                elif averagescheme == 'timefirst':
+                    print('    plot_h_vs(): Calculating T components using time-averaged profiles')
+                    T_av, y = time_averaged_profile_from_df(df, 'T_av')
+                    uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+                    df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs, **kwargs)
+                    x = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
+                                                     update=False, **postprocess_kwargs, **kwargs)
+                elif (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any()):
                     print('    plot_h_vs(): Calculating T components')
                     x = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
-                                                     update=False,  **postprocess_kwargs,
-                                                     **kwargs)
-            else:
-                x = df['h_components']
-
-        elif which_x == 'Ra':
-            x_key = 'Ra'
-            if Ra_i == 'eff':  # calculate effective Ra using time-mean of T field params
+                                                     update=False, **postprocess_kwargs, **kwargs)
+                else:
+                    x = df['h_components']
+            elif which_x == 'Ra':
+                if averagescheme == 'timelast' or averagescheme == 'timefirst':
+                    x = float(Ra[ii])
+                else:
+                    x = float(Ra[ii]) * np.ones(
+                        len(df.index))  # normally this is equal to Ra (constant along index)
+            elif which_x == 'Ra_i_eff':  # calculate effective Ra using time-mean of T field params
                 if averagescheme == 'timelast':
                     x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
                                  T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
@@ -944,7 +956,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                         'Ra_i_eff not implemented yet if using h output over all timesteps without averaging')
                     # x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'],
                     #          T_l=df['T_l'], delta_L=df['delta_L'])
-            elif Ra_i:
+            elif which_x == 'Ra_i':
                 if averagescheme == 'timelast':
                     x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
                 elif averagescheme == 'timefirst':
@@ -952,59 +964,55 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 else:
                     raise Exception(
                         'Ra_i not implemented yet if using h output over all timesteps without averaging')
+
+            try:
+                df_plot = pd.DataFrame({which_x: x})
+            except:
+                df_plot = pd.DataFrame({which_x: [x]})
+
+            # figure out the rest of the plotting stuff depending on averaging scheme
+            if averagescheme == 'timelast':
+                n_sols_all.append(len(df.index))
+                # df_plot = pd.concat([df_plot, df[['h_rms', 'h_peak']]], axis=1)
+                df_plot['h_rms'] = df.h_rms.mean()
+                df_plot['h_peak'] = df.h_peak.mean()
+            elif averagescheme == 'timefirst':
+                df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                                        data_path=data_path, **kwargs)
+                df_plot = pd.concat([df_plot, df_h], axis=1)
+                n_sols_all.append(1)
             else:
-                if averagescheme == 'timelast' or averagescheme == 'timefirst':
-                    x = float(cases_var[ii])
-                else:
-                    x = float(cases_var[ii]) * np.ones(
-                        len(df.index))  # normally this is equal to Ra (constant along index)
+                # use each xy point (y=h) for fitting to
+                df_plot = pd.concat([df_plot, df], axis=1)
+                df_plot.dropna(axis=0, how='any', subset=quants.keys(), inplace=True)  # remove any rows with nans
+                n_sols_all.extend([len(df.index)] * len(df.index))
 
-        try:
-            df_plot = pd.DataFrame({x_key: x})
-        except:
-            df_plot = pd.DataFrame({x_key: [x]})
+            print('df_plot\n', df_plot)
 
-        if averagescheme == 'timelast':
-            n_sols_all.append(len(df.index))
-            # df_plot = pd.concat([df_plot, df[['h_rms', 'h_peak']]], axis=1)
-            df_plot['h_rms'] = df.h_rms.mean()
-            df_plot['h_peak'] = df.h_peak.mean()
-        elif averagescheme == 'timefirst':
-            df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
-                                    data_path=data_path, **kwargs)
-            df_plot = pd.concat([df_plot, df_h], axis=1)
-            n_sols_all.append(1)
-        else:
-            # use each xy point (y=h) for fitting to
-            df_plot = pd.concat([df_plot, df], axis=1)
-            df_plot.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key], inplace=True)  # remove any rows with nans
-            n_sols_all.extend([len(df.index)] * len(df.index))
+            # append to working
+            yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[which_x].values)))
+            yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[which_x].values)))
+            qdict = parameter_percentiles(case, df=df_plot, keys=quants.keys(), plot=False)
+            for key in quants.keys():
+                try:
+                    quants[key] = np.vstack((quants[key], qdict[key]))
+                except ValueError:  # haven't added anything yet
+                    quants[key] = qdict[key].reshape((1,3))  # reshape so it works if you just have one row
 
-        print('df_plot\n', df_plot)
-        yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[x_key].values)))
-        yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[x_key].values)))
-        qdict = parameter_percentiles(case, df=df_plot, keys=['h_peak', 'h_rms', x_key], plot=False)
-        quants_h_peak[ii, :] = qdict['h_peak'] * hscale
-        quants_h_rms[ii, :] = qdict['h_rms'] * hscale
-        quants_x[ii, :] = qdict[x_key]
-
-
-    yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
-    yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
-    xerr = [quants_x[:, 1] - quants_x[:, 0],
-            quants_x[:, 2] - quants_x[:, 1]]
-
-    if ax is None:
-        fig = plt.figure()
-        ax = plt.gca()
-
-    ax.errorbar(quants_x[:, 1], quants_h_peak[:, 1], yerr=yerr_peak, xerr=xerr, elinewidth=0.5,
-                fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
-    ax.errorbar(quants_x[:, 1], quants_h_rms[:, 1], yerr=yerr_rms, xerr=xerr, elinewidth=0.5,
-                fmt='o', c=c_rms, capsize=5)
+    # get errorbars and plot them
+    err = dict.fromkeys(quants.keys())
+    try:
+        for key in quants.keys():
+            err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
+        ax.errorbar(quants[which_x][:, 1], quants['h_peak'][:, 1], yerr=err['h_peak'], xerr=err[which_x], elinewidth=0.5,
+                    fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
+        ax.errorbar(quants[which_x][:, 1], quants['h_rms'][:, 1], yerr=err['h_rms'], xerr=err[which_x], elinewidth=0.5,
+                    fmt='o', c=c_rms, capsize=5)
+    except TypeError:  # no cases in given regimes
+        pass
 
     if fit:
-        if which_x == 'components':
+        if which_x == 'h_components':
             intercept=True
         else:
             intercept=False
@@ -1303,9 +1311,9 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                           show_bounds=False, regimes_title='', Ra_i=False, show_isoviscous=False, y2label='',
                           labelsize=14, xlabel='Ra', include_regimes=None, ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
 
-    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
+    Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
-        include_regimes = ['steady', 'trans.', 'chaotic']
+        include_regimes = regime_names
     if c_regimes is None:
         c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
     if T_components:
@@ -1357,10 +1365,10 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
 
                 if not (not Ra_regime):  # if this regime is not empty
                     fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
-                                        load_ii[Ra_regime_idx], which_x=which_x, Ra_i=Ra_i, show_isoviscous=show_isoviscous,
-                                        fig=fig, ax=ax, c_rms=c_regimes[ir], c_peak=c_regimes[ir],
-                                        p_dimensionals=p_dimensionals,
-                                        save=False, ylabel='', xlabel='', labelsize=labelsize, y2label=y2label, **kwargs)
+                                        load_ii[Ra_regime_idx], p_dimensionals=p_dimensionals, which_x=which_x,
+                                        save=False, labelsize=labelsize, xlabel='', ylabel='', y2label=y2label,
+                                        c_peak=c_regimes[ir], c_rms=c_regimes[ir], Ra_i=Ra_i,
+                                        show_isoviscous=show_isoviscous, fig=fig, ax=ax, **kwargs)
                     if show_bounds:
                         ax.axvline(float(Ra_regime[-1]) * 2, c='k', lw=0.5, alpha=0.6, ls='--')
                         # ax.text(ax.get_xlim()[0], ylim[0], regime_name, fontsize=8, va='bottom', ha='left')
@@ -1436,15 +1444,17 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
 
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys=None, data_path=data_path_bullard,
-                        fig_path=fig_path_bullard, load_grid='auto', Ra_i=False, compare_exponent=None,
+                        fig_path=fig_path_bullard, load_grid='auto', regime_grid=None, include_regimes=None, Ra_i=False, compare_exponent=None,
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
-                        postprocess_functions=[], xlim=None, ylim=None, legloc=None, averagescheme=None,
+                        postprocess_functions=[], xlim=None, ylim=None, legloc=None, averagescheme=None, regime_names=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
                         fig=None, axes=None, fig_fmt='.png', postprocess_kwargs={}, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
 
-    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
+    Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid))
+    if include_regimes is None:
+        include_regimes = regime_names
     if ylabels is None:
         ylabels = keys
     if iterable_not_string(keys):
@@ -2108,13 +2118,13 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                          fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end_grid=None, normtime=True,
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=10,
                          xlabelpad=8, ylabelpad=-2, markers=None, markersize=20, alpha=0.5,
-                         fig=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
+                         fig=None, cmap='magma', vmin=None, vmax=None, include_regimes=None, regime_names=None,
                          data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
 
-    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
+    Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
-        include_regimes = ['steady', 'trans.', 'chaotic']
+        include_regimes = regime_names
     if markers is None:
         markers = ['o', '^', 's', 'D', 'v', 'X']
     if ylabels is None:
@@ -2277,7 +2287,7 @@ def Nu_eff(gamma=None, d_m=None, delta_L=None, alpha_m=None, g=None, b=None, kap
 
 def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_grid=None, end_grid=None,
                          data_path=data_path_bullard, redo=True, load_grid=None, regime_grid=None, include_regimes=None, **kwargs):
-    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
+    Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid))
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
@@ -2319,7 +2329,7 @@ def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', data
 
 def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
                           data_path=data_path_bullard, redo=True, load_grid=None, regime_grid=None, include_regimes=None, **kwargs):
-    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
+    Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid))
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
@@ -2363,14 +2373,14 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
 
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
                             literature_file=None,
-                            legend=True, postprocess_kwargs={},
+                            legend=True, postprocess_kwargs={}, regime_names=None,
                             c='k', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
-                            save=True, fname='model-data', labelsize=16, regime_names=None, clist=None,
+                            save=True, fname='model-data', labelsize=16, clist=None,
                             cmap='magma', cbar='eta', include_regimes=None, **kwargs):
 
-    Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
+    Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
-        include_regimes = ['steady', 'trans.', 'chaotic']
+        include_regimes = regime_names
     if averagescheme == 'timefirst':
         psuffixes = ['_T']
         postprocess_functions = [T_parameters_at_sol]

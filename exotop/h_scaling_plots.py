@@ -10,19 +10,27 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
 load = True #load_grid
 
-# plot time-evolution of list of keys for all cases in given regime
+# try h scalings with heuristic all chaotic cases
+
+_ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load_grid, data_path=data_path,
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='components',
+                 include_regimes=['chaotic'], save=True, fname='h_T_chaotic', labelsize=16,
+                 xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', title='',
+                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                 regime_grid=regime_grid_td)
 
 # plot h scalings - with dT_m*delta*alpha
 
-_ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
-                         T_components=True, averagescheme='timefirst', legloc='upper right',
-                         load_grid=load, fig_path=fig_path, fname='h_T_timeavg', fig_fmt=fig_fmt, end_grid=end_grid,
-                         labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h^\prime$',
-                         xlabelpad=8, ylabelpad=20, fit=True, showallscatter=False,
-                         #xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2),
-                         logx=True, logy=True,
-                         regimes_title='Stationarity', leftleg_bbox=(-0.1, 0.95), data_path=data_path,
-                         postprocess_kwargs=postprocess_kwargs, include_regimes=['chaotic'])
+# _ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
+#                          T_components=True, averagescheme='timefirst', legloc='upper right',
+#                          load_grid=load, fig_path=fig_path, fname='h_T_timeavg', fig_fmt=fig_fmt, end_grid=end_grid,
+#                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h^\prime$',
+#                          xlabelpad=8, ylabelpad=20, fit=True, showallscatter=False,
+#                          #xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2),
+#                          logx=True, logy=True,
+#                          regimes_title='Stationarity', leftleg_bbox=(-0.1, 0.95), data_path=data_path,
+#                          postprocess_kwargs=postprocess_kwargs, include_regimes=['chaotic'])
 load = True
 
 # same but just looking at each time point
@@ -44,7 +52,7 @@ load = True
 # _ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
 #                          load_grid=load, show_isoviscous=True, averagescheme='timefirst',
 #                          fig_path=fig_path, fname='h_Ra_timeavg', fig_fmt=fig_fmt, end_grid=end_grid, labelsize=14,
-#                          xlabel='Ra_i', Ra_i=True,
+#                          xlabel='Ra_i', which_x='Ra_i',
 #                          ylabel='dynamic topography $h^\prime$', y2label='dynamic topography $h$ (km)',
 #                          xlabelpad=8, ylabelpad=5, fit=True, showallscatter=False,
 #                          xlim=(0.6e6, 5e8), #ylim=(1, 12),
