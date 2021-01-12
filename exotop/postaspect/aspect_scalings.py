@@ -539,9 +539,9 @@ def h_timeaverage(case, ts0, tsf=1e50):
         raise Exception(case+'ts0 does not catch topography')
     h_all = np.vstack(h_all)
     peak, rms = peak_and_rms(np.mean(h_all, axis=0))
-    h_params['h_peak'] = peak
-    h_params['h_rms'] = rms
-    h_params['n'] = np.shape(h_all)[0]
+    h_params['h_peak'] = [peak]
+    h_params['h_rms'] = [rms]
+    h_params['n'] = [np.shape(h_all)[0]]
     return pd.DataFrame.from_dict(h_params)
 
 
@@ -966,11 +966,13 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, np.array(df[x_key].mean())))
                 n_sols_all.append(len(df.index))
             elif averagescheme == 'timefirst':
-                df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
-                                        data_path=data_path, **kwargs)
+                # df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                #                         data_path=data_path, **kwargs)
+                # df['h_rms'] = df_h['h_rms']
+                # df['h_peak'] = df_h['h_peak']
                 yx_peak_all.append(
-                    (np.array(df_h['h_peak']) * hscale, np.array(df_av[x_key])))  # each xy point (y=h)
-                yx_rms_all.append((np.array(df['h_rms']) * hscale, np.array(df_av[x_key])))
+                    (np.array(df['h_peak'].mean()) * hscale, x))  # each xy point (y=h)
+                yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, x))
                 n_sols_all.append(1)
             else:
                 # use each xy point (y=h) for fitting to
@@ -2287,7 +2289,7 @@ def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', data
         time = dat.stats_time
         i_time = np.argmax(time >= t1)  # index of first timestep to process
         ts0 = i_time
-        tsf = len(time) - 1
+        tsf = i_time + 10 # len(time) - 1
         df = postprocess_fn(case, ts0, tsf, **kwargs)
         print('Processed', postprocess_fn, 'for time steps', ts0, 'to', tsf)
         pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
