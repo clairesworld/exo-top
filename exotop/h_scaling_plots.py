@@ -15,7 +15,7 @@ load = True #load_grid
 # plot h scalings - with dT_m*delta*alpha
 
 _ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
-                         T_components=True, averagefirst=True, legloc='upper right',
+                         T_components=True, averagescheme=None, legloc='upper right',
                          load_grid=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end_grid=end_grid,
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h^\prime$',
                          xlabelpad=8, ylabelpad=20, fit=True, showallscatter=False,
@@ -27,23 +27,23 @@ load = True
 
 # same but just looking at each time point
 
-_ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
-                         T_components=True, averagefirst=False, legloc='upper right',
-                         load_grid=load,
-                         fig_path=fig_path, fname='h_T_all_scatter', fig_fmt=fig_fmt, end_grid=end_grid,
-                         labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography $h^\prime$',
-                         xlabelpad=8, ylabelpad=20, fit=True, showallscatter=True,
-                         #xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2),
-                         logx=True, logy=True,
-                         regimes_title='Stationarity', leftleg_bbox=(-0.1, 0.95), data_path=data_path,
-                         postprocess_kwargs=postprocess_kwargs,)
+# _ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
+#                          T_components=True, averagescheme=None, legloc='upper right',
+#                          load_grid=load,
+#                          fig_path=fig_path, fname='h_T_all_scatter', fig_fmt=fig_fmt, end_grid=end_grid,
+#                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography $h^\prime$',
+#                          xlabelpad=8, ylabelpad=20, fit=True, showallscatter=True,
+#                          #xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2),
+#                          logx=True, logy=True,
+#                          regimes_title='Stationarity', leftleg_bbox=(-0.1, 0.95), data_path=data_path,
+#                          postprocess_kwargs=postprocess_kwargs,)
 load = True
 
 # # plot h scalings with Ra
 #
 # _ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
-#                          load_grid=load, show_isoviscous=True, averagefirst=True,
-#                          fig_path=fig_path, fname='h_Ra_all', fig_fmt=fig_fmt, end_grid=end_grid, labelsize=14,
+#                          load_grid=load, show_isoviscous=True, averagescheme='timefirst',
+#                          fig_path=fig_path, fname='h_Ra_timeavg', fig_fmt=fig_fmt, end_grid=end_grid, labelsize=14,
 #                          xlabel='Ra_i', Ra_i=True,
 #                          ylabel='dynamic topography $h^\prime$', y2label='dynamic topography $h$ (km)',
 #                          xlabelpad=8, ylabelpad=5, fit=True, showallscatter=False,

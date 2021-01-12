@@ -2289,7 +2289,7 @@ def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', data
         time = dat.stats_time
         i_time = np.argmax(time >= t1)  # index of first timestep to process
         ts0 = i_time
-        tsf = i_time + 10 # len(time) - 1
+        tsf = len(time) - 1
         df = postprocess_fn(case, ts0, tsf, **kwargs)
         print('Processed', postprocess_fn, 'for time steps', ts0, 'to', tsf)
         pkl.dump(df, open(case_path + 'pickle/' + fname, "wb"))
