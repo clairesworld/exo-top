@@ -297,8 +297,8 @@ def get_cases_list(Ra, eta, end=None):
         # end is 2d grid
         x_var = None
         cases = []
-        for jj, e in eta:
-            cases.extend(['Ra' + r + '-eta' + e + en for r, en in zip(Ra, end[jj])])
+        for e, ennn in zip(eta, end):
+            cases.extend(['Ra' + r + '-eta' + e + en for r, en in zip(Ra, ennn)])
     elif iterable_not_string(Ra):
         x_var = Ra
         if end is None:
