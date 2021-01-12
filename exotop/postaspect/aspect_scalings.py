@@ -877,7 +877,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               save=True, fname='h',
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
-              fit=False, logx=True, logy=True, hscale=1, Ra_i=False, show_isoviscous=False,
+              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs={}, regime_names=None, **kwargs):
     # either Ra or eta is 1D list of strings (other is singular), t1, end must match shape
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra, eta, (t1_grid, load_grid, end_grid, regime_grid))
@@ -897,107 +897,109 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         fig = plt.figure()
         ax = plt.gca()
 
-    cases, cases_var = get_cases_list(Ra, eta, end_grid)
     quants = {'h_rms':None, 'h_peak':None, which_x:None}
     yx_peak_all, yx_rms_all, n_sols_all = [], [], []
 
-    for ii, case in enumerate(cases):
-        if regime_grid[ii] in include_regimes:
-            t1_ii = t1_grid[ii]
-            load_ii = load_grid[ii]
-            # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+    # loop over cases
+    for jj, etastr in enumerate(eta):
+        cases, cases_var = get_cases_list(Ra, etastr, end_grid[jj])
+        for ii, case in enumerate(cases):
+            if regime_grid[jj][ii] in include_regimes:
+                t1_ii = t1_grid[jj][ii]
+                load_ii = load_grid[jj][ii]
+                # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
-            # load outputs
-            dfs = []
-            if Ra_i and ('_T' not in psuffixes):
-                psuffixes.append('_T')
-                postprocess_functions.append(T_parameters_at_sol)
-            for ip, ps in enumerate(psuffixes):
-                df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
-                               data_path=data_path, at_sol=at_sol, **kwargs)
-                dfs.append(df1)
-            df = pd.concat(dfs, axis=1)
-            df = df.loc[:, ~df.columns.duplicated()]
+                # load outputs
+                dfs = []
+                if which_x == 'Ra_i' and ('_T' not in psuffixes):  # need to load T info for getting Ra_i
+                    psuffixes.append('_T')
+                    postprocess_functions.append(T_parameters_at_sol)
+                for ip, ps in enumerate(psuffixes):
+                    df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
+                                   data_path=data_path, at_sol=at_sol, **kwargs)
+                    dfs.append(df1)
+                df = pd.concat(dfs, axis=1)
+                df = df.loc[:, ~df.columns.duplicated()]
 
-            # extract x values for plotting
-            if which_x == 'h_components':
-                if averagescheme == 'timelast':
-                    print('    plot_h_vs(): Averaging T components calcualted at each timestep')
-                    x = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
-                                                     update=False, **postprocess_kwargs, **kwargs)
-                elif averagescheme == 'timefirst':
-                    print('    plot_h_vs(): Calculating T components using time-averaged profiles')
-                    T_av, y = time_averaged_profile_from_df(df, 'T_av')
-                    uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-                    df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs, **kwargs)
-                    x = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
-                                                     update=False, **postprocess_kwargs, **kwargs)
-                elif (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any()):
-                    print('    plot_h_vs(): Calculating T components')
-                    x = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
-                                                     update=False, **postprocess_kwargs, **kwargs)
-                else:
-                    x = df['h_components']
-            elif which_x == 'Ra':
-                if averagescheme == 'timelast' or averagescheme == 'timefirst':
-                    x = float(Ra[ii])
-                else:
-                    x = float(Ra[ii]) * np.ones(
-                        len(df.index))  # normally this is equal to Ra (constant along index)
-            elif which_x == 'Ra_i_eff':  # calculate effective Ra using time-mean of T field params
-                if averagescheme == 'timelast':
-                    x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
-                                 T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
-                elif averagescheme == 'timefirst':
-                    x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'],
-                                 T_l=df_av['T_l'], delta_L=df_av['delta_L'])
-                else:
-                    raise Exception(
-                        'Ra_i_eff not implemented yet if using h output over all timesteps without averaging')
-                    # x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'],
-                    #          T_l=df['T_l'], delta_L=df['delta_L'])
-            elif which_x == 'Ra_i':
-                if averagescheme == 'timelast':
-                    x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
-                elif averagescheme == 'timefirst':
-                    x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'])
-                else:
-                    raise Exception(
-                        'Ra_i not implemented yet if using h output over all timesteps without averaging')
+                # extract x values for plotting
+                if which_x == 'h_components':
+                    if averagescheme == 'timelast':
+                        print('    plot_h_vs(): Averaging T components calcualted at each timestep')
+                        x = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
+                                                         update=False, **postprocess_kwargs, **kwargs)
+                    elif averagescheme == 'timefirst':
+                        print('    plot_h_vs(): Calculating T components using time-averaged profiles')
+                        T_av, y = time_averaged_profile_from_df(df, 'T_av')
+                        uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+                        df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs, **kwargs)
+                        x = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
+                                                         update=False, **postprocess_kwargs, **kwargs)
+                    elif (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any()):
+                        print('    plot_h_vs(): Calculating T components')
+                        x = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
+                                                         update=False, **postprocess_kwargs, **kwargs)
+                    else:
+                        x = df['h_components']
+                elif which_x == 'Ra':
+                    if averagescheme == 'timelast' or averagescheme == 'timefirst':
+                        x = float(Ra[ii])
+                    else:
+                        x = float(Ra[ii]) * np.ones(
+                            len(df.index))  # normally this is equal to Ra (constant along index)
+                elif which_x == 'Ra_i_eff':  # calculate effective Ra using time-mean of T field params
+                    if averagescheme == 'timelast':
+                        x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
+                                     T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
+                    elif averagescheme == 'timefirst':
+                        x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'],
+                                     T_l=df_av['T_l'], delta_L=df_av['delta_L'])
+                    else:
+                        raise Exception(
+                            'Ra_i_eff not implemented yet if using h output over all timesteps without averaging')
+                        # x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'],
+                        #          T_l=df['T_l'], delta_L=df['delta_L'])
+                elif which_x == 'Ra_i':
+                    if averagescheme == 'timelast':
+                        x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
+                    elif averagescheme == 'timefirst':
+                        x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'])
+                    else:
+                        raise Exception(
+                            'Ra_i not implemented yet if using h output over all timesteps without averaging')
 
-            try:
-                df_plot = pd.DataFrame({which_x: x})
-            except:
-                df_plot = pd.DataFrame({which_x: [x]})
-
-            # figure out the rest of the plotting stuff depending on averaging scheme
-            if averagescheme == 'timelast':
-                n_sols_all.append(len(df.index))
-                # df_plot = pd.concat([df_plot, df[['h_rms', 'h_peak']]], axis=1)
-                df_plot['h_rms'] = df.h_rms.mean()
-                df_plot['h_peak'] = df.h_peak.mean()
-            elif averagescheme == 'timefirst':
-                df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
-                                        data_path=data_path, **kwargs)
-                df_plot = pd.concat([df_plot, df_h], axis=1)
-                n_sols_all.append(1)
-            else:
-                # use each xy point (y=h) for fitting to
-                df_plot = pd.concat([df_plot, df], axis=1)
-                df_plot.dropna(axis=0, how='any', subset=quants.keys(), inplace=True)  # remove any rows with nans
-                n_sols_all.extend([len(df.index)] * len(df.index))
-
-            print('df_plot\n', df_plot)
-
-            # append to working
-            yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[which_x].values)))
-            yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[which_x].values)))
-            qdict = parameter_percentiles(case, df=df_plot, keys=quants.keys(), plot=False)
-            for key in quants.keys():
                 try:
-                    quants[key] = np.vstack((quants[key], qdict[key]))
-                except ValueError:  # haven't added anything yet
-                    quants[key] = qdict[key].reshape((1,3))  # reshape so it works if you just have one row
+                    df_plot = pd.DataFrame({which_x: x})
+                except:
+                    df_plot = pd.DataFrame({which_x: [x]})
+
+                # figure out the rest of the plotting stuff depending on averaging scheme
+                if averagescheme == 'timelast':
+                    n_sols_all.append(len(df.index))
+                    # df_plot = pd.concat([df_plot, df[['h_rms', 'h_peak']]], axis=1)
+                    df_plot['h_rms'] = df.h_rms.mean()
+                    df_plot['h_peak'] = df.h_peak.mean()
+                elif averagescheme == 'timefirst':
+                    df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                                            data_path=data_path, **kwargs)
+                    df_plot = pd.concat([df_plot, df_h], axis=1)
+                    n_sols_all.append(1)
+                else:
+                    # use each xy point (y=h) for fitting to
+                    df_plot = pd.concat([df_plot, df], axis=1)
+                    df_plot.dropna(axis=0, how='any', subset=quants.keys(), inplace=True)  # remove any rows with nans
+                    n_sols_all.extend([len(df.index)] * len(df.index))
+
+                print('df_plot\n', df_plot)
+
+                # append to working
+                yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[which_x].values)))
+                yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[which_x].values)))
+                qdict = parameter_percentiles(case, df=df_plot, keys=quants.keys(), plot=False)
+                for key in quants.keys():
+                    try:
+                        quants[key] = np.vstack((quants[key], qdict[key]))
+                    except ValueError:  # haven't added anything yet
+                        quants[key] = qdict[key].reshape((1,3))  # reshape so it works if you just have one row
 
     # get errorbars and plot them
     err = dict.fromkeys(quants.keys())
