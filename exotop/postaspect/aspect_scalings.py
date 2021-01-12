@@ -933,7 +933,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                     x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
                                  T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
                 elif averagescheme == 'timefirst':
-                    x = x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'],
+                    x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'],
                                  T_l=df_av['T_l'], delta_L=df_av['delta_L'])
                 else:
                     if not h_components:
@@ -966,10 +966,10 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, np.array(df[x_key].mean())))
                 n_sols_all.append(len(df.index))
             elif averagescheme == 'timefirst':
-                # df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
-                #                         data_path=data_path, **kwargs)
-                # df['h_rms'] = df_h['h_rms']
-                # df['h_peak'] = df_h['h_peak']
+                df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                                        data_path=data_path, **kwargs)
+                df['h_rms'] = df_h['h_rms']
+                df['h_peak'] = df_h['h_peak']
                 yx_peak_all.append(
                     (np.array(df['h_peak'].mean()) * hscale, x))  # each xy point (y=h)
                 yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, x))
@@ -1436,9 +1436,9 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys=None, data_path=data_path_bullard,
                         fig_path=fig_path_bullard, load_grid='auto', Ra_i=False, compare_exponent=None,
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
-                        postprocess_functions=[], xlim=None, ylim=None, legloc=None,
+                        postprocess_functions=[], xlim=None, ylim=None, legloc=None, averagescheme=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
-                        fig=None, axes=None, fig_fmt='.png', **kwargs):
+                        fig=None, axes=None, fig_fmt='.png', postprocess_kwargs={}, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
 
@@ -1485,7 +1485,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
                 dfs = []
                 for ip, suffix in enumerate(psuffixes):
                     df1 = pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
-                                   dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
+                                   dat_new=dat, data_path=data_path, load=load_ii, postprocess_kwargs=postprocess_kwargs, **kwargs)
                     dfs.append(df1)
                 try:
                     df = pd.concat(dfs, axis=1)
@@ -1494,6 +1494,20 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
                     for dfi in dfs:
                         print(dfi)
                     raise e
+
+                if averagescheme == 'timefirst':
+                    print('    subplots_Ra_scaling(): Calculating T components using time-averaged profiles')
+                    T_av, y = time_averaged_profile_from_df(df, 'T_av')
+                    uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+                    df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
+                                                **kwargs)
+                    # h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
+                    #                                  update=False, **postprocess_kwargs, **kwargs)
+
+                    if 'Nu' in keys:
+                        df_av['Nu'] = np.mean(df['Nu'])  # using average flux anyways so scheme doesn't matter
+                    df = df_av
+
                 for key in keys:
                     med = np.median(df[key])
                     if np.isnan(med):
@@ -2347,16 +2361,20 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
 
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
                             literature_file=None,
-                            legend=True,
-                            c='k', averagefirst=True, ylim=None, which_h='rms', data_path=data_path_bullard,
+                            legend=True, postprocess_kwargs={},
+                            c='k', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', labelsize=16, regime_names=None, clist=None,
                             cmap='magma', cbar='eta', include_regimes=None, **kwargs):
 
     Ra_ls, eta_ls, t1_grid, load_grid, end_grid = reshape_inputs(Ra_ls, eta_ls, t1_grid, load_grid, end_grid)
     if include_regimes is None:
         include_regimes = ['steady', 'trans.', 'chaotic']
-    psuffixes = ['_T', '_h']
-    postprocess_functions = [T_parameters_at_sol, h_at_ts]
+    if averagescheme == 'timefirst':
+        psuffixes = ['_T']
+        postprocess_functions = [T_parameters_at_sol]
+    else:
+        psuffixes = ['_T', '_h']
+        postprocess_functions = [T_parameters_at_sol, h_at_ts]
 
     if cbar == 'eta':
         clabel = r'$\Delta \eta$'
@@ -2395,10 +2413,23 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_
                 df = df.loc[:, ~df.columns.duplicated()]
                 df = df.dropna(axis=0, how='any', thresh=None, subset=['h_rms', 'h_peak', 'h_components'])
 
-                if averagefirst:
-                    print('    plot_h_vs(): Calculating T components using time-mean')
+                if averagescheme == 'timelast':
+                    print('    plot_heuristic_scalings(): Averaging T components calcualted at each timestep')
                     h_components = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii,
-                                                     load=load_ii, update=False, **kwargs)
+                                                     load=load_ii, update=False, **postprocess_kwargs, **kwargs)
+                elif averagescheme == 'timefirst':
+                    print('    plot_heuristic_scalings(): Calculating T components using time-averaged profiles')
+                    T_av, y = time_averaged_profile_from_df(df, 'T_av')
+                    uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+                    df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
+                                                **kwargs)
+                    h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
+                                                     update=False, **postprocess_kwargs, **kwargs)
+                    df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                                            data_path=data_path, **kwargs)
+
+                    df['h_rms'] = df_h['h_rms']
+                    df['h_peak'] = df_h['h_peak']
                 if which_h == 'rms':
                     h = np.array(df['h_rms'])
                 elif which_h == 'peak':
@@ -2406,7 +2437,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_
                 try:
                     df = df.dropna(axis=0, how='any',
                                    subset=['h_peak', 'h_rms', 'h_components'])  # remove any rows with nans
-                    # fit to time-mean rather than all points
+
                     h_data_all.append((np.mean(h)))
                     x_data_all.append(np.mean(h_components))
                     if cbar == 'eta':

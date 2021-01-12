@@ -14,13 +14,14 @@ load = True #load_grid
 
 const, expon = sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
                                           end_grid=end_grid, literature_file=None, legend=True, c='k',
+                                          averagescheme='timefirst',
                                           ylim=[4e-3, 4e-2], which_h='rms', data_path=data_path, save=True,
-                                          fname='model-data-chaotic', cbar='eta', include_regimes=['chaotic'],
+                                          fname='model-data-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
                                           intercept=True, postprocess_kwargs=postprocess_kwargs, fig_fmt=fig_fmt)
 print('fit parameters:', const, expon)
 
-sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
-                           end_grid=end_grid, literature_file=None, legend=True, c='k', ylim=[2e-3, 4e-2],
-                           which_h='rms', data_path=data_path, save=True, fname='model-data-regimes',
-                           regime_names=regime_names_td, clist=c_regimes_td, cbar='regime', intercept=True,
-                           postprocess_kwargs=postprocess_kwargs, fig_fmt=fig_fmt)
+# sc.plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
+#                            end_grid=end_grid, literature_file=None, legend=True, c='k', ylim=[2e-3, 4e-2],
+#                            which_h='rms', data_path=data_path, save=True, fname='model-data-regimes',
+#                            regime_names=regime_names_td, clist=c_regimes_td, cbar='regime', intercept=True,
+#                            postprocess_kwargs=postprocess_kwargs, fig_fmt=fig_fmt)
