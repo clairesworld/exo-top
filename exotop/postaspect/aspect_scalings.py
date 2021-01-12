@@ -966,6 +966,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         except:
             df_plot = pd.DataFrame({x_key: [x]})
 
+        print('df_plot', df_plot)
         try:
             if averagescheme == 'timelast':
                 n_sols_all.append(len(df.index))
@@ -974,6 +975,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             elif averagescheme == 'timefirst':
                 df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
                                         data_path=data_path, **kwargs)
+                print('df_h', df_h, df_h.columns)
+                print('df_plot', df_plot, df_plot.columns)
                 df_plot = pd.concat([df_plot, df_h], axis=1, ignore_index=True)
                 n_sols_all.append(1)
             else:
