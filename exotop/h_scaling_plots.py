@@ -15,14 +15,14 @@ load = True #load_grid
 # plot h scalings - with dT_m*delta*alpha
 
 _ = sc.subplots_topo_regimes(Ra_ls, eta_ls, regime_grid_td, regime_names_td, c_regimes=c_regimes_td, save=True, t1_grid=t1_grid,
-                         T_components=True, averagescheme=None, legloc='upper right',
-                         load_grid=load, fig_path=fig_path, fname='h_T_all', fig_fmt=fig_fmt, end_grid=end_grid,
+                         T_components=True, averagescheme='timefirst', legloc='upper right',
+                         load_grid=load, fig_path=fig_path, fname='h_T_timeavg', fig_fmt=fig_fmt, end_grid=end_grid,
                          labelsize=14, xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography, $h^\prime$',
                          xlabelpad=8, ylabelpad=20, fit=True, showallscatter=False,
                          #xlim=(1e-8, 0.9e-6), ylim=(6e-3, 10e-2),
                          logx=True, logy=True,
                          regimes_title='Stationarity', leftleg_bbox=(-0.1, 0.95), data_path=data_path,
-                         postprocess_kwargs=postprocess_kwargs,)
+                         postprocess_kwargs=postprocess_kwargs, include_regimes=['chaotic'])
 load = True
 
 # same but just looking at each time point
