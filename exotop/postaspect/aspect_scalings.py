@@ -2316,7 +2316,8 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
                         load = load_grid[jj][ii]
                     else:
                         load = 'auto'
-                    pickleio_average(case, t1=t1_ii, load=load, data_path=data_path, **kwargs)
+                    df = pickleio_average(case, t1=t1_ii, load=load, data_path=data_path, **kwargs)
+                    print(df)
 
 
 # def reprocess_time_averages(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_grid=None, end_grid=None,
