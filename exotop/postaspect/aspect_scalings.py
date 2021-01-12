@@ -913,7 +913,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 dfs = []
                 for ip, ps in enumerate(psuffixes):
                     df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
-                                   data_path=data_path, at_sol=at_sol, **kwargs)
+                                   data_path=data_path, at_sol=at_sol, postprocess_kwargs=postprocess_kwargs, **kwargs)
                     dfs.append(df1)
                 df = pd.concat(dfs, axis=1)
                 df = df.loc[:, ~df.columns.duplicated()]
@@ -966,7 +966,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
 
                 try:
                     df_plot = pd.DataFrame({which_x: x})
-                except:
+                except ValueError:
                     df_plot = pd.DataFrame({which_x: [x]})
 
                 # figure out the rest of the plotting stuff depending on averaging scheme
@@ -985,8 +985,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     df_plot = pd.concat([df_plot, df], axis=1)
                     df_plot.dropna(axis=0, how='any', subset=quants.keys(), inplace=True)  # remove any rows with nans
                     n_sols_all.extend([len(df.index)] * len(df.index))
-
-                print('df_plot\n', df_plot)
 
                 # append to working
                 yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[which_x].values)))

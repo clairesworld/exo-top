@@ -12,7 +12,7 @@ load = True #load_grid
 
 # try h scalings with heuristic all chaotic cases
 
-_ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load_grid, data_path=data_path,
+_ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='h_components',
                  include_regimes=['chaotic'], save=True, fname='h_T_chaotic', labelsize=16,
                  xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', title='',
