@@ -972,8 +972,6 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         elif averagescheme == 'timefirst':
             df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
                                     data_path=data_path, **kwargs)
-            print('df_h', df_h, df_h.columns)
-            print('df_plot', df_plot, df_plot.columns)
             df_plot = pd.concat([df_plot, df_h], axis=1)
             n_sols_all.append(1)
         else:
@@ -982,7 +980,7 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             df_plot.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key], inplace=True)  # remove any rows with nans
             n_sols_all.extend([len(df.index)] * len(df.index))
 
-        print('df_plot', df_plot)
+        print('df_plot\n', df_plot)
         yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[x_key].values)))
         yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[x_key].values)))
         qdict = parameter_percentiles(case, df=df_plot, keys=['h_peak', 'h_rms', x_key], plot=False)
@@ -2415,12 +2413,14 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_
                     dfs.append(df1)
                 df = pd.concat(dfs, axis=1)
                 df = df.loc[:, ~df.columns.duplicated()]
-                df = df.dropna(axis=0, how='any', thresh=None, subset=['h_rms', 'h_peak', 'h_components'])
 
                 if averagescheme == 'timelast':
-                    print('    plot_heuristic_scalings(): Averaging T components calcualted at each timestep')
-                    h_components = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii,
+                    print('    plot_heuristic_scalings(): Averaging T components calculated at each timestep')
+                    df = df.dropna(axis=0, how='any',
+                                   subset=['h_peak', 'h_rms', 'h_components']).mean(axis=0)  # remove any rows with nans
+                    h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii,
                                                      load=load_ii, update=False, **postprocess_kwargs, **kwargs)
+
                 elif averagescheme == 'timefirst':
                     print('    plot_heuristic_scalings(): Calculating T components using time-averaged profiles')
                     T_av, y = time_averaged_profile_from_df(df, 'T_av')
@@ -2429,27 +2429,20 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_
                                                 **kwargs)
                     h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
                                                      update=False, **postprocess_kwargs, **kwargs)
-                    df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                    df = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
                                             data_path=data_path, **kwargs)
 
-                    df['h_rms'] = df_h['h_rms']
-                    df['h_peak'] = df_h['h_peak']
                 if which_h == 'rms':
                     h = np.array(df['h_rms'])
                 elif which_h == 'peak':
                     h = np.array(df['h_peak'])
-                try:
-                    df = df.dropna(axis=0, how='any',
-                                   subset=['h_peak', 'h_rms', 'h_components'])  # remove any rows with nans
 
-                    h_data_all.append((np.mean(h)))
-                    x_data_all.append(np.mean(h_components))
-                    if cbar == 'eta':
-                        c_data_all.append(float(eta_str))
-                    elif cbar == 'regime':
-                        c_data_all.append(regime_to_digital(ii, jj, regime_grid=regime_grid, regime_names=regime_names))
-                except KeyError as e:  # e.g. no h at solutions yet
-                    print('    Catching KeyError:', e)
+                h_data_all.append((np.mean(h)))
+                x_data_all.append(np.mean(h_components))
+                if cbar == 'eta':
+                    c_data_all.append(float(eta_str))
+                elif cbar == 'regime':
+                    c_data_all.append(regime_to_digital(ii, jj, regime_grid=regime_grid, regime_names=regime_names))
     x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
     print('x_data: min', np.min(x_data), 'max', np.max(x_data), '(n =', len(x_data), ')')
     expon, const = fit_log(x_data, h_data, weights=None, **kwargs)
