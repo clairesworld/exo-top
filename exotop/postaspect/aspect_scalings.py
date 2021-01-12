@@ -797,9 +797,14 @@ def fit_log(x, h, intercept=False, weights=None, **kwargs):
         print('x', x, type(x))
         raise e
     if intercept:
-        popt, pcov = curve_fit(coefficient, x1, h1)
-        slope = 1.0
-        intercept = popt[0]
+        try:
+            popt, pcov = curve_fit(coefficient, x1, h1)
+            slope = 1.0
+            intercept = popt[0]
+        except ValueError as e:
+            print('x', x1, np.shape(x1))
+            print('h', h1, np.shape(h1))
+            raise e
     elif weights is None:
         try:
             slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
