@@ -913,23 +913,22 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
             x_key = 'h_components'
             if averagescheme == 'timelast':
                 print('    plot_h_vs(): Averaging T components calcualted at each timestep')
-                h_components = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
+                x = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
                                                  update=False, **postprocess_kwargs, **kwargs)
             elif averagescheme == 'timefirst':
                 print('    plot_h_vs(): Calculating T components using time-averaged profiles')
                 T_av, y = time_averaged_profile_from_df(df, 'T_av')
                 uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
                 df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs, **kwargs)
-                h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
+                x = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
                                                  update=False,  **postprocess_kwargs, **kwargs)
             elif (x_key not in df.columns) or ((x_key in df.columns) and df[x_key].isnull().values.any()):
                     print('    plot_h_vs(): Calculating T components')
-                    h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
+                    x = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
                                                      update=False,  **postprocess_kwargs,
                                                      **kwargs)
             else:
-                h_components = df['h_components']
-            x = h_components
+                x = df['h_components']
 
         elif which_x == 'Ra':
             x_key = 'Ra'
@@ -961,35 +960,32 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 else:
                     x = float(cases_var[ii]) * np.ones(
                         len(df.index))  # normally this is equal to Ra (constant along index)
-        df[x_key] = x
 
         try:
-            df = df.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key])  # remove any rows with nans
+            df_plot = pd.DataFrame({x_key: x})
+        except:
+            df_plot = pd.DataFrame({x_key: [x]})
+
+        try:
             if averagescheme == 'timelast':
-                yx_peak_all.append(
-                    (np.array(df['h_peak'].mean()) * hscale, np.array(df[x_key].mean())))  # each xy point (y=h)
-                yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, np.array(df[x_key].mean())))
                 n_sols_all.append(len(df.index))
+                df_plot['h_rms'] = df.h_rms.mean()
+                df_plot['h_peak'] = df.h_peak.mean()
             elif averagescheme == 'timefirst':
                 df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
                                         data_path=data_path, **kwargs)
-                df['h_rms'] = df_h['h_rms']
-                df['h_peak'] = df_h['h_peak']
-                print('df_h[h_rms]', df_h['h_rms'])
-                print('df[h_rms]', df['h_rms'])
-                print('df[h_rms].mean()', df['h_rms'].mean())
-                print('(np.array(df[h_rms].mean())', np.array(df['h_rms'].mean()))
-                yx_peak_all.append(
-                    (np.array(df['h_peak'].mean()) * hscale, x))  # each xy point (y=h)
-                yx_rms_all.append((np.array(df['h_rms'].mean()) * hscale, x))
+                df_plot = pd.concat([df_plot, df_h], axis=1, ignore_index=True)
                 n_sols_all.append(1)
             else:
                 # use each xy point (y=h) for fitting to
-                yx_peak_all.append((np.array(df['h_peak'].values) * hscale, np.array(df[x_key].values)))
-                yx_rms_all.append((np.array(df['h_rms'].values) * hscale, np.array(df[x_key].values)))
+                df_plot = pd.concat([df_plot, df], axis=1)
+                df_plot.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key], inplace=True)  # remove any rows with nans
                 n_sols_all.extend([len(df.index)] * len(df.index))
-            # regardless of whether to fit to all time outputs or just mean, always showing time-variability (gaussian?)
-            qdict = parameter_percentiles(case, df=df, keys=['h_peak', 'h_rms', x_key], plot=False)
+
+            print('df_plot', df_plot)
+            yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[x_key].values)))
+            yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[x_key].values)))
+            qdict = parameter_percentiles(case, df=df_plot, keys=['h_peak', 'h_rms', x_key], plot=False)
             quants_h_peak[ii, :] = qdict['h_peak'] * hscale
             quants_h_rms[ii, :] = qdict['h_rms'] * hscale
             quants_x[ii, :] = qdict[x_key]
