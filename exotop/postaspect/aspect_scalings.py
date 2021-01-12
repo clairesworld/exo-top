@@ -940,9 +940,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                     x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'],
                                  T_l=df_av['T_l'], delta_L=df_av['delta_L'])
                 else:
-                    if not h_components:
-                        raise Exception(
-                            'Ra_i_eff not implemented yet if using h output over all timesteps without averaging')
+                    raise Exception(
+                        'Ra_i_eff not implemented yet if using h output over all timesteps without averaging')
                     # x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'],
                     #          T_l=df['T_l'], delta_L=df['delta_L'])
             elif Ra_i:
@@ -951,9 +950,8 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
                 elif averagescheme == 'timefirst':
                     x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'])
                 else:
-                    if not h_components:
-                        raise Exception(
-                            'Ra_i not implemented yet if using h output over all timesteps without averaging')
+                    raise Exception(
+                        'Ra_i not implemented yet if using h output over all timesteps without averaging')
             else:
                 if averagescheme == 'timelast' or averagescheme == 'timefirst':
                     x = float(cases_var[ii])
@@ -966,34 +964,32 @@ def plot_h_vs(Ra=None, eta=None, t1=None, end=None, load='auto', data_path=data_
         except:
             df_plot = pd.DataFrame({x_key: [x]})
 
-        print('df_plot', df_plot)
-        try:
-            if averagescheme == 'timelast':
-                n_sols_all.append(len(df.index))
-                df_plot['h_rms'] = df.h_rms.mean()
-                df_plot['h_peak'] = df.h_peak.mean()
-            elif averagescheme == 'timefirst':
-                df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
-                                        data_path=data_path, **kwargs)
-                print('df_h', df_h, df_h.columns)
-                print('df_plot', df_plot, df_plot.columns)
-                df_plot = pd.concat([df_plot, df_h], axis=1, ignore_index=True)
-                n_sols_all.append(1)
-            else:
-                # use each xy point (y=h) for fitting to
-                df_plot = pd.concat([df_plot, df], axis=1)
-                df_plot.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key], inplace=True)  # remove any rows with nans
-                n_sols_all.extend([len(df.index)] * len(df.index))
+        if averagescheme == 'timelast':
+            n_sols_all.append(len(df.index))
+            # df_plot = pd.concat([df_plot, df[['h_rms', 'h_peak']]], axis=1)
+            df_plot['h_rms'] = df.h_rms.mean()
+            df_plot['h_peak'] = df.h_peak.mean()
+        elif averagescheme == 'timefirst':
+            df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                                    data_path=data_path, **kwargs)
+            print('df_h', df_h, df_h.columns)
+            print('df_plot', df_plot, df_plot.columns)
+            df_plot = pd.concat([df_plot, df_h], axis=1)
+            n_sols_all.append(1)
+        else:
+            # use each xy point (y=h) for fitting to
+            df_plot = pd.concat([df_plot, df], axis=1)
+            df_plot.dropna(axis=0, how='any', subset=['h_peak', 'h_rms', x_key], inplace=True)  # remove any rows with nans
+            n_sols_all.extend([len(df.index)] * len(df.index))
 
-            print('df_plot', df_plot)
-            yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[x_key].values)))
-            yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[x_key].values)))
-            qdict = parameter_percentiles(case, df=df_plot, keys=['h_peak', 'h_rms', x_key], plot=False)
-            quants_h_peak[ii, :] = qdict['h_peak'] * hscale
-            quants_h_rms[ii, :] = qdict['h_rms'] * hscale
-            quants_x[ii, :] = qdict[x_key]
-        except KeyError as e:  # e.g. no h at solutions yet
-            print('    Catching KeyError:', e)
+        print('df_plot', df_plot)
+        yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[x_key].values)))
+        yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[x_key].values)))
+        qdict = parameter_percentiles(case, df=df_plot, keys=['h_peak', 'h_rms', x_key], plot=False)
+        quants_h_peak[ii, :] = qdict['h_peak'] * hscale
+        quants_h_rms[ii, :] = qdict['h_rms'] * hscale
+        quants_x[ii, :] = qdict[x_key]
+
 
     yerr_peak = [quants_h_peak[:, 1] - quants_h_peak[:, 0], quants_h_peak[:, 2] - quants_h_peak[:, 1]]
     yerr_rms = [quants_h_rms[:, 1] - quants_h_rms[:, 0], quants_h_rms[:, 2] - quants_h_rms[:, 1]]
