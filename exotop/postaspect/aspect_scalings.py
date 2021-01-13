@@ -924,6 +924,13 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 df = df.loc[:, ~df.columns.duplicated()]
                 df.dropna(axis=0, inplace=True, subset=['h_rms', 'h_peak'])  # double check
 
+
+                if averagescheme == 'timefirst':
+                    T_av, y = time_averaged_profile_from_df(df, 'T_av')
+                    uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+                    df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
+                                                **kwargs)
+
                 # extract x values for plotting
                 if 'h_components' in which_x:
                     if averagescheme == 'timelast':
@@ -932,9 +939,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                                                          update=False, **postprocess_kwargs, **kwargs)
                     elif averagescheme == 'timefirst':
                         print('    plot_h_vs(): Calculating T components using time-averaged profiles')
-                        T_av, y = time_averaged_profile_from_df(df, 'T_av')
-                        uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-                        df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs, **kwargs)
                         x = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
                                                          update=False, **postprocess_kwargs, **kwargs)
                     elif (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any()):
