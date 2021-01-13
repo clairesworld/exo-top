@@ -755,8 +755,9 @@ def T_parameters_at_sol(case, n, dat=None, T_av=None, uv_mag_av=None, data_path=
 #
 #     return np.percentile(peak_list, qs), np.percentile(rms_list, qs)
 
-def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwargs):
+def parameter_percentiles(case=None, df=None, keys=None, plot=False, sigma=2, **kwargs):
     # probability distribution for a number of parameters with df containing time evolutions
+    # df can also be a dict...
     if sigma == 2:
         qs = [2.5, 50, 97.5]
     elif sigma == 1:
@@ -764,9 +765,8 @@ def parameter_percentiles(case, df=None, keys=None, plot=False, sigma=2, **kwarg
     else:
         print('Unrecognized sigma value')
     qdict = {}
-    df.dropna(axis=0, inplace=True, subset=keys)
     for key in keys:
-        vals = df[key].values
+        vals = df[key]  #.values
         try:
             qdict[key] = np.percentile(vals, qs)
         except TypeError:
@@ -822,7 +822,7 @@ def fit_log(x, h, intercept=False, weights=None, **kwargs):
     return slope, 10 ** intercept
 
 
-def fit_2log(x, y, h, intercept=False, weights=None, **kwargs):
+def fit_2log(x, y, h, **kwargs):
 
     try:
         df = pd.DataFrame({'x':np.log10(np.array(x)), 'y': np.log10(np.array(y)), 'h': np.log10(np.array(h))})
@@ -878,7 +878,13 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra, eta, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
-    if which_x in ['h_components', 'Ra_i', 'Ra_i_eff']:
+    multifit = False
+    if iterable_not_string(which_x) and ('Ra_i' in which_x) or ('Ra_i_eff' in which_x):
+        multifit = True
+        psuffixes = ['_T', '_h']
+        at_sol = True
+        postprocess_functions = [T_parameters_at_sol, h_at_ts]
+    elif which_x in ['Ra_i', 'Ra_i_eff', 'h_components']:
         psuffixes = ['_T', '_h']
         at_sol = True
         postprocess_functions = [T_parameters_at_sol, h_at_ts]
@@ -887,12 +893,16 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         at_sol = False
         postprocess_functions = [h_at_ts]
     else:
-        raise Exception('plot_h_vs(): Invalid variable for x-axis')
+        raise Exception('plot_h_vs(): Invalid variable for x-axis / not implemented')
     if ax is None:
         fig = plt.figure()
         ax = plt.gca()
 
-    quants = {'h_rms':None, 'h_peak':None, which_x:None}
+    if multifit:
+        quants = dict.fromkeys(['h_rms', 'h_peak', *which_x])
+    else:
+        quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
+
     yx_peak_all, yx_rms_all, n_sols_all = [], [], []
 
     # loop over cases
@@ -912,9 +922,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     dfs.append(df1)
                 df = pd.concat(dfs, axis=1)
                 df = df.loc[:, ~df.columns.duplicated()]
+                df.dropna(axis=0, inplace=True, subset=['h_rms', 'h_peak'])  # double check
 
                 # extract x values for plotting
-                if which_x == 'h_components':
+                if 'h_components' in which_x:
                     if averagescheme == 'timelast':
                         print('    plot_h_vs(): Averaging T components calcualted at each timestep')
                         x = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
@@ -932,13 +943,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                                                          update=False, **postprocess_kwargs, **kwargs)
                     else:
                         x = df['h_components']
-                elif which_x == 'Ra':
-                    if averagescheme == 'timelast' or averagescheme == 'timefirst':
-                        x = float(Ra[ii])
-                    else:
-                        x = float(Ra[ii]) * np.ones(
-                            len(df.index))  # normally this is equal to Ra (constant along index)
-                elif which_x == 'Ra_i_eff':  # calculate effective Ra using time-mean of T field params
+                elif 'Ra_i_eff' in which_x:  # calculate effective Ra using time-mean of T field params
                     if averagescheme == 'timelast':
                         x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
                                      T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
@@ -949,8 +954,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         raise Exception(
                             'Ra_i_eff not implemented yet if using h output over all timesteps without averaging')
                         # x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'],
-                        #          T_l=df['T_l'], delta_L=df['delta_L'])
-                elif which_x == 'Ra_i':
+                        #              T_l=df['T_l'], delta_L=df['delta_L'])
+                elif 'Ra_i' in which_x:
                     if averagescheme == 'timelast':
                         x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
                     elif averagescheme == 'timefirst':
@@ -958,13 +963,30 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     else:
                         raise Exception(
                             'Ra_i not implemented yet if using h output over all timesteps without averaging')
+                elif 'Ra' in which_x:
+                    if averagescheme == 'timelast' or averagescheme == 'timefirst':
+                        x = float(Ra[ii])
+                    else:
+                        x = float(Ra[ii]) * np.ones(
+                            len(df.index))  # normally this is equal to Ra (constant along index)
 
-                try:
-                    df_plot = pd.DataFrame({which_x: x})
-                except ValueError:
-                    df_plot = pd.DataFrame({which_x: [x]})
+                if multifit:
+                    if 'eta' in which_x:
+                        x1 = float(etastr)
+                    else:
+                        raise Exception(
+                            'multifit not implemented yet for second parameter other than delta eta')
+                    try:
+                        df_plot = pd.DataFrame({which_x[0]: x, which_x[1]: x1})
+                    except ValueError:
+                        df_plot = pd.DataFrame({which_x[0]: [x], which_x[1]: [x1]})
+                else:
+                    try:
+                        df_plot = pd.DataFrame({which_x: x})
+                    except ValueError:
+                        df_plot = pd.DataFrame({which_x: [x]})
 
-                # figure out the rest of the plotting stuff depending on averaging scheme
+                # figure out the rest of the plotting stuff, mostly y values, depending on averaging scheme
                 if averagescheme == 'timelast':
                     n_sols_all.append(len(df.index))
                     # df_plot = pd.concat([df_plot, df[['h_rms', 'h_peak']]], axis=1)
@@ -978,12 +1000,16 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 else:
                     # use each xy point (y=h) for fitting to
                     df_plot = pd.concat([df_plot, df], axis=1)
-                    df_plot.dropna(axis=0, how='any', subset=quants.keys(), inplace=True)  # remove any rows with nans
+                    # df_plot.dropna(axis=0, how='any', subset=quants.keys(), inplace=True)  # remove any rows with nans
                     n_sols_all.extend([len(df.index)] * len(df.index))
 
                 # append to working
-                yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[which_x].values)))
-                yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[which_x].values)))
+                if multifit:
+                    yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[[*which_x]].values)))
+                    yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[[*which_x]].values)))
+                else:
+                    yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[which_x].values)))
+                    yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[which_x].values)))
                 qdict = parameter_percentiles(case, df=df_plot, keys=quants.keys(), plot=False)
                 for key in quants.keys():
                     try:
@@ -1009,7 +1035,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             intercept=False
         ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all), c=c_rms, labelsize=labelsize,
-                               intercept=intercept, **kwargs)
+                               intercept=intercept, multifit=multifit, **kwargs)
 
     if show_isoviscous:
         df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
@@ -1057,7 +1083,7 @@ def nondimensionalise_h(h, p):
         raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to nondimensionalise')
 
 
-def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=None,
+def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=None, multifit=False,
                       c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
@@ -1067,9 +1093,20 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=Non
     else:
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
-        expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
-        xprime = np.linspace(np.min(flatx), np.max(flatx))
-        hprime = const * xprime ** expon
+
+        if multifit:
+            flatx0 = [a[0] for a in flatx]
+            flatx1 = [a[1] for a in flatx]
+            x0prime = np.linspace(np.min(flatx0), np.max(flatx0))
+            x1prime = np.linspace(np.min(flatx1), np.max(flatx1))
+            x0v, x1v = np.meshgrid(x0prime, x1prime)
+            const, expon = fit_2log(x=flatx0, y=flatx1, h=flaty)
+            hprime = const * x0v ** expon[0] * x1v ** expon[1]
+            print('hprime', np.shape(hprime))
+        else:
+            xprime = np.linspace(np.min(flatx), np.max(flatx))
+            expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
+            hprime = const * xprime ** expon
         h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
                       label='{:.2e} x^{:.3f}'.format(const, expon))
         if legend:

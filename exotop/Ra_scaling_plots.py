@@ -14,6 +14,7 @@ load = True # load_grid
 # chaotic
 _ = sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1_grid=t1_grid[1:, 4:], end_grid=end_grid[1:, 4:],
                        keys=['delta_rh', 'dT_rh', 'Nu'], data_path=data_path, fig_path=fig_path,
+                       regime_names=regime_names_td, regime_grid=regime_grid_td,
                        load_grid=load,# load_grid[1:, 4:],
                        averagescheme='timefirst',
                        Ra_i='eff', save=True, fname='Ra_eff-scalings-chaotic_timeavg',
@@ -26,6 +27,7 @@ _ = sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1_grid=t1_grid[1:, 4:], end_g
 # steady state
 _ = sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1_grid=t1_grid[:, :3], end_grid=end_grid[:, :3], keys=['delta_rh', 'dT_rh'],
                        data_path=data_path, fig_path=fig_path, load_grid=load, Ra_i='eff', save=True,
+                        regime_names=regime_names_td, regime_grid=regime_grid_td,
                        fname='Ra_eff-scalings-steady', labelsize=14, ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'],
                        psuffixes=['_T'], title='Steady-state', postprocess_functions=[sc.T_parameters_at_sol],
                        xlim=(0.3e5, 1e6), ylim=[(None), (None)], legloc=['lower left', 'upper left'], cmap='winter',
@@ -39,6 +41,7 @@ _ = sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1_grid=t1_grid[:, :3], end_grid=e
 # chaotic
 _ = sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1_grid=t1_grid[1:, 4:], end_grid=end_grid[1:, 4:],
                        keys=['delta_0', 'delta_rh', 'dT_rh', 'Nu'], data_path=data_path, fig_path=fig_path, load_grid=load,
+                        regime_names=regime_names_td, regime_grid=regime_grid_td,
                        Ra_i=True, save=True, fname='Ra-scalings-chaotic_timeavg',
                            averagescheme='timefirst',
                            compare_label='Moresi & Solomatov 1995', labelsize=14,
@@ -51,6 +54,7 @@ _ = sc.subplots_Ra_scaling(Ra_ls[4:], eta_ls[1:], t1_grid=t1_grid[1:, 4:], end_g
 # steady state
 _ = sc.subplots_Ra_scaling(Ra_ls[:3], eta_ls, t1_grid=t1_grid[:, :3], end_grid=end_grid[:, :3], keys=['delta_rh', 'dT_rh'],
                        data_path=data_path, fig_path=fig_path, load_grid=load, Ra_i=True, save=True,
+                        regime_names=regime_names_td, regime_grid=regime_grid_td,
                        fname='Ra-scalings-steady', labelsize=14, ylabels=[r'$\delta_{rh}$', r'$\Delta T_{rh}$'],
                        psuffixes=['_T'], title='Steady-state', postprocess_functions=[sc.T_parameters_at_sol],
                        xlim=(0.1e6, 0.5e7), ylim=[(None), (None)], legloc=['lower left', 'upper left'], cmap='winter',
