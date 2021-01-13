@@ -800,11 +800,7 @@ def fit_log(x, h, intercept=False, weights=None, **kwargs):
     try:
         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
         h1 = np.log10(np.array(h))
-    except TypeError as e:
-        print('h', h, type(h))
-        print('x', x, type(x))
-        raise e
-    except ValueError as e:
+    except Exception as e:
         print('h', h, type(h))
         print('x', x, type(x))
         raise e
@@ -834,9 +830,9 @@ def fit_2log(x, y, h, **kwargs):
     try:
         df = pd.DataFrame({'x':np.log10(np.array(x)), 'y': np.log10(np.array(y)), 'h': np.log10(np.array(h))})
     except Exception as e:
-        print('h', h, type(h))
-        print('x', x, type(x))
-        print('y', y, type(y))
+        # print('h', h, type(h))
+        # print('x', x, type(x))
+        # print('y', y, type(y))
         raise e
 
     X = df[['x','y']]
@@ -991,8 +987,10 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                     df_plot[which_x] = x
 
                 # append to working
-                print('df_plot[h_rms].values) * hscale', np.array(df_plot['h_rms'].values) * hscale)
-                print('df_plot', df_plot)
+                print('\ndf_plot[h_rms].values) * hscale')
+                print(np.array(df_plot['h_rms'].values) * hscale)
+                print('\ndf_plot')
+                print(df_plot)
                 yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[[*which_xs]].values)))
                 yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[[*which_xs]].values)))
                 qdict = parameter_percentiles(case, df=df_plot, keys=quants.keys(), plot=False)
@@ -2583,7 +2581,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_
                             legend=True, postprocess_kwargs={}, regime_names=None,
                             c='k', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', labelsize=16, clist=None,
-                            cmap='magma', cbar='eta', include_regimes=None, **kwargs):
+                            cmap='magma', cbar=None, include_regimes=None, **kwargs):
 
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
@@ -2688,7 +2686,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_
 
     scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
 
-    if not (not cbar):
+    if cbar is not None:
         cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=discrete,
                          vmin=vmin, vmax=vmax, rot=crot)
 
