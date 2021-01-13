@@ -1268,7 +1268,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=Non
             for ind, z in enumerate(z_vec):
                 hprime = const * x0prime ** expon[0] * z ** expon[1]
                 if ind == len(z_vec) - 1:
-                    label = '{:.2f} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
+                    label = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
                 h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100,
                               label=label
                               )
@@ -1278,7 +1278,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=Non
             expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
-                          label='{:.2e} x^{:.3f}'.format(const, expon))
+                          label='{:.2f} x^{:.3f}'.format(const, expon))
         if legend:
             handles, labels = ax.get_legend_handles_labels()
             # handles.append(h3)

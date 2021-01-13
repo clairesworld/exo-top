@@ -15,9 +15,9 @@ load = True #load_grid
 _ = sc.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_xs=('Ra_i', 'eta'),
                  include_regimes=['chaotic'], save=True, fname='h_Ra-eta_chaotic', labelsize=16,
-                 xlabel=r'C Ra$^m \Delta\eta^n$', ylabel='dynamic topography', title='',
+                 title=r'C Ra$^m \Delta\eta^n$', xlabel='Ra_i', ylabel='dynamic topography',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                 show_isoviscous=False, ylim=(1e-2, 1e-1), xlim=(1e7, 3e8),  postprocess_kwargs=postprocess_kwargs,
                  regime_grid=regime_grid_td)
 
 # try h scalings with heuristic all chaotic cases
