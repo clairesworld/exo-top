@@ -1000,6 +1000,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                         elinewidth=0.5, fmt='d', c=c_list[jj], capsize=5, alpha=0.5, markeredgecolor=highlight_colour)
             ax.errorbar(quants[which_xs[0]][:, 1], quants['h_rms'][:, 1], yerr=err['h_rms'], xerr=err[which_xs[0]],
                         elinewidth=0.5, fmt='o', c=c_list[jj], capsize=5)
+            print('c', c_list[jj], 'z', z)
     except TypeError:  # no cases in given regimes
         pass
 
