@@ -984,8 +984,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                     df_plot[which_x] = x
 
                 # append to working
-                yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[[*which_x]].values)))
-                yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[[*which_x]].values)))
+                yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[[*which_xs]].values)))
+                yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[[*which_xs]].values)))
                 qdict = parameter_percentiles(case, df=df_plot, keys=quants.keys(), plot=False)
                 for key in quants.keys():
                     try:
