@@ -991,16 +991,15 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     # get errorbars and plot them
     err = dict.fromkeys(quants.keys())
     z_vec = np.unique(quants[which_xs[1]][:, 1])
-    print('z_vec', z_vec)
     c_list = colorize(np.log10(z_vec), cmap=cmap, vmin=vmin, vmax=vmax)[0]
     try:
         for key in quants.keys():
             err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
         for jj, z in enumerate(z_vec):
             ax.errorbar(quants[which_xs[0]][:, 1], quants['h_peak'][:, 1], yerr=err['h_peak'], xerr=err[which_xs[0]],
-                        elinewidth=0.5, fmt='d', c=z_vec[jj], capsize=5, alpha=0.5, markeredgecolor=highlight_colour)
+                        elinewidth=0.5, fmt='d', c=c_list[jj], capsize=5, alpha=0.5, markeredgecolor=highlight_colour)
             ax.errorbar(quants[which_xs[0]][:, 1], quants['h_rms'][:, 1], yerr=err['h_rms'], xerr=err[which_xs[0]],
-                        elinewidth=0.5, fmt='o', c=z_vec[jj], capsize=5)
+                        elinewidth=0.5, fmt='o', c=c_list[jj], capsize=5)
     except TypeError:  # no cases in given regimes
         pass
 
@@ -1273,7 +1272,6 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=Non
                 h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100,
                               label=label
                               )
-                print('c', c_list[ind])
 
         else:
             xprime = np.linspace(np.min(flatx), np.max(flatx))

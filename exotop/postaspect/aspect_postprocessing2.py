@@ -354,7 +354,6 @@ class Aspect_Data():
             print("Reading heat flux statistics from", filename)
         data = np.genfromtxt(filename, comments='#', usecols=col)
         self.stats_heatflux_top = data[:]
-        print('heatflux data', np.shape(data[:]))
 
 
     def read_stats_sol_files(self, col_vis=20):
