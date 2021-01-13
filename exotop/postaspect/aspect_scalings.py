@@ -599,11 +599,6 @@ def T_parameters_at_sol(case, n, dat=None, T_av=None, uv_mag_av=None, data_path=
     d_n = dat.T_components(n, T_av=T_av, uv_mag_av=uv_mag_av, data_path=data_path, **kwargs)  # dict of components just at solution n
     d_n['h_components'] = T_components_of_h(case, df=d_n, dat=dat, data_path=data_path, **kwargs)
 
-    # for key in d_n.keys():
-    #     try:
-    #         _ = (e for e in d_n[key])
-    #     except TypeError:
-    #         d_n[key] = [d_n[key]]  # ensure iterable for some reason (so you can do list extension later)
     return d_n
 
 
@@ -977,7 +972,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     df_plot['h_peak'] = df.h_peak.mean()
                 elif averagescheme == 'timefirst':
                     df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
-                                            data_path=data_path, **kwargs)
+                                            data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
                     df_plot = pd.concat([df_plot, df_h], axis=1)
                     n_sols_all.append(1)
                 else:
@@ -2437,7 +2432,7 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_
                     h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
                                                      update=False, **postprocess_kwargs, **kwargs)
                     df = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
-                                            data_path=data_path, **kwargs)
+                                            data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
                 if which_h == 'rms':
                     h = np.array(df['h_rms'])
