@@ -338,6 +338,25 @@ class Aspect_Data():
         # print(self.stats_timestep)
         # print("dask.dataframe took %s seconds" % (time.time() - start_time))
 
+
+    def read_times(self, verbose=True):
+        filename = self.directory + "statistics"
+        if verbose:
+            print("Reading times from", filename)
+        data = np.genfromtxt(filename, comments='#', usecols=[0, 1])
+        self.stats_timestep = np.array([int(d) for d in data[:,0]])  # np.array([d[0] for d in all_data])
+        self.stats_time = data[:,1]
+
+
+    def read_stats_heatflux(self, verbose=True, col=19):
+        filename = self.directory + "statistics"
+        if verbose:
+            print("Reading heat flux statistics from", filename)
+        data = np.genfromtxt(filename, comments='#', usecols=col)
+        self.stats_heatflux_top = data[:]
+        print('heatflux data', np.shape(data[:]))
+
+
     def read_stats_sol_files(self, col_vis=20):
         filename = self.directory + "statistics"
         data = np.genfromtxt(filename, comments='#', dtype=None, usecols=col_vis)
@@ -351,6 +370,7 @@ class Aspect_Data():
             files[n] = last
         self.sol_files = files
         return files
+
 
     def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, verbose=False, i_vis=20):
         # input solution file and get first timestep - for n or all solutions
@@ -367,7 +387,7 @@ class Aspect_Data():
             try:
                 time = self.stats_time
             except AttributeError as e:
-                self.read_statistics(verbose=verbose)
+                self.read_times(verbose=verbose)
                 time = self.stats_time
             if n is None:
                 return time[indices]
@@ -484,7 +504,7 @@ class Aspect_Data():
         try:
             F = self.stats_heatflux_top / X_extent
         except AttributeError:
-            self.read_statistics(verbose=False)
+            self.read_stats_heatflux(verbose=False)
             F = self.stats_heatflux_top / X_extent
 
         Nu = d*F/(k*dT)
@@ -511,7 +531,7 @@ class Aspect_Data():
         try:
             F = self.stats_heatflux_top[ts]/X_extent
         except AttributeError:
-            self.read_statistics(verbose=False)
+            self.read_stats_heatflux(verbose=False)
             F = self.stats_heatflux_top[ts] / X_extent
         return k*(T_i - T_l)/F
 
