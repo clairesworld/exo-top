@@ -336,11 +336,12 @@ def time_averaged_profile(case, n0, nf, which='temperature', dat=None, data_path
     for n in range(n0, nf + 1):
         print('Loading', which, 'profile at n =', n)
         if which == 'temperature':
-            x, y, _, T = dat.read_temperature(n, verbose=verbose)
-            prof = post.horizontal_mean(T, x)
+            x, y, _, A = dat.read_temperature(n, verbose=verbose)
         elif which == 'velocity':
-            x, y, _, _, _, _, uv_mag = dat.read_velocity(n, verbose=verbose)
-            prof = post.horizontal_mean(uv_mag, x)
+            x, y, _, _, _, _, A = dat.read_velocity(n, verbose=verbose)
+        else:
+            raise Exception('Profile type not implemented')
+        prof = post.horizontal_mean(A, x)
         profs_time.append(prof)
     profs_time = np.array(profs_time)
     profs_mean = np.mean(profs_time, axis=0)
@@ -374,7 +375,9 @@ def read_evol(case, col, dat=None, data_path=data_path_bullard):
 
 
 def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
-                         df_to_extend=None, sol_files=None, postprocess_kwargs={}, **kwargs):
+                         df_to_extend=None, sol_files=None, postprocess_kwargs=None, **kwargs):
+    if postprocess_kwargs is None:
+        postprocess_kwargs = {}
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
     if dat is None:
@@ -479,10 +482,11 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
 
 
 def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
-                        df_to_extend=None, postprocess_kwargs={}, **kwargs):
+                        df_to_extend=None, postprocess_kwargs=None, **kwargs):
+    if postprocess_kwargs is None:
+        postprocess_kwargs = {}
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
-
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True,
                                read_parameters=False)
@@ -563,8 +567,10 @@ def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
 
 
 def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path_bullard, update=False,
-                      fend='.pkl', alpha_m=None, postprocess_kwargs={}, **kwargs):
+                      fend='.pkl', alpha_m=None, postprocess_kwargs=None, **kwargs):
     # calculate T components in h heuristic for all processed solutions
+    if postprocess_kwargs is None:
+        postprocess_kwargs = {}
     if 'alpha_m' in postprocess_kwargs:
         if (alpha_m is not None) and (alpha_m != postprocess_kwargs['alpha_m']):
             raise Exception('Error: competing alpha_m values passed to T_componenents_of_h. What the heck is going on!')
@@ -576,8 +582,9 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
     try:
         h_components = alpha_m * (np.array(df['dT_rh']) / np.array(df['dT_m'])) * (
                 np.array(df['delta_rh']) / np.array(df['d_m']))
-    except KeyError:
+    except KeyError as e:
         print(df)
+        raise e
 
     if update:
         df['h_components'] = h_components
@@ -826,7 +833,7 @@ def fit_2log(x, y, h, **kwargs):
 
     try:
         df = pd.DataFrame({'x':np.log10(np.array(x)), 'y': np.log10(np.array(y)), 'h': np.log10(np.array(h))})
-    except (ValueError, TypeError) as e:
+    except Exception as e:
         print('h', h, type(h))
         print('x', x, type(x))
         print('y', y, type(y))
@@ -2310,7 +2317,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                          fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end_grid=None, normtime=True,
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=10,
                          xlabelpad=8, ylabelpad=-2, markers=None, markersize=20, alpha=0.5,
-                         fig=None, cmap='magma', vmin=None, vmax=None, include_regimes=None, regime_names=None,
+                         fig=None, axes=None, cmap='magma', vmin=None, vmax=None, include_regimes=None, regime_names=None,
                          data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
 
@@ -2633,11 +2640,14 @@ def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_
                                                      update=False, **postprocess_kwargs, **kwargs)
                     df = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
                                             data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
-
+                else:
+                    raise Exception('Averaging scheme not recognized/implemented')
                 if which_h == 'rms':
                     h = np.array(df['h_rms'])
                 elif which_h == 'peak':
                     h = np.array(df['h_peak'])
+                else:
+                    raise Exception('Invalid entry for which_h')
 
                 h_data_all.append((np.mean(h)))
                 x_data_all.append(np.mean(h_components))
