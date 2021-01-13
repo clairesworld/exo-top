@@ -945,10 +945,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         x = df['h_components']
                 elif 'Ra_i_eff' in which_x:  # calculate effective Ra using time-mean of T field params
                     if averagescheme == 'timelast':
-                        x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean(),
+                        x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(etastr), T_i=df['T_i'].mean(),
                                      T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
                     elif averagescheme == 'timefirst':
-                        x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'],
+                        x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(etastr), T_i=df_av['T_i'],
                                      T_l=df_av['T_l'], delta_L=df_av['delta_L'])
                     else:
                         raise Exception(
@@ -957,9 +957,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         #              T_l=df['T_l'], delta_L=df['delta_L'])
                 elif 'Ra_i' in which_x:
                     if averagescheme == 'timelast':
-                        x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'].mean())
+                        x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(etastr), T_i=df['T_i'].mean())
                     elif averagescheme == 'timefirst':
-                        x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df_av['T_i'])
+                        x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(etastr), T_i=df_av['T_i'])
                     else:
                         raise Exception(
                             'Ra_i not implemented yet if using h output over all timesteps without averaging')
