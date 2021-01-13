@@ -1002,23 +1002,29 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
     # get errorbars and plot them
     err = dict.fromkeys(quants.keys())
-    z_vec = np.unique(quants[which_xs[1]][:, 1])
+    z_vec = quants[which_xs[1]][:, 1]
     c_list = colorize(np.log10(z_vec), cmap=cmap, vmin=vmin, vmax=vmax)[0]
     try:
         for key in quants.keys():
             err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
         for jj, z in enumerate(z_vec):
-            ax.errorbar(quants[which_xs[0]][:, 1], quants['h_peak'][:, 1], yerr=err['h_peak'], xerr=err[which_xs[0]],
-                        elinewidth=0.5, fmt='d', mfc=c_list[jj], c=c_list[jj], capsize=5, alpha=0.5, markeredgecolor=highlight_colour)
-            ax.errorbar(quants[which_xs[0]][:, 1], quants['h_rms'][:, 1], yerr=err['h_rms'], xerr=err[which_xs[0]],
+            # get subset of points with this z-value
+            ind = np.nonzero(z_vec == z)
+            ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1], yerr=err['h_peak'].T[ind].T,
+                        xerr=err[which_xs[0]].T[ind].T,
+                        elinewidth=0.5, fmt='d', mfc=c_list[jj], c=c_list[jj], capsize=5, alpha=0.5,
+                        markeredgecolor=highlight_colour)
+            ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_rms'][ind, 1], yerr=err['h_rms'].T[ind].T,
+                        xerr=err[which_xs[0]].T[ind].T,
                         elinewidth=0.5, fmt='o', mfc=c_list[jj], c=c_list[jj], capsize=5)
-            print('c', c_list[jj], 'z', z)
+            print('c', c_list[jj], 'z', z, 'npoints', len(quants[which_xs[0]][ind, 1]))
     except TypeError:  # no cases in given regimes
         pass
 
     if fit:
-        ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all), c_list=c_list, labelsize=labelsize,
-                               multifit=True, cmap=cmap, **kwargs)
+        ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all),
+                               c_list=colorize(np.log10(np.unique(z_vec)), cmap=cmap, vmin=vmin, vmax=vmax)[0],
+                               labelsize=labelsize, multifit=True, cmap=cmap, **kwargs)
 
     if show_isoviscous:
         df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
