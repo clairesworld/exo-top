@@ -866,6 +866,187 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
+def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
+              fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
+              fig_fmt='.png', which_xs=None, include_regimes=None, regime_grid=None,
+              save=True, fname='h', clabel=None, cbar=True, clabelpad=17,
+              labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', cmap='winter',
+              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, vmin=None, vmax=None,
+              fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs={}, regime_names=None, **kwargs):
+    # for fitting h to 2 component power law, which_xs is iterable of x values, the first of which is the plotting one
+    Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra, eta, (t1_grid, load_grid, end_grid, regime_grid))
+    if include_regimes is None:
+        include_regimes = regime_names
+    if clabel is None:
+        clabel = which_xs[1]
+    psuffixes = []
+    postprocess_functions = []
+    at_sol = False
+    if ('Ra_i' in which_xs) or ('Ra_i_eff' in which_xs):  # load T stuff
+        psuffixes.append('_T')
+        at_sol = True
+        postprocess_functions.append(T_parameters_at_sol)
+    if averagescheme != 'timefirst':  # load all h
+        psuffixes.append('_h')
+        postprocess_functions.append(h_at_ts)
+    if ax is None:
+        fig = plt.figure()
+        ax = plt.gca()
+
+    quants = dict.fromkeys(['h_rms', 'h_peak', *which_xs])
+    yx_peak_all, yx_rms_all, n_sols_all = [], [], []
+
+    # loop over cases
+    for jj, etastr in enumerate(eta):
+        cases, cases_var = get_cases_list(Ra, etastr, end_grid[jj])
+        for ii, case in enumerate(cases):
+            if regime_grid[jj][ii] in include_regimes:
+                t1_ii = t1_grid[jj][ii]
+                load_ii = load_grid[jj][ii]
+                df_plot = pd.DataFrame(columns=quants.keys())
+                # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+
+                # load outputs
+                dfs = []
+                for ip, ps in enumerate(psuffixes):
+                    df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii, load=load_ii,
+                                   data_path=data_path, at_sol=at_sol, postprocess_kwargs=postprocess_kwargs, **kwargs)
+                    dfs.append(df1)
+                df = pd.concat(dfs, axis=1)
+                df = df.loc[:, ~df.columns.duplicated()]
+
+                # get the y values, depending on averaging scheme
+                if averagescheme == 'timelast':
+                    df_plot['h_rms'] = [df.h_rms.mean()]
+                    df_plot['h_peak'] = [df.h_peak.mean()]
+                    n_sols_all.append(len(df.index))
+                elif averagescheme == 'timefirst':
+                    # load time-averages
+                    T_av, y = time_averaged_profile_from_df(df, 'T_av')
+                    uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+                    df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
+                                                **kwargs)
+                    df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                                            data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
+                    df_plot['h_rms'] = [df_h.h_rms]
+                    df_plot['h_peak'] = [df_h.h_peak]
+                    n_sols_all.append(1)
+                else:
+                    # use each xy point (y=h) for fitting
+                    df_plot['h_rms'] = df.h_rms
+                    df_plot['h_peak'] = df.h_peak
+                    # df_plot.dropna(axis=0, how='any', subset=quants.keys(), inplace=True)  # remove any rows with nans
+                    n_sols_all.extend([len(df.index)] * len(df.index))
+
+                # extract x values for plotting
+                for which_x in which_xs:
+                    if 'h_components' in which_x:
+                        if averagescheme == 'timelast':
+                            print('    plot_h_vs(): Averaging T components calcualted at each timestep')
+                            x = T_components_of_h(case, df=df.mean(axis=0), data_path=data_path, t1=t1_ii, load=load_ii,
+                                                             update=False, **postprocess_kwargs, **kwargs)
+                        elif averagescheme == 'timefirst':
+                            print('    plot_h_vs(): Calculating T components using time-averaged profiles')
+                            x = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
+                                                             update=False, **postprocess_kwargs, **kwargs)
+                        elif (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any()):
+                            print('    plot_h_vs(): Calculating T components')
+                            x = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii, load=load_ii,
+                                                             update=False, **postprocess_kwargs, **kwargs)
+                        else:
+                            x = df['h_components']
+                    elif 'Ra_i_eff' in which_x:  # calculate effective Ra using time-mean of T field params
+                        if averagescheme == 'timelast':
+                            x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(etastr), T_i=df['T_i'].mean(),
+                                         T_l=df['T_l'].mean(), delta_L=df['delta_L'].mean())
+                        elif averagescheme == 'timefirst':
+                            x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(etastr), T_i=df_av['T_i'],
+                                         T_l=df_av['T_l'], delta_L=df_av['delta_L'])
+                        else:
+                            raise Exception(
+                                'Ra_i_eff not implemented yet if using h output over all timesteps without averaging')
+                            # x = Ra_i_eff(Ra_1=float(cases_var[ii]), d_eta=float(eta), T_i=df['T_i'],
+                            #              T_l=df['T_l'], delta_L=df['delta_L'])
+                    elif 'Ra_i' in which_x:
+                        if averagescheme == 'timelast':
+                            x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(etastr), T_i=df['T_i'].mean())
+                        elif averagescheme == 'timefirst':
+                            x = Ra_interior(Ra_1=float(cases_var[ii]), d_eta=float(etastr), T_i=df_av['T_i'])
+                        else:
+                            raise Exception(
+                                'Ra_i not implemented yet if using h output over all timesteps without averaging')
+                    elif 'Ra' in which_x:
+                        x = float(Ra[ii])
+                    elif 'eta' in which_x:
+                        x = float(etastr)
+                    else:
+                        raise Exception('plot_h_vs_2component(): Invalid variable for x-axis / not implemented')
+                    df_plot[which_x] = x
+
+                # append to working
+                yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[[*which_x]].values)))
+                yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[[*which_x]].values)))
+                qdict = parameter_percentiles(case, df=df_plot, keys=quants.keys(), plot=False)
+                for key in quants.keys():
+                    try:
+                        quants[key] = np.vstack((quants[key], qdict[key]))
+                    except ValueError:  # haven't added anything yet
+                        quants[key] = qdict[key].reshape((1,3))  # reshape so it works if you just have one row
+
+    # get errorbars and plot them
+    err = dict.fromkeys(quants.keys())
+    z_vec = quants[which_x[1]][:, 1]
+    c_list = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+    try:
+        for key in quants.keys():
+            err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
+        for jj, z in enumerate(z_vec):
+            ax.errorbar(quants[which_x[0]][:, 1], quants['h_peak'][:, 1], yerr=err['h_peak'], xerr=err[which_x[0]],
+                        elinewidth=0.5, fmt='d', c=z_vec[jj], capsize=5, alpha=0.5, markeredgecolor=highlight_colour)
+            ax.errorbar(quants[which_x[0]][:, 1], quants['h_rms'][:, 1], yerr=err['h_rms'], xerr=err[which_x[0]],
+                        elinewidth=0.5, fmt='o', c=z_vec[jj], capsize=5)
+    except TypeError:  # no cases in given regimes
+        pass
+
+    if fit:
+        ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all), c=c_list, labelsize=labelsize,
+                               multifit=True, cmap=cmap, **kwargs)
+
+    if show_isoviscous:
+        df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
+        Ra_iso = df_JFR['Ra']
+        h_rms_iso = df_JFR['RMS_topo']
+        ax.plot(Ra_iso, h_rms_iso, c='k', ls='--', lw=0.5)
+
+    if logx:
+        ax.set_xscale('log')
+    if logy:
+        ax.set_yscale('log')
+    if ylim is not None:
+        ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if cbar:
+        dum = ax.scatter(z_vec, z_vec, c=jj, cmap='winter', visible=False, zorder=0)
+        cb = colourbar(dum, label=clabel, labelsize=labelsize, labelpad=clabelpad)
+    ax.set_ylabel(ylabel, fontsize=labelsize)
+    ax.set_xlabel(xlabel, fontsize=labelsize)
+    ax.set_title(title, fontsize=labelsize)
+
+    if p_dimensionals is not None:
+        ax2 = ax.twinx()
+        # ax2.set_ylabel(y2label, fontsize=labelsize)
+        ymin, ymax = ax.get_ylim()
+        # apply function and set transformed values to right axis limits
+        ax2.set_ylim((dimensionalise_h(ymin, p_dimensionals), dimensionalise_h(ymax, p_dimensionals)))
+        # set an invisible artist to twin axes
+        # to prevent falling back to initial values on rescale events
+        ax2.plot([], [])
+    if save:
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+    return fig, ax
+
+
 def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
@@ -878,13 +1059,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra, eta, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
-    multifit = False
-    if iterable_not_string(which_x) and ('Ra_i' in which_x) or ('Ra_i_eff' in which_x):
-        multifit = True
-        psuffixes = ['_T', '_h']
-        at_sol = True
-        postprocess_functions = [T_parameters_at_sol, h_at_ts]
-    elif which_x in ['Ra_i', 'Ra_i_eff', 'h_components']:
+    if which_x in ['Ra_i', 'Ra_i_eff', 'h_components']:
         psuffixes = ['_T', '_h']
         at_sol = True
         postprocess_functions = [T_parameters_at_sol, h_at_ts]
@@ -898,10 +1073,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         fig = plt.figure()
         ax = plt.gca()
 
-    if multifit:
-        quants = dict.fromkeys(['h_rms', 'h_peak', *which_x])
-    else:
-        quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
+    quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
 
     yx_peak_all, yx_rms_all, n_sols_all = [], [], []
 
@@ -974,21 +1146,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         x = float(Ra[ii]) * np.ones(
                             len(df.index))  # normally this is equal to Ra (constant along index)
 
-                if multifit:
-                    if 'eta' in which_x:
-                        x1 = float(etastr)
-                    else:
-                        raise Exception(
-                            'multifit not implemented yet for second parameter other than delta eta')
-                    try:
-                        df_plot = pd.DataFrame({which_x[0]: x, which_x[1]: x1})
-                    except ValueError:
-                        df_plot = pd.DataFrame({which_x[0]: [x], which_x[1]: [x1]})
-                else:
-                    try:
-                        df_plot = pd.DataFrame({which_x: x})
-                    except ValueError:
-                        df_plot = pd.DataFrame({which_x: [x]})
+                try:
+                    df_plot = pd.DataFrame({which_x: x})
+                except ValueError:
+                    df_plot = pd.DataFrame({which_x: [x]})
 
                 # figure out the rest of the plotting stuff, mostly y values, depending on averaging scheme
                 if averagescheme == 'timelast':
@@ -1008,12 +1169,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     n_sols_all.extend([len(df.index)] * len(df.index))
 
                 # append to working
-                if multifit:
-                    yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[[*which_x]].values)))
-                    yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[[*which_x]].values)))
-                else:
-                    yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[which_x].values)))
-                    yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[which_x].values)))
+                yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[which_x].values)))
+                yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[which_x].values)))
                 qdict = parameter_percentiles(case, df=df_plot, keys=quants.keys(), plot=False)
                 for key in quants.keys():
                     try:
@@ -1030,7 +1187,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
         ax.errorbar(quants[which_x][:, 1], quants['h_rms'][:, 1], yerr=err['h_rms'], xerr=err[which_x], elinewidth=0.5,
                     fmt='o', c=c_rms, capsize=5)
-    except TypeError:  # no cases in given regimes
+    except TypeError:  # no cases in given regimes as quants is dict of None
         pass
 
     if fit:
@@ -1039,7 +1196,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             intercept=False
         ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all), c=c_rms, labelsize=labelsize,
-                               intercept=intercept, multifit=multifit, **kwargs)
+                               intercept=intercept, **kwargs)
 
     if show_isoviscous:
         df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
@@ -1087,7 +1244,7 @@ def nondimensionalise_h(h, p):
         raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to nondimensionalise')
 
 
-def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=None, multifit=False,
+def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=None, multifit=False, cmap='winter',
                       c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
@@ -1098,25 +1255,33 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=Non
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
 
-        if multifit:
+        if multifit:  # fit to 2 parameter power law
             flatx0 = [a[0] for a in flatx]
             flatx1 = [a[1] for a in flatx]
             x0prime = np.linspace(np.min(flatx0), np.max(flatx0))
             x1prime = np.linspace(np.min(flatx1), np.max(flatx1))
-            x0v, x1v = np.meshgrid(x0prime, x1prime)
-            const, expon = fit_2log(x=flatx0, y=flatx1, h=flaty)
-            hprime = const * x0v ** expon[0] * x1v ** expon[1]
-            print('hprime', np.shape(hprime))
+            expon, const = fit_2log(x=flatx0, y=flatx1, h=flaty)
+            z_vec = np.unique(flatx1)
+            c_list = colorize(z_vec, cmap='winter')[0]
+            label = None
+            for ind, z in enumerate(z_vec):
+                hprime = const * x0prime ** expon[0] * z ** expon[1]
+                if ind == len(z_vec) - 1:
+                    label = '{:.2f} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
+                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100,
+                              label=label
+                              )
+
         else:
             xprime = np.linspace(np.min(flatx), np.max(flatx))
             expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
-        h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
-                      label='{:.2e} x^{:.3f}'.format(const, expon))
+            h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
+                          label='{:.2e} x^{:.3f}'.format(const, expon))
         if legend:
             handles, labels = ax.get_legend_handles_labels()
-            handles.append(h3)
-            labels.append('{:.2e} x^{:.3f}'.format(const, expon))
+            # handles.append(h3)
+            # labels.append('{:.2e} x^{:.3f}'.format(const, expon))
             leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
             ax.add_artist(leg)
     else:
