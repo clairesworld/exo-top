@@ -562,7 +562,7 @@ def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
 
 def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path_bullard, update=False,
                       fend='.pkl', alpha_m=None, postprocess_kwargs=None, **kwargs):
-    # calculate T components in h heuristic for all processed solutions
+    # calculate T components in h heuristic for all processed solutions, df can be dict
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     if 'alpha_m' in postprocess_kwargs:
@@ -574,7 +574,7 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
                       dat_new=dat, data_path=data_path, at_sol=True, fend=fend, **kwargs)
 
     try:
-        h_components = alpha_m * df.dT_rh.to_numpy() / df.dT_m.to_numpy() * df.delta_rh.to_numpy() / df.d_m.to_numpy()
+        h_components = alpha_m * np.array(df['dT_rh']) / np.array(df['dT_m']) * np.array(df['delta_rh']) / np.array(df['d_m'])
     except KeyError as e:
         print(df)
         raise e
