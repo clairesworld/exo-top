@@ -12,8 +12,8 @@ load = True #load_grid
 
 # try h scalings to two-component power law for chaotic
 
-_ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x=('Ra_i', 'eta'),
+_ = sc.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_xs=('Ra_i', 'eta'),
                  include_regimes=['chaotic'], save=True, fname='h_Ra-eta_chaotic', labelsize=16,
                  xlabel=r'C Ra$^m \Delta\eta^n$', ylabel='dynamic topography', title='',
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
@@ -22,13 +22,13 @@ _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_
 
 # try h scalings with heuristic all chaotic cases
 
-# _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-#                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='h_components',
-#                  include_regimes=['chaotic'], save=True, fname='h_T_chaotic', labelsize=16,
-#                  xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', title='',
-#                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-#                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-#                  regime_grid=regime_grid_td)
+_ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='h_components',
+                 include_regimes=['chaotic'], save=True, fname='h_T_chaotic', labelsize=16,
+                 xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', title='',
+                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                 regime_grid=regime_grid_td)
 
 # plot h scalings - with dT_m*delta*alpha
 
