@@ -770,7 +770,7 @@ def parameter_percentiles(case=None, df=None, keys=None, plot=False, sigma=2, **
     elif sigma == 1:
         qs = [16, 50, 84]
     else:
-        print('Unrecognized sigma value')
+        raise Exception('Unrecognized sigma value')
     qdict = {}
     for key in keys:
         vals = df[key]  #.values
@@ -991,6 +991,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                     df_plot[which_x] = x
 
                 # append to working
+                print('df_plot['h_rms'].values) * hscale', df_plot['h_rms'].values) * hscale)
+                print('df_plot', df_plot)
                 yx_peak_all.append((np.array(df_plot['h_peak'].values) * hscale, np.array(df_plot[[*which_xs]].values)))
                 yx_rms_all.append((np.array(df_plot['h_rms'].values) * hscale, np.array(df_plot[[*which_xs]].values)))
                 qdict = parameter_percentiles(case, df=df_plot, keys=quants.keys(), plot=False)
@@ -1034,7 +1036,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     if xlim is not None:
         ax.set_xlim(xlim)
     if cbar:
-        dum = ax.scatter(z_vec, z_vec, c=jj, cmap='winter', visible=False, zorder=0)
+        dum = ax.scatter(z_vec, z_vec, c=z_vec, cmap='winter', visible=False, zorder=0)
         cb = colourbar(dum, label=clabel, labelsize=labelsize, labelpad=clabelpad)
     ax.set_ylabel(ylabel, fontsize=labelsize)
     ax.set_xlabel(xlabel, fontsize=labelsize)
@@ -1061,8 +1063,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False,
-              fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs={}, regime_names=None, **kwargs):
+              fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     # either Ra or eta is 1D list of strings (other is singular), t1, end must match shape
+    if postprocess_kwargs is None:
+        postprocess_kwargs = {}
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra, eta, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
@@ -1645,12 +1649,16 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys=None, data_path=data_path_bullard,
                         fig_path=fig_path_bullard, load_grid='auto', regime_grid=None, include_regimes=None, Ra_i=False, compare_exponent=None,
                         save=True, fname='Ra_scalings', labelsize=16, ylabels=None, psuffixes='', title='',
-                        postprocess_functions=[], xlim=None, ylim=None, legloc=None, averagescheme=None, regime_names=None,
+                        postprocess_functions=None, xlim=None, ylim=None, legloc=None, averagescheme=None, regime_names=None,
                         cmap='magma', compare_pub=None, compare_label=None, vmin=None, vmax=None,
-                        fig=None, axes=None, fig_fmt='.png', postprocess_kwargs={}, **kwargs):
+                        fig=None, axes=None, fig_fmt='.png', postprocess_kwargs=None, **kwargs):
     # Ra or eta is list of strings, t1 is a list of numbers the same length
     # instead of plotting vs Ra or eta, plot vs theoretical components of scaling relationship
 
+    if postprocess_functions is None:
+        postprocess_functions = []
+    if postprocess_kwargs is None:
+        postprocess_kwargs = {}
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
