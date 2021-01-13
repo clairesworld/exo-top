@@ -991,6 +991,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     # get errorbars and plot them
     err = dict.fromkeys(quants.keys())
     z_vec = quants[which_xs[1]][:, 1]
+    print('z_vec', z_vec)
     c_list = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
     try:
         for key in quants.keys():
@@ -1022,7 +1023,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     if xlim is not None:
         ax.set_xlim(xlim)
     if cbar:
-        dum = ax.scatter(z_vec, z_vec, c=z_vec, cmap='winter', visible=False, zorder=0)
+        dum = ax.scatter(z_vec, z_vec, c=z_vec, cmap='winter', vmin=vmin, vmax=vmax, visible=False, zorder=0)
         cb = colourbar(dum, label=clabel, labelsize=labelsize, labelpad=clabelpad)
     ax.set_ylabel(ylabel, fontsize=labelsize)
     ax.set_xlabel(xlabel, fontsize=labelsize)
