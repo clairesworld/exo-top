@@ -1006,11 +1006,12 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     c_list = colorize(np.log10(z_vec), cmap=cmap, vmin=vmin, vmax=vmax)[0]
     try:
         for key in quants.keys():
-            err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
+            err[key] = np.array([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
         for jj, z in enumerate(z_vec):
             # get subset of points with this z-value
             ind = np.nonzero(z_vec == z)
-            ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1], yerr=err['h_peak'].T[ind].T,
+            ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1],
+                        yerr=err['h_peak'].T[ind].T,
                         xerr=err[which_xs[0]].T[ind].T,
                         elinewidth=0.5, fmt='d', mfc=c_list[jj], c=c_list[jj], capsize=5, alpha=0.5,
                         markeredgecolor=highlight_colour)
