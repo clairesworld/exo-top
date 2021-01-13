@@ -1298,27 +1298,21 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=Non
 
 
 def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=None, save=True, t1_grid=None, nrows=2,
-                          ncols=2, T_components=False, leftleg_bbox=(-0.05, 1), p_dimensionals=None,
+                          ncols=2, which_x='Ra', leftleg_bbox=(-0.05, 1), p_dimensionals=None,
                           load_grid='auto', fig_path=fig_path_bullard, fname='h_Ra_all', fig_fmt='.png', end_grid=None,
                           show_bounds=False, regimes_title='', Ra_i=False, show_isoviscous=False, y2label='',
                           labelsize=14, xlabel='Ra', include_regimes=None, ylabel='dynamic topography', xlabelpad=12, ylabelpad=2, **kwargs):
-
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
     if c_regimes is None:
         c_regimes = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:dark violet']
-    if T_components:
-        print(r'Plotting h vs. $\alpha \Delta T \delta$')
-        which_x = 'components'
-    else:
-        print(r'Plotting h vs. Ra')
-        which_x = 'Ra'
     if show_isoviscous:
         show_isoviscous_flag = True
     else:
         show_isoviscous_flag = False
 
+    print(r'Plotting h vs.', which_x, 'for', include_regimes, 'regimes')
     fig = plt.figure(figsize=(7, 7))
     bigax = fig.add_subplot(111)  # The big subplot
     bigax.spines['top'].set_color('none')
@@ -1345,26 +1339,26 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
         end_ii = end_grid[ii]
         load_ii = load_grid[ii]
 
-        for ir, regime_name in enumerate(regime_names):
-            if regime_name in include_regimes:
-                Ra_regime = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
-                Ra_regime_idx = [j for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
+        for ir, regime_name in enumerate(include_regimes):
+            Ra_regime = [Ra_ls[j] for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
+            Ra_regime_idx = [j for j in np.nonzero(regime_grid[ii] == regime_name)[0]]
 
-                if ir == 0 and show_isoviscous_flag:
-                    show_isoviscous = True
-                else:
-                    show_isoviscous = False
+            if ir == 0 and show_isoviscous_flag:
+                show_isoviscous = True
+            else:
+                show_isoviscous = False
 
-                if not (not Ra_regime):  # if this regime is not empty
-                    fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_ii[Ra_regime_idx], end_ii[Ra_regime_idx],
-                                        load_ii[Ra_regime_idx], p_dimensionals=p_dimensionals, which_x=which_x,
-                                        save=False, labelsize=labelsize, xlabel='', ylabel='', y2label=y2label,
-                                        c_peak=c_regimes[ir], c_rms=c_regimes[ir], Ra_i=Ra_i,
-                                        show_isoviscous=show_isoviscous, fig=fig, ax=ax, **kwargs)
-                    if show_bounds:
-                        ax.axvline(float(Ra_regime[-1]) * 2, c='k', lw=0.5, alpha=0.6, ls='--')
-                        # ax.text(ax.get_xlim()[0], ylim[0], regime_name, fontsize=8, va='bottom', ha='left')
-                    # print('Plotted', len(Ra_regime), regime_name, 'case(s)')
+            if not (not Ra_regime):  # if this regime is not empty
+                fig, ax = plot_h_vs(Ra_regime, eta_ii, t1_grid=t1_ii[Ra_regime_idx], end_grid=end_ii[Ra_regime_idx],
+                                    load_grid=load_ii[Ra_regime_idx], regime_grid=regime_grid[ii,Ra_regime_idx],
+                                    p_dimensionals=p_dimensionals, which_x=which_x,
+                                    save=False, labelsize=labelsize, xlabel='', ylabel='', y2label=y2label,
+                                    c_peak=c_regimes[ir], c_rms=c_regimes[ir], Ra_i=Ra_i, regime_names=regime_names,
+                                    show_isoviscous=show_isoviscous, fig=fig, ax=ax, **kwargs)
+                if show_bounds:
+                    ax.axvline(float(Ra_regime[-1]) * 2, c='k', lw=0.5, alpha=0.6, ls='--')
+                    # ax.text(ax.get_xlim()[0], ylim[0], regime_name, fontsize=8, va='bottom', ha='left')
+                # print('Plotted', len(Ra_regime), regime_name, 'case(s)')
 
         # ax.set_title(r'$\Delta \eta$=' + eta_ii, fontsize=labelsize-2)
         ax.text(0.01, 0.98, r'$\Delta \eta$=' + eta_ii, fontsize=labelsize - 4, ha='left', va='top',
