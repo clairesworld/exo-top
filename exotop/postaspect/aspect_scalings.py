@@ -1007,15 +1007,27 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     try:
         for key in quants.keys():
             err[key] = np.array([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
+
+        print('\nquants x\n', quants[which_xs[0]])
+        print('\nerr x\n', err[which_xs[0]])
         for jj, z in enumerate(z_vec):
             # get subset of points with this z-value
             ind = np.nonzero(z_vec == z)
+
+            print('ind', ind)
+            print('x', np.shape(quants[which_xs[0]][ind, 1]))
+            print('y', np.shape(quants[which_xs[0]][ind, 1]))
+            print('xerr', np.shape(err[which_xs[0]].T[ind].T))
+
+
+
             ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1],
                         yerr=err['h_peak'].T[ind].T,
                         xerr=err[which_xs[0]].T[ind].T,
                         elinewidth=0.5, fmt='d', mfc=c_list[jj], c=c_list[jj], capsize=5, alpha=0.5,
                         markeredgecolor=highlight_colour)
-            ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_rms'][ind, 1], yerr=err['h_rms'].T[ind].T,
+            ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_rms'][ind, 1],
+                        yerr=err['h_rms'].T[ind].T,
                         xerr=err[which_xs[0]].T[ind].T,
                         elinewidth=0.5, fmt='o', mfc=c_list[jj], c=c_list[jj], capsize=5)
             print('c', c_list[jj], 'z', z, 'npoints', len(quants[which_xs[0]][ind, 1]))
@@ -2289,7 +2301,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 
 
 def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None,
-                         load_grid='auto', psuffixes=['_T'], postprocess_functions=[T_parameters_at_sol],
+                         load_grid='auto', psuffixes=None, postprocess_functions=None,
                          fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end_grid=None, normtime=True,
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=10,
                          xlabelpad=8, ylabelpad=-2, markers=None, markersize=20, alpha=0.5,
@@ -2298,6 +2310,10 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                          data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
 
+    if psuffixes is None:
+        psuffixes = ['_T']
+    if postprocess_functions is None:
+        postprocess_functions = [T_parameters_at_sol]
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
     t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
@@ -2557,10 +2573,12 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
 
 def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
                             literature_file=None,
-                            legend=True, postprocess_kwargs={}, regime_names=None,
+                            legend=True, postprocess_kwargs=None, regime_names=None,
                             c='k', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                             save=True, fname='model-data', labelsize=16, clist=None,
                             cmap='magma', cbar=None, include_regimes=None, **kwargs):
+    if postprocess_kwargs is None:
+        postprocess_kwargs = {}
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
     t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
