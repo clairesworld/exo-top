@@ -1023,7 +1023,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
             print('\nx slice\n')
             print(quants[which_xs[0]][ind, 1])
-            print('\nxerr slice\n', np.shape(err[which_xs[0]].T[ind].T)
+            print('\nxerr slice\n', err[which_xs[0]].T[ind].T)
 
             ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1],
                         yerr=err['h_peak'].T[ind].T,
