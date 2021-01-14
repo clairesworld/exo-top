@@ -139,8 +139,7 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
             if reprocess_flag:
                 if not hasattr(dat_new, 'stats_time'):
                     dat_new.read_times(verbose=verbose)
-                if (Nu_at_ts in postprocess_functions) and not hasattr(dat_new, 'stats_heatflux_top'):
-                    dat_new.read_stats_heatflux(verbose=verbose)
+                dat_new.read_stats_heatflux(verbose=verbose)
                 if at_sol:
                     if not hasattr(dat_new, 'sol_files'):
                         dat_new.read_stats_sol_files()
