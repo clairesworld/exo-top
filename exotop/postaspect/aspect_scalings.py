@@ -906,6 +906,7 @@ def plot_getx(Ra, eta, case=None, df=None, which_x=None, averagescheme=None, dat
 def plot_geth(case=None, df=None, averagescheme=None, data_path=data_path_bullard,
               t1=None, postprocess_kwargs=None, load=True, **kwargs):
     # get the y values, depending on averaging scheme
+    print('load plotgeth', load)
     if averagescheme == 'timelast':
         h_rms = df.h_rms.mean()
         h_peak = df.h_peak.mean()
@@ -1993,7 +1994,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
 def get_h_average(Ra, eta, which_h='rms', end=None, data_path=data_path_bullard, load=True, **kwargs):
     case = 'Ra' + Ra + '-eta' + eta + end
-    print('load', load)
+    print('load get_h_average', load)
     rms, peak = plot_geth(case=case, averagescheme='timefirst', data_path=data_path, load=load, **kwargs)
     if which_h=='rms':
         return rms
@@ -2566,6 +2567,7 @@ def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', verb
     # for these time-average ones 'auto' counts as reprocess
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
+    print('load pickleio', load)
     if load is not True:
         dat = post.Aspect_Data(directory=case_path, verbose=verbose,
                                read_statistics=False, read_parameters=False)
