@@ -2647,12 +2647,6 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
         t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
-    if averagescheme == 'timefirst':
-        psuffixes = ['_T']
-        postprocess_functions = [T_parameters_at_sol]
-    else:
-        psuffixes = ['_T', '_h']
-        postprocess_functions = [T_parameters_at_sol, h_at_ts]
     twocomponent = False
     if iterable_not_string(which_x):
         twocomponent = True
