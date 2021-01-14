@@ -574,7 +574,8 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
                       dat_new=dat, data_path=data_path, at_sol=True, fend=fend, **kwargs)
 
     try:
-        h_components = alpha_m * np.array(df['dT_rh']) / np.array(df['dT_m']) * np.array(df['delta_rh']) / np.array(df['d_m'])
+        h_components = alpha_m * np.array(df['dT_rh']) / np.array(df['dT_m']) * np.array(df['delta_rh']) / np.array(
+            df['d_m'])
     except KeyError as e:
         print(df)
         raise e
@@ -862,7 +863,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 
 def plot_getx(Ra, eta, case=None, df=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
-                t1=None, load=None, postprocess_kwargs=None, **kwargs):
+              t1=None, load=None, postprocess_kwargs=None, **kwargs):
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     if 'h_components' in which_x:
@@ -983,7 +984,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
                 # extract x values for plotting
                 xs = [plot_getx(Ra[ii], etastr, case=case, df=df_plot, which_x=which_x, data_path=data_path_bullard,
-                                t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, **kwargs) for which_x in which_xs]
+                                t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, **kwargs) for which_x in
+                      which_xs]
 
                 # get the y values, depending on averaging scheme
                 h_rms, h_peak = plot_geth(case=case, df=df, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
@@ -991,8 +993,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                 # append to working
                 yx_peak_all.append((h_peak, xs))
                 yx_rms_all.append((h_rms, xs))
-                qdict = parameter_percentiles(case, df={'h_rms':h_rms, 'h_peak':h_peak,
-                                                        **{key:value for (key,value) in zip(which_xs, xs)}},
+                qdict = parameter_percentiles(case, df={'h_rms': h_rms, 'h_peak': h_peak,
+                                                        **{key: value for (key, value) in zip(which_xs, xs)}},
                                               keys=quants.keys(), plot=False)
                 for key in quants.keys():
                     try:
@@ -1013,7 +1015,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
         print('\nz_vec\n', z_vec)
         for jj, z in enumerate(z_vec):
             # get subset of points with this z-value
-            ind = np.nonzero(z_vec == z)
+            ind = np.nonzero(z_vec == z)[0]
 
             print('ind', ind)
             print('x', np.shape(quants[which_xs[0]][ind, 1]))
@@ -1498,7 +1500,7 @@ def subplots_topo_regimes(Ra_ls, eta_ls, regime_grid, regime_names, c_regimes=No
                           labelsize=14, xlabel='Ra', include_regimes=None, ylabel='dynamic topography', xlabelpad=12,
                           ylabelpad=2, **kwargs):
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
-    t1_grid, load_grid, end_grid, regime_grid))
+        t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
     if c_regimes is None:
@@ -1641,7 +1643,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
-    t1_grid, load_grid, end_grid, regime_grid))
+        t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
     if ylabels is None:
@@ -2319,7 +2321,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
     if postprocess_functions is None:
         postprocess_functions = [T_parameters_at_sol]
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
-    t1_grid, load_grid, end_grid, regime_grid))
+        t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
     if markers is None:
@@ -2487,7 +2489,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
                          data_path=data_path_bullard, redo=True, load_grid=None, regime_grid=None, include_regimes=None,
                          **kwargs):
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
-    t1_grid, load_grid, end_grid, regime_grid))
+        t1_grid, load_grid, end_grid, regime_grid))
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
@@ -2533,7 +2535,7 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
                           data_path=data_path_bullard, redo=True, load_grid=None, regime_grid=None,
                           include_regimes=None, **kwargs):
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
-    t1_grid, load_grid, end_grid, regime_grid))
+        t1_grid, load_grid, end_grid, regime_grid))
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
@@ -2575,16 +2577,16 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
 #                              data_path=data_path, at_sol=True, load=load, **kwargs)
 
 
-def plot_heuristic_scalings(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
-                            literature_file=None,
-                            legend=True, postprocess_kwargs=None, regime_names=None,
-                            c='k', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
-                            save=True, fname='model-data', labelsize=16, clist=None,
-                            cmap='magma', cbar=None, include_regimes=None, **kwargs):
+def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
+                    literature_file=None,
+                    legend=True, postprocess_kwargs=None, regime_names=None,
+                    c='k', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
+                    save=True, fname='model-data', labelsize=16, clist=None,
+                    cmap='magma', cbar=None, include_regimes=None, **kwargs):
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
-    t1_grid, load_grid, end_grid, regime_grid))
+        t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
     if averagescheme == 'timefirst':
