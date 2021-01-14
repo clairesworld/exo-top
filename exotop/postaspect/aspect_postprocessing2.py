@@ -571,15 +571,16 @@ class Aspect_Data():
     #         diff = abs(Ti - Ti_guess)
     #     return Ti, d0
 
-    def lid_thickness(self, n=None, uv_mag=None, uv_mag_av=None, tol=1e-3, plot=False, spline=True, **kwargs):
+    def lid_thickness(self, n=None, uv_mag=None, uv_mag_av=None, y=None, tol=1e-3, plot=False, spline=True, **kwargs):
         # stagnant lid depth y_L from Moresi & Solomatov 2000 method - thickness delta_L = 1 - y_L
-        try:
-            x = self.x
-            y = self.y
-        except AttributeError:
-            self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
-            x = self.x
-            y = self.y
+        if y is None:
+            try:
+                x = self.x
+                y = self.y
+            except AttributeError:
+                self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
+                x = self.x
+                y = self.y
         if uv_mag_av is None:
             if uv_mag is None:
                 _, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=False)
@@ -686,15 +687,16 @@ class Aspect_Data():
         except IndexError:
             return b
     
-    def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, uv_mag=None, plot=False,
+    def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, uv_mag=None, y=None, plot=False,
                              verbose=False, **kwargs):
-        try:
-            x = self.x
-            y = self.y
-        except AttributeError:
-            self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
-            x = self.x
-            y = self.y
+        if y is None:
+            try:
+                x = self.x
+                y = self.y
+            except AttributeError:
+                self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
+                x = self.x
+                y = self.y
         if T_av is None:
             if T is None:
                 _, _, _, T = self.read_temperature(n, verbose=verbose, **kwargs)
@@ -710,14 +712,15 @@ class Aspect_Data():
         # T_l = T_av[find_nearest_idx(y, delta_L)]
         return T_l
 
-    def max_Ty(self, n=None, T=None, T_av=None, verbose=False):
-        try:
-            x = self.x
-            y = self.y
-        except AttributeError:
-            self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
-            x = self.x
-            y = self.y
+    def max_Ty(self, n=None, T=None, T_av=None, y=None, verbose=False):
+        if y is None:
+            try:
+                x = self.x
+                y = self.y
+            except AttributeError:
+                self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
+                x = self.x
+                y = self.y
         if T_av is None:
             if T is None:
                 _, _, _, T = self.read_temperature(n, verbose=verbose)
@@ -730,17 +733,18 @@ class Aspect_Data():
             return T_i, y_i
 
 
-    def internal_temperature(self, n=None, T=None, T_av=None, plot=False, return_coords=False, verbose=False,
+    def internal_temperature(self, n=None, T=None, T_av=None, y=None, plot=False, return_coords=False, verbose=False,
                              spline=True, usemax=False, **kwargs):
         # almost-isothermal temperature of core of convecting cell
         # note: MS2000 define this as the maximal horizontally-averaged temperature in the (convecting) layer
-        try:
-            x = self.x
-            y = self.y
-        except AttributeError:
-            self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
-            x = self.x
-            y = self.y
+        if y is None:
+            try:
+                x = self.x
+                y = self.y
+            except AttributeError:
+                self.read_mesh(n)  # mesh should be the same for all timesteps (after grid refinement)?
+                x = self.x
+                y = self.y
         if T_av is None:
             if T is None:
                 _, _, _, T = self.read_temperature(n, verbose=verbose)
@@ -790,7 +794,8 @@ class Aspect_Data():
         if T_l is None:
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
-    
+
+
     def T_components(self, n=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
                      uv_mag_av=None, d_m=1, dT_m=1, y=None,
                      verbose=False, **kwargs):
@@ -818,13 +823,13 @@ class Aspect_Data():
             d_m = p['Geometry model']['Box']['Y extent']
             dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
         if y_L is None:
-            y_L = self.lid_thickness(n, uv_mag_av=uv_mag_av, **kwargs)
+            y_L = self.lid_thickness(n, uv_mag_av=uv_mag_av, y=y, **kwargs)
         if T_i is None:
-            T_i = self.internal_temperature(n, T_av=T_av, **kwargs)
+            T_i = self.internal_temperature(n, T_av=T_av,  y=y,**kwargs)
         if T_l is None:
-            T_l = self.lid_base_temperature(n, T_av=T_av, delta_L=y_L, **kwargs)
+            T_l = self.lid_base_temperature(n, T_av=T_av, delta_L=y_L, y=y, **kwargs)
         if delta_rh is None:
-            delta_rh = self.ubl_thickness(n, T_l=T_l, T_i=T_i, **kwargs)
+            delta_rh = self.ubl_thickness(n, T_l=T_l, T_i=T_i,  y=y, **kwargs)
         delta_L = y[-1] - y_L
         delta_0 = self.delta_0(delta_rh=delta_rh, delta_L=delta_L)  # mechanical boundary layer MS95
         dT_rh = self.dT_rh(T_l=T_l, T_i=T_i)
