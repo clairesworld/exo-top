@@ -1045,8 +1045,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     if xlim is not None:
         ax.set_xlim(xlim)
     if legend:
-        leg = ax.legend(handles=[ax.scatter([],[], marker='d', c=c_list[jj], visible=False),
-                                 ax.scatter([],[], marker='o', c=c_list[jj], visible=False)],
+        leg = ax.legend(handles=[ax.scatter([],[], marker='d', s=50, c=c_list[jj], visible=False),
+                                 ax.scatter([],[], marker='o', s=50, c=c_list[jj], visible=False)],
                         labels=['h_peak, data', 'h rms data'])
         ax.add_artist(leg)
     if cbar:
@@ -1162,10 +1162,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         for key in quants.keys():
             err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
         ax.errorbar(quants[which_x][:, 1], quants['h_peak'][:, 1], yerr=err['h_peak'], xerr=err[which_x],
-                    elinewidth=0.5, label='h peak, data',
+                    elinewidth=0.5,
                     fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
         ax.errorbar(quants[which_x][:, 1], quants['h_rms'][:, 1], yerr=err['h_rms'], xerr=err[which_x], elinewidth=0.5,
-                    fmt='o', c=c_rms, capsize=5, label='h rms, data')
+                    fmt='o', c=c_rms, capsize=5)
     except TypeError:  # no cases in given regimes as quants is dict of None
         pass
 
@@ -1195,7 +1195,11 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_title(title, fontsize=labelsize)
     if legend:
-        ax.legend()
+        leg = ax.legend(handles=[mlines.Line2D([], [], color='k', marker='d', alpha=0.5,
+                                                markersize=25, markeredgecolor=highlight_colour, label='h_peak, data'),
+                                 mlines.Line2D([], [], color='k', marker='o', alpha=0.5,
+                                               markersize=25, label='h rms data')])
+        ax.add_artist(leg)
 
     if p_dimensionals is not None:
         ax2 = ax.twinx()
