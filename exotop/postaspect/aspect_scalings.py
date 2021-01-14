@@ -2665,6 +2665,9 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
         crot = 0  # 70
         cmap = cmap_from_list(clist, cmap_name='regimes')
         discrete = True
+    else:
+        cnorm = None
+        vmin, vmax = None, None
 
     h_data_all = []
     x_data_all = []
