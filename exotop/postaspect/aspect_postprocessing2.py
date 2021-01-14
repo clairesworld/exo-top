@@ -796,13 +796,12 @@ class Aspect_Data():
                      verbose=False, **kwargs):
         if n is None:
             n = self.final_step()
-        try:
-            y = self.y
-        except AttributeError:
-            if y is not None:
+        if y is None:
+            try:
                 y = self.y
-            self.read_mesh(n)  # mesh should be the same for all timesteps in steady state?
-            y = self.y
+            except AttributeError:
+                self.read_mesh(n)  # mesh should be the same for all timesteps in steady state?
+                y = self.y
         if T_av is None:
             x, y, _, T = self.read_temperature(n, verbose=verbose)
             T_av = horizontal_mean(T, x)
