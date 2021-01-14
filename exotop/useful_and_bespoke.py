@@ -103,3 +103,11 @@ def age_index(times, age, age_scale=1):
     # get index of age in times with optional scaling for age
     return min(enumerate(times), key=lambda x: abs(age - x[1] * age_scale))[0]
 
+
+def minmaxnorm(x, a=0, b=1):
+    # linear normalisation to min, max
+    xmin = np.min(x)
+    xmax = np.max(x)
+    x = (x - xmin) / (xmax - xmin)  # norm to 0, 1
+    x = x * (b - a) + b  # scale to a, b
+    return x

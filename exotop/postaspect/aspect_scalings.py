@@ -18,7 +18,7 @@ import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect import aspect_postprocessing2 as post  # noqa: E402
 from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, \
-    colourbar, not_string  # noqa: E402
+    colourbar, not_string, minmaxnorm  # noqa: E402
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
@@ -2045,8 +2045,11 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
     logRa = np.log10(Ra)
     logeta = np.log10(eta)
 
-    logRa2 = xlim[0] + np.ptp(xlim)*logRa
-    logeta2 = ylim[0] + np.ptp(ylim)*logeta
+    logRa2 = minmaxnorm(logRa, xlim[0], xlim[1])
+    logeta2 = minmaxnorm(logeta, ylim[0], ylim[1])
+
+    print('original logRa', logRa)
+    print('original logeta', logeta)
 
     print('normalised log Ra range, should equal xlim', logRa2.min(), logRa2.max())
     print('normalised log eta range, should equal ylim', logeta2.min(), logeta2.max())
