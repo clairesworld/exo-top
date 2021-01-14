@@ -904,14 +904,14 @@ def plot_getx(Ra, eta, case=None, df=None, which_x=None, averagescheme=None, dat
 
 
 def plot_geth(case=None, df=None, averagescheme=None, data_path=data_path_bullard,
-              t1=None, postprocess_kwargs=None, **kwargs):
+              t1=None, postprocess_kwargs=None, load=True, **kwargs):
     # get the y values, depending on averaging scheme
     if averagescheme == 'timelast':
         h_rms = df.h_rms.mean()
         h_peak = df.h_peak.mean()
     elif averagescheme == 'timefirst':
         # load time-averages
-        df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1, load=True,
+        df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1, load=load,
                                 data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
         h_rms = df_h.iloc[0].h_rms
         h_peak = df_h.iloc[0].h_peak
@@ -1991,9 +1991,9 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
     return fig, axes
 
 
-def get_h_average(Ra, eta, which_h='rms', end=None, data_path=data_path_bullard, **kwargs):
+def get_h_average(Ra, eta, which_h='rms', end=None, data_path=data_path_bullard, load=True, **kwargs):
     case = 'Ra' + Ra + '-eta' + eta + end
-    rms, peak = plot_geth(case=case, averagescheme='timefirst', data_path=data_path, **kwargs)
+    rms, peak = plot_geth(case=case, averagescheme='timefirst', data_path=data_path, load=load, **kwargs)
     if which_h=='rms':
         return rms
     elif which_h=='peak':
@@ -2017,7 +2017,7 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
                                       intercept=False)
 
     # make grid
-    fig, ax = plot_parameter_grid(Ra_ls, eta_ls, function=get_h_average, data_path=data_path, load=load_grid, cmap=cmap,
+    fig, ax = plot_parameter_grid(Ra_ls, eta_ls, function=get_h_average, data_path=data_path, load=True, cmap=cmap,
                         vmin=vmin, vmax=vmax, save=False, labelsize=16,  t1_grid=t1_grid, end=end_grid, cticklabels=cticklabels,
                         cticks=cticks, title=title, lognorm=False, log=False, clabel=clabel, overplot_h=False, which_h=which_h,  **kwargs)
 
