@@ -2045,8 +2045,8 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
     logRa = np.log10(Ra)
     logeta = np.log10(eta)
 
-    logRa2 = xlim.min() + np.ptp(xlim)*logRa
-    logeta2 = ylim.min() + np.ptp(ylim)*logeta
+    logRa2 = xlim[0] + np.ptp(xlim)*logRa
+    logeta2 = ylim[0] + np.ptp(ylim)*logeta
 
     print('normalised log Ra range, should equal xlim', logRa2.min(), logRa2.max())
     print('normalised log eta range, should equal ylim', logeta2.min(), logeta2.max())
