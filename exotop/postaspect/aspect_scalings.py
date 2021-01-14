@@ -898,7 +898,7 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=da
         # load time-averages
         T_av, y = time_averaged_profile_from_df(df, 'T_av')
         uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-        df1 = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs, **kwargs)
+        df1 = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs)
     else:
         # use each xy point (y=h) for fitting
         pass
