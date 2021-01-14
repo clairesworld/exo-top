@@ -1015,14 +1015,15 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
             # get subset of points with this z-value
             ind = np.nonzero(z_vec == z)
 
-            print('z', z)
-
             print('ind', ind)
             print('x', np.shape(quants[which_xs[0]][ind, 1]))
-            print('y', np.shape(quants[which_xs[0]][ind, 1]))
+            print('y', np.shape(quants['h_peak'][ind, 1]))
             print('xerr', np.shape(err[which_xs[0]].T[ind].T))
-
             print('c', c_list[jj], 'z', z, 'npoints', len(quants[which_xs[0]][ind, 1]))
+
+            print('\nx slice\n')
+            print(quants[which_xs[0]][ind, 1])
+            print('\nxerr slice\n', np.shape(err[which_xs[0]].T[ind].T)
 
             ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1],
                         yerr=err['h_peak'].T[ind].T,
