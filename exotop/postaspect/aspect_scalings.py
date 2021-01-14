@@ -1045,9 +1045,10 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     if xlim is not None:
         ax.set_xlim(xlim)
     if legend:
-        leg = ax.legend(handles=[ax.scatter([],[], marker='d', s=50, c=c_list[jj], visible=False),
-                                 ax.scatter([],[], marker='o', s=50, c=c_list[jj], visible=False)],
-                        labels=['h_peak, data', 'h rms data'])
+        leg = ax.legend(handles=[mlines.Line2D([], [], color='k', marker='d', alpha=0.5,
+                                                markersize=25, markeredgecolor=highlight_colour, label=r'$h_{peak}$, data'),
+                                 mlines.Line2D([], [], color='k', marker='o', alpha=0.5,
+                                               markersize=25, label=r'$h_{rms}$, data')])
         ax.add_artist(leg)
     if cbar:
         dum = ax.scatter(z_vec, z_vec, c=z_vec, cmap=cmap, vmin=vmin, vmax=vmax, visible=False, zorder=0,
@@ -1196,9 +1197,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     ax.set_title(title, fontsize=labelsize)
     if legend:
         leg = ax.legend(handles=[mlines.Line2D([], [], color='k', marker='d', alpha=0.5,
-                                                markersize=25, markeredgecolor=highlight_colour, label='h_peak, data'),
+                                                markersize=25, markeredgecolor=highlight_colour, label=r'$h_{peak}$, data'),
                                  mlines.Line2D([], [], color='k', marker='o', alpha=0.5,
-                                               markersize=25, label='h rms data')])
+                                               markersize=25, label=r'$h_{rms}$, data')])
         ax.add_artist(leg)
 
     if p_dimensionals is not None:
