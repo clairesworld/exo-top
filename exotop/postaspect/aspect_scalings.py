@@ -1010,16 +1010,19 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
         print('\nquants x\n', quants[which_xs[0]])
         print('\nerr x\n', err[which_xs[0]])
+        print('\nz_vec\n', z_vec)
         for jj, z in enumerate(z_vec):
             # get subset of points with this z-value
             ind = np.nonzero(z_vec == z)
+
+            print('z', z)
 
             print('ind', ind)
             print('x', np.shape(quants[which_xs[0]][ind, 1]))
             print('y', np.shape(quants[which_xs[0]][ind, 1]))
             print('xerr', np.shape(err[which_xs[0]].T[ind].T))
 
-
+            print('c', c_list[jj], 'z', z, 'npoints', len(quants[which_xs[0]][ind, 1]))
 
             ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1],
                         yerr=err['h_peak'].T[ind].T,
@@ -1030,7 +1033,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                         yerr=err['h_rms'].T[ind].T,
                         xerr=err[which_xs[0]].T[ind].T,
                         elinewidth=0.5, fmt='o', mfc=c_list[jj], c=c_list[jj], capsize=5)
-            print('c', c_list[jj], 'z', z, 'npoints', len(quants[which_xs[0]][ind, 1]))
+
     except TypeError:  # no cases in given regimes
         pass
 
