@@ -2009,18 +2009,18 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
                         cticks=None, title='', lognorm=False, log=False, clabel=r'$h_{rms}$', which_h='rms',
                          nlevels_contour=10, cmap='Greys_r', cmap_contours='spring', postprocess_kwargs={}, **kwargs):
 
-    # get fit things
-    const, expon = plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid, t1_grid=t1_grid, load_grid=load_grid,
-                                      end_grid=end_grid, literature_file=None, legend=False, averagescheme=averagescheme,
-                                      postprocess_kwargs=postprocess_kwargs,
-                                      which_h=which_h, which_x=which_x, data_path=data_path,
-                                      save=False, cbar=None, include_regimes=include_regimes,
-                                      intercept=False)
-
     # make grid
     fig, ax = plot_parameter_grid(Ra_ls, eta_ls, function=get_h_average, data_path=data_path, load=True, cmap=cmap,
                         vmin=vmin, vmax=vmax, save=False, labelsize=16,  t1_grid=t1_grid, end=end_grid, cticklabels=cticklabels,
                         cticks=cticks, title=title, lognorm=False, log=False, clabel=clabel, overplot_h=False, which_h=which_h,  **kwargs)
+
+    # get fit things
+    const, expon = plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid, t1_grid=t1_grid, load_grid=load_grid,
+                                   end_grid=end_grid, literature_file=None, legend=False, averagescheme=averagescheme,
+                                   postprocess_kwargs=postprocess_kwargs,
+                                   which_h=which_h, which_x=which_x, data_path=data_path,
+                                   save=False, cbar=None, include_regimes=include_regimes,
+                                   intercept=False)
 
     # add contours
     Ra = [float(r) for r in Ra_ls]
