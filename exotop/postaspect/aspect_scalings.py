@@ -919,7 +919,7 @@ def plot_geth(case=None, df=None, averagescheme=None, data_path=data_path_bullar
 
 def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
                          fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
-                         fig_fmt='.png', which_xs=None, include_regimes=None, regime_grid=None,
+                         fig_fmt='.png', which_xs=None, include_regimes=None, regime_grid=None, legend=False,
                          save=True, fname='h', clabel=None, cbar=True, clabelpad=17,
                          labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', cmap='winter',
                          fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, vmin=None, vmax=None,
@@ -1009,33 +1009,21 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     try:
         for key in quants.keys():
             err[key] = np.array([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
-
-        print('\nquants x\n', quants[which_xs[0]])
-        print('\nerr x\n', err[which_xs[0]])
-        print('\nz_vec\n', z_vec)
+        labels = ['h_peak, data', 'h_rms, data']
         for jj, z in enumerate(z_vec):
             # get subset of points with this z-value
             ind = np.nonzero(z_vec == z)[0]
-
-            print('ind', ind)
-            print('x', np.shape(quants[which_xs[0]][ind, 1]))
-            print('y', np.shape(quants['h_peak'][ind, 1]))
-            print('xerr', np.shape(err[which_xs[0]].T[ind].T))
-            print('c', c_list[jj], 'z', z, 'npoints', len(quants[which_xs[0]][ind, 1]))
-
-            print('\nx slice\n')
-            print(quants[which_xs[0]][ind, 1])
-            print('\nxerr slice\n', err[which_xs[0]].T[ind].T)
-
+            if ii > 1:
+                labels = [None, None]
             ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1],
                         yerr=err['h_peak'].T[ind].T,
                         xerr=err[which_xs[0]].T[ind].T,
                         elinewidth=0.5, fmt='d', mfc=c_list[jj], c=c_list[jj], capsize=5, alpha=0.5,
-                        markeredgecolor=highlight_colour)
+                        markeredgecolor=highlight_colour, label=labels[0])
             ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_rms'][ind, 1],
                         yerr=err['h_rms'].T[ind].T,
                         xerr=err[which_xs[0]].T[ind].T,
-                        elinewidth=0.5, fmt='o', mfc=c_list[jj], c=c_list[jj], capsize=5)
+                        elinewidth=0.5, fmt='o', mfc=c_list[jj], c=c_list[jj], capsize=5, label=labels[1])
 
     except TypeError:  # no cases in given regimes
         pass
@@ -1059,6 +1047,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
         ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
     if xlim is not None:
         ax.set_xlim(xlim)
+    if legend:
+        ax.legend()
     if cbar:
         dum = ax.scatter(z_vec, z_vec, c=z_vec, cmap=cmap, vmin=vmin, vmax=vmax, visible=False, zorder=0,
                          norm=LogNorm())
@@ -2579,7 +2569,7 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
 
 def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
                     literature_file=None,
-                    legend=True, postprocess_kwargs=None, regime_names=None,
+                    legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
                     c='k', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None,
                     cmap='magma', cbar=None, include_regimes=None, **kwargs):
