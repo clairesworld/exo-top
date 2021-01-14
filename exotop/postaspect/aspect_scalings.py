@@ -2026,16 +2026,16 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
     eta = [float(e) for e in eta_ls]
     Rv, ev = np.meshgrid(Ra, eta)
     idx = regime_grid == include_regimes
-    Ra = np.logspace(np.log10(Rv[idx].min()), np.log10(Rv[idx].max()))
-    eta = np.logspace(np.log10(ev[idx].min()), np.log10(ev[idx].max()))
-    X, Y = np.meshgrid(Ra, eta)
+    Ra_r = np.logspace(np.log10(Rv[idx].min()), np.log10(Rv[idx].max()))
+    eta_r = np.logspace(np.log10(ev[idx].min()), np.log10(ev[idx].max()))
+    X, Y = np.meshgrid(Ra_r, eta_r)
     H = const * X**expon[0] * Y**expon[1]
 
     # normalize to axis limits
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
-    xlim2 = xlim - xlim[0] / (xlim[1] - xlim[0])
-    ylim2 = ylim - ylim[0] / (ylim[1] - ylim[0])
+    xlim2 = np.array([Ra.min(), Ra.max()]) - xlim[0] / (xlim[1] - xlim[0])
+    ylim2 = np.array([eta.min(), eta.max()]) - ylim[0] / (ylim[1] - ylim[0])
     X2, Y2 = np.meshgrid(np.logspace(np.log10(xlim2[0]), np.log10(xlim2[1])),
                          np.logspace(np.log10(ylim2[0]), np.log10(ylim2[1])))
 
