@@ -1993,17 +1993,21 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
 
 def plot_fit_parameter_grid(Ra_ls, eta_ls, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
-                        vmin=None, vmax=None,
-                        save=True, fname='grid', labelsize=16, fig_fmt='.png', t1=None, end=None, cticklabels=None,
+                        vmin=None, vmax=None, averagescheme=None, which_x=None,
+                        save=True, fname='fit-grid', labelsize=16, fig_fmt='.png', t1_grid=None, end=None, cticklabels=None,
                         cticks=None, title='', lognorm=False, log=False, clabel=None, discrete=False,
                          nlevels_contour=10, cmap='jet', clist=None, cmap_contours='spring', **kwargs):
+
+    # get fit things
     const, expon = plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
                                       end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
                                       postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
-                                      ylim=[4e-3, 4e-2], which_x=('Ra_i', 'eta'), which_h='rms', data_path=data_path,
+                                      ylim=[4e-3, 4e-2], , which_h='rms', data_path=data_path,
                                       save=True,
                                       fname='model-data-power-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
-                                      intercept=True, fig_fmt=fig_fmt)
+                                      intercept=True, f)
+    if save:
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, tight_layout=False)
 
 
 def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
@@ -2715,7 +2719,10 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
         c = 'k'
         vmin, vmax = None, None
     else:
-        c = [q for _, q in sorted(zip(x_data_all, c_data_all))]
+        if twocomponent:
+            c = c_data_all
+        else:
+            c = [q for _, q in sorted(zip(x_data_all, c_data_all))]
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
     if twocomponent:
