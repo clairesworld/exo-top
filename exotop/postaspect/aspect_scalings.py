@@ -1150,7 +1150,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 yx_peak_all.append((h_peak, x))
                 yx_rms_all.append((h_rms, x))
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
-                                              keys=quants.keys(), plot=False)
+                                              keys=quants.keys(), plot=False, sigma=2)
                 for key in quants.keys():
                     try:
                         quants[key] = np.vstack((quants[key], qdict[key]))
@@ -2686,40 +2686,19 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
             load_ii = load_grid[jj][ii]
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
                     regime_grid[jj][ii] in include_regimes):
-                # load outputs
-                dfs = []
-                for ip, ps in enumerate(psuffixes):
-                    df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
-                                   load=load_ii, data_path=data_path, at_sol=True, **kwargs)
-                    dfs.append(df1)
-                df = pd.concat(dfs, axis=1)
-                df = df.loc[:, ~df.columns.duplicated()]
-
-                """v paste"""
-                if averagescheme == 'timelast':
-                    df_plot = df.mean(axis=0)
-                elif averagescheme == 'timefirst':
-                    # load time-averages
-                    T_av, y = time_averaged_profile_from_df(df, 'T_av')
-                    uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-                    df_plot = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
-                                                  **kwargs)
-                else:
-                    # use each xy point (y=h) for fitting
-                    df_plot = df
 
                 # extract x values for plotting
                 if twocomponent:
-                    x = [plot_getx(Ra_var[ii], eta_str, case=case, df=df_plot, which_x=xx, data_path=data_path,
+                    x = [plot_getx(Ra_var[ii], eta_str, case=case, which_x=xx, data_path=data_path,
                               t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
                               averagescheme=averagescheme,**kwargs) for xx in which_x]
                 else:
-                    x = plot_getx(Ra_var[ii], eta_str, case=case, df=df_plot, which_x=which_x, data_path=data_path,
+                    x = plot_getx(Ra_var[ii], eta_str, case=case, which_x=which_x, data_path=data_path,
                                   t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
                                   averagescheme=averagescheme,**kwargs)
 
                 # get the y values, depending on averaging scheme
-                h_rms, h_peak = plot_geth(case=case, df=df, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
+                h_rms, h_peak = plot_geth(case=case, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
                                           postprocess_kwargs=postprocess_kwargs, **kwargs)
                 """^ paste"""
 
