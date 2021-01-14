@@ -1992,6 +1992,20 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
     return fig, axes
 
 
+def plot_fit_parameter_grid(Ra_ls, eta_ls, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
+                        vmin=None, vmax=None,
+                        save=True, fname='grid', labelsize=16, fig_fmt='.png', t1=None, end=None, cticklabels=None,
+                        cticks=None, title='', lognorm=False, log=False, clabel=None, discrete=False,
+                         nlevels_contour=10, cmap='jet', clist=None, cmap_contours='spring', **kwargs):
+    const, expon = plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
+                                      end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
+                                      postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
+                                      ylim=[4e-3, 4e-2], which_x=('Ra_i', 'eta'), which_h='rms', data_path=data_path,
+                                      save=True,
+                                      fname='model-data-power-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
+                                      intercept=True, fig_fmt=fig_fmt)
+
+
 def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path=fig_path_bullard, load='auto',
                         vmin=None, vmax=None, set_under=None, set_over=None,
                         save=True, fname='grid', labelsize=16, fig_fmt='.png', t1=None, end=None, cticklabels=None,
@@ -2107,6 +2121,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     ax.set_title(title, fontsize=labelsize)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, tight_layout=False)
+    return fig, ax
 
 
 def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **kwargs):
@@ -2675,33 +2690,6 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
                 else:
                     raise Exception('Invalid entry for which_h')
 
-                # if averagescheme == 'timelast':
-                #     print('    plot_heuristic_scalings(): Averaging T components calculated at each timestep')
-                #     df = df.dropna(axis=0, how='any',
-                #                    subset=['h_peak', 'h_rms', 'h_components']).mean(axis=0)  # remove any rows with nans
-                #     h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii,
-                #                                      load=load_ii, update=False, **postprocess_kwargs, **kwargs)
-                #
-                # elif averagescheme == 'timefirst':
-                #     print('    plot_heuristic_scalings(): Calculating T components using time-averaged profiles')
-                #     T_av, y = time_averaged_profile_from_df(df, 'T_av')
-                #     uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-                #     df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
-                #                                 **kwargs)
-                #     h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
-                #                                      update=False, **postprocess_kwargs, **kwargs)
-                #     df = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
-                #                           data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
-                # else:
-                #     raise Exception('Averaging scheme not recognized/implemented')
-                # if which_h == 'rms':
-                #     h = np.array(df['h_rms'])
-                # elif which_h == 'peak':
-                #     h = np.array(df['h_peak'])
-
-                # h_data_all.append((np.mean(h)))
-                # x_data_all.append(np.mean(h_components))
-
                 h_data_all.append(h)
                 x_data_all.append(x)
                 if cbar == 'eta':
@@ -2731,7 +2719,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
     if twocomponent:
-        title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(expon[0]) + r' $\Delta \eta' + '^{:.3f}'.format(expon[1])
+        title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])
     else:
         title = 'Fit to h = ({:.2f}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
     ax.set_title(title, fontsize=labelsize)
