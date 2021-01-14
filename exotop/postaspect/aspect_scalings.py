@@ -2102,7 +2102,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
     else:
         im_norm = None  # Normalize(vmin=vmin, vmax=vmax, clip=False)
 
-    im = ax.imshow(m, origin='bottom', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax,
+    im = ax.imshow(m, origin='lower', aspect='equal', interpolation='None', cmap=cmap, vmin=vmin, vmax=vmax,
                    norm=im_norm)
 
     # draw grid lines
@@ -2567,7 +2567,7 @@ def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', verb
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     print('load pickleio', load)
-    if load is False:
+    if not load:
         dat = post.Aspect_Data(directory=case_path, verbose=verbose,
                                read_statistics=False, read_parameters=False)
         dat.read_times(verbose=verbose)
