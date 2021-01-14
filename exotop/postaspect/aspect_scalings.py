@@ -1268,7 +1268,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, multifit=Fa
             expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
-                          label='{:.2f} x^{:.3f}'.format(const, expon))
+                          label='{:.2e} x^{:.3f}'.format(const, expon))
         if legend:
             handles, labels = ax.get_legend_handles_labels()
             # handles.append(h3)
