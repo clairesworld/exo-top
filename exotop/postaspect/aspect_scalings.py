@@ -801,7 +801,10 @@ def fit_log(x, h, intercept=False, weights=None, **kwargs):
         raise e
     if intercept:
         try:
-            popt, pcov = curve_fit(coefficient, x1, h1)
+            # check for and remove nans
+            df = pd.DataFrame({'x':x1, 'h': h1})
+            df.dropna(inplace=True)
+            popt, pcov = curve_fit(coefficient, df.x.to_numpy(), df.h.to_numpy())
             slope = 1.0
             intercept = popt[0]
         except ValueError as e:
@@ -2584,6 +2587,8 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
                     c='k', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None,
                     cmap='magma', cbar=None, include_regimes=None, **kwargs):
+    if averagescheme is None:
+        raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
@@ -2596,7 +2601,9 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     else:
         psuffixes = ['_T', '_h']
         postprocess_functions = [T_parameters_at_sol, h_at_ts]
-
+    twocomponent = False
+    if iterable_not_string(which_x):
+        twocomponent = True
     if cbar == 'eta':
         clabel = r'$\Delta \eta$'
         cticklabels = None
@@ -2633,44 +2640,89 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
                 df = pd.concat(dfs, axis=1)
                 df = df.loc[:, ~df.columns.duplicated()]
 
+                """v paste"""
                 if averagescheme == 'timelast':
-                    print('    plot_heuristic_scalings(): Averaging T components calculated at each timestep')
-                    df = df.dropna(axis=0, how='any',
-                                   subset=['h_peak', 'h_rms', 'h_components']).mean(axis=0)  # remove any rows with nans
-                    h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii,
-                                                     load=load_ii, update=False, **postprocess_kwargs, **kwargs)
-
+                    df_plot = df.mean(axis=0)
                 elif averagescheme == 'timefirst':
-                    print('    plot_heuristic_scalings(): Calculating T components using time-averaged profiles')
+                    # load time-averages
                     T_av, y = time_averaged_profile_from_df(df, 'T_av')
                     uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-                    df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
-                                                **kwargs)
-                    h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
-                                                     update=False, **postprocess_kwargs, **kwargs)
-                    df = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
-                                          data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
+                    df_plot = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
+                                                  **kwargs)
                 else:
-                    raise Exception('Averaging scheme not recognized/implemented')
+                    # use each xy point (y=h) for fitting
+                    df_plot = df
+
+                # extract x values for plotting
+                if twocomponent:
+                    x = [plot_getx(Ra_var[ii], eta_str, case=case, df=df_plot, which_x=xx, data_path=data_path,
+                              t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
+                              averagescheme=averagescheme,**kwargs) for xx in which_x]
+                else:
+                    x = plot_getx(Ra_var[ii], eta_str, case=case, df=df_plot, which_x=which_x, data_path=data_path,
+                                  t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
+                                  averagescheme=averagescheme,**kwargs)
+
+                # get the y values, depending on averaging scheme
+                h_rms, h_peak = plot_geth(case=case, df=df, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
+                                          postprocess_kwargs=postprocess_kwargs, **kwargs)
+                """^ paste"""
+
                 if which_h == 'rms':
-                    h = np.array(df['h_rms'])
+                    h = h_rms
                 elif which_h == 'peak':
-                    h = np.array(df['h_peak'])
+                    h = h_peak
                 else:
                     raise Exception('Invalid entry for which_h')
 
-                h_data_all.append((np.mean(h)))
-                x_data_all.append(np.mean(h_components))
+                # if averagescheme == 'timelast':
+                #     print('    plot_heuristic_scalings(): Averaging T components calculated at each timestep')
+                #     df = df.dropna(axis=0, how='any',
+                #                    subset=['h_peak', 'h_rms', 'h_components']).mean(axis=0)  # remove any rows with nans
+                #     h_components = T_components_of_h(case, df=df, data_path=data_path, t1=t1_ii,
+                #                                      load=load_ii, update=False, **postprocess_kwargs, **kwargs)
+                #
+                # elif averagescheme == 'timefirst':
+                #     print('    plot_heuristic_scalings(): Calculating T components using time-averaged profiles')
+                #     T_av, y = time_averaged_profile_from_df(df, 'T_av')
+                #     uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+                #     df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
+                #                                 **kwargs)
+                #     h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
+                #                                      update=False, **postprocess_kwargs, **kwargs)
+                #     df = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1_ii, load=True,
+                #                           data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
+                # else:
+                #     raise Exception('Averaging scheme not recognized/implemented')
+                # if which_h == 'rms':
+                #     h = np.array(df['h_rms'])
+                # elif which_h == 'peak':
+                #     h = np.array(df['h_peak'])
+
+                # h_data_all.append((np.mean(h)))
+                # x_data_all.append(np.mean(h_components))
+
+                h_data_all.append(h)
+                x_data_all.append(x)
                 if cbar == 'eta':
                     c_data_all.append(float(eta_str))
                 elif cbar == 'regime':
                     c_data_all.append(regime_to_digital(ii, jj, regime_grid=regime_grid, regime_names=regime_names))
-    x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
-    print('x_data: min', np.min(x_data), 'max', np.max(x_data), '(n =', len(x_data), ')')
-    expon, const = fit_log(x_data, h_data, weights=None, **kwargs)
-    xprime = np.linspace(np.min(x_data), np.max(x_data))
-    h_fit = const * np.array(x_data) ** expon
-    print('(data, fit)', [(da, fi) for (da, fi) in zip(h_data, h_fit)])
+
+    if twocomponent:
+        x0 = [a[0] for a in x_data_all]
+        x1 = [a[1] for a in x_data_all]
+        h_data = h_data_all
+        expon, const = fit_2log(x=x0, y=x1, h=h_data_all)
+        h_fit = const * np.array(x0) ** expon[0] * np.array(x1) ** expon[1]
+
+    else:
+        x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
+        print('x_data: min', np.min(x_data), 'max', np.max(x_data), '(n =', len(x_data), ')')
+        expon, const = fit_log(x_data, h_data, weights=None, **kwargs)
+        xprime = np.linspace(np.min(x_data), np.max(x_data))
+        h_fit = const * np.array(x_data) ** expon
+        print('(data, fit)', [(da, fi) for (da, fi) in zip(h_data, h_fit)])
     if not cbar:
         c = 'k'
         vmin, vmax = None, None
@@ -2678,7 +2730,10 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
         c = [q for _, q in sorted(zip(x_data_all, c_data_all))]
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
-    title = 'Fit to h = ({:.2e}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
+    if twocomponent:
+        title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(expon[0]) + r' $\Delta \eta' + '^{:.3f}'.format(expon[1])
+    else:
+        title = 'Fit to h = ({:.2f}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
     ax.set_title(title, fontsize=labelsize)
     ax.set_xscale('log')
     ax.set_yscale('log')

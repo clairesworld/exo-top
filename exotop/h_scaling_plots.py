@@ -12,31 +12,31 @@ load = True #load_grid
 
 # try h scalings to two-component power law for chaotic
 
-_ = sc.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_xs=('Ra_i', 'eta'),
-                 include_regimes=['chaotic'], save=True, fname='h_Ra-eta_chaotic_timeavg', labelsize=16, legend=True,
-                 title=r'fit to C Ra$^m \Delta\eta^n$', xlabel=r'Ra$_i$', ylabel='dynamic topography',
-                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-                 show_isoviscous=False, ylim=(5e-3, 3e-2), xlim=(1e7, 3e8),  postprocess_kwargs=postprocess_kwargs,
-                 regime_grid=regime_grid_td)
-
-# try h scalings with heuristic all chaotic cases
-
-_ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='h_components',
-                 include_regimes=['chaotic'], save=True, fname='h_T_chaotic_timeavg', labelsize=16, legend=True,
-                 xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', title='',
-                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                 regime_grid=regime_grid_td)
-
-_ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timelast', p_dimensionals=None, which_x='h_components',
-                 include_regimes=['chaotic'], save=True, fname='h_T_chaotic', labelsize=16, legend=True,
-                 xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', title='',
-                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                 regime_grid=regime_grid_td)
+# _ = sc.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+#                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_xs=('Ra_i', 'eta'),
+#                  include_regimes=['chaotic'], save=True, fname='h_Ra-eta_chaotic_timeavg', labelsize=16, legend=True,
+#                  title=r'fit to C Ra$^m \Delta\eta^n$', xlabel=r'Ra$_i$', ylabel='dynamic topography',
+#                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+#                  show_isoviscous=False, ylim=(5e-3, 3e-2), xlim=(1e7, 3e8),  postprocess_kwargs=postprocess_kwargs,
+#                  regime_grid=regime_grid_td)
+#
+# # try h scalings with heuristic all chaotic cases
+#
+# _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+#                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='h_components',
+#                  include_regimes=['chaotic'], save=True, fname='h_T_chaotic_timeavg', labelsize=16, legend=True,
+#                  xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', title='',
+#                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+#                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+#                  regime_grid=regime_grid_td)
+#
+# _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+#                  fig_path=fig_path, averagescheme='timelast', p_dimensionals=None, which_x='h_components',
+#                  include_regimes=['chaotic'], save=True, fname='h_T_chaotic', labelsize=16, legend=True,
+#                  xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography', title='',
+#                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+#                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+#                  regime_grid=regime_grid_td)
 
 _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                  fig_path=fig_path, averagescheme=None, p_dimensionals=None, which_x='h_components',
