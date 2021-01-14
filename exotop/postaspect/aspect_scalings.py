@@ -2564,11 +2564,10 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
 
 def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', verbose=False, data_path=data_path_bullard,
                      fend='.pkl', **kwargs):
-    # for these time-average ones 'auto' counts as reprocess
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     print('load pickleio', load)
-    if load is not True:
+    if load is False:
         dat = post.Aspect_Data(directory=case_path, verbose=verbose,
                                read_statistics=False, read_parameters=False)
         dat.read_times(verbose=verbose)
