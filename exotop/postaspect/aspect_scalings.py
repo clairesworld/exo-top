@@ -901,7 +901,7 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=da
         df1 = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs)
     else:
         # use each xy point (y=h) for fitting
-        pass
+        df1 = df
     x = getx_fromdf(Ra, eta, df=df1, case=case, which_x=which_x, averagescheme=averagescheme, data_path=data_path_bullard,
                     t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
