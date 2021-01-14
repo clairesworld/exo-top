@@ -1074,7 +1074,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
-              save=True, fname='h',
+              save=True, fname='h', legend=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False,
@@ -1162,10 +1162,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         for key in quants.keys():
             err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
         ax.errorbar(quants[which_x][:, 1], quants['h_peak'][:, 1], yerr=err['h_peak'], xerr=err[which_x],
-                    elinewidth=0.5,
+                    elinewidth=0.5, label='h peak, data',
                     fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
         ax.errorbar(quants[which_x][:, 1], quants['h_rms'][:, 1], yerr=err['h_rms'], xerr=err[which_x], elinewidth=0.5,
-                    fmt='o', c=c_rms, capsize=5)
+                    fmt='o', c=c_rms, capsize=5, label='h rms, data')
     except TypeError:  # no cases in given regimes as quants is dict of None
         pass
 
@@ -1194,6 +1194,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     ax.set_ylabel(ylabel, fontsize=labelsize)
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_title(title, fontsize=labelsize)
+    if legend:
+        ax.legend()
 
     if p_dimensionals is not None:
         ax2 = ax.twinx()
