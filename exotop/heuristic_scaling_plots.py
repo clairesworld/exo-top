@@ -10,6 +10,13 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
 load = True #load_grid
 
+const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
+                                  end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
+                                  postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
+                                  ylim=[4e-3, 4e-2], which_x=['Ra_i_eff'], which_h='rms', data_path=data_path, save=True,
+                                  fname='fit-1-Raeff-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
+                                  intercept=False, fig_fmt=fig_fmt)
+
 # sc.plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path, fig_path=fig_path, load_grid=load,
 #                        averagescheme='timefirst', which_x=('Ra', 'eta'), regime_grid=regime_grid_td, include_regimes=['chaotic'],
 #                         save=True, fname='fit-grid', labelsize=16, fig_fmt=fig_fmt, t1_grid=t1_grid, end_grid=end_grid,
