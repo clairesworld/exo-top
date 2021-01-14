@@ -799,7 +799,6 @@ class Aspect_Data():
     def T_components(self, n=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
                      uv_mag_av=None, d_m=1, dT_m=1, y=None,
                      verbose=False, **kwargs):
-        print('dat.T_components, y', y)
         if n is None:
             n = self.final_step()
         if y is None:
