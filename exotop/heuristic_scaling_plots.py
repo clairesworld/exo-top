@@ -13,7 +13,7 @@ load = True #load_grid
 const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
                                   end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
                                   postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
-                                  ylim=[4e-3, 4e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path, save=True,
+                                  ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path, save=True,
                                   fname='fit-1-Raeff-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
                                   intercept=False, fig_fmt=fig_fmt)
 
