@@ -2022,8 +2022,8 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
                                    intercept=False)
 
     # get fitted h values for contours
-    Ra = [float(r) for r in Ra_ls]
-    eta = [float(e) for e in eta_ls]
+    Ra = np.array([float(r) for r in Ra_ls])
+    eta = np.array([float(e) for e in eta_ls])
     Rv, ev = np.meshgrid(Ra, eta)
     idx = regime_grid == include_regimes
     Ra_r = np.logspace(np.log10(Rv[idx].min()), np.log10(Rv[idx].max()))
@@ -2039,6 +2039,14 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
     X2, Y2 = np.meshgrid(np.logspace(np.log10(xlim2[0]), np.log10(xlim2[1])),
                          np.logspace(np.log10(ylim2[0]), np.log10(ylim2[1])))
 
+    print('X min', X.min())
+    print('Y min', Y.min())
+
+    print('xlim for norm', xlim)
+    print('ylim for norm', ylim)
+
+    print('X2 min', X2.min())
+    print('Y2 min', Y2.min())
     CS = ax.contour(X2, Y2, H, nlevels_contour, cmap=cmap_contours)
     ax.clabel(CS, inline=1, fontsize=labelsize)
 
