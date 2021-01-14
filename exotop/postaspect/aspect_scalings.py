@@ -2026,35 +2026,39 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
     eta = np.array([float(e) for e in eta_ls])
     Rv, ev = np.meshgrid(Ra, eta)
     idx = regime_grid == include_regimes
-    Ra_r = np.logspace(np.log10(Rv[idx].min()), np.log10(Rv[idx].max()))
-    eta_r = np.logspace(np.log10(ev[idx].min()), np.log10(ev[idx].max()))
+    Ra_r = np.logspace(np.log10(Rv[idx].min()), np.log10(Rv[idx].max()), endpoint=True)  # in the regime
+    eta_r = np.logspace(np.log10(ev[idx].min()), np.log10(ev[idx].max()), endpoint=True)
     X, Y = np.meshgrid(Ra_r, eta_r)
     H = const * X**expon[0] * Y**expon[1]
+
+    print('X lim original, raw Ra', X.min(), X.max())
+    print('Y lim original, raw eta', Y.min(), Y.max())
 
     # normalize to axis limits
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
 
-    xlim2 = [xlim[0] + (xlim[1] - xlim[0]) * x for x in np.log10(np.array([Ra.min(), Ra.max()]))]
-    ylim2 = [ylim[0] + (ylim[1] - ylim[0]) * x for x in np.log10(np.array([eta.min(), eta.max()]))]
-    X2, Y2 = np.meshgrid(np.linspace(np.log10(xlim2[0]), np.log10(xlim2[1])),
-                         np.linspace(np.log10(ylim2[0]), np.log10(ylim2[1])))
+    print('xlim to norm, in axis unis', xlim)
+    print('ylim to norm, in axis units', ylim)
+    print('want to normalize entire logRa, logeta range to axis units (so even in log incremets). H is already log-spaced')
 
+    logRa = np.log10(Ra)
+    logeta = np.log10(eta)
 
-    # xlim2 = np.log10(np.array([Ra.min(), Ra.max()])) - xlim[0] / (xlim[1] - xlim[0])
-    # ylim2 = np.log10(np.array([eta.min(), eta.max()])) - ylim[0] / (ylim[1] - ylim[0])
+    logRa2 = xlim.min() + np.ptp(xlim)*logRa
+    logeta2 = ylim.min() + np.ptp(ylim)*logeta
 
-    # X2, Y2 = np.meshgrid(np.logspace(np.log10(xlim2[0]), np.log10(xlim2[1])),
-    #                      np.logspace(np.log10(ylim2[0]), np.log10(ylim2[1])))
+    print('normalised log Ra range, should equal xlim', logRa2.min(), logRa2.max())
+    print('normalised log eta range, should equal ylim', logeta2.min(), logeta2.max())
 
-    print('X min original', X.min())
-    print('Y min original', Y.min())
+    logRv2, logev2 = np.meshgrid(logRa2, logeta2)
+    logRa2_r = np.linspace(logRv2[idx].min(), logRv2[idx].max())  # in the regime
+    logeta2_r = np.linspace(logev2[idx].min(), logev2[idx].max())
+    X2, Y2 = np.meshgrid(logRa2_r, logeta2_r)
 
-    print('xlim for norm', xlim)
-    print('ylim for norm', ylim)
+    print('X lim corresponding to axis units', X2.min(), X2.max())
+    print('Y lim corresponding to axis units', Y2.min(), Y2.max())
 
-    print('xlim2', xlim2)
-    print('ylim2', ylim2)
 
     CS = ax.contour(X2, Y2, H, nlevels_contour, cmap=cmap_contours)
     ax.clabel(CS, inline=1, fontsize=8)
