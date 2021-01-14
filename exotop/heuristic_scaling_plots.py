@@ -16,28 +16,28 @@ sc.plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path, fig_path=fig_pat
                         # cticklabels=None, cticks=None,
                         title='', lognorm=False, log=False, clabel=r'$h_{rms}$', postprocess_kwargs=postprocess_kwargs,
                          nlevels_contour=10, cmap='Greys_r', cmap_contours='spring')
-
-const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
-                                  end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
-                                  postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
-                                  ylim=[4e-3, 4e-2], which_x=('Ra_i_eff', 'eta'), which_h='rms', data_path=data_path, save=True,
-                                  fname='fit-power-Raeff-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
-                                  intercept=False, fig_fmt=fig_fmt)
-
-const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
-                                  end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
-                                  postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
-                                  ylim=[4e-3, 4e-2], which_x=('Ra_i', 'eta'), which_h='rms', data_path=data_path, save=True,
-                                  fname='fit-power-Rai-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
-                                  intercept=False, fig_fmt=fig_fmt)
-
-const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
-                                  end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
-                                  postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
-                                  ylim=[4e-3, 4e-2], which_x=('Ra', 'eta'), which_h='rms', data_path=data_path, save=True,
-                                  fname='fit-power-Ra-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
-                                  intercept=False, fig_fmt=fig_fmt)
-print('fit parameters:', const, expon)
+#
+# const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
+#                                   end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
+#                                   postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
+#                                   ylim=[4e-3, 4e-2], which_x=('Ra_i_eff', 'eta'), which_h='rms', data_path=data_path, save=True,
+#                                   fname='fit-power-Raeff-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
+#                                   intercept=False, fig_fmt=fig_fmt)
+#
+# const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
+#                                   end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
+#                                   postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
+#                                   ylim=[4e-3, 4e-2], which_x=('Ra_i', 'eta'), which_h='rms', data_path=data_path, save=True,
+#                                   fname='fit-power-Rai-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
+#                                   intercept=False, fig_fmt=fig_fmt)
+#
+# const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
+#                                   end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
+#                                   postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
+#                                   ylim=[4e-3, 4e-2], which_x=('Ra', 'eta'), which_h='rms', data_path=data_path, save=True,
+#                                   fname='fit-power-Ra-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
+#                                   intercept=False, fig_fmt=fig_fmt)
+# print('fit parameters:', const, expon)
 
 # heuristic scalings master
 

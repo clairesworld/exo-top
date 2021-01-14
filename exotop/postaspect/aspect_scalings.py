@@ -2013,27 +2013,34 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
                         vmin=vmin, vmax=vmax, save=False, labelsize=16,  t1_grid=t1_grid, end=end_grid, cticklabels=cticklabels,
                         cticks=cticks, title=title, lognorm=False, log=False, clabel=clabel, overplot_h=False, which_h=which_h,  **kwargs)
 
-    print('xlim', ax.get_xlim())
-    print('ylim', ax.get_ylim())
     # # get fit things
-    # const, expon = plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid, t1_grid=t1_grid, load_grid=load_grid,
-    #                                end_grid=end_grid, literature_file=None, legend=False, averagescheme=averagescheme,
-    #                                postprocess_kwargs=postprocess_kwargs,
-    #                                which_h=which_h, which_x=which_x, data_path=data_path,
-    #                                save=False, cbar=None, include_regimes=include_regimes,
-    #                                intercept=False)
-    #
-    # # add contours
-    # Ra = [float(r) for r in Ra_ls]
-    # eta = [float(e) for e in eta_ls]
-    # Rv, ev = np.meshgrid(Ra, eta)
-    # idx = regime_grid == include_regimes
-    # Ra = np.linspace(Rv[idx].min(), Rv[idx].max())
-    # eta = np.linspace(ev[idx].min(), ev[idx].max())
-    # X, Y = np.meshgrid(Ra, eta)
-    # H = const * X**expon[0] * Y**expon[1]
-    # CS = ax.contour(X, Y, H, nlevels_contour, cmap=cmap_contours)
-    # ax.clabel(CS, inline=1, fontsize=labelsize)
+    const, expon = plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid, t1_grid=t1_grid, load_grid=load_grid,
+                                   end_grid=end_grid, literature_file=None, legend=False, averagescheme=averagescheme,
+                                   postprocess_kwargs=postprocess_kwargs,
+                                   which_h=which_h, which_x=which_x, data_path=data_path,
+                                   save=False, cbar=None, include_regimes=include_regimes,
+                                   intercept=False)
+
+    # get fitted h values for contours
+    Ra = [float(r) for r in Ra_ls]
+    eta = [float(e) for e in eta_ls]
+    Rv, ev = np.meshgrid(Ra, eta)
+    idx = regime_grid == include_regimes
+    Ra = np.logspace(np.log10(Rv[idx].min()), np.log10(Rv[idx].max()))
+    eta = np.logspace(np.log10(ev[idx].min()), np.log10(ev[idx].max()))
+    X, Y = np.meshgrid(Ra, eta)
+    H = const * X**expon[0] * Y**expon[1]
+
+    # normalize to axis limits
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+    xlim2 = xlim - xlim[0] / (xlim[1] - xlim[0])
+    ylim2 = ylim - ylim[0] / (ylim[1] - ylim[0])
+    X2, Y2 = np.meshgrid(np.logspace(np.log10(xlim2[0]), np.log10(xlim2[1])),
+                         np.logspace(np.log10(ylim2[0]), np.log10(ylim2[1])))
+
+    CS = ax.contour(X2, Y2, H, nlevels_contour, cmap=cmap_contours)
+    ax.clabel(CS, inline=1, fontsize=labelsize)
 
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt, tight_layout=False)
