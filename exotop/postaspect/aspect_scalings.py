@@ -527,7 +527,7 @@ def h_at_ts(case, ts=None, **kwargs):
     return h_params_n
 
 
-def h_timeaverage(case, ts0, tsf=1e50):
+def h_timeaverage(case, ts0, tsf=1e50, **kwargs):
     h_params = {}
     h_all = []
     flag = True
@@ -1993,6 +1993,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
 def get_h_average(Ra, eta, which_h='rms', end=None, data_path=data_path_bullard, load=True, **kwargs):
     case = 'Ra' + Ra + '-eta' + eta + end
+    print('load', load)
     rms, peak = plot_geth(case=case, averagescheme='timefirst', data_path=data_path, load=load, **kwargs)
     if which_h=='rms':
         return rms
