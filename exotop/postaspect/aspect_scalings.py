@@ -1009,21 +1009,18 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     try:
         for key in quants.keys():
             err[key] = np.array([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
-        labels = ['h_peak, data', 'h_rms, data']
         for jj, z in enumerate(z_vec):
             # get subset of points with this z-value
             ind = np.nonzero(z_vec == z)[0]
-            if ii > 1:
-                labels = [None, None]
             ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1],
                         yerr=err['h_peak'].T[ind].T,
                         xerr=err[which_xs[0]].T[ind].T,
                         elinewidth=0.5, fmt='d', mfc=c_list[jj], c=c_list[jj], capsize=5, alpha=0.5,
-                        markeredgecolor=highlight_colour, label=labels[0])
+                        markeredgecolor=highlight_colour)
             ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_rms'][ind, 1],
                         yerr=err['h_rms'].T[ind].T,
                         xerr=err[which_xs[0]].T[ind].T,
-                        elinewidth=0.5, fmt='o', mfc=c_list[jj], c=c_list[jj], capsize=5, label=labels[1])
+                        elinewidth=0.5, fmt='o', mfc=c_list[jj], c=c_list[jj], capsize=5)
 
     except TypeError:  # no cases in given regimes
         pass
@@ -1048,7 +1045,10 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     if xlim is not None:
         ax.set_xlim(xlim)
     if legend:
-        ax.legend()
+        leg = ax.legend(handles=[ax.scatter([],[], marker='d', c=c_list[jj], visible=False),
+                                 ax.scatter([],[], marker='o', c=c_list[jj], visible=False)],
+                        labels=['h_peak, data', 'h rms data'])
+        ax.add_artist(leg)
     if cbar:
         dum = ax.scatter(z_vec, z_vec, c=z_vec, cmap=cmap, vmin=vmin, vmax=vmax, visible=False, zorder=0,
                          norm=LogNorm())
