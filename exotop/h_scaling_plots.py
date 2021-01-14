@@ -22,7 +22,7 @@ load = True #load_grid
 
 
 _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i',
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i', sigma=2,
                  include_regimes=['chaotic'], save=True, fname='h_Rai_chaotic_timeavg', labelsize=16, legend=True,
                  xlabel=r'Ra$_i$', ylabel='dynamic topography',
                  title=r'fit to CRa$_i^n$, averaging time first',
@@ -31,7 +31,7 @@ _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_
                  regime_grid=regime_grid_td)
 
 _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff', sigma=2,
                  include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
                  xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
                  title=r'fit to CRa$_{i,eff}^n$, averaging time first',

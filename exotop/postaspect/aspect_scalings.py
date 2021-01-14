@@ -986,7 +986,7 @@ def plot_geth(case=None, averagescheme=None, data_path=data_path_bullard, return
 def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
                          fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
                          fig_fmt='.png', which_xs=None, include_regimes=None, regime_grid=None, legend=False,
-                         save=True, fname='h', clabel=None, cbar=True, clabelpad=17,
+                         save=True, fname='h', clabel=None, cbar=True, clabelpad=17, sigma=1,
                          labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', cmap='winter',
                          fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, vmin=None, vmax=None,
                          fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs={}, regime_names=None, **kwargs):
@@ -1030,7 +1030,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                 yx_rms_all.append((h_rms, x))
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all,
                                                         **{key: value for (key, value) in zip(which_xs, x_all)}},
-                                              keys=quants.keys(), plot=False)
+                                              keys=quants.keys(), sigma=sigma, plot=False)
                 for key in quants.keys():
                     try:
                         quants[key] = np.vstack((quants[key], qdict[key]))
@@ -1110,7 +1110,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
-              save=True, fname='h', legend=False,
+              save=True, fname='h', legend=False, sigma=1,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False,
@@ -1150,7 +1150,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 yx_peak_all.append((h_peak, x))
                 yx_rms_all.append((h_rms, x))
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
-                                              keys=quants.keys(), plot=False, sigma=2)
+                                              keys=quants.keys(), plot=False, sigma=sigma)
                 for key in quants.keys():
                     try:
                         quants[key] = np.vstack((quants[key], qdict[key]))
@@ -2736,8 +2736,10 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     ax.set_xlabel('Data', fontsize=labelsize)
     if twocomponent:
         title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])
-    else:
+    elif which_x == 'h_components':
         title = 'Fit to h = ({:.2f}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
+    elif 'Ra' in which_x:
+        title = 'Fit to h = ({:.2f}'.format(const) + ') Ra^{:.3f}'.format(expon)
     ax.set_title(title, fontsize=labelsize)
     ax.set_xscale('log')
     ax.set_yscale('log')
