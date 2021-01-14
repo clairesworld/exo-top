@@ -10,7 +10,7 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
 load = True #load_grid
 
-sc.plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path, fig_path=fig_path, load_grid=load_grid,
+sc.plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path, fig_path=fig_path, load_grid=load,
                        averagescheme='timefirst', which_x=('Ra', 'eta'), regime_grid=regime_grid_td, include_regimes=['chaotic'],
                         save=True, fname='fit-grid', labelsize=16, fig_fmt=fig_fmt, t1_grid=t1_grid, end_grid=end_grid,
                         # cticklabels=None, cticks=None,
