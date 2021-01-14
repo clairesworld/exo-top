@@ -867,7 +867,10 @@ def plot_getx(Ra, eta, case=None, df=None, which_x=None, averagescheme=None, dat
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     if 'h_components' in which_x:
-        missing = (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any())
+        try:
+            missing = (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any())
+        except AttributeError:
+            missing = (which_x not in df.keys()) or ((which_x in df.keys()) and np.isnan(df[which_x]).any())
         if averagescheme is None and not missing:
             x = df['h_components'].to_numpy()
         else:
@@ -983,7 +986,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                     n_sols_all.extend([len(df.index)] * len(df.index))
 
                 # extract x values for plotting
-                xs = [plot_getx(Ra[ii], etastr, case=case, df=df_plot, which_x=which_x, data_path=data_path_bullard,
+                xs = [plot_getx(Ra[ii], etastr, case=case, df=df_plot, which_x=which_x, data_path=data_path,
+                                averagescheme=averagescheme,
                                 t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, **kwargs) for which_x in
                       which_xs]
 
@@ -1139,8 +1143,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     n_sols_all.extend([len(df.index)] * len(df.index))
 
                 # extract x values for plotting
-                x = plot_getx(Ra[ii], etastr, case=case, df=df_plot, which_x=which_x, data_path=data_path_bullard,
-                              t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, **kwargs)
+                x = plot_getx(Ra[ii], etastr, case=case, df=df_plot, which_x=which_x, data_path=data_path,
+                              t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, averagescheme=averagescheme,**kwargs)
 
                 # get the y values, depending on averaging scheme
                 h_rms, h_peak = plot_geth(case=case, df=df, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
