@@ -2036,8 +2036,12 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
     ylim = ax.get_ylim()
     xlim2 = np.array([Ra.min(), Ra.max()]) - xlim[0] / (xlim[1] - xlim[0])
     ylim2 = np.array([eta.min(), eta.max()]) - ylim[0] / (ylim[1] - ylim[0])
+
     X2, Y2 = np.meshgrid(np.logspace(np.log10(xlim2[0]), np.log10(xlim2[1])),
                          np.logspace(np.log10(ylim2[0]), np.log10(ylim2[1])))
+
+    print('xlim2', xlim2)
+    print('ylim2', ylim2)
 
     print('X min', X.min())
     print('Y min', Y.min())
