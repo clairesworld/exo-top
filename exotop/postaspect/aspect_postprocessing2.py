@@ -791,25 +791,23 @@ class Aspect_Data():
             T_l = self.lid_base_temperature(self, **kwargs)
         return -(T_l - T_i)
     
-    def T_components(self, n=None, T=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
-                     uv_mag=None, uv_mag_av=None, d_m=1, dT_m=1,
+    def T_components(self, n=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
+                     uv_mag_av=None, d_m=1, dT_m=1, y=None,
                      verbose=False, **kwargs):
         if n is None:
             n = self.final_step()
         try:
-            x = self.x
             y = self.y
         except AttributeError:
+            if y is not None:
+                y = self.y
             self.read_mesh(n)  # mesh should be the same for all timesteps in steady state?
-            x = self.x
             y = self.y
         if T_av is None:
-            if T is None:
-                _, _, _, T = self.read_temperature(n, verbose=verbose)
+            x, y, _, T = self.read_temperature(n, verbose=verbose)
             T_av = horizontal_mean(T, x)
         if uv_mag_av is None:
-            if uv_mag is None:
-                _, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=verbose)
+            x, y, _, u, v, _, uv_mag = self.read_velocity(n, verbose=verbose)
             uv_mag_av = horizontal_mean(uv_mag, x)
         if d_m is None or dT_m is None:
             try:

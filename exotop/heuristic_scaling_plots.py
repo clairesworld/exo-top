@@ -10,12 +10,12 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 
 load = True #load_grid
 
-sc.plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path, fig_path=fig_path, load_grid=load,
-                       averagescheme='timefirst', which_x=('Ra', 'eta'), regime_grid=regime_grid_td, include_regimes=['chaotic'],
-                        save=True, fname='fit-grid', labelsize=16, fig_fmt=fig_fmt, t1_grid=t1_grid, end_grid=end_grid,
-                        # cticklabels=None, cticks=None,
-                        title='', lognorm=False, log=False, clabel=r'$h_{rms}$', postprocess_kwargs=postprocess_kwargs,
-                         nlevels_contour=10, cmap='Greys_r', cmap_contours='spring')
+# sc.plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path, fig_path=fig_path, load_grid=load,
+#                        averagescheme='timefirst', which_x=('Ra', 'eta'), regime_grid=regime_grid_td, include_regimes=['chaotic'],
+#                         save=True, fname='fit-grid', labelsize=16, fig_fmt=fig_fmt, t1_grid=t1_grid, end_grid=end_grid,
+#                         # cticklabels=None, cticks=None,
+#                         title='', lognorm=False, log=False, clabel=r'$h_{rms}$', postprocess_kwargs=postprocess_kwargs,
+#                          nlevels_contour=10, cmap='Greys_r', cmap_contours='spring')
 #
 # const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
 #                                   end_grid=end_grid, literature_file=None, legend=True, cmap='winter',

@@ -164,6 +164,18 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
     return df
 
 
+def pickleio_multi(case, psuffixes=None, postprocess_functions=None, t1=None, load=None, data_path=data_path_bullard,
+                   at_sol=True, postprocess_kwargs=None, **kwargs):
+    dfs = []
+    for ip, ps in enumerate(psuffixes):
+        df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1,
+                       load=load, data_path=data_path, at_sol=at_sol, postprocess_kwargs=postprocess_kwargs, **kwargs)
+        dfs.append(df1)
+    df = pd.concat(dfs, axis=1)
+    df = df.loc[:, ~df.columns.duplicated()]
+    return df
+
+
 def pickle_and_postprocess(cases, suffix, postprocess_functions, t1=0, **kwargs):
     for ii, case in enumerate(cases):
         pickleio(case, suffix, postprocess_functions, t1=t1, **kwargs)
@@ -586,17 +598,20 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
     return h_components
 
 
-def T_parameters_at_sol(case, n, dat=None, T_av=None, uv_mag_av=None, data_path=data_path_bullard, **kwargs):
+def T_parameters_at_sol(case, n, dat=None, T_av=None, uv_mag_av=None, y=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
                                read_statistics=False, read_parameters=False)
+    if y is None:
+        dat.read_mesh(n)
+        y = dat.y
     if uv_mag_av is None:
         x, y, z, u, v, _, uv_mag = dat.read_velocity(n, verbose=False)
         uv_mag_av = post.horizontal_mean(uv_mag, x)
     if T_av is None:
         x, y, z, T = dat.read_temperature(n, verbose=False)
         T_av = post.horizontal_mean(T, x)
-    d_n = dat.T_components(n, T_av=T_av, uv_mag_av=uv_mag_av, data_path=data_path,
+    d_n = dat.T_components(n, T_av=T_av, uv_mag_av=uv_mag_av, y=y, data_path=data_path,
                            **kwargs)  # dict of components just at solution n
     d_n['h_components'] = T_components_of_h(case, df=d_n, dat=dat, data_path=data_path, **kwargs)
 
@@ -864,16 +879,49 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
     return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
 
 
-def plot_getx(Ra, eta, case=None, df=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
-              t1=None, load=None, postprocess_kwargs=None, **kwargs):
+def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
+              t1=None, load=None, postprocess_kwargs=None, return_all=False, **kwargs):
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
+    psuffixes = []
+    postprocess_functions = []
+    if which_x in ['Ra_i', 'Ra_i_eff', 'h_components']:
+        psuffixes.append('_T')
+        postprocess_functions.append(T_parameters_at_sol)
+
+    df = pickleio_multi(case, psuffixes=psuffixes, postprocess_functions=postprocess_functions, t1=t1, load=load,
+                        data_path=data_path, at_sol=True, postprocess_kwargs=postprocess_kwargs, **kwargs)
+
+    if averagescheme == 'timelast':
+        df1 = df.mean(axis=0)
+    elif averagescheme == 'timefirst':
+        # load time-averages
+        T_av, y = time_averaged_profile_from_df(df, 'T_av')
+        uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+        df1 = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs, **kwargs)
+    else:
+        # use each xy point (y=h) for fitting
+        pass
+    x = getx_fromdf(Ra, eta, df=df1, case=case, which_x=which_x, averagescheme=averagescheme, data_path=data_path_bullard,
+                    t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
+
+    if return_all:
+        x_all = getx_fromdf(Ra, eta, df=df, case=case, which_x=which_x, averagescheme=averagescheme, data_path=data_path_bullard,
+                            t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
+        return x, x_all
+    else:
+        return x
+
+
+
+def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
+                t1=None, load=None, postprocess_kwargs=None, **kwargs):
     if 'h_components' in which_x:
         try:
             missing = (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any())
         except AttributeError:
             missing = (which_x not in df.keys()) or ((which_x in df.keys()) and np.isnan(df[which_x]).any())
-        if averagescheme is None and not missing:
+        if not missing:
             x = df['h_components'].to_numpy()
         else:
             if averagescheme == 'timelast':
@@ -881,7 +929,7 @@ def plot_getx(Ra, eta, case=None, df=None, which_x=None, averagescheme=None, dat
             elif averagescheme == 'timefirst':
                 print('    Calculating T components using time-averaged profiles')
             elif missing:
-                print('    plot_h_vs(): Calculating T components')
+                print('    Calculating T components')
             else:
                 print('    Unrecognized conditions: hoping for the best')
             x = T_components_of_h(case, df=df, data_path=data_path, t1=t1, load=load, **postprocess_kwargs, **kwargs)
@@ -900,26 +948,36 @@ def plot_getx(Ra, eta, case=None, df=None, which_x=None, averagescheme=None, dat
 
     else:
         raise Exception('Invalid variable for x-axis / not implemented: ' + which_x)
+
     return x
 
 
-def plot_geth(case=None, df=None, averagescheme=None, data_path=data_path_bullard,
+def plot_geth(case=None, averagescheme=None, data_path=data_path_bullard, return_all=False,
               t1=None, postprocess_kwargs=None, load=True, **kwargs):
     # get the y values, depending on averaging scheme
-    if averagescheme == 'timelast':
+
+    if averagescheme in ['timelast', 'timefirst']:
+        df = pickleio_multi(case, psuffixes=['_h_all'], postprocess_functions=[h_at_ts], t1=t1, load=load,
+                            data_path=data_path, at_sol=False, postprocess_kwargs=postprocess_kwargs, **kwargs)
         h_rms = df.h_rms.mean()
         h_peak = df.h_peak.mean()
-    elif averagescheme == 'timefirst':
-        # load time-averages
-        df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1, load=load,
-                                data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
-        h_rms = df_h.iloc[0].h_rms
-        h_peak = df_h.iloc[0].h_peak
+    # elif averagescheme == 'timefirst':
+    #     # load time-averages
+    #     df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1, load=load,
+    #                             data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
+    #     h_rms = df_h.iloc[0].h_rms
+    #     h_peak = df_h.iloc[0].h_peak
     else:
         # use each xy point (y=h) for fitting
+        df = pickleio_multi(case, psuffixes=['_h'], postprocess_functions=[h_at_ts], t1=t1, load=load,
+                            data_path=data_path, at_sol=True, postprocess_kwargs=postprocess_kwargs, **kwargs)
         h_rms = df.h_rms.to_numpy()
         h_peak = df.h_peak.to_numpy()
-    return h_rms, h_peak
+
+    if return_all:
+        return h_rms, h_peak, df.h_rms.to_numpy(), df.h_peak.to_numpy()
+    else:
+        return h_rms, h_peak
 
 
 def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
@@ -936,22 +994,12 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
         include_regimes = regime_names
     if clabel is None:
         clabel = which_xs[1]
-    psuffixes = []
-    postprocess_functions = []
-    at_sol = False
-    if ('Ra_i' in which_xs) or ('Ra_i_eff' in which_xs):  # load T stuff
-        psuffixes.append('_T')
-        at_sol = True
-        postprocess_functions.append(T_parameters_at_sol)
-    if averagescheme != 'timefirst':  # load all h
-        psuffixes.append('_h')
-        postprocess_functions.append(h_at_ts)
     if ax is None:
         fig = plt.figure()
         ax = plt.gca()
 
     quants = dict.fromkeys(['h_rms', 'h_peak', *which_xs])
-    yx_peak_all, yx_rms_all, n_sols_all = [], [], []
+    yx_peak_all, yx_rms_all = [], []
 
     # loop over cases
     for jj, etastr in enumerate(eta):
@@ -962,44 +1010,22 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                 load_ii = load_grid[jj][ii]
                 # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
-                # load outputs
-                dfs = []
-                for ip, ps in enumerate(psuffixes):
-                    df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
-                                   load=load_ii,
-                                   data_path=data_path, at_sol=at_sol, postprocess_kwargs=postprocess_kwargs, **kwargs)
-                    dfs.append(df1)
-                df = pd.concat(dfs, axis=1)
-                df = df.loc[:, ~df.columns.duplicated()]
-
-                if averagescheme == 'timelast':
-                    df_plot = df.mean(axis=0)
-                    n_sols_all.append(len(df.index))
-                elif averagescheme == 'timefirst':
-                    # load time-averages
-                    T_av, y = time_averaged_profile_from_df(df, 'T_av')
-                    uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-                    df_plot = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
-                                                  **kwargs)
-                    n_sols_all.append(1)
-                else:
-                    # use each xy point (y=h) for fitting
-                    df_plot = df
-                    n_sols_all.extend([len(df.index)] * len(df.index))
-
-                # extract x values for plotting
-                xs = [plot_getx(Ra[ii], etastr, case=case, df=df_plot, which_x=which_x, data_path=data_path,
-                                averagescheme=averagescheme,
+                # load x values for plotting
+                xs = [plot_getx(Ra[ii], etastr, case=case, which_x=which_x, data_path=data_path,
+                                averagescheme=averagescheme, return_all=True,
                                 t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, **kwargs) for which_x in
                       which_xs]
+                x = [a[0] for a in xs]
+                x_all = [a[1] for a in xs]
 
                 # get the y values, depending on averaging scheme
-                h_rms, h_peak = plot_geth(case=case, df=df, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
+                h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, data_path=data_path,
+                                          averagescheme=averagescheme, return_all=True,
                                           postprocess_kwargs=postprocess_kwargs, **kwargs)
                 # append to working
                 yx_peak_all.append((h_peak, xs))
                 yx_rms_all.append((h_rms, xs))
-                qdict = parameter_percentiles(case, df={'h_rms': h_rms, 'h_peak': h_peak,
+                qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all,
                                                         **{key: value for (key, value) in zip(which_xs, xs)}},
                                               keys=quants.keys(), plot=False)
                 for key in quants.keys():
@@ -1032,7 +1058,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
         pass
 
     if fit:
-        ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all),
+        ax = fit_cases_on_plot(yx_rms_all, ax,
                                c_list=colorize(np.log10(np.unique(z_vec)), cmap=cmap, vmin=vmin, vmax=vmax)[0],
                                labelsize=labelsize, multifit=True, cmap=cmap, **kwargs)
 
@@ -1093,22 +1119,12 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                                                                           (t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
-    if which_x in ['Ra_i', 'Ra_i_eff', 'h_components']:
-        psuffixes = ['_T', '_h']
-        at_sol = True
-        postprocess_functions = [T_parameters_at_sol, h_at_ts]
-    elif which_x == 'Ra':
-        psuffixes = ['_h_all']
-        at_sol = False
-        postprocess_functions = [h_at_ts]
-    else:
-        raise Exception('plot_h_vs(): Invalid variable for x-axis / not implemented')
     if ax is None:
         fig = plt.figure()
         ax = plt.gca()
 
     quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
-    yx_peak_all, yx_rms_all, n_sols_all = [], [], []
+    yx_peak_all, yx_rms_all = [], []
 
     # loop over cases
     for jj, etastr in enumerate(eta):
@@ -1119,37 +1135,12 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 load_ii = load_grid[jj][ii]
                 # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
-                # load outputs
-                dfs = []
-                for ip, ps in enumerate(psuffixes):
-                    df1 = pickleio(case, suffix=ps, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
-                                   load=load_ii,
-                                   data_path=data_path, at_sol=at_sol, postprocess_kwargs=postprocess_kwargs, **kwargs)
-                    dfs.append(df1)
-                df = pd.concat(dfs, axis=1)
-                df = df.loc[:, ~df.columns.duplicated()]
-
-                if averagescheme == 'timelast':
-                    df_plot = df.mean(axis=0)
-                    n_sols_all.append(len(df.index))
-                elif averagescheme == 'timefirst':
-                    # load time-averages
-                    T_av, y = time_averaged_profile_from_df(df, 'T_av')
-                    uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-                    df_plot = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
-                                                  **kwargs)
-                    n_sols_all.append(1)
-                else:
-                    # use each xy point (y=h) for fitting
-                    df_plot = df
-                    n_sols_all.extend([len(df.index)] * len(df.index))
-
                 # extract x values for plotting
-                x = plot_getx(Ra[ii], etastr, case=case, df=df_plot, which_x=which_x, data_path=data_path,
+                x = plot_getx(Ra[ii], etastr, case=case, which_x=which_x, data_path=data_path,
                               t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, averagescheme=averagescheme,**kwargs)
 
                 # get the y values, depending on averaging scheme
-                h_rms, h_peak = plot_geth(case=case, df=df, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
+                h_rms, h_peak = plot_geth(case=case, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
                                           postprocess_kwargs=postprocess_kwargs, **kwargs)
 
                 # append to working
@@ -1181,7 +1172,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             intercept = True
         else:
             intercept = False
-        ax = fit_cases_on_plot(yx_rms_all, ax, weights=1 / np.array(n_sols_all), c=c_rms, labelsize=labelsize,
+        ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize,
                                intercept=intercept, **kwargs)
 
     if show_isoviscous:
@@ -1236,10 +1227,14 @@ def nondimensionalise_h(h, p):
         raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to nondimensionalise')
 
 
-def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, weights=None, multifit=False, c_list=None,
+def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, multifit=False, c_list=None,
                       c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
+    try:
+        weights = [len(a[0]) for a in yx_all]
+    except TypeError:
+        weights = [1]*len(x)
     if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
         flatx = [item for sublist in x for item in sublist]
         flaty = [item for sublist in y for item in sublist]
@@ -1708,9 +1703,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
                     uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
                     df_av = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
                                                 **kwargs)
-                    # h_components = T_components_of_h(case, df=df_av, data_path=data_path, t1=t1_ii, load=load_ii,
-                    #                                  update=False, **postprocess_kwargs, **kwargs)
-
                     if 'Nu' in keys:
                         df_av['Nu'] = np.mean(df['Nu'])  # using average flux anyways so scheme doesn't matter
                     df = df_av
@@ -2031,37 +2023,16 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
     X, Y = np.meshgrid(Ra_r, eta_r)
     H = const * X**expon[0] * Y**expon[1]
 
-    print('X lim original, raw Ra', X.min(), X.max())
-    print('Y lim original, raw eta', Y.min(), Y.max())
-
     # normalize to axis limits
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
 
-    print('xlim to norm, in axis unis', xlim)
-    print('ylim to norm, in axis units', ylim)
-    print('want to normalize entire logRa, logeta range to axis units (so even in log incremets). H is already log-spaced')
-
-    logRa = np.log10(Ra)
-    logeta = np.log10(eta)
-
-    logRa2 = minmaxnorm(logRa, xlim[0], xlim[1])
-    logeta2 = minmaxnorm(logeta, ylim[0], ylim[1])
-
-    print('original logRa', logRa)
-    print('original logeta', logeta)
-
-    print('normalised log Ra range, should equal xlim', logRa2.min(), logRa2.max())
-    print('normalised log eta range, should equal ylim', logeta2.min(), logeta2.max())
-
+    logRa2 = minmaxnorm(np.log10(Ra), xlim[0], xlim[1])
+    logeta2 = minmaxnorm(np.log10(eta), ylim[0], ylim[1])
     logRv2, logev2 = np.meshgrid(logRa2, logeta2)
     logRa2_r = np.linspace(logRv2[idx].min(), logRv2[idx].max())  # in the regime
     logeta2_r = np.linspace(logev2[idx].min(), logev2[idx].max())
     X2, Y2 = np.meshgrid(logRa2_r, logeta2_r)
-
-    print('X lim corresponding to axis units', X2.min(), X2.max())
-    print('Y lim corresponding to axis units', Y2.min(), Y2.max())
-
 
     CS = ax.contour(X2, Y2, H, nlevels_contour, cmap=cmap_contours)
     ax.clabel(CS, inline=1, fontsize=8)
