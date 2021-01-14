@@ -109,5 +109,5 @@ def minmaxnorm(x, a=0, b=1):
     xmin = np.min(x)
     xmax = np.max(x)
     x = (x - xmin) / (xmax - xmin)  # norm to 0, 1
-    x = x * (b - a) + b  # scale to a, b
+    x = x * (b - a) + a  # scale to a, b
     return x
