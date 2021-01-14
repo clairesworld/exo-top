@@ -922,7 +922,10 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
         except AttributeError:
             missing = (which_x not in df.keys()) or ((which_x in df.keys()) and np.isnan(df[which_x]).any())
         if not missing:
-            x = df['h_components'].to_numpy()
+            try:
+                x = df['h_components'].to_numpy()
+            except AttributeError:  # if a float
+                x = df['h_components']
         else:
             if averagescheme == 'timelast':
                 print('    Averaging T components calcualted at each timestep')
