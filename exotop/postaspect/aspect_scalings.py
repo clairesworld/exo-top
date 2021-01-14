@@ -1018,18 +1018,18 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                                 averagescheme=averagescheme, return_all=True,
                                 t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, **kwargs) for which_x in
                       which_xs]
-                x = [a[0] for a in xs]
-                x_all = [a[1] for a in xs]
+                x = [a[0] for a in xs]  # returned value according to average scheme
+                x_all = [a[1] for a in xs]  # all data for getting errorbars
 
                 # get the y values, depending on averaging scheme
                 h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, data_path=data_path,
                                           averagescheme=averagescheme, return_all=True,
                                           postprocess_kwargs=postprocess_kwargs, **kwargs)
                 # append to working
-                yx_peak_all.append((h_peak, xs))
-                yx_rms_all.append((h_rms, xs))
+                yx_peak_all.append((h_peak, x))
+                yx_rms_all.append((h_rms, x))
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all,
-                                                        **{key: value for (key, value) in zip(which_xs, xs)}},
+                                                        **{key: value for (key, value) in zip(which_xs, x_all)}},
                                               keys=quants.keys(), plot=False)
                 for key in quants.keys():
                     try:
@@ -1139,17 +1139,17 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 # dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
                 # extract x values for plotting
-                x = plot_getx(Ra[ii], etastr, case=case, which_x=which_x, data_path=data_path,
+                x, x_all = plot_getx(Ra[ii], etastr, case=case, which_x=which_x, return_all=True, data_path=data_path,
                               t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, averagescheme=averagescheme,**kwargs)
 
                 # get the y values, depending on averaging scheme
-                h_rms, h_peak = plot_geth(case=case, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
+                h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, return_all=True, data_path=data_path, averagescheme=averagescheme,
                                           postprocess_kwargs=postprocess_kwargs, **kwargs)
 
                 # append to working
                 yx_peak_all.append((h_peak, x))
                 yx_rms_all.append((h_rms, x))
-                qdict = parameter_percentiles(case, df={'h_rms': h_rms, 'h_peak': h_peak, which_x: x},
+                qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
                                               keys=quants.keys(), plot=False)
                 for key in quants.keys():
                     try:

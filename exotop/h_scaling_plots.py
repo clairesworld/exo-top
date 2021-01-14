@@ -40,14 +40,14 @@ _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_
                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
                  regime_grid=regime_grid_td)
 
-_ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme=None, p_dimensionals=None, which_x='h_components',
-                 include_regimes=['chaotic'], save=True, fname='h_T_chaotic_all', labelsize=16, legend=True,
-                 xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
-                    title=r'fit to $C\alpha \delta_{rh} \Delta T_{rh}$, no time-averaging',
-                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                 regime_grid=regime_grid_td)
+# _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+#                  fig_path=fig_path, averagescheme=None, p_dimensionals=None, which_x='h_components',
+#                  include_regimes=['chaotic'], save=True, fname='h_T_chaotic_all', labelsize=16, legend=True,
+#                  xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
+#                     title=r'fit to $C\alpha \delta_{rh} \Delta T_{rh}$, no time-averaging',
+#                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+#                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+#                  regime_grid=regime_grid_td)
 
 # plot h scalings - with dT_m*delta*alpha
 
