@@ -107,7 +107,7 @@ class Aspect_Data():
             self.read_parameters(verbose=verbose)
         if read_statistics:
             self.read_statistics(verbose=verbose)
-        if verbose:
+        if verbose and read_parameters:
             self.print_summary()
 
     def read_mesh(self, n, verbose=True):
