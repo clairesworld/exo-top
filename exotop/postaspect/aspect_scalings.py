@@ -77,13 +77,12 @@ def reshape_inputs(Ra_ls, eta_ls, grids, defaults=None):
 
 
 def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=None, at_sol=True,
-             data_path=data_path_bullard, fend='.pkl', verbose=False, **kwargs):
+             data_path=data_path_bullard, fend='.pkl', **kwargs):
     # do pickling strategy. only saving processed data for runs in quasi-steady state (past their t1 value)
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     df = pd.DataFrame()
     dump_flag = False
-    dump_flag2 = False
     reprocess_flag = False
     t1_new = t1
 
@@ -100,9 +99,9 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
 
                 if load == 'auto':  # check for additional timesteps
                     if dat_new is None:
-                        dat_new = post.Aspect_Data(directory=case_path, verbose=verbose,
-                                                   read_statistics=False, read_parameters=False)
-                        dat_new.read_times(verbose=verbose)
+                        dat_new = post.Aspect_Data(directory=case_path,
+                                                   read_statistics=False, read_parameters=False, **kwargs)
+                        dat_new.read_times(**kwargs)
                     try:
                         if at_sol:
                             print('      Checking for new solutions...')
@@ -132,14 +131,14 @@ def pickleio(case, suffix, postprocess_functions, t1=0, load='auto', dat_new=Non
                 else:
                     raise Exception('load value not understood:', load, type(load))
                 reprocess_flag = True
-                dat_new = post.Aspect_Data(directory=case_path, verbose=verbose,
-                                           read_statistics=False, read_parameters=False)
-                dat_new.read_times(verbose=verbose)
+                dat_new = post.Aspect_Data(directory=case_path,
+                                           read_statistics=False, read_parameters=False, **kwargs)
+                dat_new.read_times(**kwargs)
 
             if reprocess_flag:
                 if not hasattr(dat_new, 'stats_time'):
-                    dat_new.read_times(verbose=verbose)
-                dat_new.read_stats_heatflux(verbose=verbose)
+                    dat_new.read_times(**kwargs)
+                dat_new.read_stats_heatflux(**kwargs)
                 if at_sol:
                     if not hasattr(dat_new, 'sol_files'):
                         dat_new.read_stats_sol_files()
@@ -328,18 +327,18 @@ def peak_and_rms(h):
     return np.max(h), np.sqrt(trapzmean(h ** 2))
 
 
-def time_averaged_profile(case, n0, nf, which='temperature', dat=None, data_path=data_path_bullard, verbose=False,
+def time_averaged_profile(case, n0, nf, which='temperature', dat=None, data_path=data_path_bullard,
                           **kwargs):
     " get time-averaged profile for T, u, v etc. "
     profs_time = []
     if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, verbose=False)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
     for n in range(n0, nf + 1):
         print('Loading', which, 'profile at n =', n)
         if which == 'temperature':
-            x, y, _, A = dat.read_temperature(n, verbose=verbose)
+            x, y, _, A = dat.read_temperature(n, **kwargs)
         elif which == 'velocity':
-            x, y, _, _, _, _, A = dat.read_velocity(n, verbose=verbose)
+            x, y, _, _, _, _, A = dat.read_velocity(n, **kwargs)
         else:
             raise Exception('Profile type not implemented')
         prof = post.horizontal_mean(A, x)
@@ -360,10 +359,10 @@ def time_averaged_profile_from_df(df, col):
     return av, y
 
 
-def read_evol(case, col, dat=None, data_path=data_path_bullard):
+def read_evol(case, col, dat=None, data_path=data_path_bullard, **kwargs):
     # return time, column i, (from statistics file)
     if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=True, verbose=False)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=True, **kwargs)
     return dat.stats_time, eval('dat.stats_' + col)
 
 
@@ -382,10 +381,13 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
     if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
-                               read_parameters=False)
-    dat.read_stats(verbose=False)
-    time = dat.stats_time
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False,
+                               read_parameters=False, **kwargs)
+    try:
+        time = dat.stats_time
+    except AttributeError:
+        dat.read_times(**kwargs)
+        time = dat.stats_time
     i_time = np.argmax(time >= t1)  # index of first timestep to process
 
     if i_time > 0:
@@ -490,12 +492,12 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
     if df_to_extend is None:
         df_to_extend = pd.DataFrame()
     if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
-                               read_parameters=False)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False,
+                               read_parameters=False, **kwargs)
     try:
         time = dat.stats_time
     except AttributeError:
-        dat.read_times(verbose=False)
+        dat.read_times(**kwargs)
     i_time = np.argmax(time > t1)  # index of first timestep to process (because argmax returns 1st occurrence of 1)
 
     if i_time > 0:
@@ -565,8 +567,8 @@ def h_timeaverage(case, ts0, tsf=1e50, **kwargs):
 
 def Nu_at_ts(case, ts=None, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=False,
-                               read_parameters=True)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False,
+                               read_parameters=True, **kwargs)
     N = dat.nusselt(k=1, **kwargs)
     return {'Nu': N[ts]}
 
@@ -600,16 +602,16 @@ def T_components_of_h(case, df=None, dat=None, psuffix='_T', data_path=data_path
 
 def T_parameters_at_sol(case, n, dat=None, T_av=None, uv_mag_av=None, y=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
-                               read_statistics=False, read_parameters=False)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/',
+                               read_statistics=False, read_parameters=False, **kwargs)
     if y is None:
         dat.read_mesh(n)
         y = dat.y
     if uv_mag_av is None:
-        x, y, z, u, v, _, uv_mag = dat.read_velocity(n, verbose=False)
+        x, y, z, u, v, _, uv_mag = dat.read_velocity(n)
         uv_mag_av = post.horizontal_mean(uv_mag, x)
     if T_av is None:
-        x, y, z, T = dat.read_temperature(n, verbose=False)
+        x, y, z, T = dat.read_temperature(n)
         T_av = post.horizontal_mean(T, x)
     d_n = dat.T_components(n, T_av=T_av, uv_mag_av=uv_mag_av, y=y, data_path=data_path,
                            **kwargs)  # dict of components just at solution n
@@ -1693,8 +1695,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
                 Ra_ii = float(Ra_var[ii])
                 # load data
                 if load_ii == 'auto':
-                    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
-                                           read_statistics=False)
+                    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/',
+                                           read_statistics=False, read_parameters=False, **kwargs)
                 else:
                     dat = None
                 dfs = []
@@ -1892,7 +1894,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 load_ii = load[ii]
             else:
                 load_ii = load
-            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
+            dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=True, **kwargs)
             if ii == ncases - 1:  # show x label in bottom row only
                 setxlabel = True
             else:
@@ -2184,8 +2186,8 @@ def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **k
 
 def surf_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
-                               read_statistics=False, read_parameters=False)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/',
+                               read_statistics=False, read_parameters=False, **kwargs)
     if n is None:
         n = dat.final_step()
 
@@ -2208,12 +2210,12 @@ def plot_velocity_profile(case, dat=None, n=None, xlabel='rms velocity', ylabel=
         fig, ax = plt.subplots(figsize=(4, 4))
 
     if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
-                               read_statistics=False, read_parameters=False)
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/',
+                               read_statistics=False, read_parameters=False, **kwargs)
     if n is None:
         n = dat.final_step()
 
-    x, y, _, u, v, _, mag = dat.read_velocity(n=n, verbose=False)
+    x, y, _, u, v, _, mag = dat.read_velocity(n)
     mag_av = post.horizontal_mean(mag, x)
     fig, ax = dat.plot_profile(mag_av, n=n, y=y, label='', ylabel=None, fig=fig, ax=ax, **kwargs)
     ax.set_xlabel(xlabel, fontsize=labelsize)
@@ -2424,8 +2426,8 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
 
                 # load data
                 if load_ii == 'auto':
-                    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False,
-                                           read_statistics=False)
+                    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/',
+                                           read_statistics=False, read_parameters=False, **kwargs)
                 else:
                     dat = None
                 dfs = []
@@ -2578,14 +2580,14 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
                                  data_path=data_path, at_sol=True, load=load, **kwargs)
 
 
-def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', verbose=False, data_path=data_path_bullard,
+def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', data_path=data_path_bullard,
                      fend='.pkl', **kwargs):
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     if not load:
-        dat = post.Aspect_Data(directory=case_path, verbose=verbose,
-                               read_statistics=False, read_parameters=False)
-        dat.read_times(verbose=verbose)
+        dat = post.Aspect_Data(directory=case_path,
+                               read_statistics=False, read_parameters=False, **kwargs)
+        dat.read_times(**kwargs)
         time = dat.stats_time
         i_time = np.argmax(time >= t1)  # index of first timestep to process
         ts0 = i_time

@@ -84,7 +84,7 @@ def horizontal_mean(A, x, axis=None):
         return int_x.T[0]
 
 class Aspect_Data():
-    def __init__(self, directory, read_parameters=True, read_statistics=False, verbose=True):
+    def __init__(self, directory, read_parameters=True, read_statistics=False, verbose=False, **kwargs):
         self.directory = directory
         
         xdmf_filename = directory + "solution.xdmf"
@@ -212,8 +212,8 @@ class Aspect_Data():
 
         return times, snames
 
-    def final_step(self):
-        str_f = self.get_solution_filenames(verbose=False)[1][-1]
+    def final_step(self, verbose=True):
+        str_f = self.get_solution_filenames(verbose=verbose)[1][-1]
         return int(re.search(r'\d+', str_f).group(0))
         
     def read_temperature(self, n, verbose=True):
@@ -339,7 +339,7 @@ class Aspect_Data():
         # print("dask.dataframe took %s seconds" % (time.time() - start_time))
 
 
-    def read_times(self, verbose=True):
+    def read_times(self, verbose=True, **kwargs):
         filename = self.directory + "statistics"
         if verbose:
             print("Reading times from", filename)
@@ -348,7 +348,7 @@ class Aspect_Data():
         self.stats_time = data[:,1]
 
 
-    def read_stats_heatflux(self, verbose=True, col=19):
+    def read_stats_heatflux(self, verbose=-True, col=19, **kwargs):
         filename = self.directory + "statistics"
         if verbose:
             print("Reading heat flux statistics from", filename)
@@ -799,18 +799,22 @@ class Aspect_Data():
     def T_components(self, n=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
                      uv_mag_av=None, d_m=1, dT_m=1, y=None,
                      verbose=False, **kwargs):
-        if n is None:
-            n = self.final_step()
         if y is None:
             try:
                 y = self.y
             except AttributeError:
+                if n is None:
+                    n = self.final_step()
                 self.read_mesh(n)  # mesh should be the same for all timesteps in steady state?
                 y = self.y
         if T_av is None:
+            if n is None:
+                n = self.final_step()
             x, y, _, T = self.read_temperature(n, verbose=verbose)
             T_av = horizontal_mean(T, x)
         if uv_mag_av is None:
+            if n is None:
+                n = self.final_step()
             x, y, _, u, v, _, uv_mag = self.read_velocity(n, verbose=verbose)
             uv_mag_av = horizontal_mean(uv_mag, x)
         if d_m is None or dT_m is None:
