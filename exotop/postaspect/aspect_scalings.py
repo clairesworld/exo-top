@@ -1034,6 +1034,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                       which_xs]
                 x = [a[0] for a in xs]  # returned value according to average scheme
                 x_all = [a[1] for a in xs]  # all data for getting errorbars
+                print('x_all', x_all)
+                print('x_all[0]', x_all[0])
 
                 # get the y values, depending on averaging scheme
                 h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, data_path=data_path,
