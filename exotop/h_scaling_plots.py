@@ -21,14 +21,14 @@ load = True #load_grid
 #                  regime_grid=regime_grid_td)
 
 #
-# _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-#                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i', sigma=2,
-#                  include_regimes=['chaotic'], save=True, fname='h_Rai_chaotic_timeavg', labelsize=16, legend=True,
-#                  xlabel=r'Ra$_i$', ylabel='dynamic topography',
-#                  title=r'fit to CRa$_i^n$, averaging time first',
-#                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-#                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-#                  regime_grid=regime_grid_td, verbose=True)
+_ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i', sigma=2,
+                 include_regimes=['chaotic'], save=True, fname='h_Rai_chaotic_timeavg', labelsize=16, legend=True,
+                 xlabel=r'Ra$_i$', ylabel='dynamic topography',
+                 title=r'fit to CRa$_i^n$, averaging time first',
+                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                 regime_grid=regime_grid_td, verbose=True)
 
 _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff', sigma=2,

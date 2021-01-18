@@ -395,7 +395,7 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
             try:
                 sol_files = dat.sol_files
             except AttributeError:
-                sol_files = dat.read_stats_sol_files()
+                sol_files = dat.read_stats_sol_files(**kwargs)
         sols_in_time = sol_files[i_time:]
         n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
         n_ts = n_indices + i_time

@@ -375,11 +375,11 @@ class Aspect_Data():
         return files
 
 
-    def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, verbose=False, i_vis=20):
+    def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, i_vis=20, **kwargs):
         # input solution file and get first timestep - for n or all solutions
         # n is the number in the solution filename
         if sol_files is None:
-            sol_files = self.read_stats_sol_files(col_vis=i_vis)
+            sol_files = self.read_stats_sol_files(col_vis=i_vis, **kwargs)
         u, indices = np.unique(sol_files, return_index=True)
         if return_indices:
             if n is None:
@@ -390,7 +390,7 @@ class Aspect_Data():
             try:
                 time = self.stats_time
             except AttributeError as e:
-                self.read_times(verbose=verbose)
+                self.read_times(**kwargs)
                 time = self.stats_time
             if n is None:
                 return time[indices]
@@ -517,6 +517,7 @@ class Aspect_Data():
     def ubl_thickness(self, n=None, T_l=None, T_i=None, k=1, X_extent=8, ts=None, **kwargs):
         # get upper boundary layer thickness required to produce surface heat flux (F=Nu) between T_i and T_l
         # corresponds to rheological sublayer delta_rh in Solomatov & Moresi 2000
+        print('n passed to ubl_thickness', n)
         if X_extent is None:
             try:
                 p = self.parameters
@@ -529,14 +530,20 @@ class Aspect_Data():
             T_i = self.internal_temperature(self, n=n, **kwargs)
         if T_l is None:
             T_l = self.lid_base_temperature(self, n=n, **kwargs)
-        if ts is None:
-            ts = self.find_time_at_sol(n)
         try:
-            F = self.stats_heatflux_top[ts]/X_extent
+            heatflux = self.stats_heatflux_top
         except AttributeError:
             self.read_stats_heatflux(verbose=False)
-            F = self.stats_heatflux_top[ts] / X_extent
+            heatflux = self.stats_heatflux_top
+        if (ts is None) and (n is not None):
+            ts = self.find_time_at_sol(n, **kwargs)  # think this is where u keep reading stuff
+            heatflux_ts = heatflux[ts]
+        else:
+            heatflux_ts = np.mean(heatflux)
+
+        F = heatflux_ts / X_extent
         return k*(T_i - T_l)/F
+
 
     def delta_0(self, delta_rh=None, delta_L=None, **kwargs):
         # total lithosphere thickness, from MS95
