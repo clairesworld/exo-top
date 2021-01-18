@@ -517,12 +517,11 @@ class Aspect_Data():
     def ubl_thickness(self, n=None, T_l=None, T_i=None, k=1, X_extent=8, ts=None, **kwargs):
         # get upper boundary layer thickness required to produce surface heat flux (F=Nu) between T_i and T_l
         # corresponds to rheological sublayer delta_rh in Solomatov & Moresi 2000
-        print('n passed to ubl_thickness', n)
         if X_extent is None:
             try:
                 p = self.parameters
             except AttributeError:
-                self.read_parameters(verbose=False)
+                self.read_parameters(**kwargs)
                 p = self.parameters
             X_extent = p['Geometry model']['Box']['X extent']
 
@@ -533,7 +532,7 @@ class Aspect_Data():
         try:
             heatflux = self.stats_heatflux_top
         except AttributeError:
-            self.read_stats_heatflux(verbose=False)
+            self.read_stats_heatflux(**kwargs)
             heatflux = self.stats_heatflux_top
         if (ts is None) and (n is not None):
             ts = self.find_time_at_sol(n, **kwargs)  # think this is where u keep reading stuff
