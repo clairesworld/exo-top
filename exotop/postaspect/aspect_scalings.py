@@ -818,7 +818,7 @@ def fit_log(x, h, intercept=False, weights=None, **kwargs):
     if intercept:
         try:
             # check for and remove nans
-            df = pd.DataFrame({'x':x1, 'h': h1})
+            df = pd.DataFrame({'x': x1, 'h': h1})
             df.dropna(inplace=True)
             popt, pcov = curve_fit(coefficient, df.x.to_numpy(), df.h.to_numpy())
             slope = 1.0
@@ -904,16 +904,17 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=da
     else:
         # use each xy point (y=h) for fitting
         df1 = df
-    x = getx_fromdf(Ra, eta, df=df1, case=case, which_x=which_x, averagescheme=averagescheme, data_path=data_path_bullard,
+    x = getx_fromdf(Ra, eta, df=df1, case=case, which_x=which_x, averagescheme=averagescheme,
+                    data_path=data_path_bullard,
                     t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
     if return_all:
-        x_all = getx_fromdf(Ra, eta, df=df, case=case, which_x=which_x, averagescheme=averagescheme, data_path=data_path_bullard,
+        x_all = getx_fromdf(Ra, eta, df=df, case=case, which_x=which_x, averagescheme=averagescheme,
+                            data_path=data_path_bullard,
                             t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
         return x, x_all
     else:
         return x
-
 
 
 def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
@@ -1025,8 +1026,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
                 # get the y values, depending on averaging scheme
                 h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, data_path=data_path,
-                                          averagescheme=averagescheme, return_all=True,
-                                          postprocess_kwargs=postprocess_kwargs, **kwargs)
+                                                                 averagescheme=averagescheme, return_all=True,
+                                                                 postprocess_kwargs=postprocess_kwargs, **kwargs)
                 # append to working
                 yx_peak_all.append((h_peak, x))
                 yx_rms_all.append((h_rms, x))
@@ -1083,7 +1084,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
         ax.set_xlim(xlim)
     if legend:
         leg = ax.legend(handles=[mlines.Line2D([], [], color='k', marker='d', alpha=0.5,
-                                                markersize=15, markeredgecolor=highlight_colour, label=r'$h_{peak}$, data'),
+                                               markersize=15, markeredgecolor=highlight_colour,
+                                               label=r'$h_{peak}$, data'),
                                  mlines.Line2D([], [], color='k', marker='o', alpha=0.5,
                                                markersize=15, label=r'$h_{rms}$, data')])
         ax.add_artist(leg)
@@ -1117,7 +1119,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
-
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra, eta,
@@ -1142,11 +1143,13 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
 
                 # extract x values for plotting
                 x, x_all = plot_getx(Ra[ii], etastr, case=case, which_x=which_x, return_all=True, data_path=data_path,
-                              t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs, averagescheme=averagescheme,**kwargs)
+                                     t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
+                                     averagescheme=averagescheme, **kwargs)
 
                 # get the y values, depending on averaging scheme
-                h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, return_all=True, data_path=data_path, averagescheme=averagescheme,
-                                          postprocess_kwargs=postprocess_kwargs, **kwargs)
+                h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, return_all=True,
+                                                                 data_path=data_path, averagescheme=averagescheme,
+                                                                 postprocess_kwargs=postprocess_kwargs, **kwargs)
 
                 # append to working
                 yx_peak_all.append((h_peak, x))
@@ -1203,7 +1206,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     ax.set_title(title, fontsize=labelsize)
     if legend:
         leg = ax.legend(handles=[mlines.Line2D([], [], color=c_peak, marker='d', alpha=0.5,
-                                                markersize=10, markeredgecolor=highlight_colour, label=r'$h_{peak}$, data'),
+                                               markersize=10, markeredgecolor=highlight_colour,
+                                               label=r'$h_{peak}$, data'),
                                  mlines.Line2D([], [], color=c_rms, marker='o', alpha=0.5,
                                                markersize=10, label=r'$h_{rms}$, data')])
         ax.add_artist(leg)
@@ -1243,7 +1247,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2,
     try:
         weights = [len(a[0]) for a in yx_all]
     except TypeError:
-        weights = [1]*len(x)
+        weights = [1] * len(x)
     if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
         flatx = [item for sublist in x for item in sublist]
         flaty = [item for sublist in y for item in sublist]
@@ -1285,7 +1289,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2,
             else:
                 raise Exception('Legend labelling for this n fitted parameters not implemented')
             if showchisq:
-                newlabel = newlabel + r'; $\chi^2$ = ' + '{:.3f}'.format(chisq)
+                newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.3f}'.format(chisq)
             try:
                 labels[-1] = newlabel
             except IndexError:
@@ -2006,24 +2010,28 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 def get_h_average(Ra, eta, which_h='rms', end=None, data_path=data_path_bullard, load=True, **kwargs):
     case = 'Ra' + Ra + '-eta' + eta + end
     rms, peak = plot_geth(case=case, averagescheme='timefirst', data_path=data_path, load=load, **kwargs)
-    if which_h=='rms':
+    if which_h == 'rms':
         return rms
-    elif which_h=='peak':
+    elif which_h == 'peak':
         return peak
     else:
         raise Exception('invalid which h')
 
 
-def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_path=fig_path_bullard, load_grid=None,
-                        vmin=None, vmax=None, averagescheme=None, which_x=None, regime_grid=None, include_regimes=['chaotic'],
-                        save=True, fname='fit-grid', labelsize=16, fig_fmt='.png', t1_grid=None, end_grid=None, cticklabels=None,
-                        cticks=None, title='', lognorm=False, log=False, clabel=r'$h_{rms}$', which_h='rms',
-                         nlevels_contour=10, cmap='Greys_r', cmap_contours='spring', postprocess_kwargs={}, **kwargs):
-
+def plot_fit_parameter_grid(Ra_ls, eta_ls, data_path=data_path_bullard, fig_path=fig_path_bullard, load_grid=None,
+                            vmin=None, vmax=None, averagescheme=None, which_x=None, regime_grid=None,
+                            include_regimes=['chaotic'],
+                            save=True, fname='fit-grid', labelsize=16, fig_fmt='.png', t1_grid=None, end_grid=None,
+                            cticklabels=None,
+                            cticks=None, title='', lognorm=False, log=False, clabel=r'$h_{rms}$', which_h='rms',
+                            nlevels_contour=10, cmap='Greys_r', cmap_contours='spring', postprocess_kwargs={},
+                            **kwargs):
     # make grid
     fig, ax = plot_parameter_grid(Ra_ls, eta_ls, function=get_h_average, data_path=data_path, load=True, cmap=cmap,
-                        vmin=vmin, vmax=vmax, save=False, labelsize=16,  t1_grid=t1_grid, end=end_grid, cticklabels=cticklabels,
-                        cticks=cticks, title=title, lognorm=False, log=False, clabel=clabel, overplot_h=False, which_h=which_h,  **kwargs)
+                                  vmin=vmin, vmax=vmax, save=False, labelsize=16, t1_grid=t1_grid, end=end_grid,
+                                  cticklabels=cticklabels,
+                                  cticks=cticks, title=title, lognorm=False, log=False, clabel=clabel, overplot_h=False,
+                                  which_h=which_h, **kwargs)
 
     # # get fit things
     const, expon = plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid, t1_grid=t1_grid, load_grid=load_grid,
@@ -2041,7 +2049,7 @@ def plot_fit_parameter_grid(Ra_ls, eta_ls,  data_path=data_path_bullard, fig_pat
     Ra_r = np.logspace(np.log10(Rv[idx].min()), np.log10(Rv[idx].max()), endpoint=True)  # in the regime
     eta_r = np.logspace(np.log10(ev[idx].min()), np.log10(ev[idx].max()), endpoint=True)
     X, Y = np.meshgrid(Ra_r, eta_r)
-    H = const * X**expon[0] * Y**expon[1]
+    H = const * X ** expon[0] * Y ** expon[1]
 
     # normalize to axis limits
     xlim = ax.get_xlim()
@@ -2701,12 +2709,12 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
                 # extract x values for plotting
                 if twocomponent:
                     x = [plot_getx(Ra_var[ii], eta_str, case=case, which_x=xx, data_path=data_path,
-                              t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
-                              averagescheme=averagescheme,**kwargs) for xx in which_x]
+                                   t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
+                                   averagescheme=averagescheme, **kwargs) for xx in which_x]
                 else:
                     x = plot_getx(Ra_var[ii], eta_str, case=case, which_x=which_x, data_path=data_path,
                                   t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
-                                  averagescheme=averagescheme,**kwargs)
+                                  averagescheme=averagescheme, **kwargs)
 
                 # get the y values, depending on averaging scheme
                 h_rms, h_peak = plot_geth(case=case, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
@@ -2752,7 +2760,8 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     ax.set_ylabel('Model', fontsize=labelsize)
     ax.set_xlabel('Data', fontsize=labelsize)
     if twocomponent:
-        title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])
+        title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(
+            expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])
     elif which_x == 'h_components':
         title = 'Fit to h = ({:.2f}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
     elif 'Ra' in which_x:

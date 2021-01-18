@@ -535,7 +535,7 @@ class Aspect_Data():
             self.read_stats_heatflux(**kwargs)
             heatflux = self.stats_heatflux_top
         if (ts is None) and (n is not None):
-            ts = self.find_time_at_sol(n, **kwargs)  # think this is where u keep reading stuff
+            ts = self.find_time_at_sol(n, **kwargs)
             heatflux_ts = heatflux[ts]
         else:
             heatflux_ts = np.mean(heatflux)
@@ -807,8 +807,7 @@ class Aspect_Data():
 
 
     def T_components(self, n=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
-                     uv_mag_av=None, d_m=1, dT_m=1, y=None,
-                     **kwargs):
+                     uv_mag_av=None, d_m=1, dT_m=1, y=None, **kwargs):
         if y is None:
             try:
                 y = self.y
@@ -838,7 +837,7 @@ class Aspect_Data():
         if y_L is None:
             y_L = self.lid_thickness(n, uv_mag_av=uv_mag_av, y=y, **kwargs)
         if T_i is None:
-            T_i = self.internal_temperature(n, T_av=T_av,  y=y,**kwargs)
+            T_i = self.internal_temperature(n, T_av=T_av,  y=y, **kwargs)
         if T_l is None:
             T_l = self.lid_base_temperature(n, T_av=T_av, delta_L=y_L, y=y, **kwargs)
         if delta_rh is None:

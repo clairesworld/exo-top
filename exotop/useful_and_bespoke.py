@@ -79,13 +79,13 @@ def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
         except np.linalg.LinAlgError:
             IV = np.linalg.pinv(V)  # pseudo-inverse
         # print('inv. cov', IV)
-        dist = distance.mahalanobis(O_y, x, IV)
+        dist = distance.mahalanobis(O_y, x, IV)**2  # squared to be same units as variance
         print('D_m', dist)
         print('var(x)', np.var(x))
         print('var(O_y)', np.var(O_y))
-        dist - dist**2
+        dist = dist**2
     dof = len(O_y) - n_fitted
-    chisq = np.sum((np.array(O_y) - np.array(C_y)) / np.array(dist))
+    chisq = np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(dist))
     return chisq / dof
 
 
