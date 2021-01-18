@@ -1154,10 +1154,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
 
                 # calculate Mahalanobis distance for chi square later
                 div = int(np.ceil(len(h_rms_all)/len(x_all)))
-                print('take every', div)
-                print('n h', len(h_rms_all))
-                print('n x', len(x_all))
-                print('n h sliced', len(h_rms_all[::div]))
                 data = pd.DataFrame({'y': h_rms_all[::div], 'x': x_all})
                 D_m2 = np.sum(mahalanobis(x=data, data=data, cov=None) ** 2)
                 D_m2_all.append(D_m2)

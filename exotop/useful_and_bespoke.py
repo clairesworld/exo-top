@@ -92,7 +92,7 @@ def mahalanobis(x=None, data=None, cov=None):
 from scipy.spatial import distance
 from scipy.stats import chisquare
 
-def reduced_chisq(O_y, C_y, dist=None, n_fitted=2):
+def reduced_chisq(O_y, C_y, dist=None, n_fitted=2, **kwargs):
     # dist is an array of distance metrics e.g. variance or Mahalanobis for each point in O_y
     if dist is None:  # default to simple variance if not provided
         dist = np.var(O_y)
