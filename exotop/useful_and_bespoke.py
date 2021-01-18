@@ -76,7 +76,7 @@ def mahalanobis(x=None, data=None, cov=None):
     cov  : covariance matrix (p x p) of the distribution. If None, will be computed from data but must be df.
     """
     x_minus_mu = x - np.mean(data)
-    if not cov:
+    if cov is None:
         cov = np.cov(data.values.T)
     try:
         inv_covmat = np.linalg.inv(cov)
