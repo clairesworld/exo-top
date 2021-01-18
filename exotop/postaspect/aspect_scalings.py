@@ -1169,9 +1169,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 except (TypeError, AttributeError) as e:
                     print('x_all\n', x_all, type(x_all))
                     print('h_rms_all\n', h_rms_all[::div], type(h_rms_all))
-                    pee = np.log10(np.array(h_rms_all)[::div])
-                    poo = np.log10(np.array(x_all))
-                    data = pd.DataFrame({'y': pee, 'x': poo})
+                    pee = np.asarray(h_rms_all).astype(np.float64)[::div]
+                    poo = np.asarray(x_all).astype(np.float64)
+                    data = pd.DataFrame({'y': np.log10(pee), 'x': np.log10(poo)})
                 # V = np.cov(np.array([np.log10(h_rms_all[::div]), np.log10(x_all)]).T)
                 # try:
                 #     IV = np.linalg.inv(V)
