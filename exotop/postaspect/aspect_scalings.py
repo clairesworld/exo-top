@@ -1034,20 +1034,18 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                       which_xs]
                 x = [a[0] for a in xs]  # returned value according to average scheme
                 x_all = [a[1] for a in xs]  # all data for getting errorbars
-                print('x_all', x_all)
-                print('x_all[0]', x_all[0])
 
                 # get the y values, depending on averaging scheme
                 h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, data_path=data_path,
                                                                  averagescheme=averagescheme, return_all=True,
                                                                  postprocess_kwargs=postprocess_kwargs, **kwargs)
+                if not_iterable(x_all[0]):  # e.g. scalar
+                    x_all[0] = [x_all[0]] * len(h_rms_all)
+                if not_iterable(x_all[1]):  # e.g. scalar
+                    x_all[1] = [x_all[1]] * len(h_rms_all)
 
                 # calculate Mahalanobis distance for chi square later
-                div = int(np.ceil(len(h_rms_all)/len(x_all)))
-                print('x0', len(x_all[0]))
-                print('x1', len(x_all[1]))
-                print('h', len(h_rms_all[::div]))
-                print('div', div)
+                div = int(np.ceil(len(h_rms_all)/len(x_all[0])))
                 try:
                     data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x0': np.log10(x_all[0]), 'x1': np.log10(x_all[1])})
                 except (TypeError, AttributeError) as e:
