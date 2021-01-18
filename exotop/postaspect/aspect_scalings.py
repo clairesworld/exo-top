@@ -1164,7 +1164,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 d_m = mahalanobis(x=data, data=data, cov=None)
                 # d_m = distance.mahalanobis(np.log10(h_rms_all[::div]), np.log10(x_all), IV)
                 D_m2 = np.mean(d_m**2)
+                print('logh', np.log10(h_rms_all))
                 D_m2 = np.var(np.log10(h_rms_all))
+                print('var(logh)', D_m2)
                 D_m2_all.append(D_m2)
 
                 # append to working
