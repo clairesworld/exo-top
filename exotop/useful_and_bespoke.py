@@ -84,7 +84,7 @@ def mahalanobis(x=None, data=None, cov=None):
         inv_covmat = np.linalg.pinv(cov)  # pseudo-inverse
     left_term = np.dot(x_minus_mu, inv_covmat)
     mahal = np.dot(left_term, x_minus_mu.T)
-    x['mahala'] = mahal.diagonal()
+    x['mahala^2'] = mahal.diagonal()**2
     print(x.head(200))
     return mahal.diagonal()
 

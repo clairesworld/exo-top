@@ -1156,7 +1156,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 div = int(np.ceil(len(h_rms_all)/len(x_all)))
                 data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x': np.log10(x_all)})
                 d_m = mahalanobis(x=data, data=data, cov=None)
-                print('d_m', d_m)
                 D_m2 = np.mean(d_m ** 2)
                 print('mean of D_m**2', D_m2)
                 D_m2_all.append(D_m2)
