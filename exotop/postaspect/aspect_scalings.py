@@ -1046,13 +1046,10 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                 try:
                     len(x_all[1])
                 except TypeError:  # e.g. scalar
-                    x_all[1] = [x_all[1]] * len(x_all[0])
+                    x_all[1] = [x_all[1]] * len(x_all[0])  # this way all three will always be same length
 
                 # calculate Mahalanobis distance for chi square later
                 div = int(np.ceil(len(h_rms_all)/len(x_all[0])))
-                print('h', len(h_rms_all[::div]))
-                print('x0', len(x_all[0]))
-                print('x1', len(x_all[1]))
                 try:
                     data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x0': np.log10(x_all[0]), 'x1': np.log10(x_all[1])})
                 except (TypeError, AttributeError) as e:
@@ -1100,7 +1097,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
         pass
 
     if fit:
-        ax = fit_cases_on_plot(yx_rms_all, ax,
+        ax = fit_cases_on_plot(yx_rms_all, ax, dist=D_m2_all,
                                c_list=colorize(np.log10(np.unique(z_vec)), cmap=cmap, vmin=vmin, vmax=vmax)[0],
                                labelsize=labelsize, n_fitted=len(which_xs) + 1, cmap=cmap, **kwargs)
 
