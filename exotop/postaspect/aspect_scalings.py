@@ -892,19 +892,21 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=da
         psuffixes.append('_T')
         postprocess_functions.append(T_parameters_at_sol)
 
-    df = pickleio_multi(case, psuffixes=psuffixes, postprocess_functions=postprocess_functions, t1=t1, load=load,
-                        data_path=data_path, at_sol=True, postprocess_kwargs=postprocess_kwargs, **kwargs)
+    df, df1 = None, None
+    if not (not psuffixes):
+        df = pickleio_multi(case, psuffixes=psuffixes, postprocess_functions=postprocess_functions, t1=t1, load=load,
+                            data_path=data_path, at_sol=True, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
-    if averagescheme == 'timelast':
-        df1 = df.mean(axis=0)
-    elif averagescheme == 'timefirst':
-        # load time-averages
-        T_av, y = time_averaged_profile_from_df(df, 'T_av')
-        uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
-        df1 = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs)
-    else:
-        # use each xy point (y=h) for fitting
-        df1 = df
+        if averagescheme == 'timelast':
+            df1 = df.mean(axis=0)
+        elif averagescheme == 'timefirst':
+            # load time-averages
+            T_av, y = time_averaged_profile_from_df(df, 'T_av')
+            uv_mag_av, y = time_averaged_profile_from_df(df, 'uv_mag_av')
+            df1 = T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs)
+        else:
+            # use each xy point (y=h) for fitting
+            df1 = df
     x = getx_fromdf(Ra, eta, df=df1, case=case, which_x=which_x, averagescheme=averagescheme,
                     data_path=data_path_bullard,
                     t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
@@ -956,6 +958,13 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
     else:
         raise Exception('Invalid variable for x-axis / not implemented: ' + which_x)
 
+    try:
+        np.log10(x)  # make sure it's a number
+    except TypeError:
+        x = x.to_numpy()
+    except Exception as e:
+        print('x', x)
+        raise e
     return x
 
 
