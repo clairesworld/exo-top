@@ -67,29 +67,43 @@ def not_string(obj):
     else:
         return True
 
+import pandas as pd
+
+def mahalanobis(x=None, data=None, cov=None):
+    """Compute the Mahalanobis Distance between each row of x and the data
+    x    : vector or matrix of observed data with, say, p columns.
+    data : ndarray of the distribution from which Mahalanobis distance of each observation of x is to be computed.
+    cov  : covariance matrix (p x p) of the distribution. If None, will be computed from data but must be df.
+    """
+    x_minus_mu = x - np.mean(data)
+    if not cov:
+        cov = np.cov(data.values.T)
+    try:
+        inv_covmat = np.linalg.inv(cov)
+    except np.linalg.LinAlgError:
+        inv_covmat = np.linalg.pinv(cov)  # pseudo-inverse
+    left_term = np.dot(x_minus_mu, inv_covmat)
+    mahal = np.dot(left_term, x_minus_mu.T)
+    x['mahala'] = mahal.diagonal()
+    x.head()
+    return mahal.diagonal()
+
+
 from scipy.spatial import distance
 from scipy.stats import chisquare
-def reduced_chisq(O_y, C_y, x=None, n_fitted=2):
-    print('O_y', O_y)
-    print('C_y', C_y)
-    print('x', x)
-    if x is None:
+
+def reduced_chisq(O_y, C_y, dist=None, n_fitted=2):
+    # dist is an array of distance metrics e.g. variance or Mahalanobis for each point in O_y
+    if dist is None:  # default to simple variance if not provided
         dist = np.var(O_y)
-    else:
-        # use mahalanobis distance
-        V = np.cov(np.array([O_y, x]).T)
-        try:
-            IV = np.linalg.inv(V)
-        except np.linalg.LinAlgError:
-            IV = np.linalg.pinv(V)  # pseudo-inverse
-        dist = distance.mahalanobis(O_y, x, IV)**2  # squared to be same units as variance
-        print('D_m', dist)
-        print('var(x)', np.var(x))
-        print('var(O_y)', np.var(O_y))
+    print('D_m^2', dist)
+    print('var(O_y)', np.var(O_y))
     dof = len(O_y) - n_fitted
+    print('dof', dof)
     chisq = np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(dist))
+    # chi2 = np.sum(((array(X) - array(X_model)) ** 2 + (array(Y) - array(Y_model)) ** 2) / (s ** 2))  # 2D
     print('chisquare', chisq / dof)
-    print('chisquare with y variance', np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(np.var(O_y))) / dof)
+    print('chisquare with y variance', np.sum((np.array(O_y) - np.array(C_y))**2 / np.var(O_y)) / dof)
     print('scipy chisquare', chisquare(O_y, C_y)[0] / dof)
     return chisq / dof
 

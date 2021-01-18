@@ -18,7 +18,7 @@ import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect import aspect_postprocessing2 as post  # noqa: E402
 from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, \
-    colourbar, not_string, minmaxnorm, reduced_chisq  # noqa: E402
+    colourbar, not_string, minmaxnorm, reduced_chisq, mahalanobis  # noqa: E402
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
@@ -1131,6 +1131,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
 
     quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
     yx_peak_all, yx_rms_all = [], []
+    D_m2_all = []
 
     # loop over cases
     for jj, etastr in enumerate(eta):
@@ -1150,6 +1151,11 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, return_all=True,
                                                                  data_path=data_path, averagescheme=averagescheme,
                                                                  postprocess_kwargs=postprocess_kwargs, **kwargs)
+
+                # calculate Mahalanobis distance
+                data = pd.DataFrame({'y': h_rms_all, 'x': x_all})
+                D_m2 = np.sum(mahalanobis(x=data, data=data, cov=None) ** 2)
+                D_m2_all.append(D_m2)
 
                 # append to working
                 yx_peak_all.append((h_peak, x))
@@ -1184,7 +1190,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             intercept = True
         else:
             intercept = False
-        ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2,
+        ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
                                intercept=intercept, **kwargs)
 
     if show_isoviscous:
@@ -1276,7 +1282,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2,
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100, label='dum'
                           )
 
-        chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), x=np.log10(flatx), n_fitted=n_fitted)
+        chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), n_fitted=n_fitted, **kwargs)
 
         if legend:
             handles, labels = ax.get_legend_handles_labels()
