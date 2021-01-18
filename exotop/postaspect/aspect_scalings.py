@@ -1039,13 +1039,20 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                 h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, data_path=data_path,
                                                                  averagescheme=averagescheme, return_all=True,
                                                                  postprocess_kwargs=postprocess_kwargs, **kwargs)
-                if not_iterable(x_all[0]):  # e.g. scalar
+                try:
+                    len(x_all[0])
+                except TypeError: # e.g. scalar
                     x_all[0] = [x_all[0]] * len(h_rms_all)
-                if not_iterable(x_all[1]):  # e.g. scalar
+                try:
+                    len(x_all[1])
+                except TypeError:  # e.g. scalar
                     x_all[1] = [x_all[1]] * len(h_rms_all)
 
                 # calculate Mahalanobis distance for chi square later
                 div = int(np.ceil(len(h_rms_all)/len(x_all[0])))
+                print('h', len(h_rms_all[::div]))
+                print('x0', len(x_all[0]))
+                print('x1', len(x_all[1]))
                 try:
                     data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x0': np.log10(x_all[0]), 'x1': np.log10(x_all[1])})
                 except (TypeError, AttributeError) as e:
