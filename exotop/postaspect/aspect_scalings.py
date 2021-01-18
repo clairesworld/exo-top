@@ -959,7 +959,7 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
         raise Exception('Invalid variable for x-axis / not implemented: ' + which_x)
 
     try:
-        np.log10(x)  # make sure it's a number
+        np.log10(x)  # make sure u can do number things
     except TypeError:
         x = x.to_numpy()
     except Exception as e:
@@ -1164,9 +1164,15 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
 
                 # calculate Mahalanobis distance for chi square later
                 div = int(np.ceil(len(h_rms_all)/len(x_all)))
-                print('x_all\n', x_all)
-                print('h_rms_all\n', h_rms_all)
-                data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x': np.log10(x_all)})
+
+                try:
+                    data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x': np.log10(x_all)})
+                except TypeError as e:
+                    print('x_all\n', x_all)
+                    print('h_rms_all\n', h_rms_all[::div])
+                    pee = np.log10(np.array(h_rms_all)[::div])
+                    poo = np.log10(x_all)
+                    data = pd.DataFrame({'y': pee, 'x': poo})
                 # V = np.cov(np.array([np.log10(h_rms_all[::div]), np.log10(x_all)]).T)
                 # try:
                 #     IV = np.linalg.inv(V)
