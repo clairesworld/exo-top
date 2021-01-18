@@ -78,6 +78,7 @@ def mahalanobis(x=None, data=None, cov=None):
     x_minus_mu = x - np.mean(data)
     if cov is None:
         cov = np.cov(data.values.T)
+    print('cov\n', cov)
     try:
         inv_covmat = np.linalg.inv(cov)
     except np.linalg.LinAlgError:
