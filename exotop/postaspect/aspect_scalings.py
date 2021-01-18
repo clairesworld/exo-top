@@ -1167,8 +1167,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 try:
                     data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x': np.log10(x_all)})
                 except (TypeError, AttributeError) as e:
-                    print('x_all\n', x_all, type(x_all))
-                    print('h_rms_all\n', h_rms_all[::div], type(h_rms_all))
                     pee = np.asarray(h_rms_all).astype(np.float64)[::div]
                     poo = np.asarray(x_all).astype(np.float64)
                     data = pd.DataFrame({'y': np.log10(pee), 'x': np.log10(poo)})
@@ -1180,9 +1178,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 d_m = mahalanobis(x=data, data=data, cov=None)
                 # d_m = distance.mahalanobis(np.log10(h_rms_all[::div]), np.log10(x_all), IV)
                 D_m2 = np.mean(d_m**2)
-                print('logh', np.log10(h_rms_all))
-                D_m2 = np.var(np.log10(h_rms_all))
-                print('var(logh)', D_m2)
+                # D_m2 = np.var(np.log10(h_rms_all))
                 D_m2_all.append(D_m2)
 
                 # append to working
