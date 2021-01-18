@@ -883,6 +883,7 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
               t1=None, load=None, postprocess_kwargs=None, return_all=False, **kwargs):
+    print('plot_getx: verbose', kwargs['verbose'])
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     psuffixes = []

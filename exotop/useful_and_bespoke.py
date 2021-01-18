@@ -68,6 +68,7 @@ def not_string(obj):
         return True
 
 from scipy.spatial import distance
+from scipy.stats import chisquare
 def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
     if x is None:
         dist = np.var(O_y)
@@ -86,6 +87,8 @@ def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
         dist = dist**2
     dof = len(O_y) - n_fitted
     chisq = np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(dist))
+    print('chisquare', chisq / dof)
+    print('scipy chisquare', chisquare(O_y, C_y) / dof)
     return chisq / dof
 
 

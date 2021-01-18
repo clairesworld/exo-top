@@ -808,6 +808,7 @@ class Aspect_Data():
 
     def T_components(self, n=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
                      uv_mag_av=None, d_m=1, dT_m=1, y=None, **kwargs):
+        print('dat.T_components: verbose', kwargs['verbose'])
         if y is None:
             try:
                 y = self.y
