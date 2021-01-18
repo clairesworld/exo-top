@@ -88,7 +88,7 @@ def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
     dof = len(O_y) - n_fitted
     chisq = np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(dist))
     print('chisquare', chisq / dof)
-    print('scipy chisquare', chisquare(O_y, C_y) / dof)
+    print('scipy chisquare', chisquare(O_y, C_y)[0] / dof)
     return chisq / dof
 
 
