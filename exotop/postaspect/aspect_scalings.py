@@ -1161,9 +1161,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     IV = np.linalg.inv(V)
                 except np.linalg.LinAlgError:
                     IV = np.linalg.pinv(V)  # pseudo-inverse
-                # d_m = mahalanobis(x=data, data=data, cov=None)
-                d_m = distance.mahalanobis(np.log10(h_rms_all[::div]), np.log10(x_all), IV)
-                D_m2 = np.mean(d_m ** 2)
+                d_m = mahalanobis(x=data, data=data, cov=None)
+                # d_m = distance.mahalanobis(np.log10(h_rms_all[::div]), np.log10(x_all), IV)
+                D_m2 = np.mean(d_m)
                 D_m2_all.append(D_m2)
 
                 # append to working
