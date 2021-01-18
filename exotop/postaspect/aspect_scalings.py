@@ -608,10 +608,10 @@ def T_parameters_at_sol(case, n, dat=None, T_av=None, uv_mag_av=None, y=None, da
         dat.read_mesh(n)
         y = dat.y
     if uv_mag_av is None:
-        x, y, z, u, v, _, uv_mag = dat.read_velocity(n)
+        x, y, z, u, v, _, uv_mag = dat.read_velocity(n, **kwargs)
         uv_mag_av = post.horizontal_mean(uv_mag, x)
     if T_av is None:
-        x, y, z, T = dat.read_temperature(n)
+        x, y, z, T = dat.read_temperature(n, **kwargs)
         T_av = post.horizontal_mean(T, x)
     d_n = dat.T_components(n, T_av=T_av, uv_mag_av=uv_mag_av, y=y, data_path=data_path,
                            **kwargs)  # dict of components just at solution n
@@ -883,7 +883,6 @@ def fit_h_sigma(x, h, h_err=None, fn='line'):
 
 def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
               t1=None, load=None, postprocess_kwargs=None, return_all=False, **kwargs):
-    print('plot_getx: verbose', kwargs['verbose'])
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     psuffixes = []
@@ -2228,7 +2227,7 @@ def plot_velocity_profile(case, dat=None, n=None, xlabel='rms velocity', ylabel=
     if n is None:
         n = dat.final_step()
 
-    x, y, _, u, v, _, mag = dat.read_velocity(n)
+    x, y, _, u, v, _, mag = dat.read_velocity(n, **kwargs)
     mag_av = post.horizontal_mean(mag, x)
     fig, ax = dat.plot_profile(mag_av, n=n, y=y, label='', ylabel=None, fig=fig, ax=ax, **kwargs)
     ax.set_xlabel(xlabel, fontsize=labelsize)

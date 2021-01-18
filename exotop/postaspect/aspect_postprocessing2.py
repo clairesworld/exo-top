@@ -110,7 +110,7 @@ class Aspect_Data():
         if verbose and read_parameters:
             self.print_summary()
 
-    def read_mesh(self, n, verbose=True):
+    def read_mesh(self, n, verbose=False):
         if not(hasattr(self, 'snames')):
             self.get_solution_filenames(verbose=verbose)
         
@@ -169,7 +169,7 @@ class Aspect_Data():
         
         return self.x, self.y, self.z
     
-    def get_solution_filenames(self, verbose=True):
+    def get_solution_filenames(self, verbose=False):
         if self.format == 'hdf5':
             root_filename = self.directory+"solution.xdmf"
             
@@ -212,13 +212,13 @@ class Aspect_Data():
 
         return times, snames
 
-    def final_step(self, verbose=True):
+    def final_step(self, verbose=False):
         if verbose:
             print("Getting final solution")
         str_f = self.get_solution_filenames(verbose=verbose)[1][-1]
         return int(re.search(r'\d+', str_f).group(0))
         
-    def read_temperature(self, n, verbose=True):
+    def read_temperature(self, n, verbose=False):
         if not(hasattr(self, 'snames')):
             self.get_solution_filenames(verbose=verbose)
             
@@ -248,7 +248,7 @@ class Aspect_Data():
 #         print('final shape', np.shape(T))
         return self.x, self.y, self.z, T
 
-    def read_velocity(self, n, verbose=True):
+    def read_velocity(self, n, verbose=False):
         if not(hasattr(self, 'snames')):
             self.get_solution_filenames(verbose=verbose)
             
@@ -289,7 +289,7 @@ class Aspect_Data():
 
         return self.x, self.y, self.z, u, v, w, mag
     
-    def read_statistics(self, verbose=True, timing=False):
+    def read_statistics(self, verbose=False, timing=False):
         filename = self.directory + "statistics"
         if verbose:
             print("Reading statistics from", filename)
@@ -341,7 +341,7 @@ class Aspect_Data():
         # print("dask.dataframe took %s seconds" % (time.time() - start_time))
 
 
-    def read_times(self, verbose=True, **kwargs):
+    def read_times(self, verbose=False, **kwargs):
         filename = self.directory + "statistics"
         if verbose:
             print("Reading times from", filename)
@@ -350,7 +350,7 @@ class Aspect_Data():
         self.stats_time = data[:,1]
 
 
-    def read_stats_heatflux(self, verbose=-True, col=19, **kwargs):
+    def read_stats_heatflux(self, verbose=False, col=19, **kwargs):
         filename = self.directory + "statistics"
         if verbose:
             print("Reading heat flux statistics from", filename)
@@ -358,7 +358,7 @@ class Aspect_Data():
         self.stats_heatflux_top = data[:]
 
 
-    def read_stats_sol_files(self, col_vis=20, verbose=True, **kwargs):
+    def read_stats_sol_files(self, col_vis=20, verbose=False, **kwargs):
         filename = self.directory + "statistics"
         if verbose:
             print("Reading solution files from", filename)
@@ -397,7 +397,7 @@ class Aspect_Data():
             else:
                 return time[indices[n]]
         
-    def read_parameters(self, verbose=True):
+    def read_parameters(self, verbose=False):
         # parse the parameters file into a python dictionary
         filename = self.directory + "parameters.prm"
         if verbose:
@@ -497,7 +497,7 @@ class Aspect_Data():
             try:
                 p = self.parameters
             except AttributeError:
-                self.read_parameters(verbose=False)
+                self.read_parameters(**kwargs)
                 p = self.parameters
             d = p['Geometry model']['Box']['Y extent']
             dT = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box'][
@@ -507,7 +507,7 @@ class Aspect_Data():
         try:
             F = self.stats_heatflux_top / X_extent
         except AttributeError:
-            self.read_stats_heatflux(verbose=False)
+            self.read_stats_heatflux(**kwargs)
             F = self.stats_heatflux_top / X_extent
 
         Nu = d*F/(k*dT)
@@ -593,7 +593,7 @@ class Aspect_Data():
                 y = self.y
         if uv_mag_av is None:
             if uv_mag is None:
-                _, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=False)
+                _, _, _, u, v, _, uv_mag = self.read_velocity(n, **kwargs)
             # get horizontal average
             uv_mag_av = horizontal_mean(uv_mag, x)
         if plot:
@@ -698,7 +698,7 @@ class Aspect_Data():
             return b
     
     def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, uv_mag=None, y=None, plot=False,
-                             verbose=False, **kwargs):
+                             **kwargs):
         if y is None:
             try:
                 x = self.x
@@ -709,11 +709,11 @@ class Aspect_Data():
                 y = self.y
         if T_av is None:
             if T is None:
-                _, _, _, T = self.read_temperature(n, verbose=verbose, **kwargs)
+                _, _, _, T = self.read_temperature(n, **kwargs)
             T_av = horizontal_mean(T, x)
         if delta_L is None:
             if uv_mag is None:
-                _, _, _, _, _, _, uv_mag = self.read_velocity(n, verbose=verbose, **kwargs)
+                _, _, _, _, _, _, uv_mag = self.read_velocity(n, **kwargs)
             delta_L = self.lid_thickness(uv_mag=uv_mag, plot=plot, **kwargs)
         # find T at delta_L
         # fit spline
@@ -722,7 +722,7 @@ class Aspect_Data():
         # T_l = T_av[find_nearest_idx(y, delta_L)]
         return T_l
 
-    def max_Ty(self, n=None, T=None, T_av=None, y=None, verbose=False):
+    def max_Ty(self, n=None, T=None, T_av=None, y=None, **kwargs):
         if y is None:
             try:
                 x = self.x
@@ -733,7 +733,7 @@ class Aspect_Data():
                 y = self.y
         if T_av is None:
             if T is None:
-                _, _, _, T = self.read_temperature(n, verbose=verbose)
+                _, _, _, T = self.read_temperature(n, **kwargs)
             T_av = horizontal_mean(T, x)
         idx = np.where(T_av == T_av.max())
         T_i, y_i = T_av[idx], y[idx]
@@ -743,7 +743,7 @@ class Aspect_Data():
             return T_i, y_i
 
 
-    def internal_temperature(self, n=None, T=None, T_av=None, y=None, plot=False, return_coords=False, verbose=False,
+    def internal_temperature(self, n=None, T=None, T_av=None, y=None, plot=False, return_coords=False,
                              spline=True, usemax=False, **kwargs):
         # almost-isothermal temperature of core of convecting cell
         # note: MS2000 define this as the maximal horizontally-averaged temperature in the (convecting) layer
@@ -757,7 +757,7 @@ class Aspect_Data():
                 y = self.y
         if T_av is None:
             if T is None:
-                _, _, _, T = self.read_temperature(n, verbose=verbose)
+                _, _, _, T = self.read_temperature(n, **kwargs)
             T_av = horizontal_mean(T, x)
         # find inflection point for max core temperature
         if spline:
@@ -808,7 +808,6 @@ class Aspect_Data():
 
     def T_components(self, n=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
                      uv_mag_av=None, d_m=1, dT_m=1, y=None, **kwargs):
-        print('dat.T_components: verbose', kwargs['verbose'])
         if y is None:
             try:
                 y = self.y
@@ -853,7 +852,7 @@ class Aspect_Data():
     def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, uv_mag=None, **kwargs):
         # stagnant lid criterion S << 1 from Moresi & Solomatov 2000
         if uv_mag is None:
-            x, _, _, u, v, _, uv_mag = self.read_velocity(n, verbose=False)
+            x, _, _, u, v, _, uv_mag = self.read_velocity(n, **kwargs)
         mag_av = horizontal_mean(uv_mag, x)
         u_0 = mag_av[-1]
         # u_0 = horizontal_mean(u, x)[-1]  # surface velocity
@@ -953,7 +952,7 @@ class Aspect_Data():
         cax.set_xlabel(vlabel, fontsize=18)       
         return fig, ax
         
-    def write_ascii(self, A=None, fname='ascii', ext='.txt', path='', n=None, default_field='T', verbose=False,
+    def write_ascii(self, A=None, fname='ascii', ext='.txt', path='', n=None, default_field='T',
                     **kwargs):
         # format ascii file for initialising future ASPECT runs. A is 2D array
         if n is None:
@@ -961,12 +960,12 @@ class Aspect_Data():
 
         if A is not None:
             if self.mesh_file != self.mnames[n]:
-                self.read_mesh(n, verbose=verbose)
+                self.read_mesh(n, **kwargs)
             x = self.x
             y = self.y
         else:  # load default_field
             if default_field == 'T':
-                x, y, _, A = self.read_temperature(n, verbose=False)
+                x, y, _, A = self.read_temperature(n, **kwargs)
 
         nx = len(x)
         ny = len(y)
