@@ -1289,7 +1289,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2,
             else:
                 raise Exception('Legend labelling for this n fitted parameters not implemented')
             if showchisq:
-                newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.3f}'.format(chisq)
+                newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.4f}'.format(chisq)
             try:
                 labels[-1] = newlabel
             except IndexError:

@@ -69,7 +69,10 @@ def not_string(obj):
 
 from scipy.spatial import distance
 from scipy.stats import chisquare
-def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
+def reduced_chisq(O_y, C_y, x=None, n_fitted=2):
+    print('O_y', O_y)
+    print('C_y', C_y)
+    print('x', x)
     if x is None:
         dist = np.var(O_y)
     else:
@@ -79,7 +82,6 @@ def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
             IV = np.linalg.inv(V)
         except np.linalg.LinAlgError:
             IV = np.linalg.pinv(V)  # pseudo-inverse
-        # print('inv. cov', IV)
         dist = distance.mahalanobis(O_y, x, IV)**2  # squared to be same units as variance
         print('D_m', dist)
         print('var(x)', np.var(x))
