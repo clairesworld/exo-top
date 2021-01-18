@@ -1279,13 +1279,17 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2,
             # handles.append(h3)
             # labels.append('{:.2e} x^{:.3f}'.format(const, expon))
             if n_fitted == 2:
-                labels[-1] = '{:.2e} x^{:.3f}'.format(const, expon)
+                newlabel = '{:.2e} x^{:.3f}'.format(const, expon)
             elif n_fitted == 3:
-                labels[-1] = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
+                newlabel = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
             else:
                 raise Exception('Legend labelling for this n fitted parameters not implemented')
             if showchisq:
-                labels[-1] = labels[-1] + r'; $\chi^2$ = ' + '{:.3f}'.format(chisq)
+                newlabel = newlabel + r'; $\chi^2$ = ' + '{:.3f}'.format(chisq)
+            try:
+                labels[-1] = newlabel
+            except IndexError:
+                labels = newlabel
             leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
             ax.add_artist(leg)
     else:
