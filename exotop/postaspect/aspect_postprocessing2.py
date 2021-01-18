@@ -213,6 +213,8 @@ class Aspect_Data():
         return times, snames
 
     def final_step(self, verbose=True):
+        if verbose:
+            print("Getting final solution")
         str_f = self.get_solution_filenames(verbose=verbose)[1][-1]
         return int(re.search(r'\d+', str_f).group(0))
         
@@ -356,8 +358,10 @@ class Aspect_Data():
         self.stats_heatflux_top = data[:]
 
 
-    def read_stats_sol_files(self, col_vis=20):
+    def read_stats_sol_files(self, col_vis=20, verbose=True, **kwargs):
         filename = self.directory + "statistics"
+        if verbose:
+            print("Reading solution files from", filename)
         data = np.genfromtxt(filename, comments='#', dtype=None, usecols=col_vis)
         last = 0
         files = np.zeros(len(data), dtype=np.int64)
