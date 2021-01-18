@@ -78,14 +78,13 @@ def mahalanobis(x=None, data=None, cov=None):
     x_minus_mu = x - np.mean(data)
     if cov is None:
         cov = np.cov(data.values.T)
-    print('cov\n', cov)
     try:
         inv_covmat = np.linalg.inv(cov)
     except np.linalg.LinAlgError:
         inv_covmat = np.linalg.pinv(cov)  # pseudo-inverse
     left_term = np.dot(x_minus_mu, inv_covmat)
     mahal = np.dot(left_term, x_minus_mu.T)
-    x['mahala^2'] = mahal.diagonal()**2
+    # x['mahala^2'] = mahal.diagonal()**2
     # print(x.head(200))
     return np.sqrt(mahal.diagonal())
 
@@ -94,10 +93,8 @@ from scipy.spatial import distance
 from scipy.stats import chisquare
 
 def reduced_chisq(O_y, C_y, dist=None, n_fitted=2, **kwargs):
-    # dist is an array of distance metrics e.g. variance or Mahalanobis for each point in O_y
-    if dist is None:  # default to simple variance if not provided
-        dist = np.var(O_y)
-    # print('dist', dist)
+    # dist is an array of distance metrics / errors e.g. variance or Mahalanobis for each point in O_y
+    print('dist', dist)
     # print('var(O_y)', np.var(O_y))
     dof = len(O_y) - n_fitted
     chisq = np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(dist))
