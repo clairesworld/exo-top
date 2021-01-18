@@ -77,7 +77,10 @@ def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
         print('x data', x)
         V = np.cov(np.array([O_y, x]).T)
         print('cov', V)
-        IV = np.linalg.inv(V)
+        try:
+            IV = np.linalg.inv(V)
+        except np.linalg.LinAlgError:
+            IV = np.linalg.pinv(V)  # pseudo-inverse
         print('inv. cov', IV)
         dist = distance.mahalanobis(O_y, x, IV)
         print('D_m', dist)
