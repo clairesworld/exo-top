@@ -100,7 +100,6 @@ def reduced_chisq(O_y, C_y, dist=None, n_fitted=2, **kwargs):
     print('dist', dist)
     if dist is None:  # default to simple variance if not provided
         dist = np.var(O_y)
-    print('D_m^2', dist)
     print('var(O_y)', np.var(O_y))
     dof = len(O_y) - n_fitted
     print('dof', dof)
