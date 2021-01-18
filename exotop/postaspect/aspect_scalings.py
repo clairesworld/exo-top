@@ -1042,6 +1042,10 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
                 # calculate Mahalanobis distance for chi square later
                 div = int(np.ceil(len(h_rms_all)/len(x_all)))
+                print('x0', len(x_all[0]))
+                print('x1', len(x_all[1]))
+                print('h', len(h_rms_all[::div]))
+                print('div', div)
                 try:
                     data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x0': np.log10(x_all[0]), 'x1': np.log10(x_all[1])})
                 except (TypeError, AttributeError) as e:
