@@ -86,8 +86,8 @@ def mahalanobis(x=None, data=None, cov=None):
     left_term = np.dot(x_minus_mu, inv_covmat)
     mahal = np.dot(left_term, x_minus_mu.T)
     x['mahala^2'] = mahal.diagonal()**2
-    print(x.head(200))
-    return mahal.diagonal()
+    # print(x.head(200))
+    return np.sqrt(mahal.diagonal())
 
 
 from scipy.spatial import distance
@@ -97,14 +97,14 @@ def reduced_chisq(O_y, C_y, dist=None, n_fitted=2, **kwargs):
     # dist is an array of distance metrics e.g. variance or Mahalanobis for each point in O_y
     if dist is None:  # default to simple variance if not provided
         dist = np.var(O_y)
-    print('dist', dist)
-    print('var(O_y)', np.var(O_y))
+    # print('dist', dist)
+    # print('var(O_y)', np.var(O_y))
     dof = len(O_y) - n_fitted
     chisq = np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(dist))
     # chi2 = np.sum(((array(X) - array(X_model)) ** 2 + (array(Y) - array(Y_model)) ** 2) / (s ** 2))  # 2D
     print('chisquare', chisq / dof)
-    print('chisquare with y variance', np.sum((np.array(O_y) - np.array(C_y))**2 / np.var(O_y)) / dof)
-    print('scipy chisquare', chisquare(O_y, C_y)[0] / dof)
+    # print('chisquare with y variance', np.sum((np.array(O_y) - np.array(C_y))**2 / np.var(O_y)) / dof)
+    # print('scipy chisquare', chisquare(O_y, C_y)[0] / dof)
     return chisq / dof
 
 
