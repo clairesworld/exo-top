@@ -18,7 +18,7 @@ import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect import aspect_postprocessing2 as post  # noqa: E402
 from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, printe, not_iterable, \
-    colourbar, not_string, minmaxnorm  # noqa: E402
+    colourbar, not_string, minmaxnorm, reduced_chisq  # noqa: E402
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
 fig_path_bullard = '/raid1/cmg76/aspect/figs/'
@@ -1063,7 +1063,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
     if fit:
         ax = fit_cases_on_plot(yx_rms_all, ax,
                                c_list=colorize(np.log10(np.unique(z_vec)), cmap=cmap, vmin=vmin, vmax=vmax)[0],
-                               labelsize=labelsize, multifit=True, cmap=cmap, **kwargs)
+                               labelsize=labelsize, n_fitted=len(which_xs) + 1, cmap=cmap, **kwargs)
 
     if show_isoviscous:
         df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
@@ -1234,8 +1234,8 @@ def nondimensionalise_h(h, p):
         raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to nondimensionalise')
 
 
-def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, multifit=False, c_list=None,
-                      c='xkcd:periwinkle', legsize=8, legloc='lower left', **kwargs):
+def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2, c_list=None,
+                      c='xkcd:periwinkle', legsize=8, legloc='lower left', showchisq=True, **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
     try:
@@ -1249,34 +1249,41 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, multifit=Fa
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
 
-        if multifit:  # fit to 2 parameter power law
+        if n_fitted > 2:  # fit to 3 parameter power law
             flatx0 = [a[0] for a in flatx]
             flatx1 = [a[1] for a in flatx]
-            x0prime = np.linspace(np.min(flatx0), np.max(flatx0))
-            x1prime = np.linspace(np.min(flatx1), np.max(flatx1))
+            x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
+            x1prime = np.linspace(np.min(flatx1), np.max(flatx1), num=len(flatx1))
             expon, const = fit_2log(x=flatx0, y=flatx1, h=flaty)
             z_vec = np.unique(flatx1)
             if c_list is None:
                 c_list = colorize(np.log10(z_vec), cmap='winter')[0]
-            label = None
             for ind, z in enumerate(z_vec):
                 hprime = const * x0prime ** expon[0] * z ** expon[1]
-                if ind == len(z_vec) - 1:
-                    label = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
-                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100,
-                              label=label
+                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100
                               )
 
         else:
-            xprime = np.linspace(np.min(flatx), np.max(flatx))
+            xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
             expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
-                          label='{:.2e} x^{:.3f}'.format(const, expon))
+                          )
+
+        chisq = reduced_chisq(O_y=flaty, C_y=hprime, x=flatx, n_fitted=n_fitted)
+
         if legend:
             handles, labels = ax.get_legend_handles_labels()
             # handles.append(h3)
             # labels.append('{:.2e} x^{:.3f}'.format(const, expon))
+            if n_fitted == 2:
+                labels[-1] = '{:.2e} x^{:.3f}'.format(const, expon)
+            elif n_fitted == 3:
+                labels[-1] = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
+            else:
+                raise Exception('Legend labelling for this n fitted parameters not implemented')
+            if showchisq:
+                labels[-1] = labels[-1] + r'; $\chi^2$ = ' + '{:.3f}'.format(chisq)
             leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
             ax.add_artist(leg)
     else:

@@ -67,6 +67,21 @@ def not_string(obj):
     else:
         return True
 
+from scipy.spatial import distance
+def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
+    if x is None:
+        dist = np.var(O_y)
+    else:
+        # use mahalanobis distance
+        data = np.array([O_y, x])
+        cov = np.cov(data)
+        dist = distance.mahalanobis(O_y, x, cov.T)
+        print('D_m', dist)
+        dist - dist**2
+    dof = len(O_y) - n_fitted
+    chisq = np.sum((np.array(O_y) - np.array(C_y)) / np.array(dist))
+    return chisq / dof
+
 
 def printe(name, obj, showall=False):
     if showall:
