@@ -1181,7 +1181,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             intercept = True
         else:
             intercept = False
-        ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize,
+        ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2,
                                intercept=intercept, **kwargs)
 
     if show_isoviscous:
@@ -1202,10 +1202,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_title(title, fontsize=labelsize)
     if legend:
-        leg = ax.legend(handles=[mlines.Line2D([], [], color='k', marker='d', alpha=0.5,
-                                                markersize=15, markeredgecolor=highlight_colour, label=r'$h_{peak}$, data'),
-                                 mlines.Line2D([], [], color='k', marker='o', alpha=0.5,
-                                               markersize=15, label=r'$h_{rms}$, data')])
+        leg = ax.legend(handles=[mlines.Line2D([], [], color=c_peak, marker='d', alpha=0.5,
+                                                markersize=10, markeredgecolor=highlight_colour, label=r'$h_{peak}$, data'),
+                                 mlines.Line2D([], [], color=c_rms, marker='o', alpha=0.5,
+                                               markersize=10, label=r'$h_{rms}$, data')])
         ax.add_artist(leg)
 
     if p_dimensionals is not None:
@@ -1262,14 +1262,14 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2,
                 c_list = colorize(np.log10(z_vec), cmap='winter')[0]
             for ind, z in enumerate(z_vec):
                 hprime = const * x0prime ** expon[0] * z ** expon[1]
-                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100, label=''
+                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100, label='dum'
                               )
 
         else:
             xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
             expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
-            h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100, label=''
+            h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100, label='dum'
                           )
 
         chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), x=np.log10(flatx), n_fitted=n_fitted)
