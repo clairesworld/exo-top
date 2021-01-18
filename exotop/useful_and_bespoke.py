@@ -95,6 +95,9 @@ from scipy.stats import chisquare
 
 def reduced_chisq(O_y, C_y, dist=None, n_fitted=2, **kwargs):
     # dist is an array of distance metrics e.g. variance or Mahalanobis for each point in O_y
+    print('O_y', O_y)
+    print('C_y', C_y)
+    print('dist', dist)
     if dist is None:  # default to simple variance if not provided
         dist = np.var(O_y)
     print('D_m^2', dist)
