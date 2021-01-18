@@ -809,7 +809,7 @@ class Aspect_Data():
 
     def T_components(self, n=None, T_av=None, T_i=None, T_l=None, delta_rh=None, y_L=None,
                      uv_mag_av=None, d_m=1, dT_m=1, y=None,
-                     verbose=False, **kwargs):
+                     **kwargs):
         if y is None:
             try:
                 y = self.y
@@ -821,18 +821,18 @@ class Aspect_Data():
         if T_av is None:
             if n is None:
                 n = self.final_step()
-            x, y, _, T = self.read_temperature(n, verbose=verbose)
+            x, y, _, T = self.read_temperature(n, **kwargs)
             T_av = horizontal_mean(T, x)
         if uv_mag_av is None:
             if n is None:
                 n = self.final_step()
-            x, y, _, u, v, _, uv_mag = self.read_velocity(n, verbose=verbose)
+            x, y, _, u, v, _, uv_mag = self.read_velocity(n, **kwargs)
             uv_mag_av = horizontal_mean(uv_mag, x)
         if d_m is None or dT_m is None:
             try:
                 p = self.parameters
             except AttributeError:
-                self.read_parameters(verbose=verbose)
+                self.read_parameters(**kwargs)
                 p = self.parameters
             d_m = p['Geometry model']['Box']['Y extent']
             dT_m = p['Boundary temperature model']['Box']['Bottom temperature'] - p['Boundary temperature model']['Box']['Top temperature']
