@@ -84,10 +84,10 @@ def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
         print('D_m', dist)
         print('var(x)', np.var(x))
         print('var(O_y)', np.var(O_y))
-        dist = dist**2
     dof = len(O_y) - n_fitted
     chisq = np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(dist))
     print('chisquare', chisq / dof)
+    print('chisquare with y variance', np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(np.var(O_y))) / dof)
     print('scipy chisquare', chisquare(O_y, C_y)[0] / dof)
     return chisq / dof
 
