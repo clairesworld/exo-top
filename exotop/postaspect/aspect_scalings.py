@@ -1270,7 +1270,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2,
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100,
                           )
 
-        chisq = reduced_chisq(O_y=flaty, C_y=hprime, x=flatx, n_fitted=n_fitted)
+        chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), x=np.log10(flatx), n_fitted=n_fitted)
 
         if legend:
             handles, labels = ax.get_legend_handles_labels()

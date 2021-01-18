@@ -73,12 +73,13 @@ def reduced_chisq(O_y, C_y, x=None, n_fitted=1):
         dist = np.var(O_y)
     else:
         # use mahalanobis distance
-        data = np.array([O_y, x])
-        cov = np.cov(data)
+        # data = np.array([O_y, x])
+        # cov = np.cov(data).T
+        VI = np.linalg.inv(np.cov(np.vstack([O_y, x]).T)).T)
         print('y data', O_y)
         print('x data', x)
-        print('cov', cov)
-        dist = distance.mahalanobis(O_y, x, cov.T)
+        print('inv. cov', VI)
+        dist = distance.mahalanobis(O_y, x, VI)
         print('D_m', dist)
         dist - dist**2
     dof = len(O_y) - n_fitted
