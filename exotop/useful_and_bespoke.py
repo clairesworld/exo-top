@@ -86,7 +86,6 @@ def mahalanobis(x=None, data=None, cov=None):
     mahal = np.dot(left_term, x_minus_mu.T)
     x['mahala'] = mahal.diagonal()
     print(x.head())
-    print('D_m2', mahal.diagonal()**2)
     return mahal.diagonal()
 
 
