@@ -85,7 +85,7 @@ def mahalanobis(x=None, data=None, cov=None):
     left_term = np.dot(x_minus_mu, inv_covmat)
     mahal = np.dot(left_term, x_minus_mu.T)
     x['mahala'] = mahal.diagonal()
-    print(x.head())
+    print(x.head(200))
     return mahal.diagonal()
 
 
