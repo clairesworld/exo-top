@@ -1115,7 +1115,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
-    # either Ra or eta is 1D list of strings (other is singular), t1, end must match shape
+
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra, eta,
@@ -1159,13 +1159,17 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
 
     # get errorbars and plot them
     err = dict.fromkeys(quants.keys())
+    means = dict.fromkeys(quants.keys())
+    means['h_peak'] = [np.mean(a[0]) for a in yx_peak_all]
+    means['h_rms'] = [np.mean(a[0]) for a in yx_rms_all]
+    means[which_x] = [np.mean(a[1]) for a in yx_rms_all]
     try:
         for key in quants.keys():
             err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
-        ax.errorbar(quants[which_x][:, 1], quants['h_peak'][:, 1], yerr=err['h_peak'], xerr=err[which_x],
+        ax.errorbar(means[which_x], means['h_peak'], yerr=err['h_peak'], xerr=err[which_x],
                     elinewidth=0.5,
                     fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
-        ax.errorbar(quants[which_x][:, 1], quants['h_rms'][:, 1], yerr=err['h_rms'], xerr=err[which_x], elinewidth=0.5,
+        ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=0.5,
                     fmt='o', c=c_rms, capsize=5)
     except TypeError:  # no cases in given regimes as quants is dict of None
         pass
