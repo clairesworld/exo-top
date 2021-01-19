@@ -1281,7 +1281,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     try:
         for key in quants.keys():
             err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
-        ax.errorbar(means[which_x], means['h_peak'], yerr=err['h_peak'], xerr=err[which_x],
+        ax.errorbar(means[which_x], means['h_peak'], yerr=sdy_all,#err['h_peak'],
+                    xerr=sdx_all,#err[which_x],
                     elinewidth=0.5,
                     fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
         ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=0.5,
