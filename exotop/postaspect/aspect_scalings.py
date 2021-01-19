@@ -1365,8 +1365,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
                 c_list = colorize(np.log10(z_vec), cmap='winter')[0]
             for ind, z in enumerate(z_vec):
                 hprime = const * x0prime ** expon[0] * z ** expon[1]
-                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100, label='dum'
-                              )
+                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100, label='dum')
 
         else:
             xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
@@ -1383,7 +1382,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
             else:
                 expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
-            h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100, label='dum'
+            h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100, label='dum')
 
         if legend:
             handles, labels = ax.get_legend_handles_labels()
