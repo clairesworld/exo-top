@@ -1289,7 +1289,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             intercept = False
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
-                               xerr=[a[1] for a in sdyx_all], yerr=[a[0] for a in sdyx_all],
+                               xerr=sdx_all, yerr=sdy_all,
                                sigma=sigma, intercept=intercept, **kwargs)
 
     if show_isoviscous:
