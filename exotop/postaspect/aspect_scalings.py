@@ -1224,35 +1224,35 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                                      averagescheme=averagescheme, **kwargs)
 
                 # get the y values, depending on averaging scheme
-                h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, return_all=True,
-                                                                 data_path=data_path, averagescheme=averagescheme,
-                                                                 postprocess_kwargs=postprocess_kwargs, **kwargs)
+                h_rms, h_peak, h_rms_times, h_peak_times = plot_geth(case=case, t1=t1_ii, return_all=True,
+                                                                     data_path=data_path, averagescheme=averagescheme,
+                                                                     postprocess_kwargs=postprocess_kwargs, **kwargs)
 
                 # calculate Mahalanobis distance for chi square later
-                div = int(np.ceil(len(h_rms_all)/len(x_all)))
+                div = int(np.ceil(len(h_rms_times) / len(x_all)))
                 try:
-                    data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x': np.log10(x_all)})
+                    data = pd.DataFrame({'y': np.log10(h_rms_times[::div]), 'x': np.log10(x_all)})
                 except (TypeError, AttributeError) as e:
-                    pee = np.asarray(h_rms_all).astype(np.float64)[::div]
+                    pee = np.asarray(h_rms_times).astype(np.float64)[::div]
                     poo = np.asarray(x_all).astype(np.float64)
                     data = pd.DataFrame({'y': np.log10(pee), 'x': np.log10(poo)})
-                # V = np.cov(np.array([np.log10(h_rms_all[::div]), np.log10(x_all)]).T)
+                # V = np.cov(np.array([np.log10(h_rms_times[::div]), np.log10(x_all)]).T)
                 # try:
                 #     IV = np.linalg.inv(V)
                 # except np.linalg.LinAlgError:
                 #     IV = np.linalg.pinv(V)  # pseudo-inverse
                 d_m = mahalanobis(x=data, data=data, cov=None)
-                # d_m = distance.mahalanobis(np.log10(h_rms_all[::div]), np.log10(x_all), IV)
+                # d_m = distance.mahalanobis(np.log10(h_rms_times[::div]), np.log10(x_all), IV)
                 D_m2 = np.mean(d_m**2)
-                # D_m2 = np.var(np.log10(h_rms_all))
+                # D_m2 = np.var(np.log10(h_rms_times))
                 D_m2_all.append(D_m2)
 
                 # calculate statistics
-                sdy = np.nanstd(h_rms_all)
+                sdy = np.nanstd(h_rms_times)
                 sdx = np.nanstd(x_all)
                 # print('sdy', sdy)
                 # print('sdx', sdx)
-                qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
+                qdict = parameter_percentiles(case, df={'h_rms': h_rms_times, 'h_peak': h_peak_times, which_x: x_all},
                                               keys=quants.keys(), plot=False, sigma=2)
 
                 # print('percentile lower err x', qdict[which_x][1] - qdict[which_x][0])
