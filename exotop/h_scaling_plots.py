@@ -33,7 +33,7 @@ load = True #load_grid
 #
 _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
-                 beta0=[0.1, -0.15], sigma=2,
+                 beta0=[0.1, -0.15], sigma=1,
                  include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
                  xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
                  title=r'fit to CRa$_{i,eff}^n$, averaging time first',
