@@ -1211,6 +1211,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
     yx_peak_all, yx_rms_all = [], []
     D_m2_all = []
+    sdyx_all = []
 
     # loop over cases
     for jj, etastr in enumerate(eta):
@@ -1250,11 +1251,16 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 # D_m2 = np.var(np.log10(h_rms_all))
                 D_m2_all.append(D_m2)
 
+                # calculate statistics
+                sd = np.std(np.array([h_rms_all, x_all]), axis=1)
+                qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
+                                              keys=quants.keys(), plot=False, sigma=sigma)
+
                 # append to working
                 yx_peak_all.append((h_peak, x))
                 yx_rms_all.append((h_rms, x))
-                qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
-                                              keys=quants.keys(), plot=False, sigma=1)
+                sdyx_all.append(sd)
+
                 for key in quants.keys():
                     try:
                         quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
@@ -1284,8 +1290,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             intercept = False
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
-                               xerr=np.array(err[which_x]), yerr=np.array(err['h_rms']), sigma=sigma,
-                               intercept=intercept, **kwargs)
+                               xerr=[a[1] for a in sdyx_all], yerr=[a[0] for a in sdyx_all],
+                               sigma=sigma, intercept=intercept, **kwargs)
 
     if show_isoviscous:
         df_JFR = read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
