@@ -1227,10 +1227,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                                                                  data_path=data_path, averagescheme=averagescheme,
                                                                  postprocess_kwargs=postprocess_kwargs, **kwargs)
 
-                # append to working
-                yx_peak_all.append((h_peak, x))
-                yx_rms_all.append((h_rms, x))
-
                 # calculate Mahalanobis distance for chi square later
                 div = int(np.ceil(len(h_rms_all)/len(x_all)))
                 try:
@@ -1251,10 +1247,24 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 D_m2_all.append(D_m2)
 
                 # calculate statistics
-                sdy_all.append(np.nanstd(h_rms_all))
-                sdx_all.append(np.nanstd(x_all))
+                sdy = np.nanstd(h_rms_all)
+                sdx = np.nanstd(x_all)
+                print('sdy', sdy)
+                print('sdx', sdx)
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
-                                              keys=quants.keys(), plot=False, sigma=sigma)
+                                              keys=quants.keys(), plot=False, sigma=1)
+
+                print('percentile lower err x', qdict[which_x][1] - qdict[which_x][0])
+                print('percentile upper err x', qdict[which_x][2] - qdict[which_x][1])
+                print('percentile lower err y', qdict['h_rms'][1] - qdict['h_rms'][0])
+                print('percentile upper err y', qdict['h_rms'][2] - qdict['h_rms'][1])
+
+                # append to working
+                yx_peak_all.append((h_peak, x))
+                yx_rms_all.append((h_rms, x))
+                sdy_all.append(sdy)
+                sdx_all.append(sdx)
+
                 for key in quants.keys():
                     try:
                         quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
