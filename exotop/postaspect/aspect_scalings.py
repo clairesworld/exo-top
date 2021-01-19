@@ -872,6 +872,10 @@ def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, fig
     #     print('x', x, type(x))
     #     raise e
 
+    print('x', x)
+    print('h', h)
+    print('err_x', err_x)
+    print('err_h', err_h)
     def func_2param(p, u):
         a, b = p
         return a * u**b
