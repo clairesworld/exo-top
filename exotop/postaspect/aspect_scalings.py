@@ -864,18 +864,6 @@ def fit_2log(x, y, h, **kwargs):
 
 
 def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, fig_path=fig_path_bullard, **kwargs):
-    # try:
-    #     logx = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
-    #     logh = np.log10(np.array(h))
-    # except Exception as e:
-    #     print('h', h, type(h))
-    #     print('x', x, type(x))
-    #     raise e
-
-    print('x', x)
-    print('h', h)
-    print('err_x', err_x)
-    print('err_h', err_h)
     def func_2param(p, u):
         a, b = p
         return a * u**b
@@ -899,15 +887,20 @@ def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, fig
     # print fit parameters and 1-sigma estimates
     popt = out.beta
     perr = out.sd_beta
-    print('fit parameter', sigma, 'sigma error')
-    print('———————————–')
-    for i in range(len(popt)):
-        print(str(popt[i]) + ' +- ' + str(perr[i]))
 
     # prepare confidence level curves
     nstd = sigma  # to draw 2-sigma intervals e.g.
     popt_up = popt + nstd * perr
     popt_dw = popt - nstd * perr
+
+    print('\nfit parameter', sigma, 'sigma error')
+    print('———————————–')
+    for i in range(len(popt)):
+        print(str(popt[i]) + ' +- ' + str(perr[i]))
+        print('min:', popt_dw[i])
+        print('max:', popt_up[i])
+        print('y min @ x min', func_2param(popt_dw, x[0]))
+        print('y max @ x max', func_2param(popt_up, x[-1]))
 
     x_fit = np.linspace(min(x), max(x), 100)
     fit = func_2param(popt, x_fit)
@@ -923,7 +916,9 @@ def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, fig
         ax.set_title('fit with error on both axes', fontsize=18)
         plt.plot(x_fit, fit, 'r', lw=2, label='best fit curve')
         ax.fill_between(x_fit, fit_up, fit_dw, alpha=.25, label=str(sigma)+'-sigma interval')
-        ax.legend(loc='lower right', fontsize=18)
+        ax.legend(loc='lower right', fontsize=12)
+        # ax.set_xscale('log')
+        # ax.set_yscale('log')
         plot_save(fig, 'fit_test', fig_path)
     return (*popt, *perr)
 
