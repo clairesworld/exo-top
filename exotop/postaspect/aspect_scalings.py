@@ -1211,7 +1211,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
     yx_peak_all, yx_rms_all = [], []
     D_m2_all = []
-    sdyx_all = []
+    sdy_all, sdx_all = [], []
 
     # loop over cases
     for jj, etastr in enumerate(eta):
@@ -1231,6 +1231,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 h_rms, h_peak, h_rms_all, h_peak_all = plot_geth(case=case, t1=t1_ii, return_all=True,
                                                                  data_path=data_path, averagescheme=averagescheme,
                                                                  postprocess_kwargs=postprocess_kwargs, **kwargs)
+
+                # append to working
+                yx_peak_all.append((h_peak, x))
+                yx_rms_all.append((h_rms, x))
 
                 # calculate Mahalanobis distance for chi square later
                 div = int(np.ceil(len(h_rms_all)/len(x_all)))
@@ -1252,17 +1256,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 D_m2_all.append(D_m2)
 
                 # calculate statistics
-                a = np.array([h_rms_all, x_all])
-                print('a', a)
-                sd = np.std(a, axis=1)
+                sdy_all.append(np.nanstd(h_rms_all))
+                sdx_all.append(np.nanstd(x_all))
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
                                               keys=quants.keys(), plot=False, sigma=sigma)
-
-                # append to working
-                yx_peak_all.append((h_peak, x))
-                yx_rms_all.append((h_rms, x))
-                sdyx_all.append(sd)
-
                 for key in quants.keys():
                     try:
                         quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
