@@ -89,20 +89,15 @@ def mahalanobis(x=None, data=None, cov=None):
     return np.sqrt(mahal.diagonal())
 
 
-from scipy.spatial import distance
-from scipy.stats import chisquare
+# from scipy.spatial import distance
+# from scipy.stats import chisquare
 
 def reduced_chisq(O_y, C_y, dist=None, n_fitted=2, **kwargs):
     # dist is an array of distance metrics / errors e.g. variance or Mahalanobis for each point in O_y
-    print('O_y', O_y)
-    print('C_y', C_y)
-    print('dist', dist)
     dof = len(O_y) - n_fitted
     chisq = np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(dist))
     # chi2 = np.sum(((array(X) - array(X_model)) ** 2 + (array(Y) - array(Y_model)) ** 2) / (s ** 2))  # 2D
-    print('chisquare', chisq / dof)
-    # print('chisquare with y variance', np.sum((np.array(O_y) - np.array(C_y))**2 / np.var(O_y)) / dof)
-    # print('scipy chisquare', chisquare(O_y, C_y)[0] / dof)
+    # print('chisquare', chisq / dof)
     return chisq / dof
 
 

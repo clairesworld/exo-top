@@ -12,14 +12,14 @@ load = True #load_grid
 
 # try h scalings to two-component power law for chaotic
 #
-_ = sc.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_xs=('Ra_i', 'eta'),
-                 include_regimes=['chaotic'], save=True, fname='h_Ra-eta_chaotic_timeavg', labelsize=16, legend=True,
-                 title=r'fit to C Ra$^m \Delta\eta^n$', xlabel=r'Ra$_i$', ylabel='dynamic topography',
-                 fit=True, logx=True, logy=True, hscale=1, clabel=r'$\Delta\eta$',
-                 show_isoviscous=False, ylim=(5e-3, 3e-2), xlim=(1e7, 3e8),  postprocess_kwargs=postprocess_kwargs,
-                 regime_grid=regime_grid_td)
-#
+# _ = sc.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+#                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_xs=('Ra_i', 'eta'),
+#                  include_regimes=['chaotic'], save=True, fname='h_Ra-eta_chaotic_timeavg', labelsize=16, legend=True,
+#                  title=r'fit to C Ra$^m \Delta\eta^n$', xlabel=r'Ra$_i$', ylabel='dynamic topography',
+#                  fit=True, logx=True, logy=True, hscale=1, clabel=r'$\Delta\eta$',
+#                  show_isoviscous=False, ylim=(5e-3, 3e-2), xlim=(1e7, 3e8),  postprocess_kwargs=postprocess_kwargs,
+#                  regime_grid=regime_grid_td)
+# #
 # #
 # _ = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
 #                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i', sigma=2,

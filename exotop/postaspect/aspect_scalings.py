@@ -5,6 +5,7 @@ import pandas as pd
 import pickle as pkl
 from scipy.optimize import curve_fit
 from scipy import stats
+from scipy import odr
 import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -856,30 +857,71 @@ def fit_2log(x, y, h, **kwargs):
     regr = linear_model.LinearRegression()
     regr.fit(X, Y)
 
-    print('Intercept: \n', regr.intercept_)
-    print('Coefficients: \n', regr.coef_)
+    # print('Intercept: \n', regr.intercept_)
+    # print('Coefficients: \n', regr.coef_)
 
     return regr.coef_, 10 ** regr.intercept_
 
 
-def fit_h_sigma(x, h, h_err=None, fn='line'):
-    def line(x, a, b):
-        return a * x + b
+def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, fig_path=fig_path_bullard, **kwargs):
+    # try:
+    #     logx = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
+    #     logh = np.log10(np.array(h))
+    # except Exception as e:
+    #     print('h', h, type(h))
+    #     print('x', x, type(x))
+    #     raise e
 
-    #     def expon(x, C, n):
-    #         return C * x**n
+    def func_2param(p, u):
+        a, b = p
+        return a * u**b
 
-    idx = np.nonzero(np.isnan(x) is False)[0]
-    x_fit = np.log10(x[idx])
-    h_fit = np.log10(h[idx])
-    if h_err is not None:
-        h_err = np.log10(h_err[idx])
-    print('fitting x =', x_fit, 'h =', h_fit)
-    if fn == 'line':
-        popt, pcov = curve_fit(line, x_fit, h_fit, sigma=h_err)
-        print('slope:', popt[0], 'intercept:', popt[1])
+    def func_3param(p, u):
+        a, b, c = p
+        return a * u[0]**b * u[1]**c
 
-    return 10 ** (popt[1] + popt[0] * x)  # h evaluated at x
+    # Model object
+    model = odr.Model(func_2param)
+
+    # Create a RealData object
+    data = odr.RealData(x, h, sx=err_x, sy=err_h)
+
+    # Set up ODR with the model and data.
+    odr_ = odr.ODR(data, model, beta0=beta0)
+
+    # Run the regression.
+    out = odr_.run()
+
+    # print fit parameters and 1-sigma estimates
+    popt = out.beta
+    perr = out.sd_beta
+    print('fit parameter', sigma, 'sigma error')
+    print('———————————–')
+    for i in range(len(popt)):
+        print(str(popt[i]) + ' +- ' + str(perr[i]))
+
+    # prepare confidence level curves
+    nstd = sigma  # to draw 2-sigma intervals e.g.
+    popt_up = popt + nstd * perr
+    popt_dw = popt - nstd * perr
+
+    x_fit = np.linspace(min(x), max(x), 100)
+    fit = func_2param(popt, x_fit)
+    fit_up = func_2param(popt_up, x_fit)
+    fit_dw = func_2param(popt_dw, x_fit)
+
+    if plot:
+        # plot
+        fig, ax = plt.subplots(1)
+        ax.errorbar(x, h, yerr=err_h, xerr=err_x, hold=True, ecolor='k', fmt ='none', label ='data')
+        ax.set_xlabel('x', fontsize=18)
+        ax.set_ylabel('h', fontsize=18)
+        ax.set_title('fit with error on both axes', fontsize=18)
+        plt.plot(x_fit, fit, 'r', lw=2, label='best fit curve')
+        ax.fill_between(x_fit, fit_up, fit_dw, alpha=.25, label=str(sigma)+'-sigma interval')
+        ax.legend(loc='lower right', fontsize=18)
+        plot_save(fig, 'fit_test', fig_path)
+    return (*popt, *perr)
 
 
 def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
@@ -1211,7 +1253,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                                               keys=quants.keys(), plot=False, sigma=sigma)
                 for key in quants.keys():
                     try:
-                        quants[key] = np.vstack((quants[key], qdict[key]))
+                        quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
                     except ValueError:  # haven't added anything yet
                         quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
 
@@ -1238,6 +1280,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             intercept = False
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
+                               xerr=err[which_x], yerr=err['h_rms'],
                                intercept=intercept, **kwargs)
 
     if show_isoviscous:
@@ -1293,8 +1336,8 @@ def nondimensionalise_h(h, p):
         raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to nondimensionalise')
 
 
-def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', legsize=8, legloc='lower left', showchisq=True, **kwargs):
+def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscatter=False, n_fitted=2, c_list=None,
+                      c='xkcd:periwinkle', legsize=8, legloc='lower left', showchisq=False, **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
     try:
@@ -1323,13 +1366,14 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2,
                               )
 
         else:
+            if (yerr is not None) and (xerr is not None):
+                const, expon, const_err, expon_err = fit_logerror(flatx, flaty, xerr, yerr, **kwargs)
+            else:
+                expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
-            expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100, label='dum'
                           )
-
-        chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), n_fitted=n_fitted, **kwargs)
 
         if legend:
             handles, labels = ax.get_legend_handles_labels()
@@ -1342,6 +1386,7 @@ def fit_cases_on_plot(yx_all, ax, legend=True, showallscatter=False, n_fitted=2,
             else:
                 raise Exception('Legend labelling for this n fitted parameters not implemented')
             if showchisq:
+                chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), n_fitted=n_fitted, **kwargs)
                 newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.4f}'.format(chisq)
             try:
                 labels[-1] = newlabel
