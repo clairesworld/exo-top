@@ -1252,7 +1252,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 D_m2_all.append(D_m2)
 
                 # calculate statistics
-                sd = np.std(np.array([h_rms_all, x_all]), axis=1)
+                a = np.array([h_rms_all, x_all])
+                print('a', a)
+                sd = np.std(a, axis=1)
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
                                               keys=quants.keys(), plot=False, sigma=sigma)
 
