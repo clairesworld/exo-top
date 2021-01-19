@@ -864,19 +864,34 @@ def fit_2log(x, y, h, **kwargs):
 
 
 def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, fig_path=fig_path_bullard, **kwargs):
+    try:
+        logx = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
+        logh = np.log10(np.array(h))
+        logerr_x = np.log10(np.array(err_x))
+        logerr_h = np.log10(np.array(err_h))
+    except Exception as e:
+        print('h', h, type(h))
+        print('x', x, type(x))
+        raise e
+
     def func_2param(p, u):
         a, b = p
         return a * u**b
+
+    def func_lin2param(p, u):
+        a, b = p
+        return a + u*b
 
     def func_3param(p, u):
         a, b, c = p
         return a * u[0]**b * u[1]**c
 
     # Model object
-    model = odr.Model(func_2param)
+    model = odr.Model(func_lin2param)
 
     # Create a RealData object
-    data = odr.RealData(x, h, sx=err_x, sy=err_h)
+    # data = odr.RealData(x, h, sx=err_x, sy=err_h)
+    data = odr.RealData(logx, logh, sx=logerr_x, sy=logerr_h)
 
     # Set up ODR with the model and data.
     odr_ = odr.ODR(data, model, beta0=beta0)
@@ -887,29 +902,30 @@ def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, fig
     # print fit parameters and 1-sigma estimates
     popt = out.beta
     perr = out.sd_beta
+    popt[0] = 10**popt[0]  # unlog
+    perr[0] = 10**perr[0]
 
     # prepare confidence level curves
     nstd = sigma  # to draw 2-sigma intervals e.g.
     popt_up = popt + nstd * perr
     popt_dw = popt - nstd * perr
 
-    print('\nfit parameter', sigma, 'sigma error')
-    print('———————————–')
-    for i in range(len(popt)):
-        print(str(popt[i]) + ' +- ' + str(perr[i]))
-        print('min:', popt_dw[i])
-        print('max:', popt_up[i])
-    print('y min @ x min', func_2param(popt_dw, x[0]))
-    print('y max @ x max', func_2param(popt_up, x[-1]))
+    # print('\nfit parameter', sigma, 'sigma error')
+    # print('———————————–')
+    # for i in range(len(popt)):
+    #     print(str(popt[i]) + ' +- ' + str(perr[i]))
+    #     print('min:', popt_dw[i])
+    #     print('max:', popt_up[i])
+    # print('y min @ x min', func_2param(popt_dw, x[0]))
+    # print('y max @ x max', func_2param(popt_up, x[-1]))
     out.pprint()
-
-    x_fit = np.linspace(min(x), max(x), 100)
-    fit = func_2param(popt, x_fit)
-    fit_up = func_2param(popt_up, x_fit)
-    fit_dw = func_2param(popt_dw, x_fit)
 
     if plot:
         # plot
+        x_fit = np.linspace(min(x), max(x), 100)
+        fit = func_2param(popt, x_fit)
+        fit_up = func_2param(popt_up, x_fit)
+        fit_dw = func_2param(popt_dw, x_fit)
         fig, ax = plt.subplots(1)
         ax.errorbar(x, h, yerr=err_h, xerr=err_x, hold=True, ecolor='k', fmt ='none', label ='data')
         ax.set_xlabel('x', fontsize=18)
