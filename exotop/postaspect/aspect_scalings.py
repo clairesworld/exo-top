@@ -899,8 +899,8 @@ def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, fig
         print(str(popt[i]) + ' +- ' + str(perr[i]))
         print('min:', popt_dw[i])
         print('max:', popt_up[i])
-        print('y min @ x min', func_2param(popt_dw, x[0]))
-        print('y max @ x max', func_2param(popt_up, x[-1]))
+    print('y min @ x min', func_2param(popt_dw, x[0]))
+    print('y max @ x max', func_2param(popt_up, x[-1]))
 
     x_fit = np.linspace(min(x), max(x), 100)
     fit = func_2param(popt, x_fit)
@@ -1341,7 +1341,7 @@ def nondimensionalise_h(h, p):
 
 
 def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', legsize=8, legloc='lower left', showchisq=False, **kwargs):
+                      c='xkcd:periwinkle', sigma=1, legsize=8, legloc='lower left', showchisq=False, **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
     try:
@@ -1359,7 +1359,6 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
             flatx0 = [a[0] for a in flatx]
             flatx1 = [a[1] for a in flatx]
             x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
-            x1prime = np.linspace(np.min(flatx1), np.max(flatx1), num=len(flatx1))
             expon, const = fit_2log(x=flatx0, y=flatx1, h=flaty)
             z_vec = np.unique(flatx1)
             if c_list is None:
@@ -1370,14 +1369,21 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
                               )
 
         else:
+            xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
             if (yerr is not None) and (xerr is not None):
-                const, expon, const_err, expon_err = fit_logerror(flatx, flaty, xerr, yerr, **kwargs)
+                const, expon, const_err, expon_err = fit_logerror(flatx, flaty, xerr, yerr, sigma=sigma, **kwargs)
+                const_up = const + sigma * const_err
+                const_dw = const - sigma * const_err
+                expon_up = expon + sigma * expon_err
+                expon_dw = expon - sigma * expon_err
+                hprime_up = const_up * xprime ** expon_up
+                hprime_dw = const_dw * xprime ** expon_dw
+                hprime_dw[hprime_dw < 0] = 0  # cannot be negative
+                ax.fill_between(xprime, hprime_up, hprime_dw, alpha=.25, label=str(sigma) + '-sigma interval')
             else:
                 expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
-            xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100, label='dum'
-                          )
 
         if legend:
             handles, labels = ax.get_legend_handles_labels()
