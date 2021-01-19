@@ -1250,7 +1250,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 yx_peak_all.append((h_peak, x))
                 yx_rms_all.append((h_rms, x))
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
-                                              keys=quants.keys(), plot=False, sigma=sigma)
+                                              keys=quants.keys(), plot=False, sigma=1)
                 for key in quants.keys():
                     try:
                         quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
@@ -1280,7 +1280,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             intercept = False
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
-                               xerr=err[which_x], yerr=err['h_rms'],
+                               xerr=err[which_x], yerr=err['h_rms'], sigma=sigma,
                                intercept=intercept, **kwargs)
 
     if show_isoviscous:
