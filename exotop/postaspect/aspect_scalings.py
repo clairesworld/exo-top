@@ -901,6 +901,7 @@ def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, fig
         print('max:', popt_up[i])
     print('y min @ x min', func_2param(popt_dw, x[0]))
     print('y max @ x max', func_2param(popt_up, x[-1]))
+    out.pprint()
 
     x_fit = np.linspace(min(x), max(x), 100)
     fit = func_2param(popt, x_fit)
@@ -1249,15 +1250,15 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 # calculate statistics
                 sdy = np.nanstd(h_rms_all)
                 sdx = np.nanstd(x_all)
-                print('sdy', sdy)
-                print('sdx', sdx)
+                # print('sdy', sdy)
+                # print('sdx', sdx)
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all, which_x: x_all},
-                                              keys=quants.keys(), plot=False, sigma=1)
+                                              keys=quants.keys(), plot=False, sigma=2)
 
-                print('percentile lower err x', qdict[which_x][1] - qdict[which_x][0])
-                print('percentile upper err x', qdict[which_x][2] - qdict[which_x][1])
-                print('percentile lower err y', qdict['h_rms'][1] - qdict['h_rms'][0])
-                print('percentile upper err y', qdict['h_rms'][2] - qdict['h_rms'][1])
+                # print('percentile lower err x', qdict[which_x][1] - qdict[which_x][0])
+                # print('percentile upper err x', qdict[which_x][2] - qdict[which_x][1])
+                # print('percentile lower err y', qdict['h_rms'][1] - qdict['h_rms'][0])
+                # print('percentile upper err y', qdict['h_rms'][2] - qdict['h_rms'][1])
 
                 # append to working
                 yx_peak_all.append((h_peak, x))
@@ -1352,6 +1353,7 @@ def nondimensionalise_h(h, p):
 
 def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscatter=False, n_fitted=2, c_list=None,
                       c='xkcd:periwinkle', sigma=1, legsize=8, legloc='lower left', showchisq=False, **kwargs):
+    fiterror = (yerr is not None) and (xerr is not None)
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
     try:
@@ -1379,7 +1381,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
 
         else:
             xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
-            if (yerr is not None) and (xerr is not None):
+            if fiterror:
                 const, expon, const_err, expon_err = fit_logerror(flatx, flaty, xerr, yerr, sigma=sigma, **kwargs)
                 const_up = const + sigma * const_err
                 const_dw = const - sigma * const_err
@@ -1388,7 +1390,8 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
                 hprime_up = const_up * xprime ** expon_up
                 hprime_dw = const_dw * xprime ** expon_dw
                 hprime_dw[hprime_dw < 0] = 0  # cannot be negative
-                ax.fill_between(xprime, hprime_up, hprime_dw, alpha=.25, label=str(sigma) + '-sigma interval')
+                ax.fill_between(xprime, hprime_up, hprime_dw, alpha=.25#, label=str(sigma) + '-sigma interval'
+                                )
             else:
                 expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
@@ -1399,7 +1402,10 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
             # handles.append(h3)
             # labels.append('{:.2e} x^{:.3f}'.format(const, expon))
             if n_fitted == 2:
-                newlabel = '{:.2e} x^{:.3f}'.format(const, expon)
+                if fiterror:
+                    newlabel = '({:.2e} +- {:.2e}) x^({:.3f} +- {:.3f})'.format(const, const_err, expon, expon_err)
+                else:
+                    newlabel = '{:.2e} x^{:.3f}'.format(const, expon)
             elif n_fitted == 3:
                 newlabel = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
             else:
