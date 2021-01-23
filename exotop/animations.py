@@ -86,7 +86,7 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     # print('Finished!!')
 
     # T profile
-    fig, ax = plt.subplots(figsize=(2, 4))
+    fig2, ax = plt.subplots(figsize=(2, 4))
     ax.set_xlabel('', fontsize=labelsize, labelpad=20)
     ax.set_ylabel('', fontsize=labelsize, labelpad=20)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
@@ -107,7 +107,7 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     ax.legend(frameon=False, fontsize=20, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
     ax.set_xlim([0, 1])
     ax.set_ylim([0, 1])
-    fig, ax = dark_background(fig, ax)
+    fig2, ax = dark_background(fig2, ax)
 
     def init2():
         line.set_xdata(([np.nan] * len(y_f)))
@@ -125,13 +125,14 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
                         label='Thermal bdy layer')
         return line,
 
-    ani2 = animation.FuncAnimation(fig, animate2, frames=len(n),
+    ani2 = animation.FuncAnimation(fig2, animate2, frames=len(n),
                                   #                               init_func=init2,
                                   fargs=(df,), blit=False, repeat=True,
                                   interval=200, )  # interval: delay between frames in ms
     # HTML(ani.to_jshtml())
     ani2.save(case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
-    # print('Finished!!')
+    print('just saved to -prof.gif')
+
 
 for jj, etastr in enumerate(eta_ls):
     cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
