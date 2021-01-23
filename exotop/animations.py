@@ -19,7 +19,6 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     dat = ap.Aspect_Data(directory=data_path + 'output-' + case + '/')
     df = sc.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
-    t = df.ts.to_numpy()
 
     T_n = []
     for nn in n:
