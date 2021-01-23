@@ -1,7 +1,7 @@
 import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
-    fig_fmt, regime_grid_td, postprocess_kwargs, \
+    fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, \
     load_grid    # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 # import pstats
@@ -18,7 +18,7 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 #                         data_path=data_path,
 #                         postprocess_kwargs=postprocess_kwargs)
 
-sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_Nu'],
+sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_Nu'], regime_names=regime_names_td,
                         postprocess_functions=[sc.T_parameters_at_sol, sc.h_at_ts, sc.Nu_at_ts],
                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
                         load_grid=load_grid, postprocess_kwargs=postprocess_kwargs)

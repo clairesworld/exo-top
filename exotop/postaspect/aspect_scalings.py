@@ -2714,9 +2714,11 @@ def Nu_eff(gamma=None, d_m=None, delta_L=None, alpha_m=None, g=None, b=None, kap
 
 def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_grid=None, end_grid=None,
                          data_path=data_path_bullard, redo=True, load_grid=None, regime_grid=None, include_regimes=None,
-                         **kwargs):
+                         regime_names=None, **kwargs):
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
         t1_grid, load_grid, end_grid, regime_grid))
+    if include_regimes is None:
+        include_regimes = regime_names
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
@@ -2724,7 +2726,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
             t1_ii = t1_grid[jj][ii]
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
                 if include_regimes is not None and (regime_grid[jj][ii] in include_regimes):
-                    print(case)
+                    print('Processing', case)
                     if redo:
                         # for recalculating everything if you fucked up e.g.
                         load = False
