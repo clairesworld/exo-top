@@ -21,7 +21,7 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 sc.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_Nu'], regime_names=regime_names_td,
                         postprocess_functions=[sc.T_parameters_at_sol, sc.h_at_ts, sc.Nu_at_ts],
                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
-                        load_grid=load_grid, postprocess_kwargs=postprocess_kwargs)
+                        load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
 # ## plot summaries across delta eta
 #

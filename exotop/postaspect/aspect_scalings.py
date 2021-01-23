@@ -2725,7 +2725,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, postprocess_functions, t1_gri
         for ii, case in enumerate(cases):
             t1_ii = t1_grid[jj][ii]
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)):
-                if include_regimes is not None and (regime_grid[jj][ii] in include_regimes):
+                if regime_grid[jj][ii] in include_regimes:
                     print('Processing', case)
                     if redo:
                         # for recalculating everything if you fucked up e.g.
