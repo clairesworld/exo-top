@@ -44,7 +44,7 @@ i_plot = list(range(len(Ra_ls)))  # range(4,5)
 for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
     if ii in i_plot:
         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
-        labels_ii = [r'$\Deltka \eta$=' + eta for eta in eta_ls]
+        labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
         sc.subplots_cases(
             cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
             fname='all-Ra' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
