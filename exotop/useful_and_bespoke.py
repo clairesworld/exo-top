@@ -1,4 +1,5 @@
 import numpy as np
+
 def colorize(vector,cmap='plasma', vmin=None, vmax=None):
     """Convert a vector to RGBA colors. @author: jlustigy
 
@@ -45,15 +46,17 @@ def cmap_from_list(clist, n_bin=None, cmap_name=''):
     return cm
 
 
-from collections import Iterable
-from six import string_types
 def iterable_not_string(obj):
+    from collections import Iterable
+    from six import string_types
     if isinstance(obj, Iterable) and not isinstance(obj, string_types):
         return True
     else:
         return False  # also False if None
 
-def not_iterable(obj):
+def not_iterable(obj):  # but can be a string
+    from collections import Iterable
+    from six import string_types
     if isinstance(obj, string_types):
         return True
     elif not isinstance(obj, Iterable):
@@ -62,6 +65,7 @@ def not_iterable(obj):
         return False
 
 def not_string(obj):
+    from six import string_types
     if isinstance(obj, string_types):
         return False
     else:
@@ -89,10 +93,9 @@ def mahalanobis(x=None, data=None, cov=None):
     return np.sqrt(mahal.diagonal())
 
 
-# from scipy.spatial import distance
-# from scipy.stats import chisquare
-
 def reduced_chisq(O_y, C_y, dist=None, n_fitted=2, **kwargs):
+    # from scipy.spatial import distance
+    # from scipy.stats import chisquare
     # dist is an array of distance metrics / errors e.g. variance or Mahalanobis for each point in O_y
     dof = len(O_y) - n_fitted
     chisq = np.sum((np.array(O_y) - np.array(C_y))**2 / np.array(dist))
@@ -111,9 +114,9 @@ def printe(name, obj, showall=False):
         pass
 
 
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 def colourbar(mappable, vmin=None, vmax=None, label='', labelsize=16, ticks=None, ticklabels=None, labelpad=17,
               rot=None, discrete=False):
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
     # from https://joseph-long.com/writing/colorbars/
     ax = mappable.axes
     fig = ax.figure
@@ -144,3 +147,84 @@ def minmaxnorm(x, a=0, b=1):
     x = (x - xmin) / (xmax - xmin)  # norm to 0, 1
     x = x * (b - a) + a  # scale to a, b
     return x
+
+
+# image scatter fn
+def imscatter(x, y, image, ax=None, zoom=1):
+    # from PIL import Image
+    import matplotlib.pyplot as plt
+    from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+    if ax is None:
+        ax = plt.gca()
+    try:
+        image = plt.imread(image)
+    except TypeError:
+        # Likely already an array...
+        pass
+    im = OffsetImage(image, zoom=zoom)
+    x, y = np.atleast_1d(x, y)
+    artists = []
+    for x0, y0 in zip(x, y):
+        ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=False)
+        artists.append(ax.add_artist(ab))
+    ax.update_datalim(np.column_stack([x, y]))
+    ax.autoscale()
+    return artists
+
+
+def hide_log_ticklabels(ax, axis='both', index='all', hideticks=False, flipped=False):
+    # hilariously tricky thing of hiding tick labels for log scale. answer from
+    # https://stackoverflow.com/questions/36064477/remove-specific-ticks-on-logarithmic-plot-in-matplotlib
+    from matplotlib.ticker import NullFormatter
+    if not (axis in ['x', 'y', 'both']):
+        raise Exception('axis must be x, y, or both')
+    if not (index in ['first', 'last', 'all']):
+        raise Exception('index must be first, last, or all')
+    axes = []
+    if axis in ['x', 'both']:
+        axes.append(ax.xaxis)
+    if axis == ['y', 'both']:
+        axes.append(ax.yaxis)
+
+    for a in axes:
+        a.set_minor_formatter(NullFormatter())
+        if (index == 'first') or (index == 'last' and flipped):
+            tcks = [a.get_major_ticks()[1]]
+        elif (index == 'last') or (index == 'first' and flipped):
+            tcks = [a.get_major_ticks()[-2]]
+        elif index == 'both':
+            tcks = a.get_major_ticks()
+        for t in tcks:
+            t.label1.set_visible(False)
+        if hideticks:
+            [a.set_tick_params(which=m, size=0) for m in ['minor', 'major']]
+            [a.set_tick_params(which=m, width=0) for m in ['minor', 'major']]
+
+
+def dark_background(fig, ax, fgc='xkcd:off white', bgc='xkcd:black'):
+    """ recolour fig and its axes to foreground and background colour - not artists tho """
+    import matplotlib.pyplot as plt
+    from matplotlib.legend import Legend
+    if not_iterable(ax):
+        ax = [ax]
+
+    fig.patch.set_facecolor(bgc)
+
+    for a in ax:
+        a.set_facecolor(bgc)
+        [a.spines[s].set_color(fgc) for s in ['bottom', 'top', 'right', 'left']]
+        a.xaxis.label.set_color(fgc)
+        a.tick_params(axis='x', colors=fgc)
+        a.yaxis.label.set_color(fgc)
+        a.tick_params(axis='y', colors=fgc)
+
+        # if there's a legend do that too
+        legends = [c for c in a.get_children() if isinstance(c, Legend)]
+        for l in legends:
+            for text in l.get_texts():
+                plt.setp(text, color=fgc)
+            # todo: spines? (legend.edgecolor)
+        # todo: title color
+    print('Remember to add facecolor=fig.get_facecolor() to savefig()')
+
+    return (fig, *ax)

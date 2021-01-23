@@ -1271,8 +1271,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 # calculate statistics
                 sdy = np.nanstd(h_rms_times)
                 sdx = np.nanstd(x_times)
-                print('mean log sdy', np.mean(np.nanstd(np.log10(np.asarray(h_rms_times).astype(np.float64)))))
-                print('mean log sdx', np.mean(np.nanstd(np.log10(np.asarray(x_times).astype(np.float64)))))
+                print('log sdy', np.nanstd(np.log10(np.asarray(h_rms_times).astype(np.float64))))
+                print('log sdx', np.nanstd(np.log10(np.asarray(x_times).astype(np.float64))))
                 qdict = parameter_percentiles(case, df={'h_rms': h_rms_times, 'h_peak': h_peak_times, which_x: x_times},
                                               keys=quants.keys(), plot=False, sigma=2)
 
