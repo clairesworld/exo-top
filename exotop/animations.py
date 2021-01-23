@@ -1,4 +1,5 @@
 import sys
+import os
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, \
@@ -13,7 +14,7 @@ from matplotlib import cm, colors, rc
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pandas as pd
 
-def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm'):
+def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm', fps=15):
     # preload data
     dat = ap.Aspect_Data(directory=data_path + 'output-' + case + '/')
     df = sc.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
@@ -73,12 +74,13 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     # HTML(ani.to_jshtml())
 
     # set frame rate according to model time:
-    t = df.time.to_numpy()
-    dt = t[-1] - t[0]
-    print('model time span:', dt)
-    factor = 1 / 68
-    fps = len(n) / (dt) * factor
-    print('equivalent fps:', fps)
+    if fps is None:
+        t = df.time.to_numpy()
+        dt = t[-1] - t[0]
+        print('model time span:', dt)
+        factor = 1 / 68
+        fps = len(n) / (dt) * factor
+        print('equivalent fps:', fps)
 
     ani.save(fig_path+case + '-T.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
     # print('Finished!!')
@@ -107,11 +109,11 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     ax.set_ylim([0, 1])
     fig, ax = dark_background(fig, ax)
 
-    def init():
+    def init2():
         line.set_xdata(([np.nan] * len(y_f)))
         return line,
 
-    def animate(i, df):
+    def animate2(i, df):
         ax.collections.clear()
         df_n = df.iloc[i]
         T_f = np.array(df_n['T_av'].tolist())
@@ -123,16 +125,17 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
                         label='Thermal bdy layer')
         return line,
 
-    ani = animation.FuncAnimation(fig, animate, frames=len(n),
-                                  #                               init_func=init,
+    ani2 = animation.FuncAnimation(fig, animate2, frames=len(n),
+                                  #                               init_func=init2,
                                   fargs=(df,), blit=False, repeat=True,
                                   interval=200, )  # interval: delay between frames in ms
     # HTML(ani.to_jshtml())
-    ani.save(case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
+    ani2.save(case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
     # print('Finished!!')
 
 for jj, etastr in enumerate(eta_ls):
     cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
     for ii, case in enumerate(cases):
-        animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm')
-        print('finished case')
+        if (os.path.exists(data_path + 'output-' + case)):
+            animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm')
+            print('finished case')
