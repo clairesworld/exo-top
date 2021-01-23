@@ -15,7 +15,6 @@ import pandas as pd
 
 def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm'):
     # preload data
-    case = 'Ra3e8-eta1e6-wide'
     dat = ap.Aspect_Data(directory=data_path + 'output-' + case + '/')
     df = sc.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
