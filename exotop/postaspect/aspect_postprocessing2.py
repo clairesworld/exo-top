@@ -218,7 +218,7 @@ class Aspect_Data():
         str_f = self.get_solution_filenames(verbose=verbose)[1][-1]
         return int(re.search(r'\d+', str_f).group(0))
         
-    def read_temperature(self, n, verbose=False):
+    def read_temperature(self, n, verbose=False, **kwargs):
         if not(hasattr(self, 'snames')):
             self.get_solution_filenames(verbose=verbose)
             
@@ -248,7 +248,7 @@ class Aspect_Data():
 #         print('final shape', np.shape(T))
         return self.x, self.y, self.z, T
 
-    def read_velocity(self, n, verbose=False):
+    def read_velocity(self, n, verbose=False, **kwargs):
         if not(hasattr(self, 'snames')):
             self.get_solution_filenames(verbose=verbose)
             
