@@ -135,8 +135,9 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
 
 
 for jj, etastr in enumerate(eta_ls):
-    cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
-    for ii, case in enumerate(cases):
-        if (os.path.exists(data_path + 'output-' + case)):
-            animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm')
-            print('finished case')
+    if jj >= 2:
+        cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
+        for ii, case in enumerate(cases):
+            if (os.path.exists(data_path + 'output-' + case)):
+                animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm')
+                print('finished case')
