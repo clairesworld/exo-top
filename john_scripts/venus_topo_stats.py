@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pyshtools
-from pyshtools import constant
 
 def RMS_from_l_powerspectrum(clm_topo, lmax=None):
     # Calculate RMS topography from power spectrum
@@ -10,17 +9,23 @@ def RMS_from_l_powerspectrum(clm_topo, lmax=None):
     print("RMS_topo", RMS_topo, "m")
     return RMS_topo
 
-def plot_Venus(filename='VenusTopo719.shape', lmax=719, path='benchmarks/'):
+
+def read_coeffs(filename='VenusTopo719.shape', lmax=719, path='benchmarks/'):
     # Read in spherical harmonic coefficients of topography
     lmax_read = lmax
     cilm_topo, lmax_out = pyshtools.shio.shread(path+filename, lmax=lmax_read)
     clm_topo = pyshtools.SHCoeffs.from_array(cilm_topo)
 
     # Radius of Venus in m
-    r0 = pyshtools.constant.r_venus.value
+    a0 = pyshtools.constants.Venus.r.value
 
     # Get rid of degree 0 corresponding to mean radius
     clm_topo.coeffs[:,0] = 0.0
+    return clm_topo, cilm_topo
+
+
+def plot_Venus(filename='VenusTopo719.shape', lmax=719, path='benchmarks/'):
+    clm_topo, cilm_topo = read_coeffs(filename=filename, lmax=lmax, path=path)
 
     # Some different ways of plotting power spectrum
     fig, ax = clm_topo.plot_spectrum(unit='per_l') # per degree
@@ -43,3 +48,4 @@ def plot_Venus(filename='VenusTopo719.shape', lmax=719, path='benchmarks/'):
     plt.ylabel("RMS (dimensionless)")
     plt.title("Like Figure 7 of Rappaport et al 1999")
     plt.show()
+   

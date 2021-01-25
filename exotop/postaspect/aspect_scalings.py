@@ -806,9 +806,12 @@ def parameter_percentiles(case=None, df=None, keys=None, plot=False, sigma=2, **
     return qdict
 
 
-def fit_log(x, h, intercept=False, weights=None, **kwargs):
+def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
     def coefficient(x, b):
         return x + b
+
+    def coefficient2(x, b):
+        return -2*x + b
 
     try:
         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
@@ -822,8 +825,11 @@ def fit_log(x, h, intercept=False, weights=None, **kwargs):
             # check for and remove nans
             df = pd.DataFrame({'x': x1, 'h': h1})
             df.dropna(inplace=True)
-            popt, pcov = curve_fit(coefficient, df.x.to_numpy(), df.h.to_numpy())
-            slope = 1.0
+            if slope == 1:
+                popt, pcov = curve_fit(coefficient, df.x.to_numpy(), df.h.to_numpy())
+            elif slope == -2:
+                popt, pcov = curve_fit(coefficient2, df.x.to_numpy(), df.h.to_numpy())
+            slope = slope
             intercept = popt[0]
         except ValueError as e:
             print('x', x1, np.shape(x1))

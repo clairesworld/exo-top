@@ -130,14 +130,13 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
                                   fargs=(df,), blit=False, repeat=True,
                                   interval=200, )  # interval: delay between frames in ms
     # HTML(ani.to_jshtml())
-    ani2.save(case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
-    print('just saved to -prof.gif')
+    ani2.save(fig_path+case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
 
 
 for jj, etastr in enumerate(eta_ls):
-    if jj >= 3:
+    if jj <= 2:
         cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
         for ii, case in enumerate(cases):
-            if (os.path.exists(data_path + 'output-' + case)):
+            if (os.path.exists(data_path + 'output-' + case)) and (ii >= 4):
                 animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm')
                 print('finished case')

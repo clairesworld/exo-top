@@ -1,9 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pyshtools
-from pyshtools import constant
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
+
+
+def read_hoggard(filename='NGS-2015-07-01303-s13.csv', file_path='models/', to_km=False, lmax=30):
+    sh = np.loadtxt(file_path+filename, delimiter=",")
+    cilm = np.zeros((2, lmax+1, lmax+1))
+    for i in range(sh.shape[0]):
+        l = int(sh[i,0])
+        m = int(sh[i,1])
+        coeff = sh[i,2]
+        if to_km:
+            if m>0:
+                cilm[1, l, m] = coeff/1e3  # 1e3 for converting from m to km
+            else:
+                cilm[0, l, -m] = coeff/1e3
+
+    # Hoggard uses "fully normalized" coefficients with the Condon-Shortley phase convention (like seismologists)
+    clm= pyshtools.SHCoeffs.from_array(cilm,lmax=30,normalization="ortho",csphase=-1)
+    
+    return cilm, clm
+
 
 def do(filename='NGS-2015-07-01303-s13.csv', fig_path='figs/', save=False, file_path='models/'):
     """ run John F. Rudge's script to plot dynamic topography from Hoggard (2016)
@@ -17,19 +36,7 @@ def do(filename='NGS-2015-07-01303-s13.csv', fig_path='figs/', save=False, file_
     lmax_data = 30   # spherical harmonic degree of Hoggard model
     lmax_plot = 120  # spherical harmonic degree to use for plotting purposes
 
-    sh = np.loadtxt(file_path+filename, delimiter=",")
-    cilm = np.zeros((2, lmax_data+1, lmax_data+1))
-    for i in range(sh.shape[0]):
-        l = int(sh[i,0])
-        m = int(sh[i,1])
-        coeff = sh[i,2]
-        if m>0:
-            cilm[1, l, m] = coeff/1e3  # 1e3 for converting from m to km
-        else:
-            cilm[0, l, -m] = coeff/1e3
-
-    # Hoggard uses "fully normalized" coefficients with the Condon-Shortley phase convention (like seismologists)
-    clm= pyshtools.SHCoeffs.from_array(cilm,lmax=30,normalization="ortho",csphase=-1)
+    cilm, clm = read_hoggard(filename, file_path, to_km=True, lmax=lmax_data)
 
 #     # Mimic Figure 5 -- plot of l2 norm spectrum (not really power, out by 4pi)
 #     fig1, ax1 = clm.plot_spectrum(unit="per_l",xscale='lin',yscale='log',convention="l2norm")
