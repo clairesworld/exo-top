@@ -1216,10 +1216,10 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
-              save=True, fname='h', legend=False, sigma=1, fiterror=True,
+              save=True, fname='h', legend=False, sigma=1, fiterror=True, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
-              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False,
+              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7),
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
@@ -1228,7 +1228,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     if include_regimes is None:
         include_regimes = regime_names
     if ax is None:
-        fig = plt.figure()
+        fig = plt.figure(figsize)
         ax = plt.gca()
 
     quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
@@ -1308,10 +1308,11 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     try:
         for key in quants.keys():
             err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
-        ax.errorbar(means[which_x], means['h_peak'], yerr=sdy_all,#err['h_peak'],
-                    xerr=sdx_all,#err[which_x],
-                    elinewidth=0.5,
-                    fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
+        if showpeak:
+            ax.errorbar(means[which_x], means['h_peak'], yerr=sdy_all,#err['h_peak'],
+                        xerr=sdx_all,#err[which_x],
+                        elinewidth=0.5,
+                        fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
         ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=0.5,
                     fmt='o', c=c_rms, capsize=5)
     except TypeError:  # no cases in given regimes as quants is dict of None
@@ -1329,7 +1330,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             xerr = None
             yerr = None
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
-                               xerr=xerr, yerr=yerr,
+                               xerr=xerr, yerr=yerr, legend=legend,
                                sigma=sigma, intercept=intercept, **kwargs)
 
     if show_isoviscous:
