@@ -57,6 +57,15 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
 
     fig, ax, cax = dark_background(fig, [ax, cax])
 
+    # set frame rate according to model time:
+    if fps is None:
+        t = df.time.to_numpy()
+        dt = t[-1] - t[0]
+        print('model time span:', dt)
+        factor = 1 / 68
+        fps = len(n) / (dt) * factor
+        print('equivalent fps:', fps)
+
     # do animation
     def init():
         im.set_array([])
@@ -67,23 +76,23 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
         im.set_array(T.ravel())
         return im
 
-    ani = animation.FuncAnimation(fig, animate, frames=len(n),
-                                  #                               init_func=init,
-                                  fargs=(T_n,), blit=False, repeat=True,
-                                  interval=200, )  # interval: delay between frames in ms
-    # HTML(ani.to_jshtml())
+    try:
+        ani = animation.FuncAnimation(fig, animate, frames=len(n),
+                                      #                               init_func=init,
+                                      fargs=(T_n,), blit=False, repeat=True,
+                                      interval=200, )  # interval: delay between frames in ms
+        # HTML(ani.to_jshtml())
+        ani.save(fig_path+case + '-T.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
+        # print('Finished!!')
+    except:
+        # out of cache?
+        ani = animation.FuncAnimation(fig, animate, frames=range(0, len(n), 2),
+                                      #                               init_func=init,
+                                      fargs=(T_n,), blit=False, repeat=True,
+                                      interval=200, )  # interval: delay between frames in ms
+        ani.save(fig_path+case + '-T.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
 
-    # set frame rate according to model time:
-    if fps is None:
-        t = df.time.to_numpy()
-        dt = t[-1] - t[0]
-        print('model time span:', dt)
-        factor = 1 / 68
-        fps = len(n) / (dt) * factor
-        print('equivalent fps:', fps)
 
-    ani.save(fig_path+case + '-T.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
-    # print('Finished!!')
 
     # T profile
     fig2, ax = plt.subplots(figsize=(2, 4))
