@@ -187,9 +187,9 @@ def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     ani.save(fig_path+case + '-h.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
 
 
-for jj, etastr in enumerate(reversed(eta_ls)):
+for jj, etastr in enumerate(eta_ls):
     if jj <= 20:
-        cases, cases_var = sc.get_cases_list(reversed(Ra_ls), etastr, end_grid[jj])
+        cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
         for ii, case in enumerate(cases):
             if (os.path.exists(data_path + 'output-' + case)) and (ii >= 0):
                 # animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm')
