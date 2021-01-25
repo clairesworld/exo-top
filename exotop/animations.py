@@ -187,7 +187,7 @@ for jj, etastr in enumerate(eta_ls):
     if jj <= 20:
         cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
         for ii, case in enumerate(cases):
-            if (os.path.exists(data_path + 'output-' + case)) and (ii >= 0):
+            if (os.path.exists(data_path + 'output-' + case)) and (ii >= 3):
                 animate_T(case, data_path=data_path, fig_path=fig_path+'animations/', labelsize=30, ticksize=16, cmap='gist_heat')
                 # animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16)
                 print('finished case')
