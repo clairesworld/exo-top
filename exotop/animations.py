@@ -20,6 +20,9 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     df = sc.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
 
+    if len(n) > 100:
+        n = n[::2]
+
     T_n = []
     for nn in n:
         x, y, _, T = dat.read_temperature(nn, verbose=False)
@@ -47,14 +50,11 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     cax.set_xlabel('Temperature', fontsize=18)
     cax.tick_params(axis='x', which='major', labelsize=ticksize)
     ax.set_title('Nondimensional temperature', fontsize=labelsize, pad=90, color='xkcd:off white')
-
     im = ax.pcolormesh(x, y, ap.reduce_dims(T_n[0]), cmap=cmap)
     cb = fig.colorbar(im, cax=cax, orientation="horizontal")
-
     cax.xaxis.tick_top()
     cax.xaxis.set_label_position('top')
     cax.xaxis.set_ticks_position('top')
-
     fig, ax, cax = dark_background(fig, [ax, cax])
 
     # set frame rate according to model time:
