@@ -144,7 +144,6 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
 
 def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, fps=15):
     # preload data
-    case = 'Ra3e8-eta1e6-wide'
     df = sc.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
     ts = df.index.to_numpy()
