@@ -142,10 +142,55 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     ani2.save(fig_path+case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
 
 
+def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, fps=15):
+    # preload data
+    case = 'Ra3e8-eta1e6-wide'
+    df = sc.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    n = df.sol.to_numpy()
+    ts = df.index.to_numpy()
+
+    h_n, h_peak, h_rms = [], [], []
+    for i in range(len(n)):
+        x, h = sc.read_topo_stats(case, ts[i], data_path=data_path)
+        h_norm = sc.trapznorm(h)
+        peak, rms = sc.peak_and_rms(h_norm)
+        h_n.append(h)
+        h_peak.append(peak)
+        h_rms.append(rms)
+    print('loaded', len(n), 'h profiles')
+
+    fig, ax = plt.subplots(figsize=(20, 5))
+    ax.set_xlabel('', fontsize=labelsize, labelpad=20)
+    ax.set_ylabel('', fontsize=labelsize, labelpad=20)
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
+    ax.set_xticks([])
+    # ax.set_yticks([])
+
+    hprof, = ax.plot(x, h_n[0], c='xkcd:off white', lw=3)
+    hmean, = ax.plot(x, h_rms[0], c='xkcd:off white', lw=2, ls='--')
+    ax.set_xlim([0, 8])
+    ax.set_ylim([-5e-2, 5e-2])
+    fig, ax = dark_background(fig, ax)
+
+    def init():
+        hprof.set_ydata(([np.nan] * len(x)))
+        return hprof, hmean,
+
+    def animate(i, h_n, h_rms):
+        hprof.set_xdata(h_n[i])  # update the data.
+        hmean.set_ydata(h_rms[i])
+        return hprof, hmean,
+
+    ani = animation.FuncAnimation(fig, animate, frames=len(n), init_func=init,
+                                  fargs=(h_n,h_rms), blit=True, repeat=True,
+                                  interval=200, )  # interval: delay between frames in ms
+    ani.save(fig_path+case + '-h.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
+
 for jj, etastr in enumerate(eta_ls):
     if jj <= 2:
         cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
         for ii, case in enumerate(cases):
             if (os.path.exists(data_path + 'output-' + case)) and (ii >= 4):
-                animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm')
+                # animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm')
+                animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16)
                 print('finished case')

@@ -527,7 +527,7 @@ def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=d
 def h_at_ts(case, ts=None, **kwargs):
     h_params_n = {}
     try:
-        x, h = read_topo_stats(case, ts)
+        x, h = read_topo_stats(case, ts, **kwargs)
         h_norm = trapznorm(h)
         peak, rms = peak_and_rms(h_norm)
         h_params_n['h_peak'] = peak
