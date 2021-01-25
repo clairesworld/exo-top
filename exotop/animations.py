@@ -67,10 +67,6 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
         print('equivalent fps:', fps)
 
     # do animation
-    def init():
-        im.set_array([])
-        return im
-
     def animate(i, T_n):
         T = ap.reduce_dims(T_n[i])
         im.set_array(T.ravel())
@@ -94,52 +90,52 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
 
 
 
-    # T profile
-    fig2, ax = plt.subplots(figsize=(2, 4))
-    ax.set_xlabel('', fontsize=labelsize, labelpad=20)
-    ax.set_ylabel('', fontsize=labelsize, labelpad=20)
-    ax.tick_params(axis='both', which='major', labelsize=ticksize)
-    ax.set_xticks([0, 0.5, 1])
-    ax.set_yticks([])
-
-    df_n = df.iloc[0]
-
-    delta_rh_n = np.array(df_n['delta_rh'])
-    D_l_n = np.array(df_n['y_L'])
-    T_f = np.array(df_n['T_av'].tolist())
-    y_f = np.array(df_n['y'].tolist())
-
-    line, = ax.plot(T_f, y_f, c='xkcd:off white', lw=3)
-    ax.fill_between(T_f, [D_l_n - delta_rh_n] * len(T_f), [D_l_n] * len(T_f), fc='xkcd:tangerine', alpha=0.9,
-                    label='Thermal bdy layer')
-    #                 label='Thermal bdy layer\n' + r'$\delta$ = ' + '{:04.3f}'.format(delta_rh_n))
-    ax.legend(frameon=False, fontsize=20, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
-    ax.set_xlim([0, 1])
-    ax.set_ylim([0, 1])
-    fig2, ax = dark_background(fig2, ax)
-
-    def init2():
-        line.set_xdata(([np.nan] * len(y_f)))
-        return line,
-
-    def animate2(i, df):
-        ax.collections.clear()
-        df_n = df.iloc[i]
-        T_f = np.array(df_n['T_av'].tolist())
-        line.set_xdata(T_f)  # update the data.
-
-        D_l_n = np.array(df_n['y_L'])
-        delta_rh_n = np.array(df_n['delta_rh'])
-        ax.fill_between(T_f, [D_l_n - delta_rh_n] * len(T_f), [D_l_n] * len(T_f), fc='xkcd:tangerine', alpha=0.9,
-                        label='Thermal bdy layer')
-        return line,
-
-    ani2 = animation.FuncAnimation(fig2, animate2, frames=len(n),
-                                  #                               init_func=init2,
-                                  fargs=(df,), blit=False, repeat=True,
-                                  interval=200, )  # interval: delay between frames in ms
-    # HTML(ani.to_jshtml())
-    ani2.save(fig_path+case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
+    # # T profile
+    # fig2, ax = plt.subplots(figsize=(2, 4))
+    # ax.set_xlabel('', fontsize=labelsize, labelpad=20)
+    # ax.set_ylabel('', fontsize=labelsize, labelpad=20)
+    # ax.tick_params(axis='both', which='major', labelsize=ticksize)
+    # ax.set_xticks([0, 0.5, 1])
+    # ax.set_yticks([])
+    #
+    # df_n = df.iloc[0]
+    #
+    # delta_rh_n = np.array(df_n['delta_rh'])
+    # D_l_n = np.array(df_n['y_L'])
+    # T_f = np.array(df_n['T_av'].tolist())
+    # y_f = np.array(df_n['y'].tolist())
+    #
+    # line, = ax.plot(T_f, y_f, c='xkcd:off white', lw=3)
+    # ax.fill_between(T_f, [D_l_n - delta_rh_n] * len(T_f), [D_l_n] * len(T_f), fc='xkcd:tangerine', alpha=0.9,
+    #                 label='Thermal bdy layer')
+    # #                 label='Thermal bdy layer\n' + r'$\delta$ = ' + '{:04.3f}'.format(delta_rh_n))
+    # ax.legend(frameon=False, fontsize=20, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
+    # ax.set_xlim([0, 1])
+    # ax.set_ylim([0, 1])
+    # fig2, ax = dark_background(fig2, ax)
+    #
+    # def init2():
+    #     line.set_xdata(([np.nan] * len(y_f)))
+    #     return line,
+    #
+    # def animate2(i, df):
+    #     ax.collections.clear()
+    #     df_n = df.iloc[i]
+    #     T_f = np.array(df_n['T_av'].tolist())
+    #     line.set_xdata(T_f)  # update the data.
+    #
+    #     D_l_n = np.array(df_n['y_L'])
+    #     delta_rh_n = np.array(df_n['delta_rh'])
+    #     ax.fill_between(T_f, [D_l_n - delta_rh_n] * len(T_f), [D_l_n] * len(T_f), fc='xkcd:tangerine', alpha=0.9,
+    #                     label='Thermal bdy layer')
+    #     return line,
+    #
+    # ani2 = animation.FuncAnimation(fig2, animate2, frames=len(n),
+    #                               #                               init_func=init2,
+    #                               fargs=(df,), blit=False, repeat=True,
+    #                               interval=200, )  # interval: delay between frames in ms
+    # # HTML(ani.to_jshtml())
+    # ani2.save(fig_path+case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
 
 
 def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, fps=15):
@@ -192,6 +188,6 @@ for jj, etastr in enumerate(eta_ls):
         cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
         for ii, case in enumerate(cases):
             if (os.path.exists(data_path + 'output-' + case)) and (ii >= 0):
-                # animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='coolwarm')
-                animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16)
+                animate_T(case, data_path=data_path, fig_path=fig_path+'animations/', labelsize=30, ticksize=16, cmap='gist_heat')
+                # animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16)
                 print('finished case')
