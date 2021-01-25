@@ -158,7 +158,7 @@ def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
         h_rms.append(rms)
     print('loaded', len(n), 'h profiles')
 
-    fig, ax = plt.subplots(figsize=(20, 5))
+    fig, ax = plt.subplots(figsize=(20, 3.5))
     ax.set_xlabel('', fontsize=labelsize, labelpad=20)
     ax.set_ylabel('', fontsize=labelsize, labelpad=20)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
