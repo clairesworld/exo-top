@@ -167,18 +167,19 @@ def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     # ax.set_yticks([])
 
     hprof, = ax.plot(x, h_n[0], c='xkcd:off white', lw=3)
-    hmean, = ax.plot(x, h_rms[0], c='xkcd:off white', lw=2, ls='--')
+    hmean, = ax.plot(x, [h_rms[0]]*len(x), c='xkcd:off white', lw=2, ls='--')
     ax.set_xlim([0, 8])
     ax.set_ylim([-5e-2, 5e-2])
     fig, ax = dark_background(fig, ax)
 
     def init():
         hprof.set_ydata(([np.nan] * len(x)))
+        hmean.set_ydata(([np.nan] * len(x)))
         return hprof, hmean,
 
     def animate(i, h_n, h_rms):
-        hprof.set_xdata(h_n[i])  # update the data.
-        hmean.set_ydata(h_rms[i])
+        hprof.set_ydata((h_n[i]))  # update the data.
+        hmean.set_ydata(([h_rms[i]]*len(x)))
         return hprof, hmean,
 
     ani = animation.FuncAnimation(fig, animate, frames=len(n), init_func=init,
