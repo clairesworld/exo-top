@@ -1216,7 +1216,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
-              save=True, fname='h', legend=False, sigma=1,
+              save=True, fname='h', legend=False, sigma=1, fiterror=True,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False,
@@ -1322,8 +1322,14 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             intercept = True
         else:
             intercept = False
+        if fiterror:
+            xerr = sdx_all
+            yerr = sdy_all
+        else:
+            xerr = None
+            yerr = None
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
-                               xerr=sdx_all, yerr=sdy_all,
+                               xerr=xerr, yerr=yerr,
                                sigma=sigma, intercept=intercept, **kwargs)
 
     if show_isoviscous:
@@ -1424,6 +1430,8 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
                 expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100, label='dum')
+
+        print('fit: {:.2e} x^{:.3f}'.format(const, expon))
 
         if legend:
             handles, labels = ax.get_legend_handles_labels()
