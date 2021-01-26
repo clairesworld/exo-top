@@ -33,7 +33,7 @@ for regime in regimes:
         mlines.Line2D([], [], color=c_rms[3], marker='o', ls='--',
                                      markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
     elif regime == 'chaotic':
-        include_regimes = ['steady', 'trans.', 'chaotic']
+        include_regimes = ['chaotic']
         ylim = [6e-3, 2e-2]
         xlim = [1e6, 3e7]
         yticks = [6e-3, 1e-2, 4e-2]
