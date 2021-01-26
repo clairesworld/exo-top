@@ -2897,12 +2897,15 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                 else:
                     raise Exception('Invalid entry for which_h')
 
+                # append to working
                 h_data_all.append(h)
                 x_data_all.append(x)
                 if z_name == 'eta':
                     z_data_all.append(jj)
                 elif z_name == 'regime':
                     z_data_all.append(regime_grid[jj][ii])
+                yx_peak_all.append((h_peak, x))
+                yx_rms_all.append((h_rms, x))
 
     if twocomponent:
         x0 = [a[0] for a in x_data_all]

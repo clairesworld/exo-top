@@ -85,7 +85,7 @@ for regime in regimes:
     """ model vs data """
 
     cmap = cmap_from_list(c_rms, cmap_name='eta')
-    fig, ax = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
+    fig, ax = sc.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
                                       end_grid=end_grid, literature_file=None, legend=False, cmap=cmap, ms=ms,
                                       postprocess_kwargs=postprocess_kwargs, c_contours='xkcd:off white', fc='k', averagescheme='timefirst',
                                       ylim=ylim, which_x='Ra_i_eff', which_h='rms', data_path=data_path,
