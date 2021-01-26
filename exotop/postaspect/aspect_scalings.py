@@ -2844,7 +2844,7 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
 
 
 def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
-                    literature_file=None, ms=30,
+                    literature_file=None, ms=30, fig=None, ax=None, figsize=(7, 5), xlabelpad=10, ylabelpad=10,
                     legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
                     c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
@@ -2853,6 +2853,8 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=figsize)
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
         t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
@@ -2886,7 +2888,6 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     x_data_all = []
     c_data_all = []
     jj_all = []
-    fig, ax = plt.subplots(1, 1, figsize=(7, 5))
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
         for ii, case in enumerate(cases):
@@ -2947,8 +2948,8 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
             c = c_data_all
         else:
             c = [q for _, q in sorted(zip(x_data_all, c_data_all))]
-    ax.set_ylabel('Model', fontsize=labelsize)
-    ax.set_xlabel('Data', fontsize=labelsize)
+    ax.set_ylabel('Model', fontsize=labelsize, labelpad=ylabelpad)
+    ax.set_xlabel('Data', fontsize=labelsize, labelpad=xlabelpad)
     if twocomponent:
         title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(
             expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])

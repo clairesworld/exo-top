@@ -87,10 +87,10 @@ for regime in regimes:
     cmap = cmap_from_list(c_rms, cmap_name='eta')
     fig, ax = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
                                       end_grid=end_grid, literature_file=None, legend=False, cmap=cmap, ms=ms,
-                                      postprocess_kwargs=postprocess_kwargs, c='xkcd:off white', fc='k', averagescheme='timefirst',
+                                      postprocess_kwargs=postprocess_kwargs, c_contours='xkcd:off white', fc='k', averagescheme='timefirst',
                                       ylim=ylim, which_x='Ra_i_eff', which_h='rms', data_path=data_path,
-                                 clist=c_rms,
-                                      save=False, cbar=None, include_regimes=include_regimes, axissize=axissize,
+                                      clist=c_rms, figsize=(9,9), labelsize=axissize, ylabelpad=20, xlabelpad=13,
+                                      save=False, cbar=None, include_regimes=include_regimes,
                                       intercept=False, fig_fmt=fig_fmt, vmin=1e6, vmax=1e8, show_cbar=False)
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
