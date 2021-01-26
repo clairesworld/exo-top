@@ -14,7 +14,7 @@ c_fit = 'xkcd:off white'
 c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
 lw = 5
 
-regimes = ['all']
+regimes = ['all', 'chaotic']
 for regime in regimes:
     if regime == 'all':
         include_regimes = ['steady', 'trans.', 'chaotic']
@@ -22,7 +22,7 @@ for regime in regimes:
         xlim = [0.7e5, 3e7]
         yticks = [6e-3,  1e-2, 2e-2, 4e-2]
         xticks = [1e5, 1e6, 1e7]
-        fitlabel = r'$\Delta h = 0.345$ Ra$^{-0.212}$'
+        fitlabel = r'$\Delta h = 0.345$ Ra$_{i, eff}^{-0.212}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                      markersize=0, lw=lw, label=fitlabel),
         mlines.Line2D([], [], color=c_rms[0], marker='o', ls='--',
@@ -39,7 +39,7 @@ for regime in regimes:
         xlim = [1e6, 3e7]
         yticks = [6e-3,  8e-3, 1e-2, 1.2e-2, 1.4e-2]
         xticks = [1e6, 1e7, 3e7]
-        fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
+        fitlabel = r'$\Delta h = 0.094$ Ra$_{i, eff}^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
                    mlines.Line2D([], [], color=c_rms[1], marker='o', ls='--',
@@ -52,7 +52,7 @@ for regime in regimes:
     fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
                      fig_path=fig_path, averagescheme='timefirst', which_x='Ra_i_eff',
                      sigma=1,
-                     include_regimes=include_regimes, save=False, fname='h_Raieff_chaotic_timeavg', labelsize=axissize,
+                     include_regimes=include_regimes, save=False,  labelsize=axissize,
                            legend=False, figsize=(16,9), showpeak=False, lw=lw, ms=25, elw=2, ecapsize=8,
                      xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography $\Delta h^\prime$', ylabelpad=20, xlabelpad=13,
                      title='', fiterror=False, c_fit=c_fit,
