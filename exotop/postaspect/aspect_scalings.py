@@ -1219,7 +1219,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               save=True, fname='h', legend=False, sigma=1, fiterror=True, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=40, lw=1,
-              xlabelpad=10, ylabelpad=10,
+              xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7), c_fit=None,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
@@ -1336,8 +1336,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                             xerr=np.asarray([err[which_x][:,pp]]).T, elinewidth=1,
                             fmt=mark, c=c_rms[pp], capsize=5, ms=ms)
         else:
-            ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=1,
-                        fmt=mark, c=c_rms, capsize=5, ms=ms)
+            ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=elw,
+                        fmt=mark, c=c_rms, capsize=ecapsize, ms=ms)
     except TypeError as e:
         if quants['h_rms'] is None:  # no cases in given regimes as quants is dict of None
             pass
