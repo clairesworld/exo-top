@@ -3139,7 +3139,7 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
                 # transform data points to screen space
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
-                if (x0[0] < pos[0] < x0[1]) and (y0[0] < pos[1] < y0[1])
+                if (x0[0] < pos[0] < x0[1]) and (y0[0] < pos[1] < y0[1]):
                     ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=fontsize, rotation=rot, color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec=fc, fc=fc))
     return fig, ax
