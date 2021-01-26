@@ -94,7 +94,8 @@ for regime in regimes:
                                       clist=c_rms, figsize=(9, 10), labelsize=axissize, ylabelpad=20, xlabelpad=13,
                                       z_name='eta', elw=elw, ecapsize=ecapsize,
                                       save=False, include_regimes=include_regimes, errorsize=16, errs=[0.5, 0.2, 0.1, 0.05],
-                                      intercept=False, fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False)
+                                      intercept=False, fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False,
+                                           ylabel=r'Model $\Delta h^\prime$', xlabel=r'Data $\Delta h^\prime$')
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
     if yticks is not None:

@@ -2849,7 +2849,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
                     cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None, cticklabels=None,
-                              errs=None, elw=1, ecapsize=5, crot=0, discrete=True, errorsize=9, sigma=2, **kwargs):
+                              ylabel='Model', xlabel='Data', errs=None, elw=1, ecapsize=5, crot=0, discrete=True, errorsize=9, sigma=2, **kwargs):
     if averagescheme is None:
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
@@ -2938,8 +2938,8 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
             z_vec = z_data_all
         else:
             z_vec = [q for _, q in sorted(zip(x_data_all, z_data_all))]
-    ax.set_ylabel('Model', fontsize=labelsize, labelpad=ylabelpad)
-    ax.set_xlabel('Data', fontsize=labelsize, labelpad=xlabelpad)
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
+    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
     if twocomponent:
         title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(
             expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])
@@ -3135,12 +3135,13 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
         for y in [y_plus, y_minus]:
             l, = ax.plot(x0, y, c=c, lw=1, ls='--')
             if labels:
-                pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
+                # pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
+                pos = [(x0[-2] + x0[-1]) / 2., (y[-2] + y[-1]) / 2.]
                 # transform data points to screen space
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
-                if (x0[0] < pos[0] < x0[1]) and (y0[0] < pos[1] < y0[1]):
-                    ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=fontsize, rotation=rot, color=l.get_color(),
+                # if (x0[0] < pos[0] < x0[1]) and (y0[0] < pos[1] < y0[1]):
+                ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=fontsize, rotation=rot, color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec=fc, fc=fc))
     return fig, ax
 
