@@ -2849,7 +2849,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
                     cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None, cticklabels=None,
-                              elw=1, ecapsize=5, crot=0, discrete=True, errorsize=9, sigma=2, *kwargs):
+                              elw=1, ecapsize=5, crot=0, discrete=True, errorsize=9, sigma=2, **kwargs):
     if averagescheme is None:
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
