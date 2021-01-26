@@ -1328,7 +1328,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         mark = 'o'
         if colourful:
             print('len x', len(np.array(means[which_x])))
-            for pp in range(len(np.array(means[which_x]))):
+            for pp in range(6):
                 print('pp', pp)
                 print('xval', means[which_x][pp])
                 print('yval', means['h_rms'][pp])
@@ -1339,6 +1339,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=1,
                         fmt=mark, c=c_rms, capsize=5, ms=ms)
+
+        ax.scatter(means[which_x][0], means['h_rms'][0], c='xkcd:yellow', ms=100)
     except TypeError:  # no cases in given regimes as quants is dict of None
         pass
 
@@ -1451,7 +1453,6 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
                 expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
-            print('lw', lw)
 
         print('fit: {:.2e} x^{:.3f}'.format(const, expon))
 
