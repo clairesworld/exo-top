@@ -34,10 +34,10 @@ for regime in regimes:
                                      markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
     elif regime == 'chaotic':
         include_regimes = ['chaotic']
-        ylim = [6e-3, 2e-2]
-        xlim = [1e6, 3e7]
-        yticks = [6e-3, 1e-2, 2e-2]
-        xticks = [1e6, 1e7]
+        ylim = [6e-3, 1.3e-2]
+        xlim = [2e6, 3e7]
+        yticks = [6e-3, 1e-2, 1.3e-2]
+        xticks = [2e6, 1e7, 3e7]
         fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
