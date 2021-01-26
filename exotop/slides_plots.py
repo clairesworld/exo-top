@@ -11,7 +11,7 @@ ticksize = 22
 axissize = 40
 xticks = [1e6, 1e7]
 yticks = [6e-3, 1e-2, 2e-2]
-c_rms = ['xkcd:lilac', 'xkcd:orange','xkcd:yellow']
+c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange','xkcd:yellow']
 c_fit = 'xkcd:off white'
 lw = 5
 fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
