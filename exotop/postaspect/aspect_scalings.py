@@ -1331,7 +1331,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 print('pp', pp)
                 print('xval', means[which_x][pp])
                 print('xerr', err['h_rms'][:,pp])
-                ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=err['h_rms'][:,pp], xerr=err[which_x][:,pp], elinewidth=1,
+                ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=err['h_rms'][:,pp].T, xerr=err[which_x][:,pp].T, elinewidth=1,
                             fmt=mark, c=c_rms[pp], capsize=5, ms=ms)
         else:
             ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=1,
