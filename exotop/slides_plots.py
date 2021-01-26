@@ -1,7 +1,7 @@
 import sys
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
-    fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, load_grid    # noqa: E402
+    fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, load_grid, p_Earth    # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 from exotop.useful_and_bespoke import dark_background
 import numpy as np
@@ -15,7 +15,7 @@ c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange','xkcd:yellow']
 c_fit = 'xkcd:off white'
 lw = 5
 fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
+                 fig_path=fig_path, averagescheme='timefirst', which_x='Ra_i_eff',
                  sigma=1,
                  include_regimes=['steady', 'trans.', 'chaotic'], save=False, fname='h_Raieff_chaotic_timeavg', labelsize=axissize,
                        legend=False, figsize=(16,9), showpeak=False, lw=lw, ms=25, elw=2, ecapsize=8,
@@ -23,8 +23,8 @@ fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid,
                  title='', fiterror=False, c_fit=c_fit,
                  c_peak='k', c_rms=c_rms,
                        fit=True, logx=True, logy=True, hscale=1,
-                 show_isoviscous=False, ylim=[4e-3, 3.5e-2], xlim=[1e5, 2e7], postprocess_kwargs=postprocess_kwargs,
-                 regime_grid=regime_grid_td)
+                 show_isoviscous=False, ylim=[6e-3, 4e-2], xlim=[0.7e5, 3e7], postprocess_kwargs=postprocess_kwargs,
+                 regime_grid=regime_grid_td, p_dimensionals=p_Earth)
 
 ax.tick_params(axis='x', labelsize=ticksize, pad=15)
 ax.tick_params(axis='y', labelsize=ticksize, pad=15)
