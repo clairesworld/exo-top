@@ -1228,7 +1228,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     if include_regimes is None:
         include_regimes = regime_names
     if ax is None:
-        fig = plt.figure(figsize)
+        fig = plt.figure(figsize=figsize)
         ax = plt.gca()
 
     quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
