@@ -1387,9 +1387,12 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         # set an invisible artist to twin axes
         # to prevent falling back to initial values on rescale events
         ax2.plot([], [])
+        axes = (ax, ax2)
+    else:
+        axes = (ax,)
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
-    return fig, ax
+    return (fig, *axes)
 
 
 def dimensionalise_h(hprime, p):
