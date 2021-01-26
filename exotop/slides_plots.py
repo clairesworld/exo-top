@@ -3,7 +3,7 @@ sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, load_grid, p_Earth    # noqa: E402
 from exotop.postaspect import aspect_scalings as sc  # noqa: E402
-from exotop.useful_and_bespoke import dark_background
+from exotop.useful_and_bespoke import dark_background, cmap_from_list
 import numpy as np
 import matplotlib.lines as mlines
 import matplotlib.ticker as ticker
@@ -37,8 +37,8 @@ for regime in regimes:
         include_regimes = ['chaotic']
         ylim = [6e-3, 1.4e-2]
         xlim = [1.999e6, 3.001e7]
-        yticks = [6e-3, 7e-3, 8e-3, 9e-3, 1e-2]
-        xticks = [1.999e6, 2e6, 1e7, 3e7, 3.001e7]
+        yticks = [6e-3, 7e-3, 8e-3, 9e-3, 1e-2, 1.1e-2, 1.2e-2, 1.3e-2, 1.4e-2]
+        xticks = [1e6, 2e6, 1e7, 3e7, 4e7]
         fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
@@ -63,24 +63,24 @@ for regime in regimes:
 
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
-    ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
-    ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.2))
-    ax.ticklabel_format(style='plain', axis='y', useOffset=False)
-    # if yticks is not None:
-    #     ax.set_yticks(yticks)
+    if yticks is not None:
+        ax.set_yticks(yticks)
     if xticks is not None:
         ax.set_xticks(xticks)
-
+    ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
+    ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
+    # ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    # ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.2))
+    # ax.ticklabel_format(style='plain', axis='y', useOffset=False)
     ax.legend(handles=handles, frameon=False, fontsize=25, ncol=1, bbox_to_anchor=(1.01, 1), loc='upper left')
 
     fig, ax = dark_background(fig, ax)
     sc.plot_save(fig, fname='h_Ra_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
 
     """ model vs data """
+    cmap = cmap_from_list(c_rms, cmap_name='eta')
     fig, ax = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
-                                      end_grid=end_grid, literature_file=None, legend=False, cmap='winter',
+                                      end_grid=end_grid, literature_file=None, legend=False, cmap=cmap,
                                       postprocess_kwargs=postprocess_kwargs, c='xkcd:off white', averagescheme='timefirst',
                                       ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
                                       save=False, cbar='eta', include_regimes=['chaotic'], axissize=axissize,
