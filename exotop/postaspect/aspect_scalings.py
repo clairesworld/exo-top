@@ -1327,11 +1327,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
         mark = 'o'
         if colourful:
-            for pp in range(6):
-                print('pp', pp)
-                print('xval', means[which_x][pp])
-                print('yerr', np.asarray([err['h_rms'][:,pp]]).T, np.shape(np.asarray([err['h_rms'][:,pp]]).T))
-
+            for pp in range(len(means[which_x])):
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:,pp]]).T,
                             xerr=np.asarray([err[which_x][:,pp]]).T, elinewidth=elw,
                             fmt=mark, c=c_rms[pp], capsize=ecapsize, ms=ms)
