@@ -1313,7 +1313,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         xerr=sdx_all,#err[which_x],
                         elinewidth=0.5, ms=ms,
                         fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
-
+            mark = 'o'
         else:
             if jj == 1:
                 mark = 'o'
@@ -1321,6 +1321,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 mark = '^'
             elif jj == 3:
                 mark = 'd'
+        print('mark', mark, 'jj', jj, 'ms', ms)
         ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=1,
                     fmt=mark, c=c_rms, capsize=5, ms=ms)
     except TypeError:  # no cases in given regimes as quants is dict of None
@@ -1439,6 +1440,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
                 expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
+            print('lw', lw)
 
         print('fit: {:.2e} x^{:.3f}'.format(const, expon))
 
