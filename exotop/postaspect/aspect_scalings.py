@@ -1440,7 +1440,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
                 h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=lw, zorder=100, label='dum')
 
         else:
-            xprime = np.linspace(ax.get_xlim[0], ax.get_xlim[1])
+            xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
             # xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
             if fiterror:
                 const, expon, const_err, expon_err = fit_logerror(flatx, flaty, xerr, yerr, sigma=sigma, **kwargs)
