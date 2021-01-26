@@ -1325,16 +1325,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         xerr=sdx_all,#err[which_x],
                         elinewidth=0.5, ms=ms,
                         fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
-            mark = 'o'
-        else:
-            if jj == 1:
-                mark = 'o'
-            elif jj == 2:
-                mark = '^'
-            elif jj == 3:
-                mark = 'd'
-            print('mark', mark, 'jj', jj, 'ms', ms)
+        mark = 'o'
         if colourful:
+            print('len x', len(np.array(means[which_x])))
             for pp, xval in enumerate(np.array(means[which_x])):
                 print('pp', pp)
                 print('xval', xval)
