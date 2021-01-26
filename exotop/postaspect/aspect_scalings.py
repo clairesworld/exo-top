@@ -2849,7 +2849,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
                     cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None, cticklabels=None,
-                              crot=0, discrete=True, errorsize=9, **kwargs):
+                              elw=1, ecapsize=5, crot=0, discrete=True, errorsize=9, sigma=2, *kwargs):
     if averagescheme is None:
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
@@ -2867,6 +2867,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
     h_data_all = []
     x_data_all = []
     z_data_all = []
+    quants = dict.fromkeys(['h_data', 'x'])
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
         for ii, case in enumerate(cases):
@@ -2881,19 +2882,21 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                                    t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
                                    averagescheme=averagescheme, **kwargs) for xx in which_x]
                 else:
-                    x = plot_getx(Ra_var[ii], eta_str, case=case, which_x=which_x, data_path=data_path,
+                    x, x_times = plot_getx(Ra_var[ii], eta_str, case=case, which_x=which_x, data_path=data_path,
                                   t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
-                                  averagescheme=averagescheme, **kwargs)
+                                  averagescheme=averagescheme, return_all=True, **kwargs)
 
                 # get the y values, depending on averaging scheme
-                h_rms, h_peak = plot_geth(case=case, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
-                                          postprocess_kwargs=postprocess_kwargs, **kwargs)
+                h_rms, h_peak, h_rms_times, h_peak_times = plot_geth(case=case, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
+                                          postprocess_kwargs=postprocess_kwargs, return_all=True, **kwargs)
                 """^ paste"""
 
                 if which_h == 'rms':
                     h = h_rms
+                    h_times = h_rms_times
                 elif which_h == 'peak':
                     h = h_peak
+                    h_times = h_peak_times
                 else:
                     raise Exception('Invalid entry for which_h')
 
@@ -2904,8 +2907,16 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     z_data_all.append(jj)
                 elif z_name == 'regime':
                     z_data_all.append(regime_grid[jj][ii])
-                yx_peak_all.append((h_peak, x))
-                yx_rms_all.append((h_rms, x))
+
+                qdict = parameter_percentiles(case, df={'h_data': h_times, 'x': x_times},
+                                              keys=quants.keys(), plot=False, sigma=sigma)
+
+                for key in quants.keys():
+                    try:
+                        quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
+                    except ValueError:  # haven't added anything yet
+                        quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
+
 
     if twocomponent:
         x0 = [a[0] for a in x_data_all]
@@ -2940,12 +2951,23 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
 
     if clist is None:
         clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
-    for pp in range(len(h_data)):
-        scat = ax.scatter(h_data[pp], h_fit[pp], s=ms, zorder=100, c=clist[z_vec[pp]])
 
-    if show_cbar:
-        cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=discrete,
-                         vmin=vmin, vmax=vmax, rot=crot)
+    # get errorbars and plot them
+    err = dict.fromkeys(quants.keys())
+    try:
+        for key in quants.keys():
+            err[key] = np.asarray([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
+        mark = 'o'
+        for pp in range(len(h_data)):
+            ax.errorbar(h_data[pp], h_fit[pp], yerr=None,
+                        xerr=np.asarray([err['h_data'][:,pp]]).T, elinewidth=elw,
+                        fmt=mark, c=clist[z_vec[pp]], capsize=ecapsize, ms=ms, zorder=10)
+
+    except TypeError as e:
+        if quants['h_data'] is None:  # no cases in given regimes as quants is dict of None
+            pass
+        else:
+            raise e
 
     fig, ax = plot_error_contours(fig, ax, c=c_contours, fc=fc, fontsize=errorsize)
     ax.set_xscale('log')
