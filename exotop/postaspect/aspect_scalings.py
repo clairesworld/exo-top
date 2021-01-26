@@ -2868,7 +2868,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
         if vmax is None:
             vmax = 2e8
         crot = 0
-        cnorm = LogNorm()
+        cnorm = LogNorm(vmin=vmin, vmax=vmax)
         discrete = False
     elif cbar == 'regime':
         clabel = ''  # 'Stationarity'
@@ -2963,6 +2963,8 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     else:
         ax.axis('equal')
 
+    print('c', c)
+    print('cmap', cmap)
     scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
 
     if show_cbar:
