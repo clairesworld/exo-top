@@ -3137,7 +3137,7 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
             if labels:
 
                 if log:
-                    pos = [10**(np.log10(x0[-2]) + np.log10(x0[-1])) / 2., 10**(np.log10(y[-2]) + np.log10(y[-1])) / 2.]
+                    pos = [10**(np.log10(x0[-2]) + np.log10(x0[-1]) / 2.), 10**(np.log10(y[-2]) + np.log10(y[-1]) / 2.)]
                 else:
                     pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
                 print('pos' , pos)
