@@ -13,6 +13,7 @@ import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm, Normalize
 import matplotlib.lines as mlines  # noqa: E402
 from sklearn import linear_model
+from scipy.interpolate import interp1d
 from scipy.spatial import distance
 # import statsmodels.api as sm
 import sys
@@ -3132,12 +3133,17 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
     for err in errs:
         y_plus = y0 + err * y0
         y_minus = y0 - err * y0
-        for y in [y_plus, y_minus]:
+        for i, y in enumerate([y_plus, y_minus]):
             l, = ax.plot(x0, y, c=c, lw=1, ls='--')
             if labels:
-
+                fY = interp1d(x0, y)
+                fX = interp1d(y, x0)
                 if log:
-                    pos = [10**((np.log10(x0[-2]) + np.log10(x0[-1])) / 2.), 10**((np.log10(y[-2]) + np.log10(y[-1])) / 2.)]
+                    if i == 0:  # top error
+                        pos = [10**((np.log10(x0[0]) + np.log10(fX(y0[-1]))) / 2.), 10**((np.log10(fY(x0[0])) + np.log10(y[-1])) / 2.)]
+                    elif i == 1:
+                        pos = [10 ** ((np.log10(fX(y0[0])) + np.log10(x0[-1])) / 2.),
+                               10 ** ((np.log10(y0[0]) + np.log10(fY(x0[-1]))) / 2.)]
                 else:
                     pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
                 print('pos' , pos)
