@@ -20,6 +20,7 @@ if regimes == 'all':
     yticks = [6e-3, 1e-2, 4e-2]
     xticks = [1e5, 1e6, 1e7]
     c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
+    fitlabel = r'$\Delta h = 0.345$ Ra$^{-0.212}$'
 elif regimes == 'chaotic':
     include_regimes = ['steady', 'trans.', 'chaotic']
     ylim = [6e-3, 2e-2]
@@ -27,6 +28,7 @@ elif regimes == 'chaotic':
     yticks = [6e-3, 1e-2, 4e-2]
     xticks = [1e6, 1e7]
     c_rms = ['xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
+    fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
 
 fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
                  fig_path=fig_path, averagescheme='timefirst', which_x='Ra_i_eff',
@@ -49,7 +51,7 @@ if xticks is not None:
 
 handles = []
 handles.append(mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
-                          markersize=0, lw=lw, label=r'$\Delta h = 0.094$ Ra$^{-0.151}$'))
+                          markersize=0, lw=lw, label=fitlabel))
 handles.append(mlines.Line2D([], [], color=c_rms[0], marker='o', ls='--',
                           markersize=20, lw=0, label=r'$\Delta \eta = 10^{5}$'))
 handles.append(mlines.Line2D([], [], color=c_rms[1], marker='o', ls='--',
@@ -59,7 +61,7 @@ handles.append(mlines.Line2D([], [], color=c_rms[2], marker='o', ls='--',
 handles.append(mlines.Line2D([], [], color=c_rms[3], marker='o', ls='--',
                           markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$'))
 
-ax.legend(handles=handles, frameon=False, fontsize=25, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
+ax.legend(handles=handles, frameon=False, fontsize=25, ncol=1, bbox_to_anchor=(1.02, 1), loc='upper left')
 
 fig, ax = dark_background(fig, ax)
 sc.plot_save(fig, fname='h_Ra_'+regimes, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
