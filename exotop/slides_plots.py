@@ -14,13 +14,13 @@ c_fit = 'xkcd:off white'
 c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
 lw = 5
 
-regimes = ['chaotic']
+regimes = ['all', 'chaotic']
 for regime in regimes:
     if regime == 'all':
         include_regimes = ['steady', 'trans.', 'chaotic']
         ylim = [6e-3, 4e-2]
         xlim = [0.7e5, 3e7]
-        yticks = [6e-3, 1e-2, 4e-2]
+        yticks = [6e-3,  8e-3, 1e-2, 2e-2, 3e-2, 4e-2]
         xticks = [1e5, 1e6, 1e7]
         fitlabel = r'$\Delta h = 0.345$ Ra$^{-0.212}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
@@ -37,7 +37,7 @@ for regime in regimes:
         include_regimes = ['chaotic']
         ylim = [6e-3, 1.4e-2]
         xlim = [1e6, 3e7]
-        yticks = [6e-3, 7e-3, 8e-3, 9e-3, 1e-2, 1.2e-2, 1.4e-2]
+        yticks = [6e-3,  8e-3, 1e-2, 1.2e-2, 1.4e-2]
         xticks = [1e6, 1e7, 3e7]
         fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
