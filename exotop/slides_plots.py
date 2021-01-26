@@ -36,7 +36,7 @@ for regime in regimes:
         include_regimes = ['chaotic']
         ylim = [6e-3, 2e-2]
         xlim = [1e6, 3e7]
-        yticks = [6e-3, 1e-2, 4e-2]
+        yticks = [6e-3, 1e-2, 2e-2]
         xticks = [1e6, 1e7]
         fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
