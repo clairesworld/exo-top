@@ -37,10 +37,10 @@ if xticks is not None:
     ax.set_xticks(xticks)
 
 handles = []
-handles.append(mlines.Line2D([], [], color=c_fit, marker='*',
-                          markersize=0, lw=lw, label=r'$\Delta h = 9.4 \times 10^{-2}$ Ra$^{-0.151}$'))
+handles.append(mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
+                          markersize=0, lw=lw, label=r'$\Delta h = 0.094 Ra$^{-0.151}$'))
 
-ax.legend(handles=handles, frameon=False, fontsize=30, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
+ax.legend(handles=handles, frameon=False, fontsize=25, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
 
 fig, ax = dark_background(fig, ax)
 sc.plot_save(fig, fname='h_Ra_chaotic', fig_path=fig_path+'slides/', facecolor=fig.get_facecolor())

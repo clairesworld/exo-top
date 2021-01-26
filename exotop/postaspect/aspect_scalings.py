@@ -1308,6 +1308,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     means['h_peak'] = [np.mean(a[0]) for a in yx_peak_all]
     means['h_rms'] = [np.mean(a[0]) for a in yx_rms_all]
     means[which_x] = [np.mean(a[1]) for a in yx_rms_all]
+    print('means x', means[which_x])
     try:
         for key in quants.keys():
             err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
@@ -1324,12 +1325,13 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 mark = '^'
             elif jj == 3:
                 mark = 'd'
-        print('mark', mark, 'jj', jj, 'ms', ms)
+            print('mark', mark, 'jj', jj, 'ms', ms)
         if colourful:
-            for pp, xval in enumerate(means[which_x]):
+            for pp, xval in enumerate(np.array(means[which_x])):
+                print('pp', pp)
                 print('xval', xval)
                 print('yval', means['h_rms'][pp])
-                print('x', c_rms[pp])
+                print('c', c_rms[pp])
                 ax.errorbar(xval, means['h_rms'][pp], yerr=err['h_rms'][:,pp], xerr=err[which_x][:,pp], elinewidth=1,
                             fmt=mark, c=c_rms[pp], capsize=5, ms=ms)
         else:
