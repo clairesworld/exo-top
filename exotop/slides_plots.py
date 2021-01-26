@@ -14,6 +14,8 @@ c_fit = 'xkcd:off white'
 c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
 lw = 5
 ms = 25
+elw = 2
+ecapsize = 8
 
 regimes = ['chaotic']
 for regime in regimes:
@@ -54,7 +56,7 @@ for regime in regimes:
     #                  fig_path=fig_path, averagescheme='timefirst', which_x='Ra_i_eff',
     #                  sigma=1,
     #                  include_regimes=include_regimes, save=False,  labelsize=axissize,
-    #                        legend=False, figsize=(16,9), showpeak=False, lw=lw, ms=ms, elw=2, ecapsize=8,
+    #                        legend=False, figsize=(16,9), showpeak=False, lw=lw, ms=ms, elw=elw, ecapsize=ecapsize,
     #                  xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography $\Delta h^\prime$', ylabelpad=20, xlabelpad=13,
     #                  title='', fiterror=False, c_fit=c_fit,
     #                  c_peak='k', c_rms=c_rms,
@@ -84,14 +86,13 @@ for regime in regimes:
 
     """ model vs data """
 
-    cmap = cmap_from_list(c_rms, cmap_name='eta')
     fig, ax = sc.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
-                                      end_grid=end_grid, literature_file=None, legend=False, cmap=cmap, ms=ms,
+                                      end_grid=end_grid, literature_file=None, legend=False, cmap=None, ms=ms,
                                       postprocess_kwargs=postprocess_kwargs, c_contours='xkcd:off white', fc='k', averagescheme='timefirst',
                                       ylim=ylim, which_x='Ra_i_eff', which_h='rms', data_path=data_path,
                                       clist=c_rms, figsize=(9,9), labelsize=axissize, ylabelpad=20, xlabelpad=13,
-                                 z_name='eta',
-                                      save=False, cbar=None, include_regimes=include_regimes, errorsize=ticksize,
+                                 z_name='eta', elw=elw, ecapsize=ecapsize,
+                                      save=False, include_regimes=include_regimes, errorsize=ticksize,
                                       intercept=False, fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False)
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
