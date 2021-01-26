@@ -1333,8 +1333,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 print('yerr', np.asarray([err['h_rms'][:,pp]]).T, np.shape(np.asarray([err['h_rms'][:,pp]]).T))
 
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:,pp]]).T,
-                            xerr=np.asarray([err[which_x][:,pp]]).T, elinewidth=1,
-                            fmt=mark, c=c_rms[pp], capsize=5, ms=ms)
+                            xerr=np.asarray([err[which_x][:,pp]]).T, elinewidth=elw,
+                            fmt=mark, c=c_rms[pp], capsize=ecapsize, ms=ms)
         else:
             ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=elw,
                         fmt=mark, c=c_rms, capsize=ecapsize, ms=ms)
