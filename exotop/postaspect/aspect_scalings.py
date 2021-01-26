@@ -1330,14 +1330,14 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             for pp in range(6):
                 print('pp', pp)
                 print('xval', means[which_x][pp])
-                print('yval', means['h_rms'][pp])
+                print('xerr', err['h_rms'][:,pp])
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=err['h_rms'][:,pp], xerr=err[which_x][:,pp], elinewidth=1,
                             fmt=mark, c=c_rms[pp], capsize=5, ms=ms)
         else:
             ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=1,
                         fmt=mark, c=c_rms, capsize=5, ms=ms)
     except TypeError as e:
-        if q['h_rms'] is None:  # no cases in given regimes as quants is dict of None
+        if quants['h_rms'] is None:  # no cases in given regimes as quants is dict of None
             pass
         else:
             raise e
