@@ -3122,7 +3122,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     return fig, ax
 
 
-def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=True):
+def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=True, log=True):
     if errs is None:
         errs = [0.5, 0.2, 0.1]
     x0 = np.array(ax.get_xlim())
@@ -3135,8 +3135,11 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
         for y in [y_plus, y_minus]:
             l, = ax.plot(x0, y, c=c, lw=1, ls='--')
             if labels:
-                # pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
-                pos = [(x0[-2] + x0[-1]) / 2., (y[-2] + y[-1]) / 2.]
+
+                if log:
+                    pos = [10**(np.log10(x0[-2]) + np.log10(x0[-1])) / 2., 10**(np.log10(y[-2]) + np.log10(y[-1])) / 2.]
+                else:
+                    pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
                 print('pos' , pos)
                 # transform data points to screen space
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
