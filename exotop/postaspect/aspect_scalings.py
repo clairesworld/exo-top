@@ -1219,7 +1219,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               save=True, fname='h', legend=False, sigma=1, fiterror=True, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=40, lw=1,
-              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7),
+              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7), c_fit=None,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
@@ -1230,7 +1230,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     if ax is None:
         fig = plt.figure(figsize=figsize)
         ax = plt.gca()
-
+    colourful = False
+    if iterable_not_string(c_rms):
+        colourful = True
     quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
     yx_peak_all, yx_rms_all = [], []
     D_m2_all = []
@@ -1338,7 +1340,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             xerr = None
             yerr = None
-        ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
+        if c_fit is None:
+            c_fit = c_rms
+        ax = fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
                                xerr=xerr, yerr=yerr, legend=legend, lw=lw,
                                sigma=sigma, intercept=intercept, **kwargs)
 
