@@ -1313,9 +1313,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     # get errorbars and plot them
     err = dict.fromkeys(quants.keys())
     means = dict.fromkeys(quants.keys())
-    means['h_peak'] = [np.mean(a[0]) for a in yx_peak_all]
-    means['h_rms'] = [np.mean(a[0]) for a in yx_rms_all]
-    means[which_x] = [np.mean(a[1]) for a in yx_rms_all]
+    means['h_peak'] = np.asarray([np.mean(a[0]) for a in yx_peak_all])
+    means['h_rms'] = np.asarray([np.mean(a[0]) for a in yx_rms_all])
+    means[which_x] = np.asarray([np.mean(a[1]) for a in yx_rms_all])
     print('means x', means[which_x])
     try:
         for key in quants.keys():
@@ -1327,23 +1327,20 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
         mark = 'o'
         if colourful:
-            print('len x', len(np.array(means[which_x])))
             for pp in range(6):
                 print('pp', pp)
                 print('xval', means[which_x][pp])
                 print('yval', means['h_rms'][pp])
-                print('c', c_rms[pp])
-                print('ms', ms)
-                # ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=err['h_rms'][:,pp], xerr=err[which_x][:,pp], elinewidth=1,
-                #             fmt=mark, c=c_rms[pp], capsize=5, ms=ms)
+                ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=err['h_rms'][:,pp], xerr=err[which_x][:,pp], elinewidth=1,
+                            fmt=mark, c=c_rms[pp], capsize=5, ms=ms)
         else:
             ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=1,
                         fmt=mark, c=c_rms, capsize=5, ms=ms)
-
-        ax.plot(means[which_x], means['h_rms'], c='xkcd:yellow')
-    except TypeError as e:  # no cases in given regimes as quants is dict of None
-        print(e)
-        pass
+    except TypeError as e:
+        if q['h_rms'] is None:  # no cases in given regimes as quants is dict of None
+            pass
+        else:
+            raise e
 
     if fit:
         if which_x == 'h_components':
