@@ -1218,7 +1218,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
               save=True, fname='h', legend=False, sigma=1, fiterror=True, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
-              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle',
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=40, lw=1,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7),
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
@@ -1311,10 +1311,18 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         if showpeak:
             ax.errorbar(means[which_x], means['h_peak'], yerr=sdy_all,#err['h_peak'],
                         xerr=sdx_all,#err[which_x],
-                        elinewidth=0.5,
+                        elinewidth=0.5, ms=ms,
                         fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
-        ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=0.5,
-                    fmt='o', c=c_rms, capsize=5)
+
+        else:
+            if jj == 1:
+                mark = 'o'
+            elif jj == 2:
+                mark = '^'
+            elif jj == 3:
+                mark = 'd'
+        ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=1,
+                    fmt=mark, c=c_rms, capsize=5, ms=ms)
     except TypeError:  # no cases in given regimes as quants is dict of None
         pass
 
@@ -1330,7 +1338,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             xerr = None
             yerr = None
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_rms, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
-                               xerr=xerr, yerr=yerr, legend=legend,
+                               xerr=xerr, yerr=yerr, legend=legend, lw=lw,
                                sigma=sigma, intercept=intercept, **kwargs)
 
     if show_isoviscous:
@@ -1387,7 +1395,7 @@ def nondimensionalise_h(h, p):
 
 
 def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', sigma=1, legsize=8, legloc='lower left', showchisq=False, **kwargs):
+                      c='xkcd:periwinkle', sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=False, **kwargs):
     fiterror = (yerr is not None) and (xerr is not None)
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
@@ -1412,7 +1420,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
                 c_list = colorize(np.log10(z_vec), cmap='winter')[0]
             for ind, z in enumerate(z_vec):
                 hprime = const * x0prime ** expon[0] * z ** expon[1]
-                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=0.5, zorder=100, label='dum')
+                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=lw, zorder=100, label='dum')
 
         else:
             xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
@@ -1430,7 +1438,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
             else:
                 expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
             hprime = const * xprime ** expon
-            h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=0.5, zorder=100, label='dum')
+            h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
 
         print('fit: {:.2e} x^{:.3f}'.format(const, expon))
 

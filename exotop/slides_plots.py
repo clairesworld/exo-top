@@ -16,11 +16,11 @@ fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid,
                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
                  sigma=1,
                  include_regimes=['chaotic'], save=False, fname='h_Raieff_chaotic_timeavg', labelsize=axissize,
-                       legend=False, figsize=(10,9), showpeak=False,
+                       legend=False, figsize=(10,9), showpeak=False, lw=3,
                  xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
                  title=r'fit to CRa$_{i,eff}^n$', fiterror=False,
                  c_peak='k', c_rms='xkcd:lilac', fit=True, logx=True, logy=True, hscale=1,
-                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                 show_isoviscous=False, ylim=[4e-3, 2e-2], xlim=[1e6, 2e7], postprocess_kwargs=postprocess_kwargs,
                  regime_grid=regime_grid_td)
 
 ax.tick_params(axis='x', labelsize=ticksize, pad=15)
