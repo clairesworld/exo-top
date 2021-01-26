@@ -1219,7 +1219,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               save=True, fname='h', legend=False, sigma=1, fiterror=True, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=40, lw=1,
-              xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5,
+              xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7), c_fit=None,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
@@ -2849,7 +2849,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
                     cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None, cticklabels=None,
-                              elw=1, ecapsize=5, crot=0, discrete=True, errorsize=9, sigma=2, **kwargs):
+                              errs=None, elw=1, ecapsize=5, crot=0, discrete=True, errorsize=9, sigma=2, **kwargs):
     if averagescheme is None:
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
@@ -2969,7 +2969,6 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
         else:
             raise e
 
-    fig, ax = plot_error_contours(fig, ax, c=c_contours, fc=fc, fontsize=errorsize)
     ax.set_xscale('log')
     ax.set_yscale('log')
     if ylim is not None:
@@ -2977,6 +2976,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
         ax.set_xlim(ylim)
     else:
         ax.axis('equal')
+    fig, ax = plot_error_contours(fig, ax, errs=errs, c=c_contours, fc=fc, fontsize=errorsize)
     if save:
         plot_save(fig, fname, **kwargs)
     return fig, ax
