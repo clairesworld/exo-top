@@ -6,6 +6,7 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 from exotop.useful_and_bespoke import dark_background
 import numpy as np
 import matplotlib.lines as mlines
+import matplotlib.ticker as ticker
 
 ticksize = 22
 axissize = 40
@@ -35,7 +36,7 @@ for regime in regimes:
     elif regime == 'chaotic':
         include_regimes = ['chaotic']
         ylim = [6e-3, 1.4e-2]
-        xlim = [2e6, 3e7]
+        xlim = [1.999e6, 3.001e7]
         yticks = [6e-3, 7e-3, 8e-3, 9e-3, 1e-2]
         xticks = [2e6, 1e7, 3e7]
         fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
@@ -62,8 +63,12 @@ for regime in regimes:
 
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
-    if yticks is not None:
-        ax.set_yticks(yticks)
+    ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
+    ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
+    # ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    ax.ticklabel_format(style='plain', axis='y', useOffset=False)
+    # if yticks is not None:
+    #     ax.set_yticks(yticks)
     if xticks is not None:
         ax.set_xticks(xticks)
 
