@@ -3127,8 +3127,6 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
         errs = [0.5, 0.2, 0.1]
     x0 = np.array(ax.get_xlim())
     y0 = np.array(ax.get_ylim())
-    print('x0', x0)
-    print('y0', y0)
     # set 1:1 line
     ax.plot(x0, y0, c=c, lw=2)
     for err in errs:
@@ -3138,11 +3136,11 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
             l, = ax.plot(x0, y, c=c, lw=1, ls='--')
             if labels:
                 pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
-                print('err', err, 'pos x, y', pos)
                 # transform data points to screen space
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
-                ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=fontsize, rotation=rot, color=l.get_color(),
+                if (x0[0] < pos[0] < x0[1]) and (y0[0] < pos[1] < y0[1])
+                    ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=fontsize, rotation=rot, color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec=fc, fc=fc))
     return fig, ax
 
