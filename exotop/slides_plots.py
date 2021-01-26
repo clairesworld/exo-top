@@ -85,8 +85,8 @@ for regime in regimes:
 
 
     """ model vs data """
-    c_contours = 'k'
-    fc='w'
+    c_contours = 'xkcd:off white'
+    fc = 'k'
     fig, ax = sc.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
                                       end_grid=end_grid, literature_file=None, legend=False, cmap=None, ms=ms,
                                       postprocess_kwargs=postprocess_kwargs, c_contours=c_contours, fc=fc, averagescheme='timefirst',
@@ -95,15 +95,15 @@ for regime in regimes:
                                       z_name='eta', elw=elw, ecapsize=ecapsize,
                                       save=False, include_regimes=include_regimes, errorsize=16, errs=[0.5, 0.2, 0.1, 0.05],
                                       intercept=False, fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False)
-    ax.tick_params(axis='x', labelsize=ticksize, pad=15)
-    ax.tick_params(axis='y', labelsize=ticksize, pad=15)
-    if yticks is not None:
-        ax.set_yticks(yticks)
-        ax.set_xticks(yticks)
-    ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
-    ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
-    ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
-    ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
+    # ax.tick_params(axis='x', labelsize=ticksize, pad=15)
+    # ax.tick_params(axis='y', labelsize=ticksize, pad=15)
+    # if yticks is not None:
+    #     ax.set_yticks(yticks)
+    #     ax.set_xticks(yticks)
+    # ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
+    # ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
+    # ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
+    # ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
 
-    # fig, ax = dark_background(fig, ax)
+    fig, ax = dark_background(fig, ax)
     sc.plot_save(fig, fname='model_data_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
