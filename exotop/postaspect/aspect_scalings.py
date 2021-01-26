@@ -1330,7 +1330,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         mark = 'o'
         if colourful:
             for pp in range(len(means[which_x])):
-                print(pp, 'jj', jj_all[pp])
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:,pp]]).T,
                             xerr=np.asarray([err[which_x][:,pp]]).T, elinewidth=elw,
                             fmt=mark, c=c_rms[jj_all[pp]], capsize=ecapsize, ms=ms)

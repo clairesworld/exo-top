@@ -10,9 +10,10 @@ import matplotlib.lines as mlines
 ticksize = 22
 axissize = 40
 c_fit = 'xkcd:off white'
+c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
 lw = 5
 
-regimes = ['all', 'chaotic']
+regimes = ['chaotic']
 for regime in regimes:
     if regime == 'all':
         include_regimes = ['steady', 'trans.', 'chaotic']
@@ -20,7 +21,6 @@ for regime in regimes:
         xlim = [0.7e5, 3e7]
         yticks = [6e-3, 1e-2, 4e-2]
         xticks = [1e5, 1e6, 1e7]
-        c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
         fitlabel = r'$\Delta h = 0.345$ Ra$^{-0.212}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                      markersize=0, lw=lw, label=fitlabel),
@@ -38,15 +38,14 @@ for regime in regimes:
         xlim = [1e6, 3e7]
         yticks = [6e-3, 1e-2, 4e-2]
         xticks = [1e6, 1e7]
-        c_rms = ['xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
         fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
-                   mlines.Line2D([], [], color=c_rms[0], marker='o', ls='--',
-                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{6}$'),
                    mlines.Line2D([], [], color=c_rms[1], marker='o', ls='--',
-                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{7}$'),
+                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{6}$'),
                    mlines.Line2D([], [], color=c_rms[2], marker='o', ls='--',
+                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{7}$'),
+                   mlines.Line2D([], [], color=c_rms[3], marker='o', ls='--',
                                  markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
 
     fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
