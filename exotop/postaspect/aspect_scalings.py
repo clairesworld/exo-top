@@ -2843,6 +2843,120 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
 #                              data_path=data_path, at_sol=True, load=load, **kwargs)
 
 
+def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
+                    literature_file=None, ms=30, fig=None, ax=None, figsize=(7, 5), xlabelpad=10, ylabelpad=10,
+                    legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
+                    c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
+                    save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
+                    cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None, cticklabels=None,
+                              crot=0, discrete=True, errorsize=9, **kwargs):
+    if averagescheme is None:
+        raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
+    if postprocess_kwargs is None:
+        postprocess_kwargs = {}
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=figsize)
+    Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
+        t1_grid, load_grid, end_grid, regime_grid))
+    if include_regimes is None:
+        include_regimes = regime_names
+    twocomponent = False
+    if iterable_not_string(which_x):
+        twocomponent = True
+
+    h_data_all = []
+    x_data_all = []
+    z_data_all = []
+    for jj, eta_str in enumerate(eta_ls):
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
+        for ii, case in enumerate(cases):
+            t1_ii = t1_grid[jj][ii]
+            load_ii = load_grid[jj][ii]
+            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
+                    regime_grid[jj][ii] in include_regimes):
+
+                # extract x values for plotting
+                if twocomponent:
+                    x = [plot_getx(Ra_var[ii], eta_str, case=case, which_x=xx, data_path=data_path,
+                                   t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
+                                   averagescheme=averagescheme, **kwargs) for xx in which_x]
+                else:
+                    x = plot_getx(Ra_var[ii], eta_str, case=case, which_x=which_x, data_path=data_path,
+                                  t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
+                                  averagescheme=averagescheme, **kwargs)
+
+                # get the y values, depending on averaging scheme
+                h_rms, h_peak = plot_geth(case=case, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
+                                          postprocess_kwargs=postprocess_kwargs, **kwargs)
+                """^ paste"""
+
+                if which_h == 'rms':
+                    h = h_rms
+                elif which_h == 'peak':
+                    h = h_peak
+                else:
+                    raise Exception('Invalid entry for which_h')
+
+                h_data_all.append(h)
+                x_data_all.append(x)
+                if z_name == 'eta':
+                    z_data_all.append(jj)
+                elif z_name == 'regime':
+                    z_data_all.append(regime_grid[jj][ii])
+
+    if twocomponent:
+        x0 = [a[0] for a in x_data_all]
+        x1 = [a[1] for a in x_data_all]
+        h_data = h_data_all
+        expon, const = fit_2log(x=x0, y=x1, h=h_data_all)
+        h_fit = const * np.array(x0) ** expon[0] * np.array(x1) ** expon[1]
+
+    else:
+        x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
+        expon, const = fit_log(x_data, h_data, weights=None, **kwargs)
+        h_fit = const * np.array(x_data) ** expon
+        print('(data, fit)', [(da, fi) for (da, fi) in zip(h_data, h_fit)])
+    if z_name is None:
+        clist = ['k']*len(h_data)
+        z_vec = range(len(h_data))
+    else:
+        if twocomponent:
+            z_vec = z_data_all
+        else:
+            z_vec = [q for _, q in sorted(zip(x_data_all, z_data_all))]
+    ax.set_ylabel('Model', fontsize=labelsize, labelpad=ylabelpad)
+    ax.set_xlabel('Data', fontsize=labelsize, labelpad=xlabelpad)
+    if twocomponent:
+        title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(
+            expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])
+    elif which_x == 'h_components':
+        title = 'Fit to h = ({:.2f}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
+    elif 'Ra' in which_x:
+        title = 'Fit to h = ({:.2f}'.format(const) + ') Ra^{:.3f}'.format(expon)
+    ax.set_title(title, fontsize=labelsize)
+
+    if clist is None:
+        clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+    for pp in range(len(h_data)):
+        scat = ax.scatter(h_data[pp], h_fit[pp], s=ms, zorder=100, c=clist[z_vec[pp]])
+
+    if show_cbar:
+        cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=discrete,
+                         vmin=vmin, vmax=vmax, rot=crot)
+
+    fig, ax = plot_error_contours(fig, ax, c=c_contours, fc=fc, fontsize=errorsize)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    if ylim is not None:
+        ax.set_ylim(ylim)
+        ax.set_xlim(ylim)
+    else:
+        ax.axis('equal')
+    if save:
+        plot_save(fig, fname, **kwargs)
+    return fig, ax
+
+
 def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
                     literature_file=None, ms=30, fig=None, ax=None, figsize=(7, 5), xlabelpad=10, ylabelpad=10,
                     legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
@@ -2983,7 +3097,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     return fig, ax
 
 
-def plot_error_contours(fig, ax, errs=None, c='k', fc='w', labels=True):
+def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=True):
     if errs is None:
         errs = [0.5, 0.2, 0.1]
     x0 = np.array(ax.get_xlim())
@@ -3000,7 +3114,7 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', labels=True):
                 # transform data points to screen space
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
-                ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=9, rotation=rot, color=l.get_color(),
+                ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=fontsize, rotation=rot, color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec=fc, fc=fc))
     return fig, ax
 

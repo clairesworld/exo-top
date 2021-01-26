@@ -90,8 +90,9 @@ for regime in regimes:
                                       postprocess_kwargs=postprocess_kwargs, c_contours='xkcd:off white', fc='k', averagescheme='timefirst',
                                       ylim=ylim, which_x='Ra_i_eff', which_h='rms', data_path=data_path,
                                       clist=c_rms, figsize=(9,9), labelsize=axissize, ylabelpad=20, xlabelpad=13,
-                                      save=False, cbar=None, include_regimes=include_regimes,
-                                      intercept=False, fig_fmt=fig_fmt, vmin=1e6, vmax=1e8, show_cbar=False)
+                                 z_name='eta',
+                                      save=False, cbar=None, include_regimes=include_regimes, errorsize=ticksize,
+                                      intercept=False, fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False)
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
     if yticks is not None:
