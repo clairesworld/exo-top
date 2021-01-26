@@ -2844,9 +2844,9 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
 
 
 def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
-                    literature_file=None,
+                    literature_file=None, ms=30,
                     legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
-                    c='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
+                    c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
                     cmap='magma', cbar=None, include_regimes=None, show_cbar=True,  **kwargs):
     if averagescheme is None:
@@ -2885,6 +2885,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     h_data_all = []
     x_data_all = []
     c_data_all = []
+    jj_all = []
     fig, ax = plt.subplots(1, 1, figsize=(7, 5))
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
@@ -2918,6 +2919,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
 
                 h_data_all.append(h)
                 x_data_all.append(x)
+                jj_all.append(jj)
                 if cbar == 'eta':
                     c_data_all.append(float(eta_str))
                 elif cbar == 'regime':
@@ -2963,16 +2965,17 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     else:
         ax.axis('equal')
 
-    print('c', c, np.shape(c))
-    print('h_data', h_data, np.shape(h_data))
-    print('h_fit', h_fit, np.shape(h_fit))
-    scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=np.squeeze(c), cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
+    if (clist is not None) and (not show_cbar):
+        for pp in range(len(h_data)):
+            scat = ax.scatter(h_data[pp], h_fit[pp], s=ms, zorder=100, c=clist[jj_all[pp]])
+    else:
+        scat = ax.scatter(h_data, h_fit, s=ms, zorder=100, c=np.squeeze(c), cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
 
     if show_cbar:
         cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=discrete,
                          vmin=vmin, vmax=vmax, rot=crot)
 
-    fig, ax = plot_error_contours(fig, ax, c=c, fc=fc)
+    fig, ax = plot_error_contours(fig, ax, c=c_contours, fc=fc)
 
     if save:
         plot_save(fig, fname, **kwargs)

@@ -13,6 +13,7 @@ axissize = 40
 c_fit = 'xkcd:off white'
 c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
 lw = 5
+ms = 25
 
 regimes = ['chaotic']
 for regime in regimes:
@@ -53,7 +54,7 @@ for regime in regimes:
     #                  fig_path=fig_path, averagescheme='timefirst', which_x='Ra_i_eff',
     #                  sigma=1,
     #                  include_regimes=include_regimes, save=False,  labelsize=axissize,
-    #                        legend=False, figsize=(16,9), showpeak=False, lw=lw, ms=25, elw=2, ecapsize=8,
+    #                        legend=False, figsize=(16,9), showpeak=False, lw=lw, ms=ms, elw=2, ecapsize=8,
     #                  xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography $\Delta h^\prime$', ylabelpad=20, xlabelpad=13,
     #                  title='', fiterror=False, c_fit=c_fit,
     #                  c_peak='k', c_rms=c_rms,
@@ -85,10 +86,11 @@ for regime in regimes:
 
     cmap = cmap_from_list(c_rms, cmap_name='eta')
     fig, ax = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
-                                      end_grid=end_grid, literature_file=None, legend=False, cmap=cmap,
+                                      end_grid=end_grid, literature_file=None, legend=False, cmap=cmap, ms=ms,
                                       postprocess_kwargs=postprocess_kwargs, c='xkcd:off white', fc='k', averagescheme='timefirst',
                                       ylim=ylim, which_x='Ra_i_eff', which_h='rms', data_path=data_path,
-                                      save=False, cbar='eta', include_regimes=include_regimes, axissize=axissize,
+                                 clist=c_rms,
+                                      save=False, cbar=None, include_regimes=include_regimes, axissize=axissize,
                                       intercept=False, fig_fmt=fig_fmt, vmin=1e6, vmax=1e8, show_cbar=False)
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
