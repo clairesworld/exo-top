@@ -12,12 +12,14 @@ import matplotlib.pyplot as plt
 
 ticksize = 20
 axissize = 35
+xticks = [1e6, 1e7]
+yticks = [1e-2]
 fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
                  sigma=1,
                  include_regimes=['chaotic'], save=False, fname='h_Raieff_chaotic_timeavg', labelsize=axissize,
                        legend=False, figsize=(10,9), showpeak=False, lw=5, ms=60,
-                 xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
+                 xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography $\Delta h^\prime$', ylabelpad=20,
                  title=r'fit to CRa$_{i,eff}^n$', fiterror=False, c_fit='xkcd:off white',
                  c_peak='k', c_rms=['xkcd:lilac', 'xkcd:lilac', 'xkcd:orange','xkcd:orange', 'xkcd:yellow','xkcd:yellow'],
                        fit=True, logx=True, logy=True, hscale=1,
@@ -26,5 +28,9 @@ fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid,
 
 ax.tick_params(axis='x', labelsize=ticksize, pad=15)
 ax.tick_params(axis='y', labelsize=ticksize, pad=15)
+if yticks is not None:
+    ax.set_yticks(yticks)
+if xticks is not None:
+    ax.set_xticks(xticks)
 fig, ax = dark_background(fig, ax)
 sc.plot_save(fig, fname='h_Ra_chaotic', fig_path=fig_path+'slides/', facecolor=fig.get_facecolor())

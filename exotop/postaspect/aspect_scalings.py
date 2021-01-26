@@ -1219,6 +1219,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               save=True, fname='h', legend=False, sigma=1, fiterror=True, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=40, lw=1,
+              xlabelpad=10, ylabelpad=10,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7), c_fit=None,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
@@ -1360,8 +1361,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
     if xlim is not None:
         ax.set_xlim(xlim)
-    ax.set_ylabel(ylabel, fontsize=labelsize)
-    ax.set_xlabel(xlabel, fontsize=labelsize)
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
+    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
     ax.set_title(title, fontsize=labelsize)
     if legend:
         leg = ax.legend(handles=[mlines.Line2D([], [], color=c_peak, marker='d', alpha=0.5,
