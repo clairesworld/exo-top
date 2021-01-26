@@ -2970,7 +2970,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
 
     if save:
         plot_save(fig, fname, **kwargs)
-    return const, expon
+    return fig, ax
 
 
 def plot_error_contours(fig, ax, errs=None, c='k', labels=True):

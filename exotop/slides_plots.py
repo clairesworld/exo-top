@@ -38,7 +38,7 @@ for regime in regimes:
         ylim = [6e-3, 1.4e-2]
         xlim = [1.999e6, 3.001e7]
         yticks = [6e-3, 7e-3, 8e-3, 9e-3, 1e-2]
-        xticks = [2e6, 1e7, 3e7]
+        xticks = [1.999e6, 2e6, 1e7, 3e7, 3.001e7]
         fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
@@ -65,7 +65,8 @@ for regime in regimes:
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
     ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
     ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
-    # ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.2))
     ax.ticklabel_format(style='plain', axis='y', useOffset=False)
     # if yticks is not None:
     #     ax.set_yticks(yticks)
@@ -77,10 +78,15 @@ for regime in regimes:
     fig, ax = dark_background(fig, ax)
     sc.plot_save(fig, fname='h_Ra_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
 
-    const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
-                                      end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
-                                      postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
+    """ model vs data """
+    fig, ax = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
+                                      end_grid=end_grid, literature_file=None, legend=False, cmap='winter',
+                                      postprocess_kwargs=postprocess_kwargs, c='xkcd:off white', averagescheme='timefirst',
                                       ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
-                                      save=True,
-                                      fname='fit-1-Raeff-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
+                                      save=False, cbar='eta', include_regimes=['chaotic'], axissize=axissize,
                                       intercept=False, fig_fmt=fig_fmt)
+    ax.tick_params(axis='x', labelsize=ticksize, pad=15)
+    ax.tick_params(axis='y', labelsize=ticksize, pad=15)
+
+    fig, ax = dark_background(fig, ax)
+    sc.plot_save(fig, fname='model_data_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
