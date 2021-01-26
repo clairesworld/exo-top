@@ -23,7 +23,7 @@ fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid,
                  title='', fiterror=False, c_fit=c_fit,
                  c_peak='k', c_rms=c_rms,
                        fit=True, logx=True, logy=True, hscale=1,
-                 show_isoviscous=False, ylim=[6e-3, 2e-2], xlim=[1e6, 2e7], postprocess_kwargs=postprocess_kwargs,
+                 show_isoviscous=False, ylim=[6e-3, 3.5e-2], xlim=[1e6, 2e7], postprocess_kwargs=postprocess_kwargs,
                  regime_grid=regime_grid_td)
 
 ax.tick_params(axis='x', labelsize=ticksize, pad=15)
@@ -46,4 +46,4 @@ handles.append(mlines.Line2D([], [], color=c_rms[2], marker='o', ls='--',
 ax.legend(handles=handles, frameon=False, fontsize=25, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
 
 fig, ax = dark_background(fig, ax)
-sc.plot_save(fig, fname='h_Ra_chaotic', fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
+sc.plot_save(fig, fname='h_Ra_trch', fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
