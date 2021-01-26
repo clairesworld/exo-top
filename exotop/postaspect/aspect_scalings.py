@@ -2847,8 +2847,8 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
                     literature_file=None,
                     legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
                     c='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
-                    save=True, fname='model-data', labelsize=16, clist=None,
-                    cmap='magma', cbar=None, include_regimes=None, **kwargs):
+                    save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
+                    cmap='magma', cbar=None, include_regimes=None, show_cbar=True,  **kwargs):
     if averagescheme is None:
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
@@ -2863,7 +2863,10 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     if cbar == 'eta':
         clabel = r'$\Delta \eta$'
         cticklabels = None
-        vmin, vmax = 0.9e5, 2e8
+        if vmin is None:
+            vmin = 0.9e5
+        if vmax is None:
+            vmax = 2e8
         crot = 0
         cnorm = LogNorm()
         discrete = False
@@ -2962,7 +2965,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
 
     scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
 
-    if cbar is not None:
+    if show_cbar:
         cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=discrete,
                          vmin=vmin, vmax=vmax, rot=crot)
 
