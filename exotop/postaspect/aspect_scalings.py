@@ -3140,7 +3140,8 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
                 fX = interp1d(y, x0)
                 if log:
                     if i == 0:  # top error
-                        pos = [10**((np.log10(x0[0]) + np.log10(fX(y0[-1]))) / 2.), 10**((np.log10(fY(x0[0])) + np.log10(y[-1])) / 2.)]
+                        pos = [10**((np.log10(x0[0]) + np.log10(fX(y0[-1]))) / 2.),
+                               10**((np.log10(fY(x0[0])) + np.log10(y0[-1])) / 2.)]
                     elif i == 1:
                         pos = [10 ** ((np.log10(fX(y0[0])) + np.log10(x0[-1])) / 2.),
                                10 ** ((np.log10(y0[0]) + np.log10(fY(x0[-1]))) / 2.)]
