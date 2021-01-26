@@ -34,9 +34,9 @@ for regime in regimes:
                                      markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
     elif regime == 'chaotic':
         include_regimes = ['chaotic']
-        ylim = [6e-3, 1.3e-2]
+        ylim = [6e-3, 1.4e-2]
         xlim = [2e6, 3e7]
-        yticks = [6e-3, 1e-2, 1.3e-2]
+        yticks = [6e-3, 7e-3, 8e-3, 9e-3, 1e-2]
         xticks = [2e6, 1e7, 3e7]
         fitlabel = r'$\Delta h = 0.094$ Ra$^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
@@ -71,3 +71,11 @@ for regime in regimes:
 
     fig, ax = dark_background(fig, ax)
     sc.plot_save(fig, fname='h_Ra_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
+
+    const, expon = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
+                                      end_grid=end_grid, literature_file=None, legend=True, cmap='winter',
+                                      postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
+                                      ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
+                                      save=True,
+                                      fname='fit-1-Raeff-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
+                                      intercept=False, fig_fmt=fig_fmt)
