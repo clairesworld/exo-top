@@ -2846,7 +2846,7 @@ def reprocess_all_average(Ra_ls, eta_ls, t1_grid=None, end_grid=None,
 def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
                     literature_file=None,
                     legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
-                    c='k', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
+                    c='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None,
                     cmap='magma', cbar=None, include_regimes=None, **kwargs):
     if averagescheme is None:
@@ -2966,14 +2966,14 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
         cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=discrete,
                          vmin=vmin, vmax=vmax, rot=crot)
 
-    fig, ax = plot_error_contours(fig, ax)
+    fig, ax = plot_error_contours(fig, ax, c=c, fc=fc)
 
     if save:
         plot_save(fig, fname, **kwargs)
     return fig, ax
 
 
-def plot_error_contours(fig, ax, errs=None, c='k', labels=True):
+def plot_error_contours(fig, ax, errs=None, c='k', fc='w', labels=True):
     if errs is None:
         errs = [0.5, 0.2, 0.1]
     x0 = np.array(ax.get_xlim())
@@ -2991,7 +2991,7 @@ def plot_error_contours(fig, ax, errs=None, c='k', labels=True):
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
                 ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=9, rotation=rot, color=l.get_color(),
-                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec='1', fc='1'))
+                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec=fc, fc=fc))
     return fig, ax
 
 # def subplots_h_fit_2D(Ra_ls=None, eta_ls=None, t1=None, end=None, load='auto', data_path=data_path_bullard,

@@ -20,7 +20,7 @@ for regime in regimes:
         include_regimes = ['steady', 'trans.', 'chaotic']
         ylim = [6e-3, 4e-2]
         xlim = [0.7e5, 3e7]
-        yticks = [6e-3,  9e-3, 1.5e-2, 2e-2, 3e-2, 4e-2]
+        yticks = [6e-3,  8e-3, 1e-2, 2e-2, 3e-2, 4e-2]
         xticks = [1e5, 1e6, 1e7]
         fitlabel = r'$\Delta h = 0.345$ Ra$^{-0.212}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
@@ -85,7 +85,7 @@ for regime in regimes:
     cmap = cmap_from_list(c_rms[1:], cmap_name='eta')
     fig, ax = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
                                       end_grid=end_grid, literature_file=None, legend=False, cmap=cmap,
-                                      postprocess_kwargs=postprocess_kwargs, c='xkcd:off white', averagescheme='timefirst',
+                                      postprocess_kwargs=postprocess_kwargs, c='xkcd:off white', fc='k', averagescheme='timefirst',
                                       ylim=ylim, which_x='Ra_i_eff', which_h='rms', data_path=data_path,
                                       save=False, cbar='eta', include_regimes=include_regimes, axissize=axissize,
                                       intercept=False, fig_fmt=fig_fmt)
