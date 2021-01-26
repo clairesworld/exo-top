@@ -21,7 +21,7 @@ fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid,
                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
                  sigma=1,
                  include_regimes=['chaotic'], save=False, fname='h_Raieff_chaotic_timeavg', labelsize=axissize,
-                       legend=False, figsize=(10,9), showpeak=False, lw=lw, ms=60,
+                       legend=False, figsize=(12,9), showpeak=False, lw=lw, ms=60,
                  xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography $\Delta h^\prime$', ylabelpad=20,
                  title=r'fit to CRa$_{i,eff}^n$', fiterror=False, c_fit=c_fit,
                  c_peak='k', c_rms=c_rms,
@@ -38,9 +38,9 @@ if xticks is not None:
 
 handles = []
 handles.append(mlines.Line2D([], [], color=c_fit, marker='*',
-                          markersize=0, lw=lw, label=r'$\Delta h = C$ Ra$^{x}$'))
+                          markersize=0, lw=lw, label=r'$\Delta h = 9.4 \times 10^{-2}$ Ra$^{-0.151}$'))
 
-ax.legend(handles=handles, frameon=False, fontsize=20, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
+ax.legend(handles=handles, frameon=False, fontsize=30, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
 
 fig, ax = dark_background(fig, ax)
 sc.plot_save(fig, fname='h_Ra_chaotic', fig_path=fig_path+'slides/', facecolor=fig.get_facecolor())

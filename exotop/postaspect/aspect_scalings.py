@@ -1327,8 +1327,11 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         print('mark', mark, 'jj', jj, 'ms', ms)
         if colourful:
             for pp, xval in enumerate(means[which_x]):
+                print('xval', xval)
+                print('yval', means['h_rms'][pp])
+                print('x', c_rms[pp])
                 ax.errorbar(xval, means['h_rms'][pp], yerr=err['h_rms'][:,pp], xerr=err[which_x][:,pp], elinewidth=1,
-                        fmt=mark, c=c_rms[pp], capsize=5, ms=ms)
+                            fmt=mark, c=c_rms[pp], capsize=5, ms=ms)
         else:
             ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=1,
                         fmt=mark, c=c_rms, capsize=5, ms=ms)
