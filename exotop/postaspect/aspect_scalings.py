@@ -1231,6 +1231,14 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     if ax is None:
         fig = plt.figure(figsize=figsize)
         ax = plt.gca()
+    if logx:
+        ax.set_xscale('log')
+    if logy:
+        ax.set_yscale('log')
+    if ylim is not None:
+        ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
+    if xlim is not None:
+        ax.set_xlim(xlim)
     colourful = False
     if iterable_not_string(c_rms):
         colourful = True
@@ -1363,14 +1371,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         h_rms_iso = df_JFR['RMS_topo']
         ax.plot(Ra_iso, h_rms_iso, c='k', ls='--', lw=0.5)
 
-    if logx:
-        ax.set_xscale('log')
-    if logy:
-        ax.set_yscale('log')
-    if ylim is not None:
-        ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
-    if xlim is not None:
-        ax.set_xlim(xlim)
+
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
     ax.set_title(title, fontsize=labelsize)
@@ -1439,7 +1440,8 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
                 h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=lw, zorder=100, label='dum')
 
         else:
-            xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
+            xprime = np.linspace(ax.get_xlim[0], ax.get_xlim[1])
+            # xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
             if fiterror:
                 const, expon, const_err, expon_err = fit_logerror(flatx, flaty, xerr, yerr, sigma=sigma, **kwargs)
                 const_up = const + sigma * const_err
