@@ -3127,6 +3127,8 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
         errs = [0.5, 0.2, 0.1]
     x0 = np.array(ax.get_xlim())
     y0 = np.array(ax.get_ylim())
+    print('x0', x0)
+    print('y0', y0)
     # set 1:1 line
     ax.plot(x0, y0, c=c, lw=2)
     for err in errs:
