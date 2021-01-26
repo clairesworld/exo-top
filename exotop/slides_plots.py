@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 ticksize = 20
 axissize = 35
 xticks = [1e6, 1e7]
-yticks = [1e-2]
+yticks = [4e-3, 1e-2, 2e-2]
 fig, ax = sc.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
                  sigma=1,
