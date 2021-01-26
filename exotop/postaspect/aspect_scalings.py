@@ -2966,7 +2966,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
     print('c', c, np.shape(c))
     print('h_data', h_data, np.shape(h_data))
     print('h_fit', h_fit, np.shape(h_fit))
-    scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=c, cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
+    scat = ax.scatter(h_data, h_fit, s=30, zorder=100, c=np.squeeze(c), cmap=cmap, norm=cnorm, vmin=vmin, vmax=vmax)
 
     if show_cbar:
         cbar = colourbar(scat, label=clabel, ticklabels=cticklabels, labelsize=labelsize, discrete=discrete,
