@@ -14,13 +14,13 @@ c_fit = 'xkcd:off white'
 c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
 lw = 5
 
-regimes = ['all', 'chaotic']
+regimes = ['all']
 for regime in regimes:
     if regime == 'all':
         include_regimes = ['steady', 'trans.', 'chaotic']
         ylim = [6e-3, 4e-2]
         xlim = [0.7e5, 3e7]
-        yticks = [6e-3,  8e-3, 1e-2, 2e-2, 3e-2, 4e-2]
+        yticks = [6e-3,  9e-3, 1.5e-2, 2e-2, 3e-2, 4e-2]
         xticks = [1e5, 1e6, 1e7]
         fitlabel = r'$\Delta h = 0.345$ Ra$^{-0.212}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
@@ -77,13 +77,17 @@ for regime in regimes:
     fig, ax = dark_background(fig, ax)
     sc.plot_save(fig, fname='h_Ra_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
 
+
+
+
+
     """ model vs data """
-    cmap = cmap_from_list(c_rms, cmap_name='eta')
+    cmap = cmap_from_list(c_rms[1:], cmap_name='eta')
     fig, ax = sc.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
                                       end_grid=end_grid, literature_file=None, legend=False, cmap=cmap,
                                       postprocess_kwargs=postprocess_kwargs, c='xkcd:off white', averagescheme='timefirst',
-                                      ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
-                                      save=False, cbar='eta', include_regimes=['chaotic'], axissize=axissize,
+                                      ylim=ylim, which_x='Ra_i_eff', which_h='rms', data_path=data_path,
+                                      save=False, cbar='eta', include_regimes=include_regimes, axissize=axissize,
                                       intercept=False, fig_fmt=fig_fmt)
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
