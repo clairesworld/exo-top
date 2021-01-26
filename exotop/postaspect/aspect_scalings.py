@@ -1319,7 +1319,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     print('means x', means[which_x])
     try:
         for key in quants.keys():
-            err[key] = [quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]]
+            err[key] = np.asarray([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
         if showpeak:
             ax.errorbar(means[which_x], means['h_peak'], yerr=sdy_all,#err['h_peak'],
                         xerr=sdx_all,#err[which_x],
