@@ -57,7 +57,7 @@ for regime in regimes:
     #                  sigma=1,
     #                  include_regimes=include_regimes, save=False,  labelsize=axissize,
     #                        legend=False, figsize=(16,9), showpeak=False, lw=lw, ms=ms, elw=elw, ecapsize=ecapsize,
-    #                  xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography $\Delta h^\prime$', ylabelpad=20, xlabelpad=13,
+    #                  xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography $\Delta h_{rms}^\prime$', ylabelpad=20, xlabelpad=13,
     #                  title='', fiterror=False, c_fit=c_fit,
     #                  c_peak='k', c_rms=c_rms,
     #                        fit=True, logx=True, logy=True, hscale=1,
@@ -95,7 +95,7 @@ for regime in regimes:
                                       z_name='eta', elw=elw, ecapsize=ecapsize,
                                       save=False, include_regimes=include_regimes, errorsize=20, errs=[0.5, 0.2, 0.1, 0.05],
                                       intercept=False, fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False,
-                                           ylabel=r'Model $\Delta h^\prime$', xlabel=r'Data $\Delta h^\prime$')
+                                           ylabel=r'Model $\Delta h_{rms}^\prime$', xlabel=r'Data $\Delta h_{rms}^\prime$')
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
     if yticks is not None:
