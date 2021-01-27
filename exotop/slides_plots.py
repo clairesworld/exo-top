@@ -110,11 +110,11 @@ for regime in regimes:
     # sc.plot_save(fig, fname='model_data_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
 
     """ peak """
-    yticks = [1e-2, 2e-2, 3e-2, 4e-2]
+    yticks = [1e-2, 2e-2, 3e-2]
     fig, ax = sc.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
                                       end_grid=end_grid, literature_file=None, legend=False, cmap=None, ms=ms,
                                       postprocess_kwargs=postprocess_kwargs, c_contours=c_contours, fc=fc, averagescheme='timefirst',
-                                      ylim=[1e-2, 4e-2], which_x='Ra_i_eff', which_h='peak', data_path=data_path,
+                                      ylim=[1e-2, 3e-2], which_x='Ra_i_eff', which_h='peak', data_path=data_path,
                                       clist=c_rms, figsize=(10, 10), labelsize=axissize, ylabelpad=20, xlabelpad=13,
                                       z_name='eta', elw=elw, ecapsize=ecapsize,
                                       save=False, include_regimes=include_regimes, errorsize=20, errs=[0.5, 0.2, 0.1, 0.05],
