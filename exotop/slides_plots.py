@@ -110,8 +110,7 @@ for regime in regimes:
     # sc.plot_save(fig, fname='model_data_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
 
     """ model vs data """
-    c_contours = 'xkcd:off white'
-    fc = 'k'
+    yticks = [1e-2, 2e-2, 3e-2, 4e-2]
     fig, ax = sc.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
                                       end_grid=end_grid, literature_file=None, legend=False, cmap=None, ms=ms,
                                       postprocess_kwargs=postprocess_kwargs, c_contours=c_contours, fc=fc, averagescheme='timefirst',
