@@ -2939,7 +2939,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
         x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
         expon, const = fit_log(x_data, h_data, weights=None, **kwargs)
         h_fit = const * np.array(x_data) ** expon
-        print('(data, fit)', [(da, fi) for (da, fi) in zip(h_data, h_fit)])
+        print('const, expon', const, expon)
     if z_name is None:
         clist = ['k']*len(h_data)
         z_vec = range(len(h_data))
