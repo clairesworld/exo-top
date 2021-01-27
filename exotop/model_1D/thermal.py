@@ -229,6 +229,7 @@ def solve(pl, t0=0, tf=4.5, T_m0=1750, T_c0=2250, D_l0=100e3, complexity=3, t_ev
     if complexity == 1:
         T_c0 = T_m0
 
+    # print('mass', pl.M_p, 'tf', tf)
     f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(pl=pl, tf=tf, complexity=complexity, **kwargs)),
                             t_span=(t0, tf), y0=[T_m0, T_c0, D_l0], t_eval=t_eval, max_step=100e6 * p.years2sec,
                             method='RK45', dense_output=False)

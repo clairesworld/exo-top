@@ -39,7 +39,7 @@ def reduce_dims(a, transpose=True):
 def find_nearest_idx(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
-    return idx
+    return int(idx)
 
 def max_slope(x,y, which='max', plot=False, tol=1):
     # find maximum gradient or minimum gradient - only works for 1D

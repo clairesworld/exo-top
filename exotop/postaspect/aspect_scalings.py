@@ -961,6 +961,11 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=da
     if which_x in ['Ra_i', 'Ra_i_eff', 'h_components']:
         psuffixes.append('_T')
         postprocess_functions.append(T_parameters_at_sol)
+    else:
+        # probably in temp thign also
+        print(' WARNING: possibly not implemented x variable')
+        psuffixes.append('_T')
+        postprocess_functions.append(T_parameters_at_sol)
 
     df, df1 = None, None
     if not (not psuffixes):
@@ -992,16 +997,20 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=da
 
 def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
                 t1=None, load=None, postprocess_kwargs=None, **kwargs):
-    if 'h_components' in which_x:
+    try:
+        keys = df.columns
+    except AttributeError:
+        keys = df.keys()
+    if ('h_components' in which_x) or (which_x in keys):
         try:
             missing = (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any())
         except AttributeError:
             missing = (which_x not in df.keys()) or ((which_x in df.keys()) and np.isnan(df[which_x]).any())
         if not missing:
             try:
-                x = df['h_components'].to_numpy()
+                x = df[which_x].to_numpy()
             except AttributeError:  # if a float
-                x = df['h_components']
+                x = df[which_x]
         else:
             if averagescheme == 'timelast':
                 print('    Averaging T components calcualted at each timestep')
