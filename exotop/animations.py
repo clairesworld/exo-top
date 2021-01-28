@@ -193,7 +193,7 @@ for jj, etastr in enumerate(eta_ls):
         for ii, case in enumerate(cases):
             if (os.path.exists(data_path + 'output-' + case)) and (ii >= 3):
                 animate_T_field(case, data_path=data_path, fig_path=fig_path+'animations/', labelsize=30, ticksize=16,
-                                shading='gourand', cmap='gist_heat')
+                                shading='gouraud', cmap='gist_heat')
                 # animate_T_prof(case, data_path=data_path, fig_path=fig_path + 'animations/', labelsize=30, ticksize=16)
                 # animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16)
                 print('finished case')
