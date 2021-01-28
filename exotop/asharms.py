@@ -17,8 +17,8 @@ def hpeak_from_spectrum(power, norm='4pi', lmax=40, n=10, **kwargs):
 
 def load_spectrum(fpath='', fname='', **kwargs):
     df = pd.read_csv(fpath + fname, header=None, names=['l', 'S_l'], index_col=False)
-    degrees = df['l']
-    power = df['S_l']
+    degrees = df['l'][1:].to_numpy()
+    power = df['S_l'][1:].to_numpy()
     # todo : find nearest l for imperfect digitization
     return power, degrees
 
@@ -60,25 +60,56 @@ def vol_from_spectrum(phi0=None, fname='', fpath='', r0=1, n_stats=10, **kwargs)
     return V0
 
 
-def powerspectrum_RMS(path=None, power_lm=None, degree=None, amplitude=False, lmax=None): # try to calcuate RMS from digitized power spectrum
+# def powerspectrum_RMS(path=None, power_lm=None, degree=None, amplitude=False, lmax=None): # try to calcuate RMS from digitized power spectrum
+#     if path is not None:
+#         df = pd.read_csv(path, header=None, names=['degree', 'value'], index_col=False)
+#         degree= np.array(df['degree'])
+#         S = np.array(df['value'])
+#     elif power_lm is not None:
+#         degree = np.arange(1, len(power_lm)-1)
+#         S = power_lm
+#
+#     if n is None:
+#         n = len(ls)
+#
+#     RMS_l = []
+#     ii = 0
+#     while l <= lmax:
+#         l = degree[ii]
+#         Slm = S[ii]
+#         if amplitude:
+#             Slm = Slm**2
+#         RMS_l.append(np.sqrt(Slm/(2*l + 1)))
+#         ii = ii + 1
+#     return sum(RMS_l)
+
+
+def powerspectrum_RMS(path=None, power_lm=None, degree=None, amplitude=False,
+                      lmax=None):  # try to calcuate RMS from digitized power spectrum
     if path is not None:
         df = pd.read_csv(path, header=None, names=['degree', 'value'], index_col=False)
-        degree= np.array(df['degree'])
+        degree = np.array(df['degree'])
         S = np.array(df['value'])
     elif power_lm is not None:
-        degree = np.arange(1, len(power_lm)-1)
+        degree = np.arange(1, len(power_lm) - 1)
         S = power_lm
 
-    if n is None:
-        n = len(ls)
+    if lmax is None:
+        lmax = degree[-1]
 
     RMS_l = []
     ii = 0
-    while l <= lmax:
-        l = degree[ii]
+    l = degree[ii]
+
+    while (l <= lmax) and ii < len(degree):
         Slm = S[ii]
         if amplitude:
-            Slm = Slm**2
-        RMS_l.append(np.sqrt(Slm/(2*l + 1)))
+            Slm = Slm ** 2
+        RMS_l.append(np.sqrt(Slm / (2 * l + 1)))
         ii = ii + 1
-    return sum(RMS_l)
+        if ii < len(degree):
+            l = degree[ii]
+
+    RMS = sum(RMS_l)
+    # print('this RMS', RMS)
+    return RMS

@@ -114,16 +114,27 @@ def printe(name, obj, showall=False):
         pass
 
 
-def colourbar(mappable, vmin=None, vmax=None, label='', labelsize=16, ticks=None, ticklabels=None, labelpad=17,
-              rot=None, discrete=False):
+def colourbar(mappable=None, ax=None, vmin=None, vmax=None, label='', labelsize=16, ticksize=14, ticks=None, ticklabels=None, labelpad=17,
+              rot=None, discrete=False, cmap='rainbow', tickformatter=None, c='k', pad=0.05, log=False):
     from mpl_toolkits.axes_grid1 import make_axes_locatable
+    import matplotlib.colors as colors
     # from https://joseph-long.com/writing/colorbars/
-    ax = mappable.axes
+
+    if ax is None:
+        ax = mappable.axes
+    if log:
+        norm = colors.LogNorm(vmin=vmin, vmax=vmax)
+    else:
+        norm=None
+
+    if mappable is None:
+        mappable = ax.scatter(np.arange(5), np.arange(5), c=np.arange(5), vmin=vmin, vmax=vmax, cmap=cmap, s=0, norm=norm)
+
     fig = ax.figure
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cax = divider.append_axes("right", size="5%", pad=pad)
     cbar = fig.colorbar(mappable, cax=cax)
-    cbar.set_label(label, rotation=270, labelpad=labelpad, fontsize=labelsize)
+    cbar.set_label(label, rotation=270, labelpad=labelpad, fontsize=labelsize, c=c)
     if ticks is not None:
         cbar.set_ticks(ticks)
     elif ticks is None and discrete:
@@ -132,6 +143,12 @@ def colourbar(mappable, vmin=None, vmax=None, label='', labelsize=16, ticks=None
         cbar.set_ticks(tick_locs)
     if ticklabels is not None:
         cbar.ax.set_yticklabels(ticklabels, rotation=rot)
+    # if tickformatter is not None:
+    #     cbar.ax.yaxis.set_major_formatter(tickformatter)
+
+    cbar.ax.yaxis.label.set_color(c)
+    cbar.ax.tick_params(axis='y', colors=c, labelsize=ticksize)
+    [cbar.ax.spines[s].set_color(c) for s in ['bottom', 'top', 'right', 'left']]
     return cbar
 
 
