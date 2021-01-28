@@ -784,6 +784,7 @@ def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_
 
 def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', showwaterscale=True, textc='k', M0=1, #0.815
                                  titlesize=24, save=False, spectrum_fname='', spectrum_fpath='', c='#81f79f', title='',
+                                 mass_iax=0,
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
     phi0 = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
     h_rms0 = harm.powerspectrum_RMS(power_lm=phi0)
@@ -798,7 +799,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', showwat
 
     if showwaterscale:
         # how does actual vol scale assuming constant mass fraction of surface water (bad assumption)?
-        mass_ax = axes[0]
+        mass_ax = axes[mass_iax]
         rho_w = 1000
         vol_0 = pl0.max_ocean[-1]
         M_w0 = rho_w * vol_0

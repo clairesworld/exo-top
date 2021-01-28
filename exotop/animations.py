@@ -191,7 +191,7 @@ for jj, etastr in enumerate(eta_ls):
     if jj <= 20:
         cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
         for ii, case in enumerate(cases):
-            if (os.path.exists(data_path + 'output-' + case)) and (ii >= 3):
+            if (os.path.exists(data_path + 'output-' + case)) and (ii >= 4):
                 animate_T_field(case, data_path=data_path, fig_path=fig_path+'animations/', labelsize=30, ticksize=16,
                                 shading='gouraud', cmap='gist_heat')
                 # animate_T_prof(case, data_path=data_path, fig_path=fig_path + 'animations/', labelsize=30, ticksize=16)
