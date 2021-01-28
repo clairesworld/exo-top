@@ -786,8 +786,8 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', showwat
                                  titlesize=24, save=False, spectrum_fname='', spectrum_fpath='', c='#81f79f', title='',
                                  mass_iax=0,
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
-    phi0 = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
-    h_rms0 = harm.powerspectrum_RMS(power_lm=phi0)
+    phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
+    h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
     pl0 = bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults, t_eval=None,
                        random=False, phi0=phi0, h_rms0=h_rms0, postprocessors=['topography', 'ocean_capacity'], **kwargs)[0]
     # v0 = harm.vol_from_spectrum(phi0=phi0, r0=pl0.R_p, **kwargs)
@@ -795,7 +795,8 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', showwat
 
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0, textc=textc,
                                               label_l=None, c=c, ylabel=ylabel, age=age, h_rms0=h_rms0, legsize=legsize,
-                                              postprocessors=['topography', 'ocean_capacity'], phi0=phi0, **kwargs)
+                                              postprocessors=['topography', 'ocean_capacity'], phi0=phi0,
+                                              leg_bbox=(1.7, 1.01), **kwargs)
 
     if showwaterscale:
         # how does actual vol scale assuming constant mass fraction of surface water (bad assumption)?
@@ -813,7 +814,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', showwat
         # title and legend
         legend = mass_ax.legend(frameon=False, fontsize=legsize,
                                 borderaxespad=0,  # mode="expand",
-                                loc='lower left', bbox_to_anchor=(1.7, 1.01), ncol=1)
+                                loc='lower left', bbox_to_anchor=leg_bbox, ncol=1)
     fig.suptitle(title, fontsize=titlesize, y=1.3, x=0.365, c=textc)
 
     if save:

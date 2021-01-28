@@ -85,7 +85,7 @@ def animate_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, 
         # out of cache?
         ani = animation.FuncAnimation(fig, animate, frames=range(0, len(n), 2),
                                       #                               init_func=init,
-                                      fargs=(T_n,), blit=True, repeat=True,
+                                      fargs=(T_n,), blit=False, repeat=True,
                                       interval=200, )  # interval: delay between frames in ms
         ani.save(fig_path+case + '-T.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
 
