@@ -639,8 +639,8 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
 
 def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidth=1, relative=True, textc='k',
                                   age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ', nplanets=20, log=False,
-                                  fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
-                                  pl_baseline=None, update_kwargs={}, initial_kwargs={}, **kwargs):
+                                  fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12, yscale=1,
+                                  pl_baseline=None, update_kwargs={}, initial_kwargs={}, verbose=False, **kwargs):
     if x_vars is None:
         x_vars = ['age', 'M_p', 'CMF', 'H0', 'Ea']
     if axes is None:
@@ -656,9 +656,8 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
 
     if relative:
         yscale = model_baseline ** -1
+    print('yscale', yscale)
 
-    else:
-        yscale = 1
     ylabel=True
     legendd=legend
 
@@ -683,10 +682,11 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
 
     if 'M_p' in x_vars:
         # mass variation
+        print('generating planets...')
         planets_mass = bulk_planets(n=nplanets, name='M_p', mini=0.1 * parameters.M_E, maxi=6 * parameters.M_E, like=defaults,
                                     t_eval=pl_baseline.t, random=False,
                                     initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
-
+        print('finished!')
         fig, ax = plot_vs_x(legend=legendd, set_xlim=True,  legsize=legsize, log=log,
             lplanets=planets_mass, xname={'M_p': ('$M_p$ ($M_E$)', parameters.M_E ** -1)},
             ynames={model_param: ('', yscale)}, snap=age, relative=relative,
@@ -694,8 +694,8 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
         if relative:
             ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
         if legend and relative:
-            ax.text(0.95, 0.95, '4.5 Ga \n 300 kJ mol$^{-1}$ \n 0.3 CMF \n 4.6 pW kg$^{-1}$', fontsize=legsize,
-                    horizontalalignment='right', c=textc,
+            ax.text(0.05, 0.95, '4.5 Ga\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
+                    horizontalalignment='left', c=textc,
                     verticalalignment='top',
                     transform=ax.transAxes)
         i_ax += 1
@@ -795,7 +795,7 @@ def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_
 
 def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwater=None, textc='k', M0=0.815,
                                  titlesize=24, save=False, spectrum_fname='', spectrum_fpath='', c='#81f79f', title='',
-                                ticksize=14, labelsize=16, clabel='Surface water mass fraction', clabelpad=20,
+                                ticksize=14, labelsize=16, clabel='Surface water mass fraction', clabelpad=20, relative=False,
                                  mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10,10), ytitle=1.1, cmap='terrain_r',
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
 
@@ -807,7 +807,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0, textc=textc,
                                               label_l=None, c=c, ylabel=ylabel, age=age, h_rms0=h_rms0, legsize=legsize,
                                               postprocessors=['topography', 'ocean_capacity'], phi0=phi0, log=log, fig=fig,
-                                              axes=axes, ticksize=ticksize, labelsize=labelsize,
+                                              axes=axes, ticksize=ticksize, labelsize=labelsize, relative=relative,
                                                **kwargs)
 
     if mass_frac_sfcwater is not None:
@@ -815,19 +815,21 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
         ax = axes[mass_iax]
         rho_w = 1000
         vol_0 = pl0.max_ocean[-1]
+        print('vol_0', vol_0)
         masses = np.logspace(np.log10(0.1), np.log10(6))  # mass in M_E
         colours = colorize([np.log10(m) for m in mass_frac_sfcwater], cmap=cmap)[0]
 
         for ii, X in enumerate(mass_frac_sfcwater):
             M_w = masses * parameters.M_E * X  # mass of sfc water in kg
             vol_w = M_w/rho_w  # volume of surface water if same mass fraction
-
-            ax.plot(masses, vol_w/vol_0,  alpha=0.4, lw=0, zorder=0, c=colours[ii], marker='o', markersize=100,
+            if relative:
+                vol_w = vol_w/vol_0
+            ax.plot(masses, vol_w,  alpha=0.4, lw=0, zorder=0, c=colours[ii], marker='o', markersize=15,
                      label='Maximum water budget')
 
         colourbar(mappable=None, ax=ax, vmin=np.min(mass_frac_sfcwater), vmax=np.max(mass_frac_sfcwater), label=clabel,
                   labelsize=labelsize*0.8, ticksize=ticksize, labelpad=clabelpad, ticks=mass_frac_sfcwater,
-                  cmap=cmap, c=textc, log=True, pad=0.1)
+                  cmap=cmap, c=textc, log=True, pad=0.2)
         #
         # # title and legend
         # legend = ax.legend(frameon=False, fontsize=legsize,
