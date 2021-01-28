@@ -815,14 +815,14 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
         ax = axes[mass_iax]
         rho_w = 1000
         vol_0 = pl0.max_ocean[-1]
-        masses = np.linspace(0.1, 6)  # mass in M_E
+        masses = np.logspace(np.log10(0.1), np.log10(6))  # mass in M_E
         colours = colorize([np.log10(m) for m in mass_frac_sfcwater], cmap=cmap)[0]
 
         for ii, X in enumerate(mass_frac_sfcwater):
             M_w = masses * parameters.M_E * X  # mass of sfc water in kg
             vol_w = M_w/rho_w  # volume of surface water if same mass fraction
 
-            ax.plot(masses, vol_w/vol_0,  alpha=0.4, lw=10, zorder=0, c=colours[ii],
+            ax.plot(masses, vol_w/vol_0,  alpha=0.4, lw=0, zorder=0, c=colours[ii], marker='o', markersize=100,
                      label='Maximum water budget')
 
         colourbar(mappable=None, ax=ax, vmin=np.min(mass_frac_sfcwater), vmax=np.max(mass_frac_sfcwater), label=clabel,

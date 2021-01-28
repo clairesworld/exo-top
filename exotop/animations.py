@@ -67,6 +67,10 @@ def animate_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, 
         fps = len(n) / (dt) * factor
         print('equivalent fps:', fps)
 
+    def init():
+        im.set_array([])
+        return im
+
     # do animation
     def animate(i, T_n):
         T = ap.reduce_dims(T_n[i])
