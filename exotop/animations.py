@@ -50,7 +50,7 @@ def animate_T(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     cax.set_xlabel('Temperature', fontsize=18)
     cax.tick_params(axis='x', which='major', labelsize=ticksize)
     ax.set_title('Nondimensional temperature', fontsize=labelsize, pad=90, color='xkcd:off white')
-    im = ax.pcolormesh(x, y, ap.reduce_dims(T_n[0]), cmap=cmap)
+    im = ax.pcolormesh(x, y, ap.reduce_dims(T_n[0]), cmap=cmap, shading='gourand')
     cb = fig.colorbar(im, cax=cax, orientation="horizontal")
     cax.xaxis.tick_top()
     cax.xaxis.set_label_position('top')

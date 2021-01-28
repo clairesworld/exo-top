@@ -4,6 +4,10 @@ import pyshtools
 
 def RMS_from_l_powerspectrum(clm_topo, lmax=None):
     # Calculate RMS topography from power spectrum
+    
+    # Get rid of degree 0 corresponding to mean radius
+    clm_topo.coeffs[:,0] = 0.0
+    
     spec = clm_topo.spectrum(unit='per_l', lmax=lmax)
     RMS_topo = np.sqrt(np.sum(spec))
     print("RMS_topo", RMS_topo, "m")

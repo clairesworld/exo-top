@@ -3288,3 +3288,18 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
 #     #     g = a * x**b * y**c
 #     #     return g.ravel()
 #     # popt, pcov = curve_fit(func, (x1, x2), h.ravel())
+
+
+def plot_h_fractal_scaling(case, ts, rho=1, Q=1, kappa=1, data_path=data_path_bullard,
+                           figsize=(7,7), labelsize=16):
+    # phi = ((rho/Q_l)**(1/3) * kappa)**(1/2)
+    x, h = read_topo_stats(case, ts, data_path=data_path)
+    x = np.array(x)
+    h = np.array(h)
+    dx = x
+    dh = np.zeros_like(dx)
+    for i in x:
+        dh = h[i] - h[0]
+
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.plot
