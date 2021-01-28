@@ -85,7 +85,7 @@ def animate_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, 
         # out of cache?
         ani = animation.FuncAnimation(fig, animate, frames=range(0, len(n), 2),
                                       #                               init_func=init,
-                                      fargs=(T_n,), blit=False, repeat=True,
+                                      fargs=(T_n,), blit=True, repeat=True,
                                       interval=200, )  # interval: delay between frames in ms
         ani.save(fig_path+case + '-T.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
 
@@ -151,9 +151,9 @@ def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     h_n, h_peak, h_rms = [], [], []
     for i in range(len(n)):
         x, h = sc.read_topo_stats(case, ts[i], data_path=data_path)
-        h_norm = sc.trapznorm(h)
+        h_norm = sc.trapznorm(h)     # normalize to 0 mean
         peak, rms = sc.peak_and_rms(h_norm)
-        h_n.append(h)
+        h_n.append(h_norm)
         h_peak.append(peak)
         h_rms.append(rms)
     print('loaded', len(n), 'h profiles')
