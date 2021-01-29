@@ -248,6 +248,36 @@ class Aspect_Data():
 #         print('final shape', np.shape(T))
         return self.x, self.y, self.z, T
 
+        def read_vertical_heatflux(self, n, verbose=False, **kwargs):
+            if not (hasattr(self, 'snames')):
+                self.get_solution_filenames(verbose=verbose)
+
+            if self.mesh_file != self.mnames[n]:
+                self.read_mesh(n, verbose=verbose)
+
+            filename = self.directory + self.snames[n]
+            if verbose:
+                print("Reading vertical heat flux from", filename)
+
+            if self.format == 'hdf5':
+                f = h5py.File(filename, "r")
+                Fz_data = f['vertical_heat_flux']
+                Fz = Fz_data[:, 0]
+
+            if self.format == 'vtu':
+                reader = vtk.vtkXMLPUnstructuredGridReader()
+                reader.SetFileName(filename)
+                reader.Update()
+                my_vtk_array = reader.GetOutput().GetPointData().GetArray("vertical_heat_flux")
+                Fz = vtk_to_numpy(my_vtk_array)
+            #             print('loaded shape', np.shape(T))
+
+            Fz = Fz[self.indices]
+            Fz.shape = self.array_shape
+
+            #         print('final shape', np.shape(Fz))
+            return self.x, self.y, self.z, Fz
+
     def read_velocity(self, n, verbose=False, **kwargs):
         if not(hasattr(self, 'snames')):
             self.get_solution_filenames(verbose=verbose)
