@@ -63,13 +63,16 @@ def haar(y, ni):
 
 def plot_h_fractal_scaling(case, n=None, rho=1, kappa=1, c_p=1, alpha=1, data_path=data_path, fig_path=fig_path,
                            figsize=(7,7), labelsize=16, c='k', lw=3, ni=10, **kwargs):
-    ts = -1
+
+    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
+    if n is None:
+        n = dat.final_step()
+    ts = dat.find_time_at_sol(n)
+
     x_mids, h = sc.read_topo_stats(case, ts, data_path=data_path)
     x_mids = np.array(x_mids)
     h = np.array(h)
 
-    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
-    n = dat.final_step()
     x, y, _, F = dat.read_vertical_heatflux(n)
     F = post.reduce_dims(F)
     F_surf = F[:,-1]
