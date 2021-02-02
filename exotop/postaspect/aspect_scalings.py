@@ -2719,7 +2719,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
     else:
         nkeys = 1
     if fig is None:
-        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys * 2))
+        fig, axes = plt.subplots(nkeys, 1, figsize=(len(eta_ls)*3, nkeys * 2))
         if nkeys == 1:
             axes = np.array([axes])
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
@@ -2728,6 +2728,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
         c_jj = c_list[jj]
+        axs = axes[jj]
 
         for ii, case in enumerate(cases):
             t1_ii = t1_grid[jj][ii]
@@ -2758,13 +2759,13 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
 
                 # do the plotting on each axis
                 for k, key in enumerate(keys):
-                    ax = axes[k]
+                    ax = axs[k]
                     data = df[key]
                     ax.set_xlabel(xlabels[k], fontsize=labelsize, labelpad=xlabelpad)
                     ax.hist(data, histtype='step', bins=nbins, color=c_jj, density=True)
 
     # legend proxy artist
-    ax = axes[0]
+    ax = axes[0,0]
     # scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, s=markersize,
     #                   vmin=vmin, vmax=vmax)  # dummy - neeeds matplotlib 3.1.1
     # legend1 = ax.legend(*scat.legend_elements(num=len(logeta_fl)),
