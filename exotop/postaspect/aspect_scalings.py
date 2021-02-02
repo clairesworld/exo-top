@@ -38,7 +38,7 @@ def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches
     print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  saved to ', path, '!\n')
 
 
-def read_topo_stats(case, ts, data_path=data_path_bullard):
+def read_topo_stats(case, ts, data_path=data_path_bullard, **kwargs):
     df = pd.read_csv(data_path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
                      names=['x', 'y', 'h'], skiprows=1, index_col=False, delimiter=r"\s+", engine='python')
     return df['x'], df['h']
