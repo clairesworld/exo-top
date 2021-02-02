@@ -2761,6 +2761,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                 for k, key in enumerate(keys):
                     ax = axs[k]
                     data = df[key]
+                    data = data[~np.isnan(data)]  # remove nan
                     ax.set_xlabel(xlabels[k], fontsize=labelsize, labelpad=xlabelpad)
                     ax.hist(data, histtype='step', bins=nbins, color=c_jj, density=True)
 

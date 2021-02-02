@@ -7,7 +7,7 @@ from exotop.postaspect import aspect_scalings as sc  # noqa: E402
 # import pstats
 
 sc.subplots_hist(Ra_ls[-1], eta_ls[1:], regime_grid=regime_grid_td[1:,-1], save=True, t1_grid=t1_grid[1:,-1], load_grid=True,
-                        psuffixes=['_T', '_h'], postprocess_functions=[sc.T_parameters_at_sol, sc.h_at_ts], fig_path=fig_path,
+                        psuffixes=['_T', '_h_all'], postprocess_functions=[sc.T_parameters_at_sol, sc.h_at_ts], fig_path=fig_path,
                         fname='hist-Ra3e8', fig_fmt=fig_fmt, end_grid=end_grid[1:,-1],  labelsize=14,
                          keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_rms'], title='Ra 3e8', xlabelpad=8,
                        cmap='magma', vmin=5, vmax=8.5, nbins=10,
