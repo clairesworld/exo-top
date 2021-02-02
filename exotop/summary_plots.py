@@ -10,7 +10,7 @@ sc.subplots_hist(Ra_ls[-1], eta_ls[1:], regime_grid=regime_grid_td[1:,-1], save=
                         psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol], fig_path=fig_path,
                         fname='hist-Ra3e8', fig_fmt=fig_fmt, end_grid=end_grid[1:,-1],  labelsize=14,
                          keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_components'], title='Ra 3e8', xlabelpad=8,
-                       cmap='magma', vmin=5, vmax=8.5,
+                       cmap='magma', vmin=5, vmax=8.5, nbins=10,
                         data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)
 
 # (re)process all
