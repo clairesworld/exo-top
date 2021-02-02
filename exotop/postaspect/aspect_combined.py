@@ -396,7 +396,7 @@ def animate_Ra(default='Earthbaseline', fig_path='figs/', figsize=(9, 9), labels
 
 
 def animate_Ra_time(default='Earthbaseline', fig_path='figs/', figsize=(9, 9), labelsize=16, ylabelpad=10, xlabelpad=10,
-                    ticksize=12, fname='ani_1D',
+                    ticksize=12, fname='ani_1D', scalar=False,
                     xticks=[0.1, 0.3, 1, 2, 3, 4, 5, 6], yticks=None, aspect_cases=None, ms_scat=20, marker_scat='o', c_scat='g',
                     data_path='', x_test=0.815*M_E, x_min=0.03 * M_E, x_max=6 * M_E, y_param=None, x_param='M_p', x2_param='Ra_i_eff',
                     xscale=M_E ** -1, x2scale=1, yscale=1, fps=15, c='b', y2label=r'$\Delta h_{rms}$ (m)', y2scale=1,
@@ -506,6 +506,10 @@ def animate_Ra_time(default='Earthbaseline', fig_path='figs/', figsize=(9, 9), l
     # ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
+    ax.yaxis.set_minor_formatter(ticker.NullFormatter())
+    ax2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
+    ax2.yaxis.set_minor_formatter(ticker.NullFormatter())
     if logx:
         ax.set_xscale('log')
         ax.set_yscale('log')
@@ -577,6 +581,8 @@ def animate_Ra_time(default='Earthbaseline', fig_path='figs/', figsize=(9, 9), l
         # ax2.set_xlim(min(x2_orig_i), max(x2_orig_i))  # added ax attribute here
         ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
         ax.xaxis.set_minor_formatter(ticker.NullFormatter())
+        ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
+        ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 
         ani_text.set_text(anim_tpref + '{:4.1f}'.format(anim_vec[i] * anim_scale) + anim_tsuff)
         return p1, p2, aspect_scat, pl_scat, ani_text,
