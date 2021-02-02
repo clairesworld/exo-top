@@ -2763,6 +2763,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                     data = df[key].dropna()
                     ax.set_xlabel(xlabels[k], fontsize=labelsize, labelpad=xlabelpad)
                     ax.hist(data, histtype='step', bins=nbins, color=c_jj, density=True)
+                    ax.axvline(np.mean(data), c=c_jj, ls='--')
 
     # legend proxy artist
     ax = axes[0,0]
