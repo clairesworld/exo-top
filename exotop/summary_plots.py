@@ -64,7 +64,7 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
 #                         ylabelpad=8, markers=None, markersize=24, cmap='magma', vmin=5, vmax=8.5,
 #                         include_regimes=['chaotic'], data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 
-sc.subplots_evol_at_sol(Ra_ls[-1], eta_ls[1:], regime_grid=regime_grid_td, save=True, t1_grid=t1_grid[1:,-1], load_grid=True,
+sc.subplots_evol_at_sol(Ra_ls[-1], eta_ls[1:], regime_grid=regime_grid_td[1:,-1], save=True, t1_grid=t1_grid[1:,-1], load_grid=True,
                         psuffixes=['_T'], postprocess_functions=[sc.T_parameters_at_sol], fig_path=fig_path,
                         fname='evol-Ra3e8', fig_fmt=fig_fmt, end_grid=end_grid[1:,-1], normtime=True, labelsize=14, xlabel=r'Time',
                         ylabels=None, keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_components'], title='', xlabelpad=8,
