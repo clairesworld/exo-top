@@ -2692,6 +2692,98 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
     return fig, axes
 
 
+def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbins=20,
+                         load_grid='auto', psuffixes=None, postprocess_functions=None,
+                         fig_path=fig_path_bullard, fname='hist-evol', fig_fmt='.png', end_grid=None, normtime=True,
+                         labelsize=14, xlabels=None, keys=None, title='', legsize=10,
+                         xlabelpad=8,alpha=0.5,
+                         fig=None, axes=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
+                         regime_names=None,
+                         data_path=data_path_bullard, **kwargs):
+    # plot histograms of time evolution for single Ra (only eta-colouring is implemented)
+
+    if psuffixes is None:
+        psuffixes = ['_T']
+    if postprocess_functions is None:
+        postprocess_functions = [T_parameters_at_sol]
+    Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
+        t1_grid, load_grid, end_grid, regime_grid))
+    if include_regimes is None:
+        include_regimes = regime_names
+    if xlabels is None:
+        xlabels = keys
+    if iterable_not_string(keys):
+        nkeys = len(keys)
+    elif keys is None:
+        raise Exception('No x-axis keys provided!')
+    else:
+        nkeys = 1
+    if fig is None:
+        fig, axes = plt.subplots(nkeys, 1, figsize=(7, nkeys * 2))
+        if nkeys == 1:
+            axes = np.array([axes])
+    logeta_fl = [np.log10(float(a)) for a in eta_ls]
+    c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+
+    for jj, eta_str in enumerate(eta_ls):
+        cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
+        c_jj = c_list[jj]
+
+        for ii, case in enumerate(cases):
+            t1_ii = t1_grid[jj][ii]
+            load_ii = load_grid[jj][ii]
+
+            if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
+                    regime_grid[jj][ii] in include_regimes):
+                Ra_ii = float(Ra_var[ii])
+
+                # load data
+                if load_ii == 'auto':
+                    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/',
+                                           read_statistics=False, read_parameters=False, **kwargs)
+                else:
+                    dat = None
+                dfs = []
+                for ip, suffix in enumerate(psuffixes):
+                    df1 = pickleio(case, suffix=suffix, postprocess_functions=postprocess_functions[ip], t1=t1_ii,
+                                   dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
+                    dfs.append(df1)
+                try:
+                    df = pd.concat(dfs, axis=1)
+                    df = df.loc[:, ~df.columns.duplicated()]
+                except Exception as e:
+                    for dfi in dfs:
+                        print(dfi)
+                    raise e
+
+                # do the plotting on each axis
+                for k, key in enumerate(keys):
+                    ax = axes[k]
+                    data = df[key]
+                    ax.set_xlabel(xlabels[k], fontsize=labelsize, labelpad=xlabelpad)
+                    ax.hist(data, histtype='step', bins=nbins, color=c_jj, density=True)
+
+    # legend proxy artist
+    ax = axes[0]
+    # scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, s=markersize,
+    #                   vmin=vmin, vmax=vmax)  # dummy - neeeds matplotlib 3.1.1
+    # legend1 = ax.legend(*scat.legend_elements(num=len(logeta_fl)),
+    #                     loc="upper left", title=r"log $\Delta \eta$", fontsize=legsize)
+    lines = []
+    for jj, leta in enumerate(logeta_fl):
+        p = mlines.Line2D([], [], lw=2, color=c_list[jj], label=leta,
+                          alpha=alpha)
+        lines.append(p)
+    legend1 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="upper left",
+                        title=r"log $\Delta \eta$", )
+    ax.add_artist(legend1)
+
+    plt.suptitle(title, fontsize=labelsize, y=1.02)
+    if save:
+        plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
+    return fig, axes
+
+
 def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=True, t1=0, dat=None, show_sols=False,
               ylabel='rms velocity', xlabel='time', yscale=1, c='k', settitle=True, setxlabel=True, fig_fmt='.png',
               setylabel=True, legend=False, labelsize=16, labelpad=5, label=None, sol_df=None,
