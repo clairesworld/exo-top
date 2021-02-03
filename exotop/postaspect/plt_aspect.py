@@ -1374,6 +1374,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                     ax.set_xlabel(xlabels[k], fontsize=labelsize, labelpad=xlabelpad)
                     ax.hist(data, histtype='step', bins=nbins, color=c_jj, density=True)
                     ax.axvline(np.mean(data), c=c_jj, ls='--')
+                    ax.text(0.95, 0.95, 'n = '+str(len(data)), fontsize=10, c='k', horizontalalignment='right',verticalalignment='top',transform = ax.transAxes)
 
     # legend proxy artist
     ax = axes[0,0]
