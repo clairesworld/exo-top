@@ -111,7 +111,7 @@ def build_solarsystem(run_args=None, ident_list=None, dicts=False):
 "                      PLOTTING                           "
 
 
-def plot_save(fig, fname, fig_path='figs/', fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
+def plot_save(fig, fname, fig_path='plat/', fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
     path = fig_path + fname + fig_fmt
     directory = os.path.dirname(path)
     os.makedirs(directory, exist_ok=True)
@@ -122,7 +122,7 @@ def plot_save(fig, fname, fig_path='figs/', fig_fmt='.png', bbox_inches='tight',
 
 
 def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, write_out=False,
-                compare_dir=None, fig_path='figs/', labelpad=None, labelsize=15, legsize=10, fname=None,
+                compare_dir=None, fig_path='plat/', labelpad=None, labelsize=15, legsize=10, fname=None,
                 line_args=None, cmp_line_args=None, annotate_colour='xkcd:bright purple',
                 print_tf=False, colorbar=False, legend=True, hidex=False, fformat='.png',
                 ident=None, fig=None, axes=None, label=None, cmp_label=None, ticksize=12,
@@ -216,8 +216,8 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
     # if colorbar:
     #     fig.subplots_adjust(right=0.8)
     #     cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-    #     fig.colorbar(sc, cax=cbar_ax)
-    #     sc.set_visible = False
+    #     fig.colorbar(plat, cax=cbar_ax)
+    #     plat.set_visible = False
 
     plt.tight_layout()
     if plots_save:
@@ -510,7 +510,7 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
               plots_save=False, s=30, ls='-', lw=1, cmap='rainbow', marker='o', legtitle=None, legendtop=False,
               colorbar=False, c='k', ylabel=True, ymin=None, ymax=None, set_ylim=True, set_xlim=False, fformat='.png',
               zorder_l=None, zorder_sc=None, label_l=None, fname=None, ticksize=12, xmin=None, xmax=None,
-              fig_path='figs/', printrange=False, log=False, relative=False, **kwargs):
+              fig_path='plat/', printrange=False, log=False, relative=False, **kwargs):
     # for a list of planets, plot some parameter on the y axis vs. parameter x
     if (c is None) and (scplanets is not None):
         c = np.arange(len(scplanets))

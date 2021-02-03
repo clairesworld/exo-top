@@ -43,12 +43,15 @@ end_grid[2:, 5] = "-wide-ascii"  # which runs use ascii initialisation
 end_grid[3, 4] = "-wide-ascii"  # which runs use ascii initialisation
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
-fig_path_bullard = '/raid1/cmg76/aspect/figs/'
+fig_path_bullard = '/raid1/cmg76/aspect/plat/'
+fig_path_home = '/home/claire/Works/exo-top/exotop/figs_scratch/'
+data_path_home = '/home/claire/Works/aspect/runs/model-output/'
 data_path = data_path_bullard
 fig_path = fig_path_bullard
 fig_fmt = '.png'
 
 c_rms = 'xkcd:forest green'
 c_peak = 'xkcd:periwinkle'
+highlight_colour = 'xkcd:coral'
 
 p_Earth = {'alpha_m': 1.35e-5, 'dT_m': 2700, 'd_m': 2800}   # dimensionalisation factors

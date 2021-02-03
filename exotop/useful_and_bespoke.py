@@ -1,3 +1,5 @@
+""" bunch of custom functions """
+
 import numpy as np
 
 def colorize(vector,cmap='plasma', vmin=None, vmax=None):
@@ -156,6 +158,24 @@ def age_index(times, age, age_scale=1):
     # get index of age in times with optional scaling for age
     return min(enumerate(times), key=lambda x: abs(age - x[1] * age_scale))[0]
 
+
+def find_nearest_idx(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return int(idx)
+
+def unique_rows(a):
+    # Given a numpy array, return another numpy array with only the unique rows
+    a = np.ascontiguousarray(a)
+    unique_a = np.unique(a.view([('', a.dtype)]*a.shape[1]))
+    return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
+
+def unique_rows_indices(a):
+    # Given a numpy array, return another numpy array with only the unique rows
+    a = np.ascontiguousarray(a)
+    unique_a, indices = np.unique(a.view([('', a.dtype)]*a.shape[1]), return_index=True)
+    return indices
+    #return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
 
 def minmaxnorm(x, a=0, b=1):
     # linear normalisation to min, max

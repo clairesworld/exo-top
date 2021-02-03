@@ -1,45 +1,27 @@
+""" ASPECT runs: AspectData class definitions """
+
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import trapz
 from scipy.interpolate import UnivariateSpline
-from scipy import interpolate
 import xml.etree.ElementTree
 import os
 import h5py
 import re
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import pandas as pd
 import time
-import csv
+# import csv
 # import dask.dataframe
 rasterized = True
-
-def unique_rows(a):
-    # Given a numpy array, return another numpy array with only the unique rows
-    a = np.ascontiguousarray(a)
-    unique_a = np.unique(a.view([('', a.dtype)]*a.shape[1]))
-    return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
-
-def unique_rows_indices(a):
-    # Given a numpy array, return another numpy array with only the unique rows
-    a = np.ascontiguousarray(a)
-    unique_a, indices = np.unique(a.view([('', a.dtype)]*a.shape[1]), return_index=True)
-    return indices
-    #return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
 
 def reduce_dims(a, transpose=True): 
     # output array from 3D to 2D, if simulation is 2D
     if transpose:
         return a[:,:,0].T
     else:
-        return a[:,:,0]    
-    
-def find_nearest_idx(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return int(idx)
+        return a[:,:,0]
 
 def max_slope(x,y, which='max', plot=False, tol=1):
     # find maximum gradient or minimum gradient - only works for 1D

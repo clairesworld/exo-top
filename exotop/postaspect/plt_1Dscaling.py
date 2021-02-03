@@ -1,15 +1,5 @@
 """ Functions to plot relevant 1D thermal model results which rely on processing of ASPECT runs """
 import numpy as np
-import sys
-
-# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-sys.path.insert(0, '/home/claire/Works/exo-top/')
-from exotop.postaspect.aspect_scalings import plot_save, plot_getx, dimensionalise_h, nondimensionalise_h, pickleio, \
-    data_path_bullard, Ra_i_eff  # noqa: E402
-from exotop.postaspect.aspect_postprocessing2 import find_nearest_idx
-from exotop.model_1D.parameters import M_E, sec2Gyr  # noqa: E402
-from exotop.model_1D.the_results import bulk_planets, plot_output, build_planet_from_id  # noqa: E402
-from exotop.useful_and_bespoke import iterable_not_string, not_iterable, colorize, dark_background
 import pandas as pd  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.ticker import NullFormatter  # noqa: E402
@@ -20,6 +10,16 @@ import matplotlib.animation as animation
 import matplotlib.ticker as ticker
 from scipy.interpolate import interp1d
 from scipy.interpolate import InterpolatedUnivariateSpline
+import sys
+
+# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+sys.path.insert(0, '/home/claire/Works/exo-top/')
+from exotop.postaspect.plt_aspect import plot_save, plot_getx  # noqa: E402
+from exotop.postaspect.aspect_post import dimensionalise_h, nondimensionalise_h, pickleio, Ra_i_eff  # noqa: E402
+from exotop.postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard  # noqa: E402
+from exotop.model_1D.parameters import M_E, sec2Gyr  # noqa: E402
+from exotop.model_1D.the_results import bulk_planets, plot_output, build_planet_from_id  # noqa: E402
+from exotop.useful_and_bespoke import find_nearest_idx, iterable_not_string, not_iterable, colorize, dark_background
 
 
 def overplot_aspect_data(ax, case, x_param=None, y_param=None, pkl_suffix=['_T', '_h'], c='k', markersize=20,
@@ -238,7 +238,7 @@ def plot_1D_evolutions(default, nplanets=45, labelsize=23, ticksize=16, clabelpa
 
 
 # TODO
-def animate_Ra(default='Earthbaseline', fig_path='figs/', figsize=(9, 9), labelsize=16, ylabelpad=10, xlabelpad=10,
+def animate_Ra(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), labelsize=16, ylabelpad=10, xlabelpad=10,
                     ticksize=12, fname='ani_1D',
                     xticks=[0.01, 0.1, 0.3, 1, 2, 3, 4, 5, 6], yticks=None, aspect_cases=None, markersize=20, marker='o', c_scat='g',
                     data_path='', x_min=0.03 * M_E, x_max=6 * M_E, y_param=None, x_param='M_p', x2_param='Ra_i_eff',
@@ -395,7 +395,7 @@ def animate_Ra(default='Earthbaseline', fig_path='figs/', figsize=(9, 9), labels
     print('saved to', fig_path + fname)
 
 
-def animate_Ra_time(default='Earthbaseline', fig_path='figs/', figsize=(9, 9), labelsize=16, ylabelpad=10, xlabelpad=10,
+def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), labelsize=16, ylabelpad=10, xlabelpad=10,
                     ticksize=12, fname='ani_1D', scalar=False,
                     xticks=[0.1, 0.3, 1, 2, 3, 4, 5, 6], yticks=None, aspect_cases=None, ms_scat=20, marker_scat='o', c_scat='g',
                     data_path='', x_test=0.815*M_E, x_min=0.03 * M_E, x_max=6 * M_E, y_param=None, x_param='M_p', x2_param='Ra_i_eff',

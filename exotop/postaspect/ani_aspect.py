@@ -4,8 +4,8 @@ sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, \
     load_grid    # noqa: E402
-from exotop.postaspect import aspect_scalings as sc  # noqa: E402
-from exotop.postaspect import aspect_postprocessing2 as ap
+from exotop.postaspect import plt_aspect as sc  # noqa: E402
+from exotop.postaspect import aspectdata as ap
 from exotop.useful_and_bespoke import hide_log_ticklabels, not_iterable, dark_background
 import numpy as np
 import matplotlib.pyplot as plt
@@ -189,16 +189,3 @@ def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
                                   fargs=(h_n,h_rms), blit=True, repeat=True,
                                   interval=200, )  # interval: delay between frames in ms
     ani.save(fig_path+case + '-h.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
-
-
-for jj, etastr in enumerate(eta_ls):
-    if jj <= 20:
-        cases, cases_var = sc.get_cases_list(Ra_ls, etastr, end_grid[jj])
-        for ii, case in enumerate(cases):
-            if (os.path.exists(data_path + 'output-' + case)) and (ii >= 4):
-                animate_T_field(case, data_path=data_path, fig_path=fig_path+'animations/', labelsize=30, ticksize=16,
-                                shading='nearest',#'gouraud',
-                                cmap='gist_heat')
-                # animate_T_prof(case, data_path=data_path, fig_path=fig_path + 'animations/', labelsize=30, ticksize=16)
-                # animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16)
-                print('finished case')
