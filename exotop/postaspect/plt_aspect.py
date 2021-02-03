@@ -1392,7 +1392,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                         title=r"log $\Delta \eta$", )
     ax.add_artist(legend1)
 
-    legend2 = ax.legend([mlines.Line2D([], [], lw=2, ls='--', color='k', label='mean'),
+    legend2 = ax.legend(handles=[mlines.Line2D([], [], lw=2, ls='--', color='k', label='mean'),
                          mlines.Line2D([], [], lw=2, ls='-', color='k', label='median')],
                         bbox_to_anchor=(0.05, 1.05), fontsize=legsize, frameon=True, loc="lower left")
     ax.add_artist(legend2)
