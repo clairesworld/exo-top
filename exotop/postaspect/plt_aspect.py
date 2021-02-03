@@ -1374,6 +1374,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                     ax.set_xlabel(xlabels[k], fontsize=labelsize, labelpad=xlabelpad)
                     ax.hist(data, histtype='step', bins=nbins, color=c_jj, density=True)
                     ax.axvline(np.mean(data), c=c_jj, ls='--')
+                    ax.axvline(np.median(data), c=c_jj, ls='-')
                     ax.text(0.95, 0.95, 'n = '+str(len(data)), fontsize=10, c='k', horizontalalignment='right',verticalalignment='top',transform = ax.transAxes)
 
     # legend proxy artist
@@ -1390,6 +1391,11 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
     legend1 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="upper left",
                         title=r"log $\Delta \eta$", )
     ax.add_artist(legend1)
+
+    legend2 = ax.legend([mlines.Line2D([], [], lw=2, ls='--', color='k', label='mean'),
+                         mlines.Line2D([], [], lw=2, ls='-', color='k', label='median')],
+                        bbox_to_anchor=(0.05, 1.05), fontsize=legsize, frameon=True, loc="lower left")
+    ax.add_artist(legend2)
 
     plt.suptitle(title, fontsize=labelsize, y=1.02)
     if save:
