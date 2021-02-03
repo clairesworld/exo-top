@@ -16,7 +16,6 @@ import sys
 
 sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect import aspectdata as ad  # noqa: E402
-from exotop.postaspect.plt_aspect import plot_save  # noqa: E402
 from exotop.postaspect.setup_postprocessing import data_path_bullard  # noqa: E402
 from exotop.useful_and_bespoke import colorize, iterable_not_string, not_iterable, \
     not_string, minmaxnorm, reduced_chisq, mahalanobis  # noqa: E402
@@ -738,7 +737,7 @@ def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, **k
         ax.legend(loc='lower right', fontsize=12)
         # ax.set_xscale('log')
         # ax.set_yscale('log')
-        plot_save(fig, 'fit_test', **kwargs)
+        plt.savefig('fit_test.png', bbox_inches='tight')
     return (*popt, *perr)
 
 
