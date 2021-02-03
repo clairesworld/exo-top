@@ -43,7 +43,7 @@ end_grid[2:, 5] = "-wide-ascii"  # which runs use ascii initialisation
 end_grid[3, 4] = "-wide-ascii"  # which runs use ascii initialisation
 
 data_path_bullard = '/raid1/cmg76/aspect/model-output/'
-fig_path_bullard = '/raid1/cmg76/aspect/plat/'
+fig_path_bullard = '/raid1/cmg76/aspect/figs/'
 fig_path_home = '/home/claire/Works/exo-top/exotop/figs_scratch/'
 data_path_home = '/home/claire/Works/aspect/runs/model-output/'
 data_path = data_path_bullard
