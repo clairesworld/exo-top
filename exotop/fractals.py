@@ -10,6 +10,7 @@ from exotop.useful_and_bespoke import dark_background, cmap_from_list, minmaxnor
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
 
 ticksize = 22
 axissize = 40
@@ -133,52 +134,55 @@ def MHF_from_latlon(lat, lon, h, R, lon_res=20, lat_res=1):
 
 def MHF_profiles(case, n_start=None, n_end=None, t_res=20, x_res=1, data_path=data_path, **kwargs):
     # mean haar fluctuation from dyn top profiles
-    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
-    if n_end is None:
-        n_end = dat.final_step()
-    if n_start is None:
-        n_start = dat.final_step() - 10
-    ts0 = dat.find_time_at_sol(n_start, return_indices=True)
-    ts1 = dat.find_time_at_sol(n_end, return_indices=True)
-    times = np.arange(ts0, ts1 + 1, t_res)
+    if os.path.exists(data_path + 'output-' + case):
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
+        if n_end is None:
+            n_end = dat.final_step()
+        if n_start is None:
+            n_start = dat.final_step() - 10
+        ts0 = dat.find_time_at_sol(n_start, return_indices=True)
+        ts1 = dat.find_time_at_sol(n_end, return_indices=True)
+        times = np.arange(ts0, ts1 + 1, t_res)
 
-    # dat.read_mesh(n_end)
-    # print('original x mesh', np.shape(dat.x))
-    # x_mesh = dat.x[::x_res]
+        # dat.read_mesh(n_end)
+        # print('original x mesh', np.shape(dat.x))
+        # x_mesh = dat.x[::x_res]
 
-    x_mids, _ = ap.read_topo_stats(case, ts0, data_path=data_path)
-    x_mids = np.array(x_mids[::x_res])
+        x_mids, _ = ap.read_topo_stats(case, ts0, data_path=data_path)
+        x_mids = np.array(x_mids[::x_res])
 
-    # load profiles into grid with shape (n_times, n_meshx)
-    grid = np.zeros((len(x_mids), len(times)))
-    print('grid', np.shape(grid))
+        # load profiles into grid with shape (n_times, n_meshx)
+        grid = np.zeros((len(x_mids), len(times)))
+        print('grid', np.shape(grid))
 
-    for ii, ts in enumerate(times):
-        _, h = ap.read_topo_stats(case, ts, data_path=data_path)
-        # print('original h', np.shape(h))
-        h = np.array(h[::x_res])
-        # print('h', np.shape(h))
-        grid[:, ii] = h
+        for ii, ts in enumerate(times):
+            _, h = ap.read_topo_stats(case, ts, data_path=data_path)
+            # print('original h', np.shape(h))
+            h = np.array(h[::x_res])
+            # print('h', np.shape(h))
+            grid[:, ii] = h
 
 
-    haars = []
-    Ls = []
-    for ii, ts in enumerate(times):
-        # take time slice
-        hi = grid[:, ii]
+        haars = []
+        Ls = []
+        for ii, ts in enumerate(times):
+            # take time slice
+            hi = grid[:, ii]
 
-        # calculate mean Haar fluctuations at each L along transect
-        MHF_L, L = MHF(hi, x_mids)
-        haars.extend(MHF_L)
-        Ls.extend(L)
+            # calculate mean Haar fluctuations at each L along transect
+            MHF_L, L = MHF(hi, x_mids)
+            haars.extend(MHF_L)
+            Ls.extend(L)
 
-    # sort and group
-    df = pd.DataFrame({'L': Ls, 'MHF_L': haars})
-    df = df.sort_values(by=['L'])
-    df = df.groupby(['L']).mean()
-    dL = x_mids[1] - x_mids[0]
-    df.head(10)
-    return df.index.to_numpy() * dL, df.MHF_L.to_numpy()
+        # sort and group
+        df = pd.DataFrame({'L': Ls, 'MHF_L': haars})
+        df = df.sort_values(by=['L'])
+        df = df.groupby(['L']).mean()
+        dL = x_mids[1] - x_mids[0]
+        df.head(10)
+        return df.index.to_numpy() * dL, df.MHF_L.to_numpy()
+    else:
+        print('No Aspect Data found:', case)
 
 
 def plot_MHF(case, fname='MHF_', L_max=None, save=True, **kwargs):
@@ -256,6 +260,6 @@ k = 4
 kappa = k / (rho * c_p)
 # plot_h_fractal_scaling(case='Ra3e8-eta1e7-wide-ascii', ni=10, rho=rho, alpha=alpha, c_p=c_p, kappa=kappa)
 
-for case in ['Ra3e8-eta1e6-wide-ascii', 'Ra3e8-eta1e7-wide-ascii', 'Ra3e8-eta1e8-wide-ascii',
+for case in ['Ra3e8-eta1e6-wide', 'Ra3e8-eta1e7-wide-ascii', 'Ra3e8-eta1e8-wide-ascii',
              'Ra1e8-eta1e6-wide', 'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e8-wide-ascii']:
     plot_MHF(case=case, x_res=1, t_res=10)
