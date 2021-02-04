@@ -143,6 +143,7 @@ def MHF_profiles(case, n_start=None, n_end=None, t_res=20, x_res=1, data_path=da
     times = np.arange(ts0, ts1 + 1, t_res)
 
     dat.read_mesh(n_end)
+    print('original x mesh', np.shape(dat.x))
     x_mesh = dat.x[::x_res]
 
     # load profiles into grid with shape (n_times, n_meshx)
@@ -151,6 +152,7 @@ def MHF_profiles(case, n_start=None, n_end=None, t_res=20, x_res=1, data_path=da
 
     for ii, ts in enumerate(times):
         x_mids, h = ap.read_topo_stats(case, ts, data_path=data_path)
+        print('original h', np.shape(h))
         h = np.array(h[::x_res])
         print('h', np.shape(h))
         grid[:, ii] = h
