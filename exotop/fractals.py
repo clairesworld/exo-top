@@ -145,15 +145,16 @@ def MHF_profiles(case, n_start=None, n_end=None, t_res=20, x_res=1, data_path=da
     dat.read_mesh(n_end)
     x_mesh = dat.x[::x_res]
 
-    # load profiles into grid with shape (n_meshx, n_times)
-    grid = np.zeros((len(x_mesh), len(times)))
+    # load profiles into grid with shape (n_times, n_meshx)
+    grid = np.zeros((len(times), len(x_mesh)))
+    print('grid', np.shape(grid))
 
     for ii, ts in enumerate(times):
         x_mids, h = ap.read_topo_stats(case, ts, data_path=data_path)
         h = np.array(h[::x_res])
+        print('h', np.shape(h))
         grid[:, ii] = h
 
-    print('grid', np.shape(grid))
     x_mids = np.array(x_mids[::x_res])
     haars = []
     Ls = []
@@ -248,4 +249,4 @@ c_p = 1200
 k = 4
 kappa = k / (rho * c_p)
 # plot_h_fractal_scaling(case='Ra3e8-eta1e7-wide-ascii', ni=10, rho=rho, alpha=alpha, c_p=c_p, kappa=kappa)
-plot_MHF(case='Ra3e8-eta1e7-wide-ascii')
+plot_MHF(case='Ra3e8-eta1e7-wide-ascii', x_res = 100, t_res = 100)
