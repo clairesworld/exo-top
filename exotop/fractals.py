@@ -187,7 +187,8 @@ def plot_MHF(case, fname='MHF_', L_max=None, save=True, **kwargs):
     fig, ax = plt.subplots()
     ax.plot(L, MHF_L)
     ax.set_xlabel('$\Delta x$')
-    ax.set_ylabel('Mean Haar fluctuations')
+    ax.set_ylabel('Mean Haar Fluctuation')
+    ax.loglog()
 
     beta = fit_slope(MHF_L, L, k_max=L_max, fig=fig, ax=ax, i_min=0)
     # slope should = H (because mean)
@@ -254,4 +255,7 @@ c_p = 1200
 k = 4
 kappa = k / (rho * c_p)
 # plot_h_fractal_scaling(case='Ra3e8-eta1e7-wide-ascii', ni=10, rho=rho, alpha=alpha, c_p=c_p, kappa=kappa)
-plot_MHF(case='Ra3e8-eta1e7-wide-ascii', x_res = 10, t_res = 200)
+
+for case in ['Ra3e8-eta1e6-wide-ascii', 'Ra3e8-eta1e7-wide-ascii', 'Ra3e8-eta1e8-wide-ascii',
+             'Ra1e8-eta1e6-wide', 'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e8-wide-ascii']:
+    plot_MHF(case=case, x_res=1, t_res=10)
