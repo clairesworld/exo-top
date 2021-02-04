@@ -150,7 +150,7 @@ def MHF_profiles(case, n_start=None, n_end=None, t_res=20, x_res=1, data_path=da
     x_mids = np.array(x_mids[::x_res])
 
     # load profiles into grid with shape (n_times, n_meshx)
-    grid = np.zeros((len(times), len(x_mids)))
+    grid = np.zeros((len(x_mids), len(times)))
     print('grid', np.shape(grid))
 
     for ii, ts in enumerate(times):
@@ -254,4 +254,4 @@ c_p = 1200
 k = 4
 kappa = k / (rho * c_p)
 # plot_h_fractal_scaling(case='Ra3e8-eta1e7-wide-ascii', ni=10, rho=rho, alpha=alpha, c_p=c_p, kappa=kappa)
-plot_MHF(case='Ra3e8-eta1e7-wide-ascii', x_res = 100, t_res = 100)
+plot_MHF(case='Ra3e8-eta1e7-wide-ascii', x_res = 10, t_res = 200)
