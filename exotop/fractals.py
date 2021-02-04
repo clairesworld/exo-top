@@ -142,22 +142,25 @@ def MHF_profiles(case, n_start=None, n_end=None, t_res=20, x_res=1, data_path=da
     ts1 = dat.find_time_at_sol(n_end, return_indices=True)
     times = np.arange(ts0, ts1 + 1, t_res)
 
-    dat.read_mesh(n_end)
-    print('original x mesh', np.shape(dat.x))
-    x_mesh = dat.x[::x_res]
+    # dat.read_mesh(n_end)
+    # print('original x mesh', np.shape(dat.x))
+    # x_mesh = dat.x[::x_res]
+
+    x_mids, _ = ap.read_topo_stats(case, ts0, data_path=data_path)
+    x_mids = np.array(x_mids[::x_res])
 
     # load profiles into grid with shape (n_times, n_meshx)
-    grid = np.zeros((len(times), len(x_mesh)))
+    grid = np.zeros((len(times), len(x_mids)))
     print('grid', np.shape(grid))
 
     for ii, ts in enumerate(times):
-        x_mids, h = ap.read_topo_stats(case, ts, data_path=data_path)
-        print('original h', np.shape(h))
+        _, h = ap.read_topo_stats(case, ts, data_path=data_path)
+        # print('original h', np.shape(h))
         h = np.array(h[::x_res])
-        print('h', np.shape(h))
+        # print('h', np.shape(h))
         grid[:, ii] = h
 
-    x_mids = np.array(x_mids[::x_res])
+
     haars = []
     Ls = []
     for ii, ts in enumerate(times):
