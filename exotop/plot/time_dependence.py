@@ -5,17 +5,17 @@ from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_g
     load_grid    # noqa: E402
 from exotop.postaspect import plt_aspect as plat  # noqa: E402
 # import pstats
-
-plat.subplots_hist(Ra_ls[-1], eta_ls[1:], regime_grid=regime_grid_td[1:, -1], save=True, t1_grid=t1_grid[1:, -1], load_grid=True,
-                   psuffixes=['_T', '_h_all'], fig_path=fig_path,
-                   fname='hist-Ra3e8', fig_fmt=fig_fmt, end_grid=end_grid[1:,-1], labelsize=14,
-                   keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_rms'], title='Ra 3e8', xlabelpad=8,
-                   cmap='magma', vmin=5, vmax=8.5, nbins=10,
-                   data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)
+#
+# plat.subplots_hist(Ra_ls[-1], eta_ls[1:], regime_grid=regime_grid_td[1:, -1], save=True, t1_grid=t1_grid[1:, -1], load_grid=True,
+#                    psuffixes=['_T', '_h_all'], fig_path=fig_path,
+#                    fname='hist-Ra3e8', fig_fmt=fig_fmt, end_grid=end_grid[1:,-1], labelsize=14,
+#                    keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_rms'], title='Ra 3e8', xlabelpad=8,
+#                    cmap='magma', vmin=5, vmax=8.5, nbins=10,
+#                    data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)
 
 plat.subplots_hist(Ra_ls[-2], eta_ls[1:], regime_grid=regime_grid_td[1:, -2], save=True, t1_grid=t1_grid[1:, -2], load_grid=True,
-                   psuffixes=['_T', '_h_all'], fig_path=fig_path,
-                   fname='hist-Ra1e8', fig_fmt=fig_fmt, end_grid=end_grid[1:,-2], labelsize=14,
+                   psuffixes=['_T', '_h'], fig_path=fig_path,
+                   fname='hist-Ra1e8_subsampled', fig_fmt=fig_fmt, end_grid=end_grid[1:,-2], labelsize=14,
                    keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_rms'], title='Ra 1e8', xlabelpad=8,
                    cmap='magma', vmin=5, vmax=8.5, nbins=10,
                    data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)

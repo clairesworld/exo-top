@@ -1271,8 +1271,8 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                     ax.set_ylabel(ylabels[k], fontsize=labelsize, labelpad=ylabelpad)
                     if k == len(keys) - 1:
                         ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
-                    ax.scatter(x_data, y_data, c=c_jj, s=markersize, marker=marker_ii, alpha=alpha)
-                    ax.plot(x_data, y_data, c=c_jj, lw=0.8, alpha=alpha)
+                    ax.scatter(x_data, y_data, color=c_jj, s=markersize, marker=marker_ii, alpha=alpha)
+                    ax.plot(x_data, y_data, color=c_jj, lw=0.8, alpha=alpha)
 
     # legend proxy artist
     ax = axes[0]
