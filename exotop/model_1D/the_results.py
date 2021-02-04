@@ -16,6 +16,7 @@ import six
 import pandas as pd
 import random as rand
 from scipy import interpolate
+
 sys.path.append("..")
 import exotop.asharms as harm  # noqa: E402
 import matplotlib.animation as animation
@@ -61,7 +62,8 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, t_eval=None, r
     return planets
 
 
-def build_planet_from_id(ident='Earthbaseline', initial_kwargs=None, update_kwargs=None, postprocessors=None, t_eval=None,
+def build_planet_from_id(ident='Earthbaseline', initial_kwargs=None, update_kwargs=None, postprocessors=None,
+                         t_eval=None,
                          **kwargs):
     planet_kwargs = eval('inputs.' + ident + '_in')
     model_kwargs = eval('inputs.' + ident + '_run')
@@ -73,7 +75,8 @@ def build_planet_from_id(ident='Earthbaseline', initial_kwargs=None, update_kwar
     return pl
 
 
-def build_planet(planet_kwargs=None, initial_kwargs=None, postprocessors=None, t_eval=None, nondimensional=False, **kwargs):
+def build_planet(planet_kwargs=None, initial_kwargs=None, postprocessors=None, t_eval=None, nondimensional=False,
+                 **kwargs):
     if postprocessors is None:
         postprocessors = ['topography']
     if initial_kwargs is None:
@@ -158,8 +161,9 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
             #             print('y', y)
             # if the name of the parameter you want to plot exists
             yl = str(ylabels[n][0])
-            if (par == 'eta_m') or (par == 'Ra_i') or (par == 'Ra_i_eff') or (par == 'delta_eta'):  # always log scale for viscosity, Ra
-                ax.set_yscale('log')  #y = np.log10(y)
+            if (par == 'eta_m') or (par == 'Ra_i') or (par == 'Ra_i_eff') or (
+                    par == 'delta_eta'):  # always log scale for viscosity, Ra
+                ax.set_yscale('log')  # y = np.log10(y)
             plot_one(ax, t * 1e-9 / parameters.years2sec, y * ylabels[n][1], xlabel='', ylabel=yl, ticksize=ticksize,
                      labelpad=labelpad,
                      label=label, fontname=fontname, labelsize=labelsize, legsize=legsize, line_args=line_args)
@@ -476,7 +480,7 @@ def Ra_from_RaF(F=None, dT_m=None, k=None, l=None, Ra_F=None, **kwargs):  # F is
 
 
 def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names=None, pl_update_args=None,
-                            model_update_args=None, **kwargs):
+                            model_update_args=None, verbose=False, **kwargs):
     if names is None:
         names = {'T_avg': ('$T_{avg}$ (K)', 1),
                  'q_sfc': ('$q_{sfc}$ (mW m$^{-2}$)', 1e3),
@@ -495,7 +499,16 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
     pl = thermal.solve(pl, **model_kwargs)  # T_m, T_c, D_l
     pl = topography.topography(pl, C=1)
 
-    # print('T_mf', pl.T_m[-1])
+    if verbose:
+        print('T_c', pl.T_c[-1])
+        print('d_m', pl.d_m[-1])
+        print('dT_m', abs(pl.dT_m[-1]))
+        print('g_sfc', pl.g_sfc)
+        print('q_ubl', pl.q_ubl[-1])
+        print('eta', pl.eta_m[-1])
+        print('Ra_i_eff', pl.Ra_i_eff[-1])
+        print('h_rms', pl.dyn_top_rms[-1])
+        print('h_iso', pl.dyn_top_rms_isoviscous[-1])
 
     fig, axes = plot_output(pl, names, verbose=False, **kwargs)
     if show_qsfc_error:
@@ -508,7 +521,8 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
 def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=None, fig=None, axes=None,
               labels=False, labelsize=15, legsize=12, alpha=1, legend=False, snap=4.5, labelpad=None,
               plots_save=False, s=30, ls='-', lw=1, cmap='rainbow', marker='o', legtitle=None, legendtop=False,
-              colorbar=False, c='k', ylabel=True, ymin=None, ymax=None, set_ylim=True, set_xlim=False, fformat='.png',
+              colorbar=False, c='k', set_ylabel=True, ymin=None, ymax=None, set_ylim=True, set_xlim=False,
+              fformat='.png',
               zorder_l=None, zorder_sc=None, label_l=None, fname=None, ticksize=12, xmin=None, xmax=None,
               fig_path='plat/', printrange=False, log=False, relative=False, **kwargs):
     # for a list of planets, plot some parameter on the y axis vs. parameter x
@@ -588,7 +602,7 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
             ax.plot(x, y, ls=ls, c=c, lw=lw, alpha=alpha, zorder=zorder_l, label=label_l)
             if printrange:
                 print('range:', np.min(y), np.max(y))
-        if ylabel:
+        if set_ylabel:
             ax.set_ylabel(ylabels[ii][0], fontsize=labelsize, labelpad=labelpad)
             ax.tick_params(axis='y', labelsize=ticksize)
         else:
@@ -637,131 +651,208 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
     return fig, axes
 
 
+#
+# def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidth=1, relative=True, textc='k',
+#                                   age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ',
+#                                   xlabels=None, nplanets=20, log=False,
+#                                   fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12, yscale=1,
+#                                   pl_baseline=None, update_kwargs={}, initial_kwargs={}, verbose=False, **kwargs):
+#     if x_vars is None:
+#         x_vars = ['age', 'M_p', 'CMF', 'H0', 'Ea']
+#     if xlabels is None:
+#         xlabels = x_vars
+#     if axes is None:
+#         fig, axes = plt.subplots(1, len(x_vars), figsize=(4 * len(x_vars), 4), sharey=True)
+#
+#     model_baseline = eval('pl_baseline.' + model_param)
+#
+#     it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
+#     model_baseline = model_baseline[it]
+#     i_ax = 0
+#     if not_iterable(axes):
+#         axes = [axes]
+#
+#     if relative:
+#         yscale = model_baseline ** -1
+#     print('yscale', yscale)
+#
+#     ylabel=True
+#     legendd=legend
+#
+#     if 'age' in x_vars:
+#         # time/age variation
+#         fig, ax = plot_vs_x(legend=legendd, legsize=legsize, log=log,
+#                             lplanets=pl_baseline, xname={'t': ('Age (Gyr)', parameters.sec2Gyr)}, set_xlim=True,
+#                             ynames={model_param: (ylabel, yscale)}, ylabel=ylabel, relative=relative,
+#                             plots_save=False, fig=fig, axes=axes[i_ax], xmin=1.5, xmax=4.5, **kwargs)
+#         if relative:
+#             ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
+#         if legend and relative:
+#             ax.text(0.95, 0.95,
+#                     '{:1.0f}'.format(pl_baseline.M_p / parameters.M_E) + ' $M_E$ \n 300 kJ mol$^{-1}$ \n 0.3 CMF \n 4.6 pW kg$^{-1}$',
+#                     fontsize=legsize, c=textc,
+#                     horizontalalignment='right',
+#                     verticalalignment='top',
+#                     transform=ax.transAxes)
+#         i_ax += 1
+#         ylabel = False
+#         legendd = False
+#
+#     if 'M_p' in x_vars:
+#         # mass variation
+#         print('generating planets...')
+#         planets_mass = bulk_planets(n=nplanets, name='M_p', mini=0.1 * parameters.M_E, maxi=6 * parameters.M_E, like=defaults,
+#                                     t_eval=pl_baseline.t, random=False,
+#                                     initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
+#         print('finished!')
+#         fig, ax = plot_vs_x(legend=legendd, set_xlim=True,  legsize=legsize, log=log,
+#             lplanets=planets_mass, xname={'M_p': ('$M_p$ ($M_E$)', parameters.M_E ** -1)},
+#             ynames={model_param: ('', yscale)}, snap=age, relative=relative,
+#             plots_save=False, fig=fig, axes=axes[i_ax], ylabel=ylabel, **kwargs)
+#         if relative:
+#             ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
+#         if legend and relative:
+#             ax.text(0.05, 0.95, '4.5 Ga\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
+#                     horizontalalignment='left', c=textc,
+#                     verticalalignment='top',
+#                     transform=ax.transAxes)
+#         i_ax += 1
+#         ylabel = False
+#         legendd = False
+#
+#     if 'CMF' in x_vars:
+#         # CMF variation
+#         planets_CMF = bulk_planets(n=nplanets, name='CMF', mini=0.1, maxi=0.7, like=defaults, t_eval=pl_baseline.t,
+#                                    random=False, initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
+#         # where did mini=0.07829, maxi=0.544, come from?
+#         fig, ax = plot_vs_x(legend=legendd, set_xlim=True,  legsize=legsize, log=log,
+#             lplanets=planets_CMF, xname={'CMF': ('Core Mass Fraction', 1)},
+#             ynames={model_param: ('', yscale)}, snap=age, relative=relative,
+#             plots_save=False, fig=fig, axes=axes[i_ax], ylabel=ylabel, **kwargs)
+#         if relative:
+#             ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
+#         if legend and relative:
+#             ax.text(0.95, 0.95,
+#                     '4.5 Ga \n' + '{:1.0f}'.format(pl_baseline.M_p / parameters.M_E) + ' $M_E$ \n' + '300 kJ mol$^{-1}$  \n 4.6 pW kg$^{-1}$',
+#                     fontsize=legsize, c=textc,
+#                     horizontalalignment='right',
+#                     verticalalignment='top',
+#                     transform=ax.transAxes)
+#         i_ax += 1
+#         ylabel = False
+#         legendd = False
+#
+#     if 'H0' in x_vars:
+#         # H0 variation
+#         planets_H0 = bulk_planets(n=nplanets, name='H_0', mini=10e-12, maxi=40e-12, like=defaults, t_eval=pl_baseline.t,
+#                                   random=False, initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
+#         fig, ax = plot_vs_x(legend=legendd, xmin=10, xmax=40, set_xlim=True,  legsize=legsize,
+#                             lplanets=planets_H0, xname={'H_0': ('$H_0$ (pW kg$^{-1}$)', 1e12)},
+#                             ynames={model_param: ('', yscale)}, snap=age, log=log, relative=relative,
+#                             plots_save=False, fig=fig, axes=axes[i_ax], ylabel=ylabel, **kwargs)
+#         if relative:
+#             ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
+#         if legend and relative:
+#             ax.text(0.95, 0.95, '4.5 Ga \n ' +
+#                     '{:1.0f}'.format(pl_baseline.M_p / parameters.M_E) + ' $M_E$ \n 300 kJ mol$^{-1}$  \n 0.3 CMF',
+#                     fontsize=legsize,
+#                     horizontalalignment='right',
+#                     verticalalignment='top', c=textc,
+#                     transform=ax.transAxes)
+#         i_ax += 1
+#         ylabel = False
+#         legendd = False
+#
+#     if 'Ea' in x_vars:
+#         # Ea variation
+#         planets_Ea = bulk_planets(n=nplanets, name='Ea', mini=250e3, maxi=350e3, like=defaults, t_eval=pl_baseline.t,
+#                                   random=False, initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
+#         fig, ax = plot_vs_x(legend=legendd, xmin=250, xmax=350, set_xlim=True,  legsize=legsize,
+#                             lplanets=planets_Ea, xname={'Ea': ('$E_a$ (kJ mol$^{-1}$)', 1e-3)},
+#                             ynames={model_param: ('', yscale)}, snap=age, log=log, relative=relative,
+#                             plots_save=False, fig=fig, axes=axes[i_ax], ylabel=ylabel, **kwargs)
+#         if relative:
+#             ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
+#         if legend and relative:
+#             ax.text(0.95, 0.95, '4.5 Ga \n ' +
+#                     '{:1.0f}'.format(pl_baseline.M_p / parameters.M_E) + ' $M_E$ \n 0.3 CMF \n 4.6 pW kg$^{-1}$',
+#                     fontsize=legsize, c=textc,
+#                     horizontalalignment='right',
+#                     verticalalignment='top',
+#                     transform=ax.transAxes)
+#
+#     for ax in axes:
+#         ax.xaxis.set_tick_params(width=tickwidth)
+#         ax.yaxis.set_tick_params(width=tickwidth)
+#     plt.subplots_adjust(wspace=wspace)
+#     return fig, axes
+
+
 def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidth=1, relative=True, textc='k',
-                                  age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ', nplanets=20, log=False,
+                                  age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ', fig_height=4,
+                                  xlabels=None, nplanets=20, log=False, x_range=None, xscales=None, units=None,
                                   fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12, yscale=1,
                                   pl_baseline=None, update_kwargs={}, initial_kwargs={}, verbose=False, **kwargs):
     if x_vars is None:
-        x_vars = ['age', 'M_p', 'CMF', 'H0', 'Ea']
+        x_vars = ['t', 'M_p', 'CMF', 'H_0', 'Ea']
+    if units is None:
+        units = ['Gyr', '$M_E$', 'CMF', 'pW kg$^{-1}$', 'kJ mol$^{-1}$']
+    if xlabels is None:
+        xlabels = x_vars
+    if x_range is None:
+        x_range = [(1.5, age), (0.1 * parameters.M_E, 6 * parameters.M_E), (0.1, 0.7), (10e-12, 40e-12), (250e3, 350e3)]
+    if xscales is None:
+        xscales = [parameters.sec2Gyr, parameters.M_E ** -1, 1, 1e12, 1e-3]
     if axes is None:
-        fig, axes = plt.subplots(1, len(x_vars), figsize=(4 * len(x_vars), 4), sharey=True)
-
-    model_baseline = eval('pl_baseline.' + model_param)
-
-    it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
-    model_baseline = model_baseline[it]
-    i_ax = 0
+        fig, axes = plt.subplots(1, len(x_vars), figsize=(4 * len(x_vars), fig_height), sharey=True)
     if not_iterable(axes):
         axes = [axes]
 
+    it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
+    model_baseline = eval('pl_baseline.' + model_param)[it]
     if relative:
         yscale = model_baseline ** -1
-    print('yscale', yscale)
+    set_ylabel = True
+    legendd = legend
+    for i_ax, x_var in enumerate(x_vars):
+        xmin, xmax = x_range[i_ax]
+        if x_var == 't':
+            # time/age variation - plot single planet evol
+            fig, ax = plot_vs_x(lplanets=pl_baseline, xname={'t': (xlabels[i_ax], xscales[i_ax])},
+                                ynames={model_param: (ylabel, yscale)}, fig=fig, axes=axes[i_ax], legsize=legsize,
+                                legend=legendd, plots_save=False, set_ylabel=set_ylabel, set_xlim=True, xmin=xmin,
+                                xmax=xmax, log=log, relative=relative, **kwargs)
+        else:
+            if verbose:
+                print('generating planets across', x_var, '...')
+            planets = bulk_planets(n=nplanets, name=x_var, mini=xmin, maxi=xmax,
+                                   like=defaults,
+                                   t_eval=pl_baseline.t, random=False, verbose=verbose,
+                                   initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
+            fig, ax = plot_vs_x(lplanets=planets, xname={x_var: (xlabels[i_ax], xscales[i_ax])},
+                                ynames={model_param: ('', yscale)}, fig=fig, axes=axes[i_ax], legsize=legsize,
+                                legend=legendd, snap=age, plots_save=False, set_ylabel=ylabel, set_xlim=True, log=log,
+                                relative=relative, **kwargs)
 
-    ylabel=True
-    legendd=legend
-
-    if 'age' in x_vars:
-        # time/age variation
-        fig, ax = plot_vs_x(legend=legendd, legsize=legsize, log=log,
-                            lplanets=pl_baseline, xname={'t': ('Age (Gyr)', parameters.sec2Gyr)}, set_xlim=True,
-                            ynames={model_param: (ylabel, yscale)}, ylabel=ylabel, relative=relative,
-                            plots_save=False, fig=fig, axes=axes[i_ax], xmin=1.5, xmax=4.5, **kwargs)
         if relative:
             ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
         if legend and relative:
-            ax.text(0.95, 0.95,
-                    '{:1.0f}'.format(pl_baseline.M_p / parameters.M_E) + ' $M_E$ \n 300 kJ mol$^{-1}$ \n 0.3 CMF \n 4.6 pW kg$^{-1}$',
+            string = ''
+            for jj, u in enumerate(units):
+                if jj != i_ax:
+                    if x_vars[jj] == 't':
+                        string = string + '{:.3g} '.format(age * xscales[jj]) + u + '\n'
+                    else:
+                        string = string + '{:.3g} '.format(eval('pl_baseline.' + x_vars[jj]) * xscales[jj]) + u + '\n'
+            ax.text(0.95, 0.95, string,
                     fontsize=legsize, c=textc,
                     horizontalalignment='right',
                     verticalalignment='top',
                     transform=ax.transAxes)
-        i_ax += 1
-        ylabel = False
-        legendd = False
 
-    if 'M_p' in x_vars:
-        # mass variation
-        print('generating planets...')
-        planets_mass = bulk_planets(n=nplanets, name='M_p', mini=0.1 * parameters.M_E, maxi=6 * parameters.M_E, like=defaults,
-                                    t_eval=pl_baseline.t, random=False,
-                                    initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
-        print('finished!')
-        fig, ax = plot_vs_x(legend=legendd, set_xlim=True,  legsize=legsize, log=log,
-            lplanets=planets_mass, xname={'M_p': ('$M_p$ ($M_E$)', parameters.M_E ** -1)},
-            ynames={model_param: ('', yscale)}, snap=age, relative=relative,
-            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=ylabel, **kwargs)
-        if relative:
-            ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
-        if legend and relative:
-            ax.text(0.05, 0.95, '4.5 Ga\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
-                    horizontalalignment='left', c=textc,
-                    verticalalignment='top',
-                    transform=ax.transAxes)
-        i_ax += 1
-        ylabel = False
+        # turn off
+        set_ylabel = False
         legendd = False
-
-    if 'CMF' in x_vars:
-        # CMF variation
-        planets_CMF = bulk_planets(n=nplanets, name='CMF', mini=0.1, maxi=0.7, like=defaults, t_eval=pl_baseline.t,
-                                   random=False, initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
-        # where did mini=0.07829, maxi=0.544, come from?
-        fig, ax = plot_vs_x(legend=legendd, set_xlim=True,  legsize=legsize, log=log,
-            lplanets=planets_CMF, xname={'CMF': ('Core Mass Fraction', 1)},
-            ynames={model_param: ('', yscale)}, snap=age, relative=relative,
-            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=ylabel, **kwargs)
-        if relative:
-            ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
-        if legend and relative:
-            ax.text(0.95, 0.95,
-                    '4.5 Ga \n' + '{:1.0f}'.format(pl_baseline.M_p / parameters.M_E) + ' $M_E$ \n' + '300 kJ mol$^{-1}$  \n 4.6 pW kg$^{-1}$',
-                    fontsize=legsize, c=textc,
-                    horizontalalignment='right',
-                    verticalalignment='top',
-                    transform=ax.transAxes)
-        i_ax += 1
-        ylabel = False
-        legendd = False
-
-    if 'H0' in x_vars:
-        # H0 variation
-        planets_H0 = bulk_planets(n=nplanets, name='H_0', mini=10e-12, maxi=40e-12, like=defaults, t_eval=pl_baseline.t,
-                                  random=False, initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
-        fig, ax = plot_vs_x(legend=legendd, xmin=10, xmax=40, set_xlim=True,  legsize=legsize,
-                            lplanets=planets_H0, xname={'H_0': ('$H_0$ (pW kg$^{-1}$)', 1e12)},
-                            ynames={model_param: ('', yscale)}, snap=age, log=log, relative=relative,
-                            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=ylabel, **kwargs)
-        if relative:
-            ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
-        if legend and relative:
-            ax.text(0.95, 0.95, '4.5 Ga \n ' +
-                    '{:1.0f}'.format(pl_baseline.M_p / parameters.M_E) + ' $M_E$ \n 300 kJ mol$^{-1}$  \n 0.3 CMF',
-                    fontsize=legsize,
-                    horizontalalignment='right',
-                    verticalalignment='top', c=textc,
-                    transform=ax.transAxes)
-        i_ax += 1
-        ylabel = False
-        legendd = False
-
-    if 'Ea' in x_vars:
-        # Ea variation
-        planets_Ea = bulk_planets(n=nplanets, name='Ea', mini=250e3, maxi=350e3, like=defaults, t_eval=pl_baseline.t,
-                                  random=False, initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
-        fig, ax = plot_vs_x(legend=legendd, xmin=250, xmax=350, set_xlim=True,  legsize=legsize,
-                            lplanets=planets_Ea, xname={'Ea': ('$E_a$ (kJ mol$^{-1}$)', 1e-3)},
-                            ynames={model_param: ('', yscale)}, snap=age, log=log, relative=relative,
-                            plots_save=False, fig=fig, axes=axes[i_ax], ylabel=ylabel, **kwargs)
-        if relative:
-            ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
-        if legend and relative:
-            ax.text(0.95, 0.95, '4.5 Ga \n ' +
-                    '{:1.0f}'.format(pl_baseline.M_p / parameters.M_E) + ' $M_E$ \n 0.3 CMF \n 4.6 pW kg$^{-1}$',
-                    fontsize=legsize, c=textc,
-                    horizontalalignment='right',
-                    verticalalignment='top',
-                    transform=ax.transAxes)
 
     for ax in axes:
         ax.xaxis.set_tick_params(width=tickwidth)
@@ -774,18 +865,18 @@ def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_
                           models=None, labels=None, c=None, fig=None, axes=None, age=4.5,
                           initial_kwargs={}, update_kwargs={}, legend=True,
                           ylabel='$\Delta h$ / $\Delta h_0$  ', **kwargs):
-
-    initial_kwargs.update({'tf':age})
-    pl_baseline = bulk_planets(n=1, name='M_p', mini=1 * parameters.M_E, maxi=1 * parameters.M_E, like=defaults,
+    initial_kwargs.update({'tf': age})
+    pl_baseline = build_planet_from_id(ident=defaults,
                                initial_kwargs=initial_kwargs, update_kwargs=update_kwargs,
-                               postprocessors=['topography'], t_eval=None, random=False)[0]
+                               postprocessors=['topography'], t_eval=None)
     legendd = False
     for ii, h_param in enumerate(models):
         if ii == len(models) - 1:
             legendd = True
         fig, axes = plot_change_with_observeables(defaults=defaults, fig=fig, axes=axes, model_param=models[ii],
                                                   legend=legendd, pl_baseline=pl_baseline, label_l=labels[ii], c=c[ii],
-                                                  age=age, ylabel=ylabel, initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
+                                                  age=age, ylabel=ylabel, initial_kwargs=initial_kwargs,
+                                                  update_kwargs=update_kwargs, **kwargs)
 
     if save:
         plot_save(fig, fname, **kwargs)
@@ -795,20 +886,24 @@ def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_
 
 def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwater=None, textc='k', M0=0.815,
                                  titlesize=24, save=False, spectrum_fname='', spectrum_fpath='', c='#81f79f', title='',
-                                ticksize=14, labelsize=16, clabel='Surface water mass fraction', clabelpad=20, relative=False,
-                                 mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10,10), ytitle=1.1, cmap='terrain_r',
+                                 ticksize=14, labelsize=16, clabel='Surface water mass fraction', clabelpad=20,
+                                 relative=False,
+                                 mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10, 10), ytitle=1.1,
+                                 cmap='terrain_r',
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
-
     phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
     h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
     pl0 = bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults, t_eval=None,
-                       random=False, phi0=phi0, h_rms0=h_rms0, postprocessors=['topography', 'ocean_capacity'], **kwargs)[0]
+                       random=False, phi0=phi0, h_rms0=h_rms0, postprocessors=['topography', 'ocean_capacity'],
+                       **kwargs)[0]
     fig, axes = plt.subplots(figsize=figsize)
-    fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0, textc=textc,
+    fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0,
+                                              textc=textc,
                                               label_l=None, c=c, ylabel=ylabel, age=age, h_rms0=h_rms0, legsize=legsize,
-                                              postprocessors=['topography', 'ocean_capacity'], phi0=phi0, log=log, fig=fig,
+                                              postprocessors=['topography', 'ocean_capacity'], phi0=phi0, log=log,
+                                              fig=fig,
                                               axes=axes, ticksize=ticksize, labelsize=labelsize, relative=relative,
-                                               **kwargs)
+                                              **kwargs)
 
     if mass_frac_sfcwater is not None:
         # how does actual vol scale assuming constant mass fraction of surface water (bad assumption)?
@@ -821,14 +916,14 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
 
         for ii, X in enumerate(mass_frac_sfcwater):
             M_w = masses * parameters.M_E * X  # mass of sfc water in kg
-            vol_w = M_w/rho_w  # volume of surface water if same mass fraction
+            vol_w = M_w / rho_w  # volume of surface water if same mass fraction
             if relative:
-                vol_w = vol_w/vol_0
-            ax.plot(masses, vol_w,  alpha=0.4, lw=0, zorder=0, c=colours[ii], marker='o', markersize=15,
-                     label='Maximum water budget')
+                vol_w = vol_w / vol_0
+            ax.plot(masses, vol_w, alpha=0.4, lw=0, zorder=0, c=colours[ii], marker='o', markersize=15,
+                    label='Maximum water budget')
 
         colourbar(mappable=None, ax=ax, vmin=np.min(mass_frac_sfcwater), vmax=np.max(mass_frac_sfcwater), label=clabel,
-                  labelsize=labelsize*0.8, ticksize=ticksize, labelpad=clabelpad, ticks=mass_frac_sfcwater,
+                  labelsize=labelsize * 0.8, ticksize=ticksize, labelpad=clabelpad, ticks=mass_frac_sfcwater,
                   cmap=cmap, c=textc, log=True, pad=0.2)
         #
         # # title and legend
@@ -836,7 +931,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
         #                         borderaxespad=0,  # mode="expand",
         #                         loc='lower left', bbox_to_anchor=leg_bbox, ncol=1)
 
-    fig.suptitle(title, fontsize=titlesize, y=ytitle, c=textc) #x=0.365,
+    fig.suptitle(title, fontsize=titlesize, y=ytitle, c=textc)  # x=0.365,
 
     if save:
         plot_save(fig, fname, **kwargs)
@@ -850,4 +945,3 @@ def read_JFR(fname='', path='benchmarks/JFR/'):
     h_rms = np.array(df.RMS_topo)
     Nu = np.array(df.Nu)
     return Ra, h_peak, h_rms, Nu
-

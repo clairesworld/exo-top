@@ -409,5 +409,6 @@ Mars1_in = dict(
     sma=None,
     ident='Mars1',
     H_f=4e-12,  # radiogenic heating in W/kg at t_f
+    # backwards_cooling=True,
 )
-Mars1_run = dict(T_m0=1750, T_c0=2250, D_l0=300e3, tf=4.5, visc_type='KW', complexity=3)
+Mars1_run = dict(T_m0=1750, T_c0=2250, D_l0=300e3, tf=4.5, visc_type='Thi', complexity=3)
