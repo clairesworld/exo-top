@@ -2,13 +2,21 @@
 from . import parameters as p
 import numpy as np
 
+def dimensionalise(h_prime, pl, end=True, **kwargs):
+    if end:
+        h = h_prime*(np.maximum(pl.T_c[-1], pl.T_m[-1]) - pl.T_s)*pl.alpha_m*(pl.R_p - pl.R_c)
+
+        # h = pl.eta_m[-1] * pl.kappa_m / (pl.d_m[-1]**2 * pl.rho_m * pl.g_sfc)
+    return h
+
 def topography(pl, **kwargs):
     # get all topography parameters for a planet (given its thermal history)
     pl.heuristic_h = pl.delta_rh * pl.dT_rh * pl.alpha_m
-    pl.dyn_top_rms = dyn_topo_aspect(pl, **kwargs)
+    pl.dyn_top_aspect_prime = dyn_topo_prime_aspect(pl, **kwargs)
+    pl.dyn_top_heuristic = dyn_topo_heuristic(pl, **kwargs)
     pl.dyn_top_KH = dyn_topo_KH(pl)
     pl.dyn_top_rms_isoviscous = dyn_topo_Lees(pl)
-    
+    pl.dyn_top_rms = dimensionalise(pl.dyn_top_aspect_prime, pl)
     return pl
 
 
@@ -17,10 +25,10 @@ def dyn_topo_heuristic(pl, **kwargs):
     return h_prime
 
 
-def dyn_topo_aspect(pl, **kwargs):
+def dyn_topo_prime_aspect(pl, **kwargs):
     h_prime = 0.094 * pl.Ra_i_eff**-0.151  # fit to chaotic regime
-    h = h_prime*(np.maximum(pl.T_c, pl.T_m) - pl.T_s)*pl.alpha_m*(pl.R_p - pl.R_c)
-    return h
+
+    return h_prime
 
 
 def dyn_topo_KH(pl=None, Ra_i=None, **kwargs): # Kiefer and Hager 1992 scaling

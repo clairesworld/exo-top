@@ -50,6 +50,6 @@ for jj, etastr in enumerate(eta_ls):
                 anims.animate_T_field(case, data_path=data_path_bullard, fig_path=fig_path_bullard+'animations/', labelsize=30, ticksize=16,
                                 shading='nearest',#'gouraud',
                                 cmap='gist_heat')
-                # animate_T_prof(case, data_path=data_path_bullard, fig_path=fig_path_bullard + 'animations/', labelsize=30, ticksize=16)
-                # animate_h(case, data_path=data_path_bullard, fig_path=fig_path_bullard + 'animations/', labelsize=30, ticksize=16)
+                # anims.animate_T_prof(case, data_path=data_path_bullard, fig_path=fig_path_bullard + 'animations/', labelsize=30, ticksize=16)
+                # anims.animate_h(case, data_path=data_path_bullard, fig_path=fig_path_bullard + 'animations/', labelsize=30, ticksize=16)
                 print('finished case')

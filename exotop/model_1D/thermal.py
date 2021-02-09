@@ -340,6 +340,7 @@ def recalculate(t, pl, adiabats=0, complexity=3, Tlid_ini=None, **kwargs):
                 pl.q_core = pl.q_core_const
             else:
                 pl.q_core = q_bl(deltaT=pl.T_c - pl.T_m, k=pl.k_lm, d_bl_inv=TBL_c_inv, beta=pl.beta_c, **kwargs)
+
             pl.Q_core = Q_bl(q=pl.q_core, R=pl.R_c)
             pl.TBL_c = TBL_c_inv ** -1
         else:

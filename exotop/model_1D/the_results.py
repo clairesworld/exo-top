@@ -75,7 +75,7 @@ def build_planet_from_id(ident='Earthbaseline', initial_kwargs=None, update_kwar
     return pl
 
 
-def build_planet(planet_kwargs=None, initial_kwargs=None, postprocessors=None, t_eval=None, nondimensional=False,
+def build_planet(planet_kwargs=None, initial_kwargs=None, postprocessors=None, t_eval=None, nondimensional=True,
                  **kwargs):
     if postprocessors is None:
         postprocessors = ['topography']
@@ -498,6 +498,7 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
     pl = tp.TerrestrialPlanet(**planet_kwargs)
     pl = thermal.solve(pl, **model_kwargs)  # T_m, T_c, D_l
     pl = topography.topography(pl, C=1)
+    pl.nondimensionalise()
 
     if verbose:
         print('T_c', pl.T_c[-1])
