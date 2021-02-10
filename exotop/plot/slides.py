@@ -77,7 +77,7 @@ for regime in regimes:
     # ax.ticklabel_format(style='plain', axis='y', useOffset=False)
     ax.legend(handles=handles, frameon=False, fontsize=25, ncol=1, bbox_to_anchor=(1.01, 1), loc='upper left')
 
-    fig, _ = dark_background(fig, ax, ax2)
+    fig, _ = dark_background(fig, (ax, ax2))
     plat.plot_save(fig, fname='h_Ra_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
 
 
