@@ -1,5 +1,5 @@
-# import sys
-# # sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+import sys
+sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, \
      fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, load_grid, p_Venus  # noqa: E402
 from exotop.postaspect import plt_aspect as plat  # noqa: E402
