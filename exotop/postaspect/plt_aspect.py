@@ -9,8 +9,6 @@ import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm, Normalize
 import matplotlib.lines as mlines  # noqa: E402
 from scipy.interpolate import interp1d
-import sys
-# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from postaspect import aspectdata as ad  # noqa: E402
 from postaspect import aspect_post as pro  # noqa: E402
 from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour  # noqa: E402

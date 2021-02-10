@@ -1,6 +1,4 @@
-import sys
-# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-# sys.path.insert(0, '//')
+
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path_bullard, data_path_home, fig_path_bullard, fig_path_home, c_rms, c_peak, \
     c_regimes_td, regime_grid_td, regime_names_td, load_grid, alpha_m, p_Earth  # noqa: E402
 from model_1D.parameters import M_E  # noqa: E402

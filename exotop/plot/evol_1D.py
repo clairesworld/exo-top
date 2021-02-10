@@ -1,13 +1,10 @@
 """ Plot new 1D thermal model topography after processing of ASPECT runs """
 
-import sys
-sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-sys.path.insert(0, '//')
-from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path_home, fig_path_home, c_rms, c_peak, \
+from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path_home, fig_path_home, c_rms, c_peak, \
     c_regimes_td, fig_fmt, \
     regime_grid_td, regime_names_td, load_grid, alpha_m, p_Earth  # noqa: E402
-from exotop.model_1D.parameters import M_E  # noqa: E402
-from exotop.postaspect import plt_1Dscaling as plt1  # noqa: E402
+from model_1D.parameters import M_E  # noqa: E402
+from postaspect import plt_1Dscaling as plt1  # noqa: E402
 
 M_p_min = 0.03 * M_E
 M_p_max = 6 * M_E
