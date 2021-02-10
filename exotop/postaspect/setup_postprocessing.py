@@ -54,4 +54,5 @@ c_rms = 'xkcd:forest green'
 c_peak = 'xkcd:periwinkle'
 highlight_colour = 'xkcd:coral'
 
-p_Earth = {'alpha_m': 1.35e-5, 'dT_m': 2700, 'd_m': 2800}   # dimensionalisation factors
+p_Earth = {'alpha_m': 1.35e-5, 'dT_m': 2700, 'd_m': 2800e3}   # dimensionalisation factors
+p_Venus = {'alpha_m': 2e-5, 'dT_m': 3000, 'd_m': 2723e3}   # dimensionalisation factors Weller & Kiefer 2020

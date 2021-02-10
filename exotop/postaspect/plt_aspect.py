@@ -10,12 +10,11 @@ from matplotlib.colors import LogNorm, Normalize
 import matplotlib.lines as mlines  # noqa: E402
 from scipy.interpolate import interp1d
 import sys
-
-sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop.postaspect import aspectdata as ad  # noqa: E402
-from exotop.postaspect import aspect_post as pro  # noqa: E402
-from exotop.postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour  # noqa: E402
-from exotop.useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, not_iterable, \
+# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+from postaspect import aspectdata as ad  # noqa: E402
+from postaspect import aspect_post as pro  # noqa: E402
+from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour  # noqa: E402
+from useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, not_iterable, \
     colourbar, not_string, minmaxnorm, mahalanobis  # noqa: E402
 
 
@@ -303,7 +302,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               save=True, fname='h', legend=False, sigma=1, fiterror=True, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=40, lw=1,
-              xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None,
+              xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None, ticksize=None,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7), c_fit=None,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
@@ -462,17 +461,20 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         ax.add_artist(leg)
 
     if p_dimensionals is not None:
-        ax2 = ax.twinx()
-        # ax2.set_ylabel(y2label, fontsize=labelsize)
-        ymin, ymax = ax.get_ylim()
-        # apply function and set transformed values to right axis limits
-        ax2.set_ylim((pro.dimensionalise_h(ymin, p_dimensionals), pro.dimensionalise_h(ymax, p_dimensionals)))
-        # set an invisible artist to twin axes
-        # to prevent falling back to initial values on rescale events
-        ax2.plot([], [])
+        def h_todim(u):
+            return u * p_dimensionals['alpha_m'] * p_dimensionals['dT_m'] * p_dimensionals['d_m']
+
+        def h_tonondim(u):
+            return u / (p_dimensionals['alpha_m'] * p_dimensionals['dT_m'] * p_dimensionals['d_m'])
+
+        ax2 = ax.secondary_yaxis('right', functions=(h_todim, h_tonondim))
+        ax2.set_ylabel(y2label, fontsize=labelsize, labelpad=ylabelpad)
+        ax2.tick_params(axis='y', which='major', labelsize=ticksize)
         axes = (ax, ax2)
+
     else:
         axes = (ax,)
+
     if save:
         plot_save(fig, fname, fig_path=fig_path, fig_fmt=fig_fmt)
     return (fig, *axes)

@@ -34,7 +34,7 @@ def adiabat(T_0, R=None, g=None, R_p=None, h=None, c_v=None, alpha_m=None, adiab
 
 def Ra(nu=None, eta=None, kappa=None, alpha=None, rho=None, g=None, deltaT=None, l=None):
     if (nu is None) and (eta is not None):
-        return rho * alpha * deltaT * l ** 3 * g / (kappa * eta)
+        return rho * alpha * deltaT * l ** 3 * g / (kappa * eta) * 1e-1
     elif (nu is not None) and (eta is None):
         return alpha * deltaT * l ** 3 * g / (kappa * nu)
 

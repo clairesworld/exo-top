@@ -13,17 +13,17 @@ from scipy.interpolate import InterpolatedUnivariateSpline
 import sys
 
 # sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-sys.path.insert(0, '/home/claire/Works/exo-top/')
-from exotop.postaspect.plt_aspect import plot_save, plot_getx  # noqa: E402
-from exotop.postaspect.aspect_post import dimensionalise_h, nondimensionalise_h, pickleio, Ra_i_eff  # noqa: E402
-from exotop.postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard  # noqa: E402
-from exotop.model_1D.parameters import M_E, sec2Gyr  # noqa: E402
-from exotop.model_1D.the_results import bulk_planets, plot_output, build_planet_from_id  # noqa: E402
-from exotop.useful_and_bespoke import find_nearest_idx, iterable_not_string, not_iterable, colorize, dark_background
+# sys.path.insert(0, '/home/claire/Works/exo-top/')
+from postaspect.plt_aspect import plot_save, plot_getx  # noqa: E402
+from postaspect.aspect_post import dimensionalise_h, nondimensionalise_h, pickleio, Ra_i_eff  # noqa: E402
+from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard  # noqa: E402
+from model_1D.parameters import M_E, sec2Gyr  # noqa: E402
+from model_1D.the_results import bulk_planets, plot_output, build_planet_from_id  # noqa: E402
+from useful_and_bespoke import find_nearest_idx, iterable_not_string, not_iterable, colorize, dark_background
 
 
 def overplot_aspect_data(ax, case, x_param=None, y_param=None, pkl_suffix=['_T', '_h'], c='k', markersize=20,
-                         marker='*',
+                         marker='*', zorder=200,
                          data_path=data_path_bullard, return_data=False, visible=True, **kwargs):
     """ plot aspect data on existing ax for comparison, for a single case
     x and y params are either numerical value (in which case plot that) or string of df attribute stored in pkl suff"""
@@ -80,7 +80,7 @@ def overplot_aspect_data(ax, case, x_param=None, y_param=None, pkl_suffix=['_T',
     # y_data = plot_getx(Ra_str, eta_str, case=case, which_x=y_param, averagescheme='timefirst', data_path=data_path,
     #                    load=True, postprocess_kwargs=None, return_all=False, t1=0, **kwargs)
 
-    ax.scatter(x_data, y_data, c=c, s=markersize, marker=marker, visible=visible)
+    ax.scatter(x_data, y_data, c=c, s=markersize, marker=marker, visible=visible, zorder=zorder)
     if return_data:
         return ax, x_data, y_data
     else:
@@ -237,168 +237,170 @@ def plot_1D_evolutions(default, nplanets=45, labelsize=23, ticksize=16, clabelpa
     return fig, axes
 
 
-# TODO
-def animate_Ra(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), labelsize=16, ylabelpad=10, xlabelpad=10,
-                    ticksize=12, fname='ani_1D',
-                    xticks=[0.01, 0.1, 0.3, 1, 2, 3, 4, 5, 6], yticks=None, aspect_cases=None, markersize=20, marker='o', c_scat='g',
-                    data_path='', x_min=0.03 * M_E, x_max=6 * M_E, y_param=None, x_param='M_p', x2_param='Ra_i_eff',
-                    xscale=M_E ** -1, x2scale=1, yscale=1, fps=15, c='b',
-                    ani_param='Ea', ani_tpref=r'$E_a$ = ', ani_tsuff=r' kJ mol$^{-1}$', ani_scale=1e-3, ani_min=200, ani_max=375, ani_res=30,
-                    tf=9.9, ti=2, ylabel='', x_min_planets=0.1 * M_E, ini_dict=None, logx=True, text=True, dark=True,
-                    lw=3, x_res=8, alpha_lines=1, xlabel=r'$M_p$ ($M_E$)', x2label=r'Ra$_{i, eff}$', **kwargs):
-    # params refer to variable names in 1D model
-    if aspect_cases is None:
-        aspect_cases = ['Ra3e8-eta1e8-wide-ascii', 'Ra3e8-eta1e7-wide-ascii', 'Ra3e8-eta1e6-wide',
-                        'Ra1e8-eta1e8-wide-ascii',
-                        'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e6-wide']
-    ## too much effort to do animated subplots (and massive files)
-
-    # setup plot
-    fig, ax = plt.subplots(figsize=figsize)
-
-
-    # only need to load aspect data once and then re-dimensionalise it
-    cases_x, cases_y = [], []
-    for case in aspect_cases:
-        ax, x_aspect_data, y_aspect_data = overplot_aspect_data(ax, case, x_param=x2_param,
-                                                                y_param=y_param, data_path=data_path,
-                                                                pkl_suffix=['_T', '_h'], markersize=markersize,
-                                                                marker=marker,
-                                                                return_data=True, visible=False, **kwargs)
-        cases_x.append(x_aspect_data)
-        cases_y.append(y_aspect_data)
-    scat_data = np.vstack((cases_x, cases_y)).T  # shape N, 2
-
-    # setup evolutions
-    ani_vec = np.linspace(ani_min*ani_scale, ani_max*ani_scale, ani_res)
-    if x_min_planets is None:
-        x_min_planets = x_min
-    initial_kwargs = {'tf': tf}
-    if ini_dict is not None:
-        initial_kwargs.update(ini_dict)
-    pl_min = build_planet_from_id(ident=default, nondimensional=True, initial_kwargs=initial_kwargs, verbose=True,
-                                  update_kwargs={x_param: x_min_planets}, **kwargs)
-    i_start_time = np.argmax(pl_min.t >= ti / sec2Gyr)  # don't animate any cases before here
-
-    # run evolutions
-    pl_mass = bulk_planets(n=x_res, name=x_param, mini=x_min, maxi=x_max, like=default, random=False,
-                           nondimensional=True, logscale=logx, initial_kwargs=initial_kwargs, t_eval=pl_min.t,
-                           **kwargs)
-
-    # only plot planets with x value greater than x_min_planets (this is to extend axis limits for aspect compare)
-    x_orig = np.array([vars(pl)[x_param] for pl in pl_mass]) * xscale
-    ax.set_xlim(x_orig.min(),
-                x_orig.max())  # need to set limits for twin axis before removing small points so u can see Ra
-    i_plot = np.argmax(x_orig >= x_min_planets * xscale)
-
-    pl_pl = pl_mass[i_plot:]
-    x = x_orig[i_plot:]
-    y = np.array([vars(pl)[y_param + '_prime'][i_start_time] for pl in pl_pl]) * yscale
-    p1, = ax.plot(x, y, c=c, lw=lw, alpha=alpha_lines)
-
-    # setup secondary axis
-    ax2 = ax.twiny()
-    x2_orig = np.array([vars(pl)[x2_param][i_start_time] for pl in
-                        pl_mass]) * x2scale  # limits corresponding to tiny planets for extra space
-    ax2.set_xlim(x2_orig.min(), x2_orig.max())
-    x2 = x2_orig[i_plot:]
-    p2, = ax2.plot(x2, y, c=c, lw=lw, alpha=alpha_lines, ls='--')
-
-    # add scatter points for 2D simulations
-    scat = ax2.scatter(cases_x, cases_y, c=c_scat, s=markersize, marker=marker, visible=True)
-
-    # set plot params
-    if xticks is not None:
-        ax.set_xticks(xticks)
-    if yticks is not None:
-        ax.set_yticks(yticks)
-    if logx:
-        ax2.set_xscale('log')
-        ax2.set_yscale('log')
-        ax.set_xscale('log')
-        ax.set_yscale('log')
-    ax2.set_xlabel(x2label, fontsize=labelsize, labelpad=xlabelpad)
-    ax2.tick_params(axis='x', which='major', labelsize=ticksize)
-    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
-    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
-    ax.tick_params(axis='both', which='major', labelsize=ticksize)
-    # ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
-    # ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
-    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
-
-    # # set consistent tick labels - do this by tracking a few planets of known mass - will work when lines match
-    # x2_desired_ticks = np.array([1e6, 1e7, 1e8, 1e9, 1e10])
-    # x_at_ticks = np.zeros_like(x2_desired_ticks)
-    # for ii, ttt in enumerate(x2_desired_ticks):
-    #     idx = find_nearest_idx(x2_orig, ttt)
-    #     x_at_ticks[ii] = x_orig[idx]
-    # print('idx', idx)
-    #
-    # print('mass at desired ticks', x_at_ticks)
-    # print('Ra at desired ticks', x2_orig[idx.astype(int)])
-
-    # colour and adjust limits
-    if dark:
-        fig, ax, ax2 = dark_background(fig, [ax, ax2])
-        c_text = 'xkcd:off white'
-    else:
-        c_text = 'k'
-    if text:
-        ani_text = ax.text(0.95, 0.95,
-                           ani_tpref + '{:4.1f}'.format(anim_vec[i_start_time] * ani_scale) + ani_tsuff,
-                           fontsize=ticksize, c=c_text,
-                           horizontalalignment='right',
-                           verticalalignment='top',
-                           transform=ax.transAxes)
-    else:
-        ani_text = ax.text([], [], '')
-    plt.subplots_adjust(bottom=0.2, top=0.8, left=0.15)
-    plt.tight_layout()
-
-    # animation stuff
-    def init():
-        p1.set_ydata(([np.nan] * len(x)))
-        p2.set_ydata(([np.nan] * len(x)))
-        # scat.set_offsets([[], []])
-        ani_text.set_text('')
-        return p1, p2, ani_text,
-
-    def animate(i, cases_x, cases_y, pl_pl, y_param, x2_param, yscale, x2scale, pl_mass, anim_vec, anim_tpref,
-                anim_scale, anim_tsuff):
-        new_cases_x = cases_x  # Ra_i_eff axis - doesn't move if axis isn't moving
-        new_cases_y = cases_y
-        # new_scat_data = np.vstack((new_cases_x, new_cases_y)).T  # shape N, 2
-        p1y = np.array([vars(pl)[y_param + '_prime'][i] for pl in pl_pl]) * yscale
-        p2x = np.array([vars(pl)[x2_param][i] for pl in pl_pl]) * x2scale
-        p2y = np.array([vars(pl)[y_param + '_prime'][i] for pl in pl_pl]) * yscale
-
-        p1.set_ydata(p1y)  # update the data.
-        p2.set_xdata(p2x)  # note this is attached to Ra axis
-        p2.set_ydata(p2y)
-        # scat.set_offsets(new_scat_data)
-
-        p2xx = np.array([vars(pl)[x2_param][i] for pl in
-                         pl_mass]) * x2scale  # new x limits are masses corresponding to tiny extra planets
-        ax2.set_xlim(min(p2xx), max(p2xx))  # added ax attribute here
-
-        ani_text.set_text(anim_tpref + '{:4.1f}'.format(anim_vec[i] * anim_scale) + anim_tsuff)
-        return p1, p2, ani_text,
-
-    ani = animation.FuncAnimation(fig, animate, frames=range(i_start_time, len(anim_vec)), init_func=init,
-                                  fargs=(cases_x, cases_y, pl_pl, y_param, x2_param, yscale, x2scale, pl_mass, anim_vec,
-                                         ani_tpref, ani_scale, ani_tsuff),
-                                  blit=False, repeat=True,
-                                  interval=200, )  # interval: delay between frames in ms
-    print('finished!')
-    ani.save(fig_path + fname + '.gif', writer='imagemagick', fps=fps,
-             savefig_kwargs={'facecolor': fig.get_facecolor()})
-    print('saved to', fig_path + fname)
+# # TODO
+# def animate_Ra(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), labelsize=16, ylabelpad=10, xlabelpad=10,
+#                     ticksize=12, fname='ani_1D',
+#                     xticks=[0.01, 0.1, 0.3, 1, 2, 3, 4, 5, 6], yticks=None, aspect_cases=None, markersize=20, marker='o', c_scat='g',
+#                     data_path='', x_min=0.03 * M_E, x_max=6 * M_E, y_param=None, x_param='M_p', x2_param='Ra_i_eff',
+#                     xscale=M_E ** -1, x2scale=1, yscale=1, fps=15, c='b',
+#                     ani_param='Ea', ani_tpref=r'$E_a$ = ', ani_tsuff=r' kJ mol$^{-1}$', ani_scale=1e-3, ani_min=200, ani_max=375, ani_res=30,
+#                     tf=9.9, ti=2, ylabel='', x_min_planets=0.1 * M_E, ini_dict=None, logx=True, text=True, dark=True,
+#                     lw=3, x_res=8, alpha_lines=1, xlabel=r'$M_p$ ($M_E$)', x2label=r'Ra$_{i, eff}$', **kwargs):
+#     # params refer to variable names in 1D model
+#     if aspect_cases is None:
+#         aspect_cases = ['Ra3e8-eta1e8-wide-ascii', 'Ra3e8-eta1e7-wide-ascii', 'Ra3e8-eta1e6-wide',
+#                         'Ra1e8-eta1e8-wide-ascii',
+#                         'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e6-wide']
+#     ## too much effort to do animated subplots (and massive files)
+#
+#     # setup plot
+#     fig, ax = plt.subplots(figsize=figsize)
+#
+#
+#     # only need to load aspect data once and then re-dimensionalise it
+#     cases_x, cases_y = [], []
+#     for case in aspect_cases:
+#         ax, x_aspect_data, y_aspect_data = overplot_aspect_data(ax, case, x_param=x2_param,
+#                                                                 y_param=y_param, data_path=data_path,
+#                                                                 pkl_suffix=['_T', '_h'], markersize=markersize,
+#                                                                 marker=marker,
+#                                                                 return_data=True, visible=False, **kwargs)
+#         cases_x.append(x_aspect_data)
+#         cases_y.append(y_aspect_data)
+#     scat_data = np.vstack((cases_x, cases_y)).T  # shape N, 2
+#
+#     # setup evolutions
+#     ani_vec = np.linspace(ani_min*ani_scale, ani_max*ani_scale, ani_res)
+#     if x_min_planets is None:
+#         x_min_planets = x_min
+#     initial_kwargs = {'tf': tf}
+#     if ini_dict is not None:
+#         initial_kwargs.update(ini_dict)
+#     pl_min = build_planet_from_id(ident=default, nondimensional=True, initial_kwargs=initial_kwargs, verbose=True,
+#                                   update_kwargs={x_param: x_min_planets}, **kwargs)
+#     i_start_time = np.argmax(pl_min.t >= ti / sec2Gyr)  # don't animate any cases before here
+#
+#     # run evolutions
+#     pl_mass = bulk_planets(n=x_res, name=x_param, mini=x_min, maxi=x_max, like=default, random=False,
+#                            nondimensional=True, logscale=logx, initial_kwargs=initial_kwargs, t_eval=pl_min.t,
+#                            **kwargs)
+#
+#     # only plot planets with x value greater than x_min_planets (this is to extend axis limits for aspect compare)
+#     x_orig = np.array([vars(pl)[x_param] for pl in pl_mass]) * xscale
+#     ax.set_xlim(x_orig.min(),
+#                 x_orig.max())  # need to set limits for twin axis before removing small points so u can see Ra
+#     i_plot = np.argmax(x_orig >= x_min_planets * xscale)
+#
+#     pl_pl = pl_mass[i_plot:]
+#     x = x_orig[i_plot:]
+#     y = np.array([vars(pl)[y_param + '_prime'][i_start_time] for pl in pl_pl]) * yscale
+#     p1, = ax.plot(x, y, c=c, lw=lw, alpha=alpha_lines)
+#
+#     # setup secondary axis
+#     ax2 = ax.twiny()
+#     x2_orig = np.array([vars(pl)[x2_param][i_start_time] for pl in
+#                         pl_mass]) * x2scale  # limits corresponding to tiny planets for extra space
+#     ax2.set_xlim(x2_orig.min(), x2_orig.max())
+#     x2 = x2_orig[i_plot:]
+#     p2, = ax2.plot(x2, y, c=c, lw=lw, alpha=alpha_lines, ls='--')
+#
+#     # add scatter points for 2D simulations
+#     scat = ax2.scatter(cases_x, cases_y, c=c_scat, s=markersize, marker=marker, visible=True)
+#
+#     # set plot params
+#     if xticks is not None:
+#         ax.set_xticks(xticks)
+#     if yticks is not None:
+#         ax.set_yticks(yticks)
+#     if logx:
+#         ax2.set_xscale('log')
+#         ax2.set_yscale('log')
+#         ax.set_xscale('log')
+#         ax.set_yscale('log')
+#     ax2.set_xlabel(x2label, fontsize=labelsize, labelpad=xlabelpad)
+#     ax2.tick_params(axis='x', which='major', labelsize=ticksize)
+#     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
+#     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
+#     ax.tick_params(axis='both', which='major', labelsize=ticksize)
+#     # ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
+#     # ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
+#     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
+#
+#     # # set consistent tick labels - do this by tracking a few planets of known mass - will work when lines match
+#     # x2_desired_ticks = np.array([1e6, 1e7, 1e8, 1e9, 1e10])
+#     # x_at_ticks = np.zeros_like(x2_desired_ticks)
+#     # for ii, ttt in enumerate(x2_desired_ticks):
+#     #     idx = find_nearest_idx(x2_orig, ttt)
+#     #     x_at_ticks[ii] = x_orig[idx]
+#     # print('idx', idx)
+#     #
+#     # print('mass at desired ticks', x_at_ticks)
+#     # print('Ra at desired ticks', x2_orig[idx.astype(int)])
+#
+#     # colour and adjust limits
+#     if dark:
+#         fig, ax, ax2 = dark_background(fig, [ax, ax2])
+#         c_text = 'xkcd:off white'
+#     else:
+#         c_text = 'k'
+#     if text:
+#         ani_text = ax.text(0.95, 0.95,
+#                            ani_tpref + '{:4.1f}'.format(anim_vec[i_start_time] * ani_scale) + ani_tsuff,
+#                            fontsize=ticksize, c=c_text,
+#                            horizontalalignment='right',
+#                            verticalalignment='top',
+#                            transform=ax.transAxes)
+#     else:
+#         ani_text = ax.text([], [], '')
+#     plt.subplots_adjust(bottom=0.2, top=0.8, left=0.15)
+#     plt.tight_layout()
+#
+#     # animation stuff
+#     def init():
+#         p1.set_ydata(([np.nan] * len(x)))
+#         p2.set_ydata(([np.nan] * len(x)))
+#         # scat.set_offsets([[], []])
+#         ani_text.set_text('')
+#         return p1, p2, ani_text,
+#
+#     def animate(i, cases_x, cases_y, pl_pl, y_param, x2_param, yscale, x2scale, pl_mass, anim_vec, anim_tpref,
+#                 anim_scale, anim_tsuff):
+#         new_cases_x = cases_x  # Ra_i_eff axis - doesn't move if axis isn't moving
+#         new_cases_y = cases_y
+#         # new_scat_data = np.vstack((new_cases_x, new_cases_y)).T  # shape N, 2
+#         p1y = np.array([vars(pl)[y_param + '_prime'][i] for pl in pl_pl]) * yscale
+#         p2x = np.array([vars(pl)[x2_param][i] for pl in pl_pl]) * x2scale
+#         p2y = np.array([vars(pl)[y_param + '_prime'][i] for pl in pl_pl]) * yscale
+#
+#         p1.set_ydata(p1y)  # update the data.
+#         p2.set_xdata(p2x)  # note this is attached to Ra axis
+#         p2.set_ydata(p2y)
+#         # scat.set_offsets(new_scat_data)
+#
+#         p2xx = np.array([vars(pl)[x2_param][i] for pl in
+#                          pl_mass]) * x2scale  # new x limits are masses corresponding to tiny extra planets
+#         ax2.set_xlim(min(p2xx), max(p2xx))  # added ax attribute here
+#
+#         ani_text.set_text(anim_tpref + '{:4.1f}'.format(anim_vec[i] * anim_scale) + anim_tsuff)
+#         return p1, p2, ani_text,
+#
+#     ani = animation.FuncAnimation(fig, animate, frames=range(i_start_time, len(anim_vec)), init_func=init,
+#                                   fargs=(cases_x, cases_y, pl_pl, y_param, x2_param, yscale, x2scale, pl_mass, anim_vec,
+#                                          ani_tpref, ani_scale, ani_tsuff),
+#                                   blit=False, repeat=True,
+#                                   interval=200, )  # interval: delay between frames in ms
+#     print('finished!')
+#     ani.save(fig_path + fname + '.gif', writer='imagemagick', fps=fps,
+#              savefig_kwargs={'facecolor': fig.get_facecolor()})
+#     print('saved to', fig_path + fname)
 
 
 def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), labelsize=16, ylabelpad=10, xlabelpad=10,
-                    ticksize=12, fname='ani_1D', scalar=False,
-                    xticks=[0.1, 0.3, 1, 2, 3, 4, 5, 6], yticks=None, aspect_cases=None, ms_scat=20, marker_scat='o', c_scat='g',
-                    data_path='', x_test=0.815*M_E, x_min=0.03 * M_E, x_max=6 * M_E, y_param=None, x_param='M_p', x2_param='Ra_i_eff',
+                    ticksize=12, fname='ani_1D', scalar=False, i_static=None, x_test2=None,
+                    xticks=[0.1, 0.3, 1, 2, 3, 4, 5, 6], yticks=None, aspect_cases=None, ms_scat=20, marker_scat='o',
+                    c_scat='g',
+                    data_path='', x_test=0.815 * M_E, x_min=0.03 * M_E, x_max=6 * M_E, y_param=None, x_param='M_p',
+                    x2_param='Ra_i_eff',
                     xscale=M_E ** -1, x2scale=1, yscale=1, fps=15, c='b', y2label=r'$\Delta h_{rms}$ (m)', y2scale=1,
                     anim_param='t', anim_tpref='t = ', anim_tsuff=' Gyr', anim_scale=sec2Gyr, secy=False,
                     tf=10, ti=2, ylabel='', x_min_planets=0.1 * M_E, ini_dict=None, logx=True, text=True, dark=True,
@@ -409,7 +411,6 @@ def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), l
                         'Ra1e8-eta1e8-wide-ascii',
                         'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e6-wide']
     ## too much effort to do animated subplots (and massive files)
-
 
     fig, ax = plt.subplots(figsize=figsize)
 
@@ -433,10 +434,16 @@ def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), l
         initial_kwargs.update(ini_dict)
     pl_test = build_planet_from_id(ident=default, nondimensional=True, initial_kwargs=initial_kwargs, verbose=True,
                                    update_kwargs={x_param: x_test}, **kwargs)
+    if x_test2 is not None:
+        pl_test2 = build_planet_from_id(ident=default, nondimensional=True, initial_kwargs=initial_kwargs, verbose=True,
+                                        update_kwargs={x_param: x_test2}, **kwargs)
     pl_mass = bulk_planets(n=nplanets, name=x_param, mini=x_min, maxi=x_max, like=default, random=False,
                            nondimensional=True, logscale=logx, initial_kwargs=initial_kwargs, t_eval=pl_test.t,
                            **kwargs)
     i_start_time = np.argmax(pl_test.t >= ti / sec2Gyr)  # don't animate any cases before here
+    if i_static is None:
+        # index to make static figure
+        i_static = i_start_time
 
     if anim_param == 't':
         anim_vec = np.array(pl_mass[-1].t)
@@ -448,16 +455,24 @@ def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), l
     i_plot = np.argmax(x_orig >= x_min_planets * xscale)
     pl_pl = pl_mass[i_plot:]
     x = x_orig[i_plot:]
-    y = np.array([vars(pl)[y_param + '_prime'][i_start_time] for pl in pl_pl]) * yscale
+    y = np.array([vars(pl)[y_param + '_prime'][i_static] for pl in pl_pl]) * yscale
     p1, = ax.plot(x, y, c=c, lw=lw, alpha=alpha_lines)
-    pl_scat = ax.scatter(vars(pl_test)[x_param] * xscale, vars(pl_test)[y_param+'_prime'][i_start_time] * yscale, marker='*',
-                         s=ms_scat*2,
-                         c=c, edgecolors='xkcd:yellow', zorder=100)
+    pl_scat = ax.scatter(vars(pl_test)[x_param] * xscale, vars(pl_test)[y_param + '_prime'][i_static] * yscale,
+                         marker='$V$',
+                         s=ms_scat * 2,
+                         c='xkcd:goldenrod', zorder=100)
+    if x_test2 is not None:
+        pl_scat2 = ax.scatter(vars(pl_test2)[x_param] * xscale, vars(pl_test2)[y_param + '_prime'][i_static] * yscale,
+                              marker='$M$',
+                              s=ms_scat * 2,
+                              c='xkcd:goldenrod', zorder=100)
+    else:
+        pl_scat2 = ax.scatter([], [], visible=False)
 
     # secondary x axis
 
     # attempt to scale x2 axis
-    x2_orig = np.array([vars(pl)[x2_param][i_start_time] for pl in
+    x2_orig = np.array([vars(pl)[x2_param][i_static] for pl in
                         pl_mass]) * x2scale  # limits corresponding to tiny planets for extra space
     x2 = x2_orig[i_plot:]
     global x2_orig_i
@@ -473,7 +488,8 @@ def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), l
 
     ax2 = ax.secondary_xaxis('top', functions=(mass2Ra, Ra2mass))
     p2, = ax.plot(Ra2mass(x2), y, c=c, lw=lw, alpha=alpha_lines, ls='--')
-    aspect_scat = ax.scatter(Ra2mass(cases_x), cases_y, c=c_scat, s=ms_scat, marker=marker_scat, zorder=100, visible=True)
+    aspect_scat = ax.scatter(Ra2mass(cases_x), cases_y, c=c_scat, s=ms_scat, marker=marker_scat, zorder=100,
+                             visible=True)
 
     # ax2 = ax.twiny()
     # ax2.set_xlim(x2_orig.min(), x2_orig.max())
@@ -485,12 +501,15 @@ def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), l
     global dT_i
     global dm
     alpha_m = pl_test.alpha_m
-    dT_i = pl_test.T_scale[i_start_time]
+    dT_i = pl_test.T_scale[i_static]
     dm = pl_test.L_scale
+
     def h_todim(u):
-        return u*alpha_m*dT_i*dm*y2scale
+        return u * alpha_m * dT_i * dm * y2scale
+
     def h_tonondim(u):
-        return u/(alpha_m*dT_i*dm*y2scale)
+        return u / (alpha_m * dT_i * dm * y2scale)
+
     if secy:
         ax3 = ax.secondary_yaxis('right', functions=(h_todim, h_tonondim))
         ax3.set_ylabel(y2label, fontsize=labelsize, labelpad=ylabelpad)
@@ -531,15 +550,24 @@ def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), l
         c_text = 'k'
     if text:
         ani_text = ax.text(0.95, 0.95,
-                           anim_tpref + '{:4.1f}'.format(anim_vec[i_start_time] * anim_scale) + anim_tsuff,
+                           anim_tpref + '{:4.1f}'.format(anim_vec[i_static] * anim_scale) + anim_tsuff,
                            fontsize=ticksize, c=c_text,
                            horizontalalignment='right',
                            verticalalignment='top',
                            transform=ax.transAxes)
     else:
         ani_text = ax.text(0.5, 0.5, '', alpha=0, transform=ax.transAxes)
+
+    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
+    ax.xaxis.set_minor_formatter(ticker.NullFormatter())
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
+    ax.yaxis.set_minor_formatter(ticker.NullFormatter())
+
     plt.subplots_adjust(bottom=0.2, top=0.8, left=0.15)
     plt.tight_layout()
+
+    # save non-animated snapshot
+    plot_save(fig, fname=fname + '_static', fig_path=fig_path, bbox_inches=None)
 
     # animation stuff
     def init():
@@ -547,11 +575,13 @@ def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), l
         p2.set_ydata(([np.nan] * len(x)))
         aspect_scat.set_offsets([[], []])
         pl_scat.set_offsets([[], []])
+        if x_test2 is not None:
+            pl_scat2.set_offsets([[], []])
         ani_text.set_text('')
-        return p1, p2, aspect_scat, pl_scat, ani_text,
+        return p1, p2, aspect_scat, pl_scat, ani_text, pl_scat2
 
     def animate(i, cases_x, cases_y, pl_pl, y_param, x2_param, yscale, x2scale, pl_mass, anim_vec, anim_tpref,
-                anim_scale, anim_tsuff):
+                anim_scale, anim_tsuff, pl_scat2):
 
         # update secondary x
         global x2_orig_i
@@ -573,10 +603,18 @@ def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), l
         # p2.set_ydata(p2y)
         aspect_scat.set_offsets(new_scat_data)
 
-        pl_scat_x = vars(pl_test)[x_param]*xscale
-        pl_scat_y = vars(pl_test)[y_param+'_prime'][i]*yscale
+        pl_scat_x = vars(pl_test)[x_param] * xscale
+        pl_scat_y = vars(pl_test)[y_param + '_prime'][i] * yscale
         pl_scat_data = np.vstack((pl_scat_x, pl_scat_y)).T  # shape N, 2
         pl_scat.set_offsets(pl_scat_data)
+
+        if pl_scat2 is not None:
+            pl_scat2_x = vars(pl_test2)[x_param] * xscale
+            pl_scat2_y = vars(pl_test2)[y_param + '_prime'][i] * yscale
+            pl_scat2_data = np.vstack((pl_scat2_x, pl_scat2_y)).T  # shape N, 2
+            pl_scat2.set_offsets(pl_scat2_data)
+        else:
+            pl_scat2 = None
 
         # ax2.set_xlim(min(x2_orig_i), max(x2_orig_i))  # added ax attribute here
         ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
@@ -585,12 +623,17 @@ def animate_Ra_time(default='Earthbaseline', fig_path='plat/', figsize=(9, 9), l
         ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 
         ani_text.set_text(anim_tpref + '{:4.1f}'.format(anim_vec[i] * anim_scale) + anim_tsuff)
-        return p1, p2, aspect_scat, pl_scat, ani_text,
+        return p1, p2, aspect_scat, pl_scat, ani_text, pl_scat2
 
+    # print('i frames', i_start_time, len(anim_vec), 'len', len(range(i_start_time, len(anim_vec))))
+    # print('len x2', len(vars(pl_mass[-1])[x2_param]))
+    # print('len y', len(vars(pl_mass[-1])[y_param + '_prime']))
+    # for ii in range(len(pl_mass)):
+    #     print('   ii, x2:', len(vars(pl_mass[ii])[x2_param]), pl_mass[ii].M_p/M_E)
 
     ani = animation.FuncAnimation(fig, animate, frames=range(i_start_time, len(anim_vec)), init_func=init,
                                   fargs=(cases_x, cases_y, pl_pl, y_param, x2_param, yscale, x2scale, pl_mass, anim_vec,
-                                         anim_tpref, anim_scale, anim_tsuff),
+                                         anim_tpref, anim_scale, anim_tsuff, pl_scat2),
                                   blit=False, repeat=True,
                                   interval=200, )  # interval: delay between frames in ms
 

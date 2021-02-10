@@ -1,9 +1,9 @@
 from . import parameters
 import numpy as np
 import sys
-sys.path.append("..")
-from exotop.useful_and_bespoke import age_index  # noqa: E402
-import exotop.asharms as harm  # noqa: E402
+# sys.path.append("..")
+from useful_and_bespoke import age_index  # noqa: E402
+import asharms as harm  # noqa: E402
 
 
 def max_ocean(pl, n_stats=10, age=None, name_rms='dyn_top_rms', **kwargs):

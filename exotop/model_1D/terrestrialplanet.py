@@ -129,6 +129,7 @@ class TerrestrialPlanet():
     def nondimensionalise(self, **kwargs):
         # set natural scales
         T = np.maximum(self.T_c, self.T_m) - self.T_s  # fucked for cases where T_c < T_m
+        T = self.T_c - self.T_s
         L = self.R_p - self.R_c
         T0 = T[0]
 

@@ -16,12 +16,11 @@ import six
 import pandas as pd
 import random as rand
 from scipy import interpolate
-
-sys.path.append("..")
-import exotop.asharms as harm  # noqa: E402
+# sys.path.append("..")
+import asharms as harm  # noqa: E402
 import matplotlib.animation as animation
-from exotop.useful_and_bespoke import age_index, dark_background, not_iterable, colorize, colourbar  # noqa: E402
-from exotop.model_1D.parameters import M_E  # noqa: E402
+from useful_and_bespoke import age_index, dark_background, not_iterable, colorize, colourbar  # noqa: E402
+from model_1D.parameters import M_E  # noqa: E402
 # np.seterr('raise')
 import matplotlib.ticker as ticker
 
@@ -147,6 +146,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
         fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 3))
     if tspan is None:
         tspan = (0, t[-1] * 1e-9 / parameters.years2sec)
+
     out_vars = list(names.keys())
     ylabels = list(names.values())  # tuple (ylabel, yscale)
     if label is None:
@@ -166,7 +166,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
                 ax.set_yscale('log')  # y = np.log10(y)
             plot_one(ax, t * 1e-9 / parameters.years2sec, y * ylabels[n][1], xlabel='', ylabel=yl, ticksize=ticksize,
                      labelpad=labelpad,
-                     label=label, fontname=fontname, labelsize=labelsize, legsize=legsize, line_args=line_args)
+                     label=label, fontname=fontname, labelsize=labelsize, legsize=legsize, line_args=line_args,**kwargs)
             if compare_dir is not None:
                 # if data exists to benchmark this param
                 try:
@@ -179,7 +179,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
                                 cmp_label = cdir
                             plot_one(ax, df['time'], df['value'],
                                      '', yl, labelsize=labelsize, legsize=legsize, ticksize=ticksize,
-                                     label=cmp_label[cc], fontname=fontname, line_args=cmp_line_args[cc])
+                                     label=cmp_label[cc], fontname=fontname, line_args=cmp_line_args[cc], **kwargs)
                     else:
                         # not iterable
                         df = pd.read_csv(compare_dir + '/' + par + '.csv', header=None, names=['time', 'value'],
@@ -188,7 +188,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
                             cmp_label = compare_dir
                         plot_one(ax, df['time'], df['value'],
                                  '', yl, labelsize=labelsize, legsize=legsize, ticksize=ticksize,
-                                 label=cmp_label, fontname=fontname, line_args=cmp_line_args)
+                                 label=cmp_label, fontname=fontname, line_args=cmp_line_args, **kwargs)
                 except IOError:
                     print('file', str(par + '.csv'), 'not found')
                     pass
@@ -200,7 +200,7 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
                             ha='right', va='bottom',
                             arrowprops=dict(arrowstyle='->', connectionstyle="arc3,rad=-0.1",
                                             ec=annotate_colour))
-            ax.set_xlim(tspan)
+
             if legend and (n == legax):
                 ax.legend(frameon=False, fontsize=legsize)
         except ValueError as e:
@@ -208,9 +208,12 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
             print(e)
 
     # hide unused axes
-    while n + 1 < ncols * nrows:
-        fig.delaxes(axes.flatten()[n + 1])
-        n += 1
+    try:
+        while n + 1 < ncols * nrows:
+            fig.delaxes(axes.flatten()[n + 1])
+            n += 1
+    except:
+        pass
 
     plot_setxlabel(axes, 'Age (Gyr)', 'bottom', fontname=fontname, labelpad=labelpad, labelsize=labelsize)
     if title is None:
@@ -414,17 +417,25 @@ def plot_Tavg(pl, ax3=None, compare_dir=None, fig_path=None, plots_save=False, i
 
 
 def plot_one(ax, x, y, xlabel, ylabel, labelsize=15, legsize=16, ticksize=12, line_args=None,
-             text=None, xticks=True, ylim=None, label=None, labelpad=None, fontname=None, **kwargs):
+             text=None, xticks=True, xlim=None, ylim=None, label=None, labelpad=None, fontname=None, **kwargs):
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize=(3, 3))
+    if xlim is None:
+        xlim = (x.min(), x.max())
     ax.set_xlabel(xlabel, fontsize=labelsize, fontname=fontname, labelpad=labelpad)
     ax.set_ylabel(ylabel, fontsize=labelsize, fontname=fontname, labelpad=labelpad)
     if not xticks:
         ax.set_xticks([])
+    mask = (x >= xlim[0]) & (x <= xlim[1])
+    try:
+        ax.plot(x[mask], y[mask], label=label, **line_args)
+    except TypeError:
+        ax.plot(x[mask], [y]*len(x[mask]), label=label, **line_args)
+    ax.set_xlim(xlim)
     if ylim is not None:
         ax.set_ylim(ylim)
-    ax.plot(x, y, label=label, **line_args)
-    ax.set_xlim(x.min(), x.max())
+    else:
+        ax.set_ylim(None, None, auto=True)
     ax.tick_params(axis='x', labelsize=ticksize)
     ax.tick_params(axis='y', labelsize=ticksize)
     if text is not None:
@@ -612,9 +623,9 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
         ax.tick_params(axis='x', labelsize=ticksize)
 
         # log scale for viscosity
-        if (yparam[ii] is 'eta_m') or (yparam[ii] is 'nu_m') or (yparam is 'Ra_i_eff'):
+        if yparam[ii] in ['eta_m', 'nu_m', 'Ra_i_eff']:
             ax.set_yscale('log')
-        if (xparam is 'eta_m') or (xparam is 'nu_m') or (xparam is 'eta_0') or (xparam is 'Ra_i_eff'):
+        if xparam in ['eta_m', 'nu_m', 'eta_0', 'Ra_i_eff']:
             ax.set_xscale('log')
         if log:
             ax.set_xscale('log')
@@ -837,17 +848,18 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
 
         if relative:
             ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
-        if legend and relative:
+        if legend:
             string = ''
             for jj, u in enumerate(units):
                 if jj != i_ax:
                     if x_vars[jj] == 't':
-                        string = string + '{:.3g} '.format(age * xscales[jj]) + u + '\n'
+                        string = string + '{:.3g} '.format(age) + u + '\n'
                     else:
                         string = string + '{:.3g} '.format(eval('pl_baseline.' + x_vars[jj]) * xscales[jj]) + u + '\n'
-            ax.text(0.95, 0.95, string,
+            string = string[:-1]  # remove last \n
+            ax.text(0.02, 0.96, string,
                     fontsize=legsize, c=textc,
-                    horizontalalignment='right',
+                    horizontalalignment='left',
                     verticalalignment='top',
                     transform=ax.transAxes)
 

@@ -14,10 +14,10 @@ from scipy.spatial import distance
 # import statsmodels.api as sm
 import sys
 
-sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop.postaspect import aspectdata as ad  # noqa: E402
-from exotop.postaspect.setup_postprocessing import data_path_bullard  # noqa: E402
-from exotop.useful_and_bespoke import colorize, iterable_not_string, not_iterable, \
+# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+from postaspect import aspectdata as ad  # noqa: E402
+from postaspect.setup_postprocessing import data_path_bullard  # noqa: E402
+from useful_and_bespoke import colorize, iterable_not_string, not_iterable, \
     not_string, minmaxnorm, reduced_chisq, mahalanobis  # noqa: E402
 
 

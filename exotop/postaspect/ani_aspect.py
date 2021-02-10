@@ -1,12 +1,12 @@
 import sys
 import os
-sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
+# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, \
     load_grid    # noqa: E402
-from exotop.postaspect import plt_aspect as sc  # noqa: E402
-from exotop.postaspect import aspectdata as ap
-from exotop.useful_and_bespoke import hide_log_ticklabels, not_iterable, dark_background
+from postaspect import plt_aspect as sc  # noqa: E402
+from postaspect import aspectdata as ap
+from useful_and_bespoke import hide_log_ticklabels, not_iterable, dark_background
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
