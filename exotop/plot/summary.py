@@ -2,18 +2,19 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
     fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, \
     load_grid    # noqa: E402
 from postaspect import plt_aspect as plat  # noqa: E402
+from postaspect import aspect_post as ap
 # import pstats
 
 
 # (re)process all
 
-# plat.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T'],  redo=True,
+# ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T'],  redo=True,
 #                         t1_grid=t1_grid, end_grid=end_grid, load_grid=load_grid, regime_grid=regime_grid_td,
 #                         include_regimes=['steady', 'trans.'],
 #                         data_path=data_path,
 #                         postprocess_kwargs=postprocess_kwargs)
 
-plat.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_Nu'], regime_names=regime_names_td,
+ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_Nu'], regime_names=regime_names_td,
                           t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
                           load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
