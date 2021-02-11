@@ -79,7 +79,7 @@ for regime in regimes:
     ax.legend(handles=handles, frameon=False, fontsize=25, ncol=1, bbox_to_anchor=(1.01, 1), loc='upper left')
 
     ax2.tick_params(axis='y', labelsize=ticksize, pad=15)
-    ax2.set_yticks([1000, 1600, 2200])
+    ax2.set_yticks([1000, 1600, 2280])
     ax2.yaxis.set_major_formatter(ticker.ScalarFormatter())
     ax2.yaxis.set_minor_formatter(ticker.ScalarFormatter())
 

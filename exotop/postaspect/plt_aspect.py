@@ -466,7 +466,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             return u / (p_dimensionals['alpha_m'] * p_dimensionals['dT_m'] * p_dimensionals['d_m'])
 
         ax2 = ax.secondary_yaxis('right', functions=(h_todim, h_tonondim))
-        ax2.set_ylabel(y2label, fontsize=labelsize, labelpad=ylabelpad+15, rotation=270)
+        ax2.set_ylabel(y2label, fontsize=labelsize, labelpad=ylabelpad+30, rotation=270)
         ax2.tick_params(axis='y', which='major', labelsize=ticksize)
         axes = (ax, ax2)
 
