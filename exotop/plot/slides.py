@@ -61,7 +61,8 @@ for regime in regimes:
                      c_peak='k', c_rms=c_rms,
                            fit=True, logx=True, logy=True, hscale=1,
                      show_isoviscous=False, ylim=ylim, xlim=xlim, postprocess_kwargs=postprocess_kwargs,
-                     regime_grid=regime_grid_td, p_dimensionals=p_Venus, y2label=r'dynamic topography $\Delta h_{rms}$ (m)',)
+                     regime_grid=regime_grid_td, p_dimensionals=p_Venus,
+                                  y2label='             Venus\n'+r'             $\Delta h_{rms}$ (m)',)
 
 
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
