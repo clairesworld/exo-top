@@ -601,7 +601,8 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
         return x + b
 
     def coefficient2(x, b):
-        return -2*x + b
+        global slope2
+        return slope2*x + b
 
     try:
         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
@@ -617,7 +618,9 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
             df.dropna(inplace=True)
             if slope == 1:
                 popt, pcov = curve_fit(coefficient, df.x.to_numpy(), df.h.to_numpy())
-            elif slope == -2:
+            else:
+                slope2 = slope
+                global slope2
                 popt, pcov = curve_fit(coefficient2, df.x.to_numpy(), df.h.to_numpy())
             slope = slope
             intercept = popt[0]
@@ -930,7 +933,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
 
 def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscatter=False, n_fitted=2, c_list=None,
                       c='xkcd:periwinkle', sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=False, **kwargs):
-    fiterror = (yerr is not None) and (xerr is not None)
+    fiterror = (yerr is not None) or (xerr is not None)
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
     try:

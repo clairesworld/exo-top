@@ -3,7 +3,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-import sys
 from . import inputs
 from . import terrestrialplanet as tp
 from . import parameters
@@ -14,100 +13,11 @@ from collections.abc import Iterable
 import collections
 import six
 import pandas as pd
-import random as rand
 from scipy import interpolate
-# sys.path.append("..")
 import asharms as harm  # noqa: E402
 import matplotlib.animation as animation
 from useful_and_bespoke import age_index, dark_background, not_iterable, colorize, colourbar  # noqa: E402
 from model_1D.parameters import M_E  # noqa: E402
-# np.seterr('raise')
-import matplotlib.ticker as ticker
-
-
-def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, t_eval=None, random=False,
-                 initial_kwargs=None, postprocessors=None, update_kwargs=None, logscale=False, **kwargs):
-    """varying single parameter 'name' between mini and maxi, use default values otherwise.
-    update_kwargs can include any TerrestrialPlanet attribute
-    initial_kwargs can include T_m0, T_c0, D_l0, t0, tf"""
-
-    if like is not None:
-        pl_kwargs = eval('inputs.' + like + '_in')
-        model_kwargs = eval('inputs.' + like + '_run')
-    else:
-        pl_kwargs = {}  # use defaults given in terrestrialplanet.py
-        model_kwargs = {}  # initial conditions defaults given in thermal.py
-    if update_kwargs is not None:
-        pl_kwargs.update(update_kwargs)
-    if initial_kwargs is not None:
-        model_kwargs.update(initial_kwargs)
-    planets = []
-    ii = 0
-    if logscale:
-        arr = np.logspace(np.log10(mini), np.log10(maxi), num=n)
-    else:
-        arr = np.linspace(mini, maxi, num=n)
-    while ii < n:
-        if random:
-            val = rand.uniform(mini, maxi)
-        else:
-            val = arr[ii]
-        new_kwargs = pl_kwargs.copy()
-        new_kwargs.update({name: val})
-
-        pl = build_planet(new_kwargs, model_kwargs, postprocessors=postprocessors, t_eval=t_eval, **kwargs)
-        planets.append(pl)
-        ii += 1
-    return planets
-
-
-def build_planet_from_id(ident='Earthbaseline', initial_kwargs=None, update_kwargs=None, postprocessors=None,
-                         t_eval=None,
-                         **kwargs):
-    planet_kwargs = eval('inputs.' + ident + '_in')
-    model_kwargs = eval('inputs.' + ident + '_run')
-    if initial_kwargs is not None:
-        model_kwargs.update(initial_kwargs)
-    if update_kwargs is not None:
-        planet_kwargs.update(update_kwargs)
-    pl = build_planet(planet_kwargs, model_kwargs, postprocessors, t_eval, **kwargs)
-    return pl
-
-
-def build_planet(planet_kwargs=None, initial_kwargs=None, postprocessors=None, t_eval=None, nondimensional=True,
-                 **kwargs):
-    if postprocessors is None:
-        postprocessors = ['topography']
-    if initial_kwargs is None:
-        initial_kwargs = {}
-    if planet_kwargs is None:
-        planet_kwargs = {}
-    pl = tp.TerrestrialPlanet(**planet_kwargs)
-    pl = thermal.solve(pl, t_eval=t_eval, **initial_kwargs, **kwargs)  # T_m, T_c, D_l
-
-    if 'topography' in postprocessors:
-        pl = topography.topography(pl, **kwargs)
-    if 'ocean_capacity' in postprocessors:
-        pl = oceans.max_ocean(pl, **kwargs)
-
-    if nondimensional:
-        pl.nondimensionalise()
-    return pl
-
-
-def build_solarsystem(run_args=None, ident_list=None, dicts=False):
-    if ident_list is None:
-        ident_list = ['Moon1', 'Mercury1', 'Mars1', 'Venus', 'Earth']
-    planets = []
-    for ii, ident in enumerate(ident_list):
-        pl = build_planet_from_id(ident, run_args)
-        planets.append(pl)
-    if dicts:
-        # Create a zip object from two lists
-        z = zip(ident_list, planets)
-        # Create a dictionary from zip object
-        return dict(z)
-    return planets
 
 
 "                      PLOTTING                           "
