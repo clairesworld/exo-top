@@ -1,24 +1,23 @@
 """ ASPECT runs: plot scalings of h vs. Ra or T-heuristic, with subplots by eta """
 
-import sys
-
-sys.path.insert(0, '/home/cmg76/Works/exo-top/')
-from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
+# import sys
+# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
+from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     c_regimes_td, fig_fmt, \
     regime_grid_td, regime_names_td, load_grid, p_Earth, postprocess_kwargs  # noqa: E402
-from exotop.postaspect import plt_aspect as plat  # noqa: E402
+from postaspect import plt_aspect as plat  # noqa: E402
 
 load = True  # load_grid
 
 # model versus data
 
-const, expon = plat.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
-                                    end_grid=end_grid, literature_file=None, legend=True, which_x='h_components',
-                                    postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
-                                    ylim=[6e-3, 2e-2], which_h='rms', data_path=data_path, save=True,
-                                    fname='model-data-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
-                                    intercept=True, fig_fmt=fig_fmt)
-print('fit parameters:', const, expon)
+# fig, ax = plat.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
+#                                     end_grid=end_grid, literature_file=None, legend=True, which_x='h_components',
+#                                     postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
+#                                     ylim=[6e-3, 2e-2], which_h='rms', data_path=data_path, save=True,
+#                                     fname='model-data-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
+#                                     intercept=True, fig_fmt=fig_fmt)
+
 
 
 # all eta on one axis
@@ -37,25 +36,35 @@ print('fit parameters:', const, expon)
 
 # scalings with various Ra, average time first
 
-# _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-#                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i',
-#                  beta0=[0.1, -0.15],  sigma=2,
-#                  include_regimes=['chaotic'], save=True, fname='h_Rai_chaotic_timeavg', labelsize=16, legend=True,
-#                  xlabel=r'Ra$_i$', ylabel='dynamic topography',
-#                  title=r'fit to CRa$_i^n$, averaging time first',
-#                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-#                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-#                  regime_grid=regime_grid_td)
+fig, ax = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i',
+                 beta0=[0.1, -0.15],  sigma=2, showpeak=False,
+                 include_regimes=['chaotic'], save=False, fname='h_Rai_chaotic_timeavg', labelsize=16, legend=True,
+                 xlabel=r'Ra$_i$', ylabel='dynamic topography',
+                 title=r'fit to CRa$_i^n$, averaging time first',
+                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                 regime_grid=regime_grid_td)
+
+# add literature comparisons
+alpha = 3e-5
+dT = 2390 - 255
+d = 2890e3
+h = [x / (alpha*dT*d) for x in [7.28e3, 6.53e3, 4.41e3, 3.47e3]]
+Ra_i = [1e5, 1e5, 1e6, 1e7]
+ax.plot(Ra_i, h, 'o', c='g')
+fig.savefig(fig_path+'h_Rai_test'+fig_fmt, bbox_inches='tight')
+
 #
-_ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                   fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
-                   beta0=[0.1, -0.15], sigma=1,
-                   include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
-                   xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
-                   title=r'fit to CRa$_{i,eff}^n$, averaging time first',
-                   c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-                   show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td)
+# _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+#                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
+#                    beta0=[0.1, -0.15], sigma=1,
+#                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
+#                    xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
+#                    title=r'fit to CRa$_{i,eff}^n$, averaging time first',
+#                    c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+#                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+#                    regime_grid=regime_grid_td)
 
 #
 ## h scalings with heuristic all chaotic cases
