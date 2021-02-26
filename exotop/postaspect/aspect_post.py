@@ -12,9 +12,6 @@ from sklearn import linear_model
 from scipy.interpolate import interp1d
 from scipy.spatial import distance
 # import statsmodels.api as sm
-import sys
-
-# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from postaspect import aspectdata as ad  # noqa: E402
 from postaspect.setup_postprocessing import data_path_bullard  # noqa: E402
 from useful_and_bespoke import colorize, iterable_not_string, not_iterable, \
@@ -619,8 +616,8 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
             if slope == 1:
                 popt, pcov = curve_fit(coefficient, df.x.to_numpy(), df.h.to_numpy())
             else:
-                slope2 = slope
                 global slope2
+                slope2 = slope
                 popt, pcov = curve_fit(coefficient2, df.x.to_numpy(), df.h.to_numpy())
             slope = slope
             intercept = popt[0]
