@@ -37,12 +37,12 @@ load = True  # load_grid
 # scalings with various Ra, average time first
 
 fig, ax = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i', ms=10,
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i', ms=7,
                  beta0=[0.1, -0.15],  sigma=2, showpeak=False,
                  include_regimes=['steady', 'trans', 'chaotic'], save=False, fname='h_Rai_chaotic_timeavg', labelsize=16,
                  xlabel=r'Ra$_i$', ylabel='dynamic topography',
                  title=r'fit to CRa$_i^n$, averaging time first', legend=False,
-                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+                 c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
                  regime_grid=regime_grid_td)
 
@@ -52,8 +52,9 @@ dT = 2390 - 255
 d = 2890e3
 h = [x / (alpha*dT*d) for x in [7.28e3, 6.53e3, 4.41e3, 3.47e3]]
 Ra_i = [1e5, 1e5, 1e6, 1e7]
-ax.plot(Ra_i, h, 'o', c='g')
-fig.savefig(fig_path+'h_Rai_test'+fig_fmt, bbox_inches='tight')
+ax.plot(Ra_i, h, 'o', c='g', label='Arnould+ 2018')
+ax.legend()
+fig.savefig(fig_path+'h_Rai_arnould'+fig_fmt, bbox_inches='tight')
 
 #
 # _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
