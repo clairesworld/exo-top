@@ -1036,7 +1036,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
 
-        print('fit: {:.2e} x^{:.3f}'.format(const, expon))
+        # print('fit: {:.2e} x^{:.3f}'.format(const, expon))
 
         if legend:
             handles, labels = ax.get_legend_handles_labels()
@@ -1050,7 +1050,9 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
             elif n_fitted == 3:
                 newlabel = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
             else:
-                raise Exception('Legend labelling for this n fitted parameters not implemented')
+                print(' warning: Legend labelling for this n fitted parameters not implemented')
+                newlabel = ''
+                pass
             if showchisq:
                 chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), n_fitted=n_fitted, **kwargs)
                 newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.4f}'.format(chisq)
