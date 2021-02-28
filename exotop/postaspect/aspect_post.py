@@ -990,14 +990,14 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
 
 
 def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=False, **kwargs):
+                      c='xkcd:periwinkle', weights=None, sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=False, **kwargs):
     fiterror = (yerr is not None) or (xerr is not None)
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
-    try:
-        weights = [len(a[0]) for a in yx_all]
-    except TypeError:
-        weights = [1] * len(x)
+    # try:
+    #     weights = [len(a[0]) for a in yx_all]
+    # except TypeError:
+    #     weights = [1] * len(x)
     if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
         flatx = [item for sublist in x for item in sublist]
         flaty = [item for sublist in y for item in sublist]
