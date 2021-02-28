@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from . import evolve as evol
 from . import inputs
 from . import terrestrialplanet as tp
 from . import parameters
@@ -14,10 +15,10 @@ import collections
 import six
 import pandas as pd
 from scipy import interpolate
-import asharms as harm  # noqa: E402
+from exotop import asharms as harm  # noqa: E402
 import matplotlib.animation as animation
-from useful_and_bespoke import age_index, dark_background, not_iterable, colorize, colourbar  # noqa: E402
-from model_1D.parameters import M_E  # noqa: E402
+from exotop.useful_and_bespoke import age_index, dark_background, not_iterable, colorize, colourbar  # noqa: E402
+from exotop.model_1D.parameters import M_E  # noqa: E402
 
 
 "                      PLOTTING                           "
@@ -417,12 +418,12 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
     if model_update_args is not None:
         model_kwargs.update(model_update_args)
     pl = tp.TerrestrialPlanet(**planet_kwargs)
-    pl = thermal.solve(pl, **model_kwargs)  # T_m, T_c, D_l
+    pl = evol.solve(pl, verbose=verbose, run_kwargs=model_kwargs)  # T_m, T_c, D_l
     pl = topography.topography(pl, C=1)
     pl.nondimensionalise()
 
     if verbose:
-        print('T_c', pl.T_c[-1])
+        print('\nT_c', pl.T_c[-1])
         print('d_m', pl.d_m[-1])
         print('dT_m', abs(pl.dT_m[-1]))
         print('g_sfc', pl.g_sfc)
@@ -747,7 +748,7 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
         else:
             if verbose:
                 print('generating planets across', x_var, '...')
-            planets = bulk_planets(n=nplanets, name=x_var, mini=xmin, maxi=xmax,
+            planets = evol.bulk_planets(n=nplanets, name=x_var, mini=xmin, maxi=xmax,
                                    like=defaults,
                                    t_eval=pl_baseline.t, random=False, verbose=verbose,
                                    initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
@@ -789,7 +790,7 @@ def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_
                           initial_kwargs={}, update_kwargs={}, legend=True,
                           ylabel='$\Delta h$ / $\Delta h_0$  ', **kwargs):
     initial_kwargs.update({'tf': age})
-    pl_baseline = build_planet_from_id(ident=defaults,
+    pl_baseline = evol.build_planet_from_id(ident=defaults,
                                initial_kwargs=initial_kwargs, update_kwargs=update_kwargs,
                                postprocessors=['topography'], t_eval=None)
     legendd = False
@@ -816,7 +817,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
     phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
     h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
-    pl0 = bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults, t_eval=None,
+    pl0 = evol.bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults, t_eval=None,
                        random=False, phi0=phi0, h_rms0=h_rms0, postprocessors=['topography', 'ocean_capacity'],
                        **kwargs)[0]
     fig, axes = plt.subplots(figsize=figsize)

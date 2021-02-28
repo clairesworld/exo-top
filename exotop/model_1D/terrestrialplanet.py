@@ -26,8 +26,8 @@ class TerrestrialPlanet():
                             rho_c = 7200, # Density of iron core in kg m^-3 
                             rho_m = 3500, # Density of silicate mantle in kg m^-3 rho_lith = 2800,
                             Ra_crit_u = 450, # critical Rayleigh number (660 in Driscoll & Bercovici 2014)
-                            beta_u = None, # defaults to 1/3
-                            beta_c = None, # defaults to 1/3
+                            beta_u = 1/3, # defaults to 1/3
+                            beta_c = 1/3, # defaults to 1/3
                             # what pressure should you take densities at?
                             
                             # thermodynamic defaults
@@ -47,7 +47,7 @@ class TerrestrialPlanet():
                             X_U = 2e-2, # initial abundane of U in wt ppm ""
                             X_Th = 7e-2, # initial abundance of Th in wt ppm ""
                             H_f = 4.6e-12, # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999), CI chondrites
-                            H_0=22.65771894e-12,  # radiogenic heating at t0 based on above
+                            H_0 = 22.65771894e-12,  # radiogenic heating at t0 based on above
                             
                             # viscosity defaults
                             a_rh=2.44, # for beta=1/3 from Thiriet+ (2019)
@@ -67,7 +67,12 @@ class TerrestrialPlanet():
         default_attr.update(kwargs) 
         self.__dict__.update((k,v) for k,v in default_attr.items())
         # add derived parameters
-        self.init_derived(**kwargs) 
+        self.init_derived(**kwargs)
+        # placeholders for thermal evol
+        self.T_m = None
+        self.T_c = None
+        self.D_l = None
+        self.t = None
 
             
     def init_derived(self, **kwargs):

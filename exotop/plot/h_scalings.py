@@ -23,61 +23,61 @@ load = True  # load_grid
 # all eta on one axis
 
 # try h scalings to two-component power law for chaotic
-#
-# _ = plat.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-#                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_xs=('Ra_i', 'eta'),
-#                  include_regimes=['chaotic'], save=True, fname='h_Ra-eta_chaotic_timeavg', labelsize=16, legend=True,
-#                  title=r'fit to C Ra$^m \Delta\eta^n$', xlabel=r'Ra$_i$', ylabel='dynamic topography',
-#                  fit=True, logx=True, logy=True, hscale=1, clabel=r'$\Delta\eta$',
-#                  show_isoviscous=False, ylim=(5e-3, 3e-2), xlim=(1e7, 3e8),  postprocess_kwargs=postprocess_kwargs,
-#                  regime_grid=regime_grid_td)
-#
-#
+
+_ = plat.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_xs=('Ra_i', 'eta'),
+                 include_regimes=['chaotic'], save=True, fname='h_Ra-eta_chaotic_timeavg', labelsize=16, legend=True,
+                 title=r'fit to C Ra$^m \Delta\eta^n$', xlabel=r'Ra$_i$', ylabel='dynamic topography',
+                 fit=True, logx=True, logy=True, hscale=1, clabel=r'$\Delta\eta$', showpeak=False,
+                 show_isoviscous=False, ylim=(5e-3, 3e-2), xlim=(1e7, 3e8),  postprocess_kwargs=postprocess_kwargs,
+                 regime_grid=regime_grid_td)
+
+
 
 # scalings with various Ra, average time first
 
-fig, ax = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i', ms=7,
-                 beta0=[0.1, -0.15],  sigma=2, showpeak=False,
-                 include_regimes=['steady', 'trans', 'chaotic'], save=False, fname='h_Rai_chaotic_timeavg', labelsize=16,
-                 xlabel=r'Ra$_i$', ylabel='dynamic topography',
-                 title=r'fit to CRa$_i^n$, averaging time first', legend=False,
-                 c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                 regime_grid=regime_grid_td)
-
-# add literature comparisons
-alpha = 3e-5
-dT = 2390 - 255
-d = 2890e3
-h = [x / (alpha*dT*d) for x in [7.28e3, 6.53e3, 4.41e3, 3.47e3]]
-Ra_i = [1e5, 1e5, 1e6, 1e7]
-ax.plot(Ra_i, h, 'o', c='g', label='Arnould+ 2018')
-ax.legend()
-fig.savefig(fig_path+'h_Rai_arnould'+fig_fmt, bbox_inches='tight')
-
+# fig, ax = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+#                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i', ms=7,
+#                  beta0=[0.1, -0.15],  sigma=2, showpeak=False,
+#                  include_regimes=['steady', 'trans', 'chaotic'], save=False, fname='h_Rai_chaotic_timeavg', labelsize=16,
+#                  xlabel=r'Ra$_i$', ylabel='dynamic topography',
+#                  title=r'fit to CRa$_i^n$, averaging time first', legend=False,
+#                  c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+#                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+#                  regime_grid=regime_grid_td)
 #
-# _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-#                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
-#                    beta0=[0.1, -0.15], sigma=1,
-#                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
-#                    xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
-#                    title=r'fit to CRa$_{i,eff}^n$, averaging time first',
-#                    c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-#                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-#                    regime_grid=regime_grid_td)
+# # add literature comparisons
+# alpha = 3e-5
+# dT = 2390 - 255
+# d = 2890e3
+# h = [x / (alpha*dT*d) for x in [7.28e3, 6.53e3, 4.41e3, 3.47e3]]
+# Ra_i = [1e5, 1e5, 1e6, 1e7]
+# ax.plot(Ra_i, h, 'o', c='g', label='Arnould+ 2018')
+# ax.legend()
+# fig.savefig(fig_path+'h_Rai_arnould'+fig_fmt, bbox_inches='tight')
+
+
+_ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                   fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
+                   beta0=[0.1, -0.15], sigma=1,
+                   include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
+                   xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
+                   title=r'fit to CRa$_{i,eff}^n$, averaging time first', showpeak=False,
+                   c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+                   show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                   regime_grid=regime_grid_td)
 
 #
 ## h scalings with heuristic all chaotic cases
 #
-# _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-#                  fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='h_components',
-#                  include_regimes=['chaotic'], save=True, fname='h_T_chaotic_timeavg', labelsize=16, legend=True,
-#                  xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
-#                  title=r'fit to $C\alpha \delta_{rh} \Delta T_{rh}$, averaging time first',
-#                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-#                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-#                  regime_grid=regime_grid_td)
+_ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                 fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='h_components',
+                 include_regimes=['chaotic'], save=True, fname='h_T_chaotic_timeavg', labelsize=16, legend=True,
+                 xlabel=r'$\alpha \delta_{rh} \Delta T_{rh}$', ylabel='dynamic topography',
+                 title=r'fit to $C\alpha \delta_{rh} \Delta T_{rh}$, averaging time first', showpeak=False,
+                 c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+                 show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                 regime_grid=regime_grid_td)
 #
 # _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
 #                  fig_path=fig_path, averagescheme='timelast', p_dimensionals=None, which_x='h_components',

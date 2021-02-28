@@ -1536,7 +1536,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
         x0 = [a[0] for a in x_data_all]
         x1 = [a[1] for a in x_data_all]
         h_data = h_data_all
-        expon, const = pro.fit_2log(x=x0, y=x1, h=h_data_all)
+        expon, const = pro.fit_2log(x1=x0, x2=x1, h=h_data_all)
         h_fit = const * np.array(x0) ** expon[0] * np.array(x1) ** expon[1]
 
     else:
@@ -1683,7 +1683,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
         x0 = [a[0] for a in x_data_all]
         x1 = [a[1] for a in x_data_all]
         h_data = h_data_all
-        expon, const = pro.fit_2log(x=x0, y=x1, h=h_data_all)
+        expon, const = pro.fit_2log(x1=x0, x2=x1, h=h_data_all)
         h_fit = const * np.array(x0) ** expon[0] * np.array(x1) ** expon[1]
 
     else:

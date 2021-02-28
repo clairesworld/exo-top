@@ -7,6 +7,7 @@ from . import topography
 from . import oceans
 from scipy import integrate
 import random as rand
+from pprint import pprint
 
 
 def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, random=False,
@@ -91,8 +92,8 @@ def solve(pl, run_kwargs={}, t0=0, t_eval=None, verbose=False, **kwargs):
     if verbose:
         print('Solving 1D thermal history with T_m0 =', T_m0, 'K, T_c0 =', T_c0, 'K, D_l0 =', D_l0, 'm, tf =', tf,
               'Gyr')
-        print('\nrun kwargs', run_kwargs)
-        print('\nplanet object', dir(pl))
+        print('\nrun kwargs:\n', run_kwargs)
+        # print('\nplanet object', pprint(vars(pl)))
 
     t0 = t0 * 1e9 * p.years2sec  # convert input times to Gyr
     tf = tf * 1e9 * p.years2sec
@@ -106,7 +107,8 @@ def solve(pl, run_kwargs={}, t0=0, t_eval=None, verbose=False, **kwargs):
     pl.T_c = f.y[1]
     pl.D_l = f.y[2]
     pl.t = f.t
-    pl = recalculate(pl.t, pl, tf=tf, **run_kwargs, **kwargs)
+    pl = recalculate(pl.t, pl, verbose=True, **run_kwargs, **kwargs)
+
     return pl
 
 
@@ -127,11 +129,21 @@ def LHS(t, y, pl=None, **kwargs):
     return [dTdt_m, dTdt_c, dDdt]
 
 
-def recalculate(t, pl, pl_kwargs, **kwargs):
+def recalculate(t, pl, verbose=False, **kwargs):
     """ calcualte all the thermal convection parameters (single time step or postprocess all timesteps"""
 
+    if verbose:
+        print('\nrecalculate kwargs:\n', kwargs)
+        print('\nplanet:')
+        for attr in dir(pl):
+            print("pl.%s = %r" % (attr, getattr(pl, attr)))
+
     # check if there are any weird issues
-    if any([list(pl.D_l)]) > pl.R_p - pl.R_c:
+    try:
+        lid_too_thick = any([list(pl.D_l)]) > pl.R_p - pl.R_c
+    except TypeError:
+        lid_too_thick = pl.D_l > pl.R_p - pl.R_c
+    if lid_too_thick:
         print('{:.2f} M_E: convection stopped at {:.2f} Gyr because lid grew to core'.format(pl.M_p / p.M_E,
                                                                                              t * p.sec2Gyr))
         pl.D_l = pl.R_p - pl.R_c
@@ -144,10 +156,21 @@ def recalculate(t, pl, pl_kwargs, **kwargs):
     pl.M_conv = pl.M_m - pl.M_lid  # mass of convecting region
 
     # radiogenic heating
-    pl.h_rad_m = th.h_rad(t, H_0=pl.H_0, H_f=pl.H_f, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, **pl_kwargs)  # W kg^-1
+    pl.h_rad_m = th.h_rad(t, H_0=pl.H_0, H_f=pl.H_f, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, verbose=verbose, **kwargs)  # W kg^-1
     pl.a0 = pl.h_rad_m * pl.rho_m  # volumetric heating in W m^-3
     pl.H_rad_m = th.H_rad(h=pl.h_rad_m, M=pl.M_conv, **kwargs)  # mantle radiogenic heating in W
     pl.H_rad_lid = th.H_rad(h=pl.h_rad_m, M=pl.M_lid, **kwargs)  # lid radiogenic heating in W
+
+    # temperature update
+    pl.T_l = th.T_lid(T_m=pl.T_m, a_rh=pl.a_rh, Ea=pl.Ea)
+    pl.dT_rh = pl.a_rh * (p.R_b * pl.T_m ** 2 / pl.Ea)
+    pl.dT_m = pl.T_c - pl.T_l
+    try:
+        bad_T = any([list(pl.dT_m)]) < 0
+    except TypeError:
+        bad_T = pl.dT_m < 0
+    if bad_T:
+        raise ('{:.2f} M_E: WARNING: -ve T_m at {:.2f} Gyr'.format(pl.M_p / p.M_E, t * p.sec2Gyr))
 
     # viscosity update
     pl.eta_s = rh.dynamic_viscosity(T=pl.T_s, pl=pl, **kwargs)  # viscosity at surface temperature
@@ -155,13 +178,6 @@ def recalculate(t, pl, pl_kwargs, **kwargs):
     pl.eta_m = rh.dynamic_viscosity(T=pl.T_m, pl=pl, **kwargs)  # viscosity at interior mantle temperature
     pl.eta_cmb = rh.dynamic_viscosity(T=(pl.T_c + pl.T_m) / 2, pl=pl, **kwargs)  # viscosity at cmb
     pl.delta_eta = pl.eta_s / rh.dynamic_viscosity(T=(pl.T_c - pl.T_s), pl=pl, **kwargs)  # total viscosity contrast
-
-    # temperature update
-    pl.T_l = th.T_lid(T_m=pl.T_m, a_rh=pl.a_rh, Ea=pl.Ea)
-    pl.dT_rh = pl.a_rh * (p.R_b * pl.T_m ** 2 / pl.Ea)
-    pl.dT_m = pl.T_c - pl.T_l
-    if any([list(pl.dT_m)]) < 0:
-        raise ('{:.2f} M_E: WARNING: -ve T_m at {:.2f} Gyr'.format(pl.M_p / p.M_E, t * p.sec2Gyr))
 
     # equivalent to effective Ra_i in 2D models with d and dT decreased by lid thickness and temp drop
     pl.Ra_i_eff = th.Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, deltaT=abs(pl.dT_m), l=pl.d_m, kappa=pl.kappa_m,
@@ -179,7 +195,7 @@ def recalculate(t, pl, pl_kwargs, **kwargs):
 
     # core
 
-    pl.TBL_c = th.bdy_thickness(dT=pl.dT_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c,
+    pl.TBL_c = th.bdy_thickness(dT=pl.dT_m, d_m=pl.d_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c,
                                 kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, rho_m=pl.rho_m, **kwargs)
     pl.q_core = th.q_bl(deltaT=pl.T_c - pl.T_m, k=pl.k_lm, d_bl=pl.TBL_c, beta=pl.beta_c, **kwargs)
     pl.Q_core = th.Q_bl(q=pl.q_core, R=pl.R_c)

@@ -9,6 +9,7 @@ from scipy import odr
 import os
 import matplotlib.pyplot as plt
 from sklearn import linear_model
+import scipy.odr
 from scipy.interpolate import interp1d
 from scipy.spatial import distance
 # import statsmodels.api as sm
@@ -601,6 +602,9 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
         global slope2
         return slope2*x + b
 
+    def f_wrapper_for_odr(beta, x):  # parameter order for odr
+        return coefficient(x, *beta)
+
     try:
         x1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
         h1 = np.log10(np.array(h))
@@ -614,20 +618,50 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
             df = pd.DataFrame({'x': x1, 'h': h1})
             df.dropna(inplace=True)
             if slope == 1:
-                popt, pcov = curve_fit(coefficient, df.x.to_numpy(), df.h.to_numpy())
+                parameters, cov = curve_fit(coefficient, df.x.to_numpy(), df.h.to_numpy())
             else:
                 global slope2
                 slope2 = slope
-                popt, pcov = curve_fit(coefficient2, df.x.to_numpy(), df.h.to_numpy())
+                parameters, cov = curve_fit(coefficient2, df.x.to_numpy(), df.h.to_numpy())
             slope = slope
-            intercept = popt[0]
+            intercept = parameters[0]
+
+            model = scipy.odr.odrpack.Model(f_wrapper_for_odr)
+            data = scipy.odr.odrpack.Data(df.x.to_numpy(), df.h.to_numpy())
+            myodr = scipy.odr.odrpack.ODR(data, model, beta0=parameters, maxit=0)
+            myodr.set_job(fit_type=2)
+            parameter_stats = myodr.run()
+            df_e = len(x) - len(parameters)  # degrees of freedom, error
+            cov_beta = parameter_stats.cov_beta  # parameter covariance matrix from ODR
+            sd_beta = parameter_stats.sd_beta * parameter_stats.sd_beta
+            ci = []
+            t_df = scipy.stats.t.ppf(0.975, df_e)
+            ci = []
+            for i in range(len(parameters)):
+                ci.append([parameters[i] - t_df * parameter_stats.sd_beta[i],
+                           parameters[i] + t_df * parameter_stats.sd_beta[i]])
+
+            tstat_beta = parameters / parameter_stats.sd_beta  # coeff t-statistics
+            pstat_beta = (1.0 - scipy.stats.t.cdf(np.abs(tstat_beta), df_e)) * 2.0  # coef. p-values
+
+            for i in range(len(parameters)):
+                print('parameter:', parameters[i])
+                print('   conf interval:', ci[i][0], ci[i][1])
+                print('   tstat:', tstat_beta[i])
+                print('   pstat:', pstat_beta[i])
+                print()
+
         except ValueError as e:
             print('x', x1, np.shape(x1))
             print('h', h1, np.shape(h1))
             raise e
     elif weights is None:
         try:
-            slope, intercept, r_value, p_value, std_err = stats.linregress(x1, h1)
+            result = stats.linregress(x1, h1)
+            slope = result.slope
+            intercept = result.intercept
+            print('\n  slope standard error',result.stderr, '  intercept standard error', result.intercept_stderr,
+                  '  p value', result.pvalue)  # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.linregress.html
         except ValueError as e:
             print('x', np.shape(x1), 'h', np.shape(h1))
             raise e
@@ -637,26 +671,53 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
     return slope, 10 ** intercept
 
 
-def fit_2log(x, y, h, **kwargs):
+def fit_2log(x1, x2, h, **kwargs):
+    # https://stackoverflow.com/questions/35041266/scipy-odr-multiple-variable-regression
     try:
-        df = pd.DataFrame({'x': np.log10(np.array(x)), 'y': np.log10(np.array(y)), 'h': np.log10(np.array(h))})
+        df = pd.DataFrame({'x': np.log10(np.array(x1)), 'y': np.log10(np.array(x2)), 'h': np.log10(np.array(h))})
     except Exception as e:
-        # print('h', h, type(h))
-        # print('x', x, type(x))
-        # print('y', y, type(y))
+        print('h', h, type(h))
+        print('x', x1, type(x1))
+        print('y', x2, type(x2))
         raise e
 
-    X = df[['x', 'y']]
-    Y = df['h']
+    def linfit(beta, x):
+        return beta[0] * x[0] + beta[1] * x[1] + beta[2]  # notice changed indices for x
 
-    # with sklearn
-    regr = linear_model.LinearRegression()
-    regr.fit(X, Y)
+    x = np.row_stack((x1, x2))  # odr doesn't seem to work with column_stack
 
-    # print('Intercept: \n', regr.intercept_)
-    # print('Coefficients: \n', regr.coef_)
+    linmod = scipy.odr.Model(linfit)
+    data = scipy.odr.Data(x, h)
+    odrfit = scipy.odr.ODR(data, linmod, beta0=[1., 1., 1.])
+    parameter_stats = odrfit.run()
+    parameter_stats.pprint()
+    parameters = parameter_stats.beta
 
-    return regr.coef_, 10 ** regr.intercept_
+    df_e = len(x1) - len(parameters)  # degrees of freedom, error
+    cov_beta = parameter_stats.cov_beta  # parameter covariance matrix from ODR
+    sd_beta = parameter_stats.sd_beta * parameter_stats.sd_beta
+    ci = []
+    t_df = scipy.stats.t.ppf(0.975, df_e)
+    ci = []
+    for i in range(len(parameters)):
+        ci.append([parameters[i] - t_df * parameter_stats.sd_beta[i],
+                   parameters[i] + t_df * parameter_stats.sd_beta[i]])
+
+    tstat_beta = parameters / parameter_stats.sd_beta  # coeff t-statistics
+    pstat_beta = (1.0 - scipy.stats.t.cdf(np.abs(tstat_beta), df_e)) * 2.0  # coef. p-values
+
+    for i in range(len(parameters)):
+        print('parameter:', parameters[i])
+        print('   conf interval:', ci[i][0], ci[i][1])
+        print('   tstat:', tstat_beta[i])
+        print('   pstat:', pstat_beta[i])
+        print()
+
+    intercept = 10 ** parameters[0]
+    slope1 = parameters[1]
+    slope2 = parameters[2]
+
+    return (slope1, slope2), intercept
 
 
 def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, **kwargs):
@@ -948,7 +1009,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
             flatx0 = [a[0] for a in flatx]
             flatx1 = [a[1] for a in flatx]
             x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
-            expon, const = fit_2log(x=flatx0, y=flatx1, h=flaty)
+            expon, const = fit_2log(x1=flatx0, x2=flatx1, h=flaty)
             z_vec = np.unique(flatx1)
             if c_list is None:
                 c_list = colorize(np.log10(z_vec), cmap='winter')[0]
