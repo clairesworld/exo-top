@@ -297,7 +297,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
-              save=True, fname='h', legend=False, sigma=1, fiterror=True, showpeak=False,
+              save=True, fname='h', legend=False, sigma=1, fiterror=False, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=40, lw=1,
               xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None, ticksize=None,
@@ -370,8 +370,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 # calculate statistics
                 sdy = np.nanstd(h_rms_times)
                 sdx = np.nanstd(x_times)
-                print('log sdy', np.nanstd(np.log10(np.asarray(h_rms_times).astype(np.float64))))
-                print('log sdx', np.nanstd(np.log10(np.asarray(x_times).astype(np.float64))))
+                # print('log sdy', np.nanstd(np.log10(np.asarray(h_rms_times).astype(np.float64))))
+                # print('log sdx', np.nanstd(np.log10(np.asarray(x_times).astype(np.float64))))
                 qdict = pro.parameter_percentiles(case, df={'h_rms': h_rms_times, 'h_peak': h_peak_times, which_x: x_times},
                                               keys=quants.keys(), plot=False, sigma=2)
 
@@ -399,7 +399,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     means['h_peak'] = np.asarray([np.mean(a[0]) for a in yx_peak_all])
     means['h_rms'] = np.asarray([np.mean(a[0]) for a in yx_rms_all])
     means[which_x] = np.asarray([np.mean(a[1]) for a in yx_rms_all])
-    print('means x', means[which_x])
+    # print('means x', means[which_x])
     try:
         for key in quants.keys():
             err[key] = np.asarray([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])

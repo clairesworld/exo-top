@@ -684,10 +684,10 @@ def fit_2log(x1, x2, h, **kwargs):
     def linfit(beta, x):
         return beta[0] * x[0] + beta[1] * x[1] + beta[2]  # notice changed indices for x
 
-    x = np.row_stack((x1, x2))  # odr doesn't seem to work with column_stack
+    x = np.row_stack((np.log10(np.array(x1)), np.log10(np.array(x2))))  # odr doesn't seem to work with column_stack
 
     linmod = scipy.odr.Model(linfit)
-    data = scipy.odr.Data(x, h)
+    data = scipy.odr.Data(x, np.log10(np.array(h)))
     odrfit = scipy.odr.ODR(data, linmod, beta0=[1., 1., 1.])
     parameter_stats = odrfit.run()
     parameter_stats.pprint()
