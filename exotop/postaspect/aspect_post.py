@@ -660,7 +660,7 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
             result = stats.linregress(x1, h1)
             slope = result.slope
             intercept = result.intercept
-            print('\n  slope standard error',result.stderr, '  intercept standard error', result.intercept_stderr,
+            print('\n  slope standard error',result.stderr, #'  intercept standard error', result.intercept_stderr,
                   '  p value', result.pvalue)  # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.linregress.html
         except ValueError as e:
             print('x', np.shape(x1), 'h', np.shape(h1))
