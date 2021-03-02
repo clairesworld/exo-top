@@ -59,7 +59,7 @@ from postaspect import aspect_post as ap
 #    )
 
 # compare 64 and 129 resolution for Ra=3e7
-fig, ax = plat.case_subplots(
+fig, ax = plat.subplots_cases(
     ['Ra1e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
        labels=['Ra 1e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path,
     t1=[0, 0], load='auto', fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
