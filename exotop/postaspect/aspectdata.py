@@ -80,7 +80,7 @@ class Aspect_Data():
         elif pvd_check:
             self.format='vtu'
         else:
-            raise Exception('No Aspect Data found in folder '+directory)
+            print('No solution files found in folder '+directory)
         if verbose:
             print("Aspect data found in", self.format, "format")
         self.mesh_file=''

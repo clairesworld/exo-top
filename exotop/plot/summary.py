@@ -63,7 +63,7 @@ fig, ax = plat.subplots_cases(
     ['Ra1e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
        labels=['Ra 1e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path,
     t1=[0, 0], load='auto', fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
-    includepd=False, # turn on once you know where steady state starts
+    includepd=False, includeTz=False, # turn on once you know where steady state starts
    )
 
 
