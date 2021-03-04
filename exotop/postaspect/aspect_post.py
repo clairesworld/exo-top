@@ -9,7 +9,6 @@ from scipy import odr
 import os
 import matplotlib.pyplot as plt
 from sklearn import linear_model
-import scipy.odr
 from scipy.interpolate import interp1d
 from scipy.spatial import distance
 # import statsmodels.api as sm
@@ -162,7 +161,7 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
 
 
 def pickleio_multi(case, psuffixes=None, t1=None, load=None, data_path=data_path_bullard,
-                    postprocess_kwargs=None, **kwargs):
+                   postprocess_kwargs=None, **kwargs):
     dfs = []
     for ip, ps in enumerate(psuffixes):
         df1 = pickleio(case, suffix=ps, t1=t1,
@@ -359,7 +358,6 @@ def read_evol(case, col, dat=None, data_path=data_path_bullard, **kwargs):
     return dat.stats_time, eval('dat.stats_' + col)
 
 
-
 def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
                          df_to_extend=None, sol_files=None, postprocess_kwargs=None, **kwargs):
     if postprocess_kwargs is None:
@@ -425,8 +423,6 @@ def process_at_solutions(case, postprocess_functions, dat=None, t1=0, data_path=
         else:
             print('    Skipping case with t1 > 1')
     return df_to_extend
-
-
 
 
 def process_steadystate(case, postprocess_functions, dat=None, t1=0, data_path=data_path_bullard,
@@ -564,8 +560,6 @@ def T_parameters_at_sol(case, n, dat=None, T_av=None, uv_mag_av=None, y=None, da
     return d_n
 
 
-
-
 def parameter_percentiles(case=None, df=None, keys=None, sigma=2, **kwargs):
     # probability distribution for a number of parameters with df containing time evolutions
     # df can also be a dict...
@@ -600,7 +594,7 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
 
     def coefficient2(x, b):
         global slope2
-        return slope2*x + b
+        return slope2 * x + b
 
     def f_wrapper_for_odr(beta, x):  # parameter order for odr
         return coefficient(x, *beta)
@@ -626,23 +620,23 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
             slope = slope
             intercept = parameters[0]
 
-            model = scipy.odr.odrpack.Model(f_wrapper_for_odr)
-            data = scipy.odr.odrpack.Data(df.x.to_numpy(), df.h.to_numpy())
-            myodr = scipy.odr.odrpack.ODR(data, model, beta0=parameters, maxit=0)
+            model = odr.odrpack.Model(f_wrapper_for_odr)
+            data = odr.odrpack.Data(df.x.to_numpy(), df.h.to_numpy())
+            myodr = odr.odrpack.ODR(data, model, beta0=parameters, maxit=0)
             myodr.set_job(fit_type=2)
             parameter_stats = myodr.run()
             df_e = len(x) - len(parameters)  # degrees of freedom, error
             cov_beta = parameter_stats.cov_beta  # parameter covariance matrix from ODR
             sd_beta = parameter_stats.sd_beta * parameter_stats.sd_beta
             ci = []
-            t_df = scipy.stats.t.ppf(0.975, df_e)
+            t_df = stats.t.ppf(0.975, df_e)
             ci = []
             for i in range(len(parameters)):
                 ci.append([parameters[i] - t_df * parameter_stats.sd_beta[i],
                            parameters[i] + t_df * parameter_stats.sd_beta[i]])
 
             tstat_beta = parameters / parameter_stats.sd_beta  # coeff t-statistics
-            pstat_beta = (1.0 - scipy.stats.t.cdf(np.abs(tstat_beta), df_e)) * 2.0  # coef. p-values
+            pstat_beta = (1.0 - stats.t.cdf(np.abs(tstat_beta), df_e)) * 2.0  # coef. p-values
 
             for i in range(len(parameters)):
                 print('parameter:', parameters[i])
@@ -660,8 +654,9 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
             result = stats.linregress(x1, h1)
             slope = result.slope
             intercept = result.intercept
-            print('\n  slope standard error',result.stderr, #'  intercept standard error', result.intercept_stderr,
-                  '  p value', result.pvalue)  # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.linregress.html
+            print('\n  slope standard error', result.stderr,  # '  intercept standard error', result.intercept_stderr,
+                  '  p value',
+                  result.pvalue)  # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.linregress.html
         except ValueError as e:
             print('x', np.shape(x1), 'h', np.shape(h1))
             raise e
@@ -689,9 +684,9 @@ def fit_2log(x1, x2, h, **kwargs):
 
     x = np.row_stack((np.log10(np.array(x1)), np.log10(np.array(x2))))  # odr doesn't seem to work with column_stack
 
-    linmod = scipy.odr.Model(linfit)
-    data = scipy.odr.Data(x, np.log10(np.array(h)))
-    odrfit = scipy.odr.ODR(data, linmod, beta0=[1., 1., 1.])
+    linmod = odr.Model(linfit)
+    data = odr.Data(x, np.log10(np.array(h)))
+    odrfit = odr.ODR(data, linmod, beta0=[1., 1., 1.])
     parameter_stats = odrfit.run()
     parameter_stats.pprint()
     parameters = parameter_stats.beta
@@ -700,14 +695,14 @@ def fit_2log(x1, x2, h, **kwargs):
     cov_beta = parameter_stats.cov_beta  # parameter covariance matrix from ODR
     sd_beta = parameter_stats.sd_beta * parameter_stats.sd_beta
     ci = []
-    t_df = scipy.stats.t.ppf(0.975, df_e)
+    t_df = stats.t.ppf(0.975, df_e)
     ci = []
     for i in range(len(parameters)):
         ci.append([parameters[i] - t_df * parameter_stats.sd_beta[i],
                    parameters[i] + t_df * parameter_stats.sd_beta[i]])
 
     tstat_beta = parameters / parameter_stats.sd_beta  # coeff t-statistics
-    pstat_beta = (1.0 - scipy.stats.t.cdf(np.abs(tstat_beta), df_e)) * 2.0  # coef. p-values
+    pstat_beta = (1.0 - stats.t.cdf(np.abs(tstat_beta), df_e)) * 2.0  # coef. p-values
 
     for i in range(len(parameters)):
         print('parameter:', parameters[i])
@@ -723,86 +718,119 @@ def fit_2log(x1, x2, h, **kwargs):
     return (slope1, slope2), intercept
 
 
-def fit_logerror(x, h, err_x, err_h, beta0=[0.1, -0.15], sigma=2, plot=True, **kwargs):
-    print('x', x)
-    print('h', h)
-    print('err_x', err_x)
-    print('err_h', err_h)
+def fit_SE(x1, h, err_x1=1, err_h=1, num=20):
+    # convert to log
+    try:
+        logx1 = np.log10(np.array(x1))  # this should work for time-series of all x corresponding to h
+        logh = np.log10(np.array(h))
+        err_logx1 = 0.434 * np.array(err_x1) / np.array(x1)
+        err_logh = 0.434 * np.array(err_h) / np.array(h)
+    except Exception as e:
+        print('h', h, type(h))
+        print('x', x1, type(x1))
+        raise e
+
+    # standard error (single parameter only)
+
+    logxn1 = np.linspace(np.min(logx1), np.max(logx1), num)
+
+    sigma_logh = np.std(logh)
+    xbar = np.mean(logx1)
+    n = len(logh)
+    SE_y = sigma_logh * np.sqrt(1 / n + (logxn1 - xbar) ** 2 / np.sum((logxn1 - xbar) ** 2))
+    print('         -> SE_y:', SE_y)
+    return SE_y
+
+
+def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs):
+    def func_lin(beta, u):
+        a, b = beta
+        return a + u * b
+
+    def func_lin2(beta, u):
+        a, b, c = beta
+        return a + u[0] * b + u[1] * c
+
+    def func_lin0(beta, u):
+        a = beta
+        return a + u[0]
+
+    if not slope:
+        beta0 = [np.log10(2)]
+        func = func_lin0
+        x = x1
+    elif x2 is None:
+        beta0 = [np.log10(0.1), -0.1]
+        func = func_lin
+        x = x1
+    else:
+        beta0 = [np.log10(0.1), -0.1, -0.1]
+        func = func_lin2
+        x = np.row_stack((x1, x2))  # odr doesn't seem to work with column_stack
+        err_x = 1  # doesn't work with multidimensional weights
+        err_h = 1
+
+    # convert to log
     try:
         logx = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
         logh = np.log10(np.array(h))
-        logerr_x = np.log10(np.array(err_x))
-        logerr_h = np.log10(np.array(err_h))
+        if err_x == 1:
+            err_logx = 1
+        else:
+            err_logx = 0.434 * np.array(err_x) / np.array(x)
+        if err_h == 1:
+            err_logh = 1
+        else:
+            err_logh = 0.434 * np.array(err_h) / np.array(h)
     except Exception as e:
         print('h', h, type(h))
         print('x', x, type(x))
         raise e
 
-    def func_2param(p, u):
-        a, b = p
-        return a * u**b
+    data = odr.RealData(logx, logh, sx=err_logx, sy=err_logh)
+    model = odr.Model(func)
+    odrfit = odr.ODR(data, model, beta0)
+    output = odrfit.run()
 
-    def func_lin2param(p, u):
-        a, b = p
-        return a + u*b
+    if len(output.beta) == 1:
+        logcon = output.beta
+        s_logcon = output.sd_beta
+    elif len(output.beta) == 2:
+        logcon, power = output.beta
+        s_logcon, s_pow = output.sd_beta
+    elif len(output.beta) == 3:
+        logcon, pow1, pow2 = output.beta
+        s_logcon, s_pow1, s_pow2 = output.sd_beta
+    # s_logcon, s_pow = np.sqrt(np.diag(output.cov_beta))
 
-    def func_3param(p, u):
-        a, b, c = p
-        return a * u[0]**b * u[1]**c
+    con = 10 ** logcon
+    s_con = 2.302585 * 10 ** logcon * s_logcon
 
-    # Model object
-    model = odr.Model(func_2param)
-    # model = odr.Model(func_lin2param)
+    # confidence intervals
 
-    # Create a RealData object
-    data = odr.RealData(x, h, sx=err_x, sy=err_h)
-    # data = odr.RealData(logx, logh, sx=logerr_x, sy=logerr_h)
+    df_e = len(x1) - len(output.beta)  # degrees of freedom, error
+    conf = []
+    t_df = stats.t.ppf(ci, df_e)  # 0.975
+    for i in range(len(output.beta)):
+        conf.append([output.beta[i] - t_df * output.sd_beta[i],
+                     output.beta[i] + t_df * output.sd_beta[i]])
 
-    # Set up ODR with the model and data.
-    odr_ = odr.ODR(data, model, beta0=beta0)
+    # chi sqr
 
-    # Run the regression.
-    out = odr_.run()
+    chisqr = np.sum((logh - func(output.beta, logx)) ** 2)
+    MSE = chisqr / df_e
 
-    # print fit parameters and 1-sigma estimates
-    popt = out.beta
-    perr = out.sd_beta
-    # popt[0] = 10**popt[0]  # unlog
-    # perr[0] = 10**perr[0]
+    print('\n')
+    print('       -> ODR RESULTS')
+    print('         -> reason for halting:', output.stopreason)
+    if slope:
+        print('         -> slope:', power, '+/-', s_pow, '   CI:', conf[1][0], conf[1][1])
+    print('         -> intercept:', logcon, '+/-', s_logcon, '   CI:', conf[0][0], conf[0][1])
+    print('         -> constant = 10^intercept:', con, '+/-', s_con)
+    print('         -> chi sqr:', chisqr)
+    print('         -> MSE:', MSE)
 
-    # prepare confidence level curves
-    nstd = sigma  # to draw 2-sigma intervals e.g.
-    popt_up = popt + nstd * perr
-    popt_dw = popt - nstd * perr
-
-    # print('\nfit parameter', sigma, 'sigma error')
-    # print('———————————–')
-    # for i in range(len(popt)):
-    #     print(str(popt[i]) + ' +- ' + str(perr[i]))
-    #     print('min:', popt_dw[i])
-    #     print('max:', popt_up[i])
-    # print('y min @ x min', func_2param(popt_dw, x[0]))
-    # print('y max @ x max', func_2param(popt_up, x[-1]))
-    out.pprint()
-
-    if plot:
-        # plot
-        x_fit = np.linspace(min(x), max(x), 100)
-        fit = func_2param(popt, x_fit)
-        fit_up = func_2param(popt_up, x_fit)
-        fit_dw = func_2param(popt_dw, x_fit)
-        fig, ax = plt.subplots(1)
-        ax.errorbar(x, h, yerr=err_h, xerr=err_x, hold=True, ecolor='k', fmt ='none', label ='data')
-        ax.set_xlabel('x', fontsize=18)
-        ax.set_ylabel('h', fontsize=18)
-        ax.set_title('fit with error on both axes', fontsize=18)
-        plt.plot(x_fit, fit, 'r', lw=2, label='best fit curve')
-        ax.fill_between(x_fit, fit_up, fit_dw, alpha=.25, label=str(sigma)+'-sigma interval')
-        ax.legend(loc='lower right', fontsize=12)
-        # ax.set_xscale('log')
-        # ax.set_yscale('log')
-        plt.savefig('fit_test.png', bbox_inches='tight')
-    return (*popt, *perr)
+    return output.beta, output.sd_beta, chisqr
 
 
 def dimensionalise_h(hprime, p):
@@ -817,7 +845,6 @@ def nondimensionalise_h(h, p):
         return h / (p['alpha_m'] * p['dT_m'] * p['d_m'])
     except KeyError:
         raise Exception('Need alpha_m, dT_m, and d_m in p_dimensionals to nondimensionalise')
-
 
 
 def solomatov95(Ra=None, d_eta=None, df=None, case=None, dat=None,
@@ -905,8 +932,6 @@ def surf_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullar
         return np.nan
 
 
-
-
 def read_JFR(fname, path='/raid1/cmg76/aspect/benchmarks/JFR/'):
     df = pd.read_csv(path + fname, header=0, index_col=False)
     print('Loaded', fname, df.columns)
@@ -992,15 +1017,11 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
 #                     print(df)
 
 
-def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', weights=None, sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=False, **kwargs):
-    fiterror = (yerr is not None) or (xerr is not None)
+def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=False, n_fitted=2, c_list=None,
+                      c='xkcd:periwinkle', sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=False,
+                      **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
-    # try:
-    #     weights = [len(a[0]) for a in yx_all]
-    # except TypeError:
-    #     weights = [1] * len(x)
     if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
         flatx = [item for sublist in x for item in sublist]
         flaty = [item for sublist in y for item in sublist]
@@ -1008,57 +1029,50 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
 
-        if n_fitted > 2:  # fit to 3 parameter power law
+        if n_fitted == 3:  # fit to 3 parameter power law
             flatx0 = [a[0] for a in flatx]
             flatx1 = [a[1] for a in flatx]
             x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
-            expon, const = fit_2log(x1=flatx0, x2=flatx1, h=flaty)
+            beta, sd_beta, chisqr = fit_logerror(x1=flatx0, h=flaty, x2=flatx1, err_x=xerr, err_h=yerr, **kwargs)
+
+            const = beta[0]
+            const_err = sd_beta[0]
+            expon = beta[1]
+            expon_err = sd_beta[1]
+            expon2 = beta[2]
+            expon2_err = sd_beta[2]
             z_vec = np.unique(flatx1)
             if c_list is None:
                 c_list = colorize(np.log10(z_vec), cmap='winter')[0]
             for ind, z in enumerate(z_vec):
-                hprime = const * x0prime ** expon[0] * z ** expon[1]
+                hprime = const * x0prime ** expon * z ** expon2
                 h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=lw, zorder=100, label='dum')
 
         else:
+            slope = True
+            if n_fitted==1:
+                slope = False
             xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
-            # xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
-            if fiterror:
-                const, expon, const_err, expon_err = fit_logerror(flatx, flaty, xerr, yerr, sigma=sigma, **kwargs)
-                const_up = const + sigma * const_err
-                const_dw = const - sigma * const_err
-                expon_up = expon + sigma * expon_err
-                expon_dw = expon - sigma * expon_err
-                hprime_up = const_up * xprime ** expon_up
-                hprime_dw = const_dw * xprime ** expon_dw
-                hprime_dw[hprime_dw < 0] = 0  # cannot be negative
-                ax.fill_between(xprime, hprime_up, hprime_dw, alpha=.25#, label=str(sigma) + '-sigma interval'
-                                )
+            beta, sd_beta, chisqr = fit_logerror(x1=flatx, h=flaty, err_x=xerr, err_h=yerr, slope=slope, **kwargs)
+            const = beta[0]
+            const_err = sd_beta[0]
+            if slope:
+                expon = beta[1]
+                expon_err = sd_beta[1]
             else:
-                expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
+                expon = 1
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
 
-        # print('fit: {:.2e} x^{:.3f}'.format(const, expon))
-
         if legend:
             handles, labels = ax.get_legend_handles_labels()
-            # handles.append(h3)
-            # labels.append('{:.2e} x^{:.3f}'.format(const, expon))
-            if n_fitted == 2:
-                if fiterror:
-                    newlabel = '({:.2e} +- {:.2e}) x^({:.3f} +- {:.3f})'.format(const, const_err, expon, expon_err)
-                else:
-                    newlabel = '{:.2e} x^{:.3f}'.format(const, expon)
-            elif n_fitted == 3:
-                newlabel = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
-            else:
-                print(' warning: Legend labelling for this n fitted parameters not implemented')
-                newlabel = ''
-                pass
+            newlabel = '({:.2e} +- {:.2e}) x^({:.3f} +- {:.3f})'.format(const, const_err)
+            if n_fitted > 1:
+                newlabel = newlabel + ' x^({:.3f} +- {:.3f})'.format(expon, expon_err)
+            if n_fitted > 2:
+                newlabel = newlabel + ' x2^({:.3f} +- {:.3f})'.format(expon2, expon2_err)
             if showchisq:
-                chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), n_fitted=n_fitted, **kwargs)
-                newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.4f}'.format(chisq)
+                newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.4f}'.format(chisqr)
             try:
                 labels[-1] = newlabel
             except IndexError:
@@ -1070,3 +1084,82 @@ def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscat
     if showallscatter:
         ax.scatter(flatx, flaty, c=c, alpha=0.05, s=10)
     return ax
+
+# def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscatter=False, n_fitted=2, c_list=None,
+#                       c='xkcd:periwinkle', weights=None, sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=False, **kwargs):
+#     fiterror = (yerr is not None) or (xerr is not None)
+#     x = [a[1] for a in yx_all]
+#     y = [a[0] for a in yx_all]
+#     # try:
+#     #     weights = [len(a[0]) for a in yx_all]
+#     # except TypeError:
+#     #     weights = [1] * len(x)
+#     if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
+#         flatx = [item for sublist in x for item in sublist]
+#         flaty = [item for sublist in y for item in sublist]
+#     else:
+#         flatx, flaty = x, y
+#     if len(x) > 1:  # can only fit if at least 2 data
+#
+#         if n_fitted > 2:  # fit to 3 parameter power law
+#             flatx0 = [a[0] for a in flatx]
+#             flatx1 = [a[1] for a in flatx]
+#             x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
+#             expon, const = fit_2log(x1=flatx0, x2=flatx1, h=flaty)
+#             z_vec = np.unique(flatx1)
+#             if c_list is None:
+#                 c_list = colorize(np.log10(z_vec), cmap='winter')[0]
+#             for ind, z in enumerate(z_vec):
+#                 hprime = const * x0prime ** expon[0] * z ** expon[1]
+#                 h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=lw, zorder=100, label='dum')
+#
+#         else:
+#             xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
+#             # xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
+#             if fiterror:
+#                 const, expon, const_err, expon_err = fit_logerror(flatx, flaty, xerr, yerr, sigma=sigma, **kwargs)
+#                 const_up = const + sigma * const_err
+#                 const_dw = const - sigma * const_err
+#                 expon_up = expon + sigma * expon_err
+#                 expon_dw = expon - sigma * expon_err
+#                 hprime_up = const_up * xprime ** expon_up
+#                 hprime_dw = const_dw * xprime ** expon_dw
+#                 hprime_dw[hprime_dw < 0] = 0  # cannot be negative
+#                 ax.fill_between(xprime, hprime_up, hprime_dw, alpha=.25#, label=str(sigma) + '-sigma interval'
+#                                 )
+#             else:
+#                 expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
+#             hprime = const * xprime ** expon
+#             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
+#
+#         # print('fit: {:.2e} x^{:.3f}'.format(const, expon))
+#
+#         if legend:
+#             handles, labels = ax.get_legend_handles_labels()
+#             # handles.append(h3)
+#             # labels.append('{:.2e} x^{:.3f}'.format(const, expon))
+#             if n_fitted == 2:
+#                 if fiterror:
+#                     newlabel = '({:.2e} +- {:.2e}) x^({:.3f} +- {:.3f})'.format(const, const_err, expon, expon_err)
+#                 else:
+#                     newlabel = '{:.2e} x^{:.3f}'.format(const, expon)
+#             elif n_fitted == 3:
+#                 newlabel = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
+#             else:
+#                 print(' warning: Legend labelling for this n fitted parameters not implemented')
+#                 newlabel = ''
+#                 pass
+#             if showchisq:
+#                 chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), n_fitted=n_fitted, **kwargs)
+#                 newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.4f}'.format(chisq)
+#             try:
+#                 labels[-1] = newlabel
+#             except IndexError:
+#                 labels = newlabel
+#             leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
+#             ax.add_artist(leg)
+#     else:
+#         print('    Not enough points to fit')
+#     if showallscatter:
+#         ax.scatter(flatx, flaty, c=c, alpha=0.05, s=10)
+#     return ax

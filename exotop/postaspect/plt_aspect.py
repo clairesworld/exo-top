@@ -370,15 +370,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 # calculate statistics
                 sdy = np.nanstd(h_rms_times)
                 sdx = np.nanstd(x_times)
-                # print('log sdy', np.nanstd(np.log10(np.asarray(h_rms_times).astype(np.float64))))
-                # print('log sdx', np.nanstd(np.log10(np.asarray(x_times).astype(np.float64))))
                 qdict = pro.parameter_percentiles(case, df={'h_rms': h_rms_times, 'h_peak': h_peak_times, which_x: x_times},
                                               keys=quants.keys(), plot=False, sigma=2)
 
-                # print('percentile lower err x', qdict[which_x][1] - qdict[which_x][0])
-                # print('percentile upper err x', qdict[which_x][2] - qdict[which_x][1])
-                # print('percentile lower err y', qdict['h_rms'][1] - qdict['h_rms'][0])
-                # print('percentile upper err y', qdict['h_rms'][2] - qdict['h_rms'][1])
 
                 # append to working
                 yx_peak_all.append((h_peak, x))
@@ -425,20 +419,20 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
 
     if fit:
         if which_x == 'h_components':
-            intercept = True
+            n_fitted = 1
         else:
-            intercept = False
+            n_fitted = 2
         if fiterror:
             xerr = sdx_all
             yerr = sdy_all
         else:
-            xerr = None
-            yerr = None
+            xerr = 1
+            yerr = 1
         if c_fit is None:
             c_fit = c_rms
-        ax = pro.fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=2, dist=D_m2_all,
+        ax = pro.fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
                                xerr=xerr, yerr=yerr, legend=legend, lw=lw,
-                               sigma=sigma, intercept=intercept, **kwargs)
+                               sigma=sigma, **kwargs)
 
     if show_isoviscous:
         df_JFR = pro.read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')

@@ -1,5 +1,6 @@
 import numpy as np
 from . import terrestrialplanet as tp
+from . import inputs
 from . import parameters as p
 from . import thermal as th
 from . import rheology as rh
