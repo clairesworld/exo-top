@@ -666,81 +666,86 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
         intercept, slope = np.polynomial.polynomial.polyfit(x1, h1, deg=1, w=weights)
     return slope, 10 ** intercept
 
+#
+# def fit_2log(x1, x2, h, **kwargs):
+#     # https://stackoverflow.com/questions/35041266/scipy-odr-multiple-variable-regression
+#     try:
+#         df = pd.DataFrame({'x': np.log10(np.array(x1)), 'y': np.log10(np.array(x2)), 'h': np.log10(np.array(h))})
+#     except Exception as e:
+#         print('h', h, type(h))
+#         print('x', x1, type(x1))
+#         print('y', x2, type(x2))
+#         raise e
+#
+#     def linfit(beta, x):
+#         return beta[0] * x[0] + beta[1] * x[1] + beta[2]  # notice changed indices for x
+#
+#     print('x1:', np.log10(np.array(x1)))
+#     print('x2:', np.log10(np.array(x2)))
+#
+#     x = np.row_stack((np.log10(np.array(x1)), np.log10(np.array(x2))))  # odr doesn't seem to work with column_stack
+#
+#     linmod = odr.Model(linfit)
+#     data = odr.Data(x, np.log10(np.array(h)))
+#     odrfit = odr.ODR(data, linmod, beta0=[1., 1., 1.])
+#     parameter_stats = odrfit.run()
+#     parameter_stats.pprint()
+#     parameters = parameter_stats.beta
+#
+#     df_e = len(x1) - len(parameters)  # degrees of freedom, error
+#     cov_beta = parameter_stats.cov_beta  # parameter covariance matrix from ODR
+#     sd_beta = parameter_stats.sd_beta * parameter_stats.sd_beta
+#     ci = []
+#     t_df = stats.t.ppf(0.975, df_e)
+#     ci = []
+#     for i in range(len(parameters)):
+#         ci.append([parameters[i] - t_df * parameter_stats.sd_beta[i],
+#                    parameters[i] + t_df * parameter_stats.sd_beta[i]])
+#
+#     tstat_beta = parameters / parameter_stats.sd_beta  # coeff t-statistics
+#     pstat_beta = (1.0 - stats.t.cdf(np.abs(tstat_beta), df_e)) * 2.0  # coef. p-values
+#
+#     for i in range(len(parameters)):
+#         print('parameter:', parameters[i])
+#         print('   conf interval:', ci[i][0], ci[i][1])
+#         print('   tstat:', tstat_beta[i])
+#         print('   pstat:', pstat_beta[i])
+#         print()
+#
+#     intercept = 10 ** parameters[0]
+#     slope1 = parameters[1]
+#     slope2 = parameters[2]
+#
+#     return (slope1, slope2), intercept
 
-def fit_2log(x1, x2, h, **kwargs):
-    # https://stackoverflow.com/questions/35041266/scipy-odr-multiple-variable-regression
-    try:
-        df = pd.DataFrame({'x': np.log10(np.array(x1)), 'y': np.log10(np.array(x2)), 'h': np.log10(np.array(h))})
-    except Exception as e:
-        print('h', h, type(h))
-        print('x', x1, type(x1))
-        print('y', x2, type(x2))
-        raise e
 
-    def linfit(beta, x):
-        return beta[0] * x[0] + beta[1] * x[1] + beta[2]  # notice changed indices for x
-
-    print('x1:', np.log10(np.array(x1)))
-    print('x2:', np.log10(np.array(x2)))
-
-    x = np.row_stack((np.log10(np.array(x1)), np.log10(np.array(x2))))  # odr doesn't seem to work with column_stack
-
-    linmod = odr.Model(linfit)
-    data = odr.Data(x, np.log10(np.array(h)))
-    odrfit = odr.ODR(data, linmod, beta0=[1., 1., 1.])
-    parameter_stats = odrfit.run()
-    parameter_stats.pprint()
-    parameters = parameter_stats.beta
-
-    df_e = len(x1) - len(parameters)  # degrees of freedom, error
-    cov_beta = parameter_stats.cov_beta  # parameter covariance matrix from ODR
-    sd_beta = parameter_stats.sd_beta * parameter_stats.sd_beta
-    ci = []
-    t_df = stats.t.ppf(0.975, df_e)
-    ci = []
-    for i in range(len(parameters)):
-        ci.append([parameters[i] - t_df * parameter_stats.sd_beta[i],
-                   parameters[i] + t_df * parameter_stats.sd_beta[i]])
-
-    tstat_beta = parameters / parameter_stats.sd_beta  # coeff t-statistics
-    pstat_beta = (1.0 - stats.t.cdf(np.abs(tstat_beta), df_e)) * 2.0  # coef. p-values
-
-    for i in range(len(parameters)):
-        print('parameter:', parameters[i])
-        print('   conf interval:', ci[i][0], ci[i][1])
-        print('   tstat:', tstat_beta[i])
-        print('   pstat:', pstat_beta[i])
-        print()
-
-    intercept = 10 ** parameters[0]
-    slope1 = parameters[1]
-    slope2 = parameters[2]
-
-    return (slope1, slope2), intercept
-
-
-def fit_SE(x1, h, err_x1=1, err_h=1, num=20):
+def fit_SE(x, h, beta, err_x=1, err_h=1, num=20):
     # convert to log
     try:
-        logx1 = np.log10(np.array(x1))  # this should work for time-series of all x corresponding to h
+        logx1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
         logh = np.log10(np.array(h))
-        err_logx1 = 0.434 * np.array(err_x1) / np.array(x1)
+        err_logx1 = 0.434 * np.array(err_x) / np.array(x)
         err_logh = 0.434 * np.array(err_h) / np.array(h)
     except Exception as e:
         print('h', h, type(h))
-        print('x', x1, type(x1))
+        print('x', x, type(x))
         raise e
 
     # standard error (single parameter only)
 
     logxn1 = np.linspace(np.min(logx1), np.max(logx1), num)
+    loghn = beta[0] + logxn1 * beta[1]
 
     sigma_logh = np.std(logh)
     xbar = np.mean(logx1)
     n = len(logh)
-    SE_y = sigma_logh * np.sqrt(1 / n + (logxn1 - xbar) ** 2 / np.sum((logxn1 - xbar) ** 2))
-    print('         -> SE_y:', SE_y)
-    return SE_y
+    SE = sigma_logh * np.sqrt(1 / n + (logxn1 - xbar) ** 2 / np.sum((logxn1 - xbar) ** 2))
+    print('         -> SE_y:', SE)
+
+    # unlog
+    SE_unlog = 2.302585 * 10 ** loghn * SE_y
+
+    return SE_unlog
 
 
 def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs):
@@ -1043,8 +1048,8 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
             x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
             beta, sd_beta, chisqr = fit_logerror(x1=flatx0, h=flaty, x2=flatx1, err_x=xerr, err_h=yerr, **kwargs)
 
-            const = beta[0]
-            const_err = sd_beta[0]
+            const = 10**beta[0]
+            const_err = 2.302585 * 10**beta[0] * sd_beta[0]
             expon = beta[1]
             expon_err = sd_beta[1]
             expon2 = beta[2]
@@ -1062,13 +1067,14 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
                 slope = False
             xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
             beta, sd_beta, chisqr = fit_logerror(x1=flatx, h=flaty, err_x=xerr, err_h=yerr, slope=slope, **kwargs)
-            const = beta[0]
-            const_err = sd_beta[0]
+            const = 10**beta[0]
+            const_err = 2.302585 * 10**beta[0] * sd_beta[0]
             if slope:
                 expon = beta[1]
                 expon_err = sd_beta[1]
             else:
                 expon = 1
+                expon_err = 0
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
 

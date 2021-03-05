@@ -155,7 +155,7 @@ def plot_geth(case=None, averagescheme=None, data_path=data_path_bullard, return
 def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
                          fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
                          fig_fmt='.png', which_xs=None, include_regimes=None, regime_grid=None, legend=False,
-                         save=True, fname='h', clabel=None, cbar=True, clabelpad=17, sigma=1,
+                         save=True, fname='h', clabel=None, cbar=True, clabelpad=17, sigma=1, showpeak=False,
                          labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', cmap='winter',
                          fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, vmin=None, vmax=None,
                          fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs={}, regime_names=None, **kwargs):
@@ -239,11 +239,12 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
         for jj, z in enumerate(z_vec):
             # get subset of points with this z-value
             ind = np.nonzero(z_vec == z)[0]
-            ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1],
-                        yerr=err['h_peak'].T[ind].T,
-                        xerr=err[which_xs[0]].T[ind].T,
-                        elinewidth=0.5, fmt='d', mfc=c_list[jj], c=c_list[jj], capsize=5, alpha=0.5,
-                        markeredgecolor=highlight_colour)
+            if showpeak:
+                ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_peak'][ind, 1],
+                            yerr=err['h_peak'].T[ind].T,
+                            xerr=err[which_xs[0]].T[ind].T,
+                            elinewidth=0.5, fmt='d', mfc=c_list[jj], c=c_list[jj], capsize=5, alpha=0.5,
+                            markeredgecolor=highlight_colour)
             ax.errorbar(quants[which_xs[0]][ind, 1], quants['h_rms'][ind, 1],
                         yerr=err['h_rms'].T[ind].T,
                         xerr=err[which_xs[0]].T[ind].T,
@@ -271,7 +272,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
         ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
     if xlim is not None:
         ax.set_xlim(xlim)
-    if legend:
+    if legend and showpeak:
         leg = ax.legend(handles=[mlines.Line2D([], [], color='k', marker='d', alpha=0.5,
                                                markersize=15, markeredgecolor=highlight_colour,
                                                label=r'$h_{peak}$, data'),
@@ -305,7 +306,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
               save=True, fname='h', legend=False, sigma=1, fiterror=False, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
-              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=40, lw=1,
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=10, lw=1,
               xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None, ticksize=None,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7), c_fit=None,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
@@ -450,7 +451,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
     ax.set_title(title, fontsize=labelsize)
-    if legend:
+    if legend and showpeak:
         leg = ax.legend(handles=[mlines.Line2D([], [], color=c_peak, marker='d', alpha=0.5,
                                                markersize=10, markeredgecolor=highlight_colour,
                                                label=r'$h_{peak}$, data'),
