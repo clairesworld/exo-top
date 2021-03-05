@@ -110,7 +110,7 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
         x = pro.Ra_interior(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'])
 
     elif 'Ra_F_eff' in which_x:
-        print(df)
+        print('df fed to Ra_F\n', df)
         x = pro.Ra_F_eff(d_eta=float(eta), T_i=df['T_i'], delta_L=df['delta_L'], q_sfc=df['Nu'])
 
     elif 'Ra' in which_x:
