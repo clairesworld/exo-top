@@ -799,8 +799,8 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
         logcon, power = output.beta
         s_logcon, s_pow = output.sd_beta
     elif len(output.beta) == 3:
-        logcon, pow1, pow2 = output.beta
-        s_logcon, s_pow1, s_pow2 = output.sd_beta
+        logcon, power, power2 = output.beta
+        s_logcon, s_pow, s_pow2 = output.sd_beta
     # s_logcon, s_pow = np.sqrt(np.diag(output.cov_beta))
 
     con = 10 ** logcon
