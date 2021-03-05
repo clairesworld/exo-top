@@ -48,13 +48,16 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
         if averagescheme == 'timelast':
             df1 = df.mean(axis=0)
         elif averagescheme == 'timefirst':
-            # load time-averages
-            T_av, y = pro.time_averaged_profile_from_df(df, 'T_av')
-            uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
-            df_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs) # actually a dict
-            df_av = pd.DataFrame.from_dict(df_av)
-            df.update(df_av)
-            df1 = df
+            if '_T' in psuffixes:
+                # load time-averages
+                T_av, y = pro.time_averaged_profile_from_df(df, 'T_av')
+                uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
+                df_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs) # actually a dict
+                df_av = pd.DataFrame.from_dict(df_av)
+                df1 = df.mean(axis=0) # mean of df (temperature params will be replaced)
+                df1.update(df_av)  # update with properly timefirst-averaged temperature params
+            else:
+                print('not-implemented timefirst average with this x variable')
         else:
             # use each xy point (y=h) for fitting
             df1 = df
@@ -105,7 +108,7 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
         x = pro.Ra_interior(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'])
 
     elif 'Ra_F_eff' in which_x:
-        print(df.keys())
+        print(df)
         x = pro.Ra_F_eff(d_eta=float(eta), T_i=df['T_i'], delta_L=df['delta_L'], q_sfc=df['Nu'])
 
     elif 'Ra' in which_x:
