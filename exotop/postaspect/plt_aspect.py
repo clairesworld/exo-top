@@ -57,6 +57,7 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
                 df = df.drop(['T_av', 'uv_mag_av', 'y'], axis=1)  # drop lists you don't need
                 df1 = df.mean(axis=0).transpose()  # mean of other parameters
                 print('df1\n', df1)
+                print('df_av\n', df_av)
                 df1.update(df_av)  # update with properly timefirst-averaged temperature params
                 print('df updated\n', df1)
 
