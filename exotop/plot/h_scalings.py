@@ -20,7 +20,20 @@ load = True  # load_grid
 
 
 
+
+
 # all eta on one axis
+
+# Ra_F
+_ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                   fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_F_eff',
+                   beta0=[0.1, -0.15], sigma=1,
+                   include_regimes=['chaotic'], save=True, fname='h_RaF_chaotic_timeavg', labelsize=16, legend=True,
+                   xlabel=r'Ra$_{F,eff}$', ylabel='dynamic topography',
+                   title=r'fit to CRa$_{F,eff}^n$, averaging time first', showpeak=False,
+                   c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
+                   show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                   regime_grid=regime_grid_td)
 
 # try h scalings to two-component power law for chaotic
 
@@ -63,16 +76,6 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
                    xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
                    title=r'fit to CRa$_{i,eff}^n$, averaging time first', showpeak=False,
-                   c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
-                   show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td)
-
-_ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                   fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_F_eff',
-                   beta0=[0.1, -0.15], sigma=1,
-                   include_regimes=['chaotic'], save=True, fname='h_RaF_chaotic_timeavg', labelsize=16, legend=True,
-                   xlabel=r'Ra$_{F,eff}$', ylabel='dynamic topography',
-                   title=r'fit to CRa$_{F,eff}^n$, averaging time first', showpeak=False,
                    c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
                    regime_grid=regime_grid_td)

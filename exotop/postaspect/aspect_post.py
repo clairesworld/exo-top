@@ -166,9 +166,10 @@ def pickleio_multi(case, psuffixes=None, t1=None, load=None, data_path=data_path
     for ip, ps in enumerate(psuffixes):
         df1 = pickleio(case, suffix=ps, t1=t1,
                        load=load, data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
+        print('pickleio_multi df1', df1.keys())
         dfs.append(df1)
-    print('pickleio_multi dfs', dfs.keys())
     df = pd.concat(dfs, axis=1)
+    print('  after concat', df.keys())
     df = df.loc[:, ~df.columns.duplicated()]
     return df
 
