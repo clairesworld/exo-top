@@ -51,7 +51,10 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
             # load time-averages
             T_av, y = pro.time_averaged_profile_from_df(df, 'T_av')
             uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
-            df1 = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs)
+            df_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs) # actually a dict
+            df_av = pd.DataFrame.from_dict(df_av)
+            df.update(df_av)
+            df1 = df
         else:
             # use each xy point (y=h) for fitting
             df1 = df

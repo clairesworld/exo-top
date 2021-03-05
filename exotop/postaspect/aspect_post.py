@@ -171,6 +171,7 @@ def pickleio_multi(case, psuffixes=None, t1=None, load=None, data_path=data_path
     df = pd.concat(dfs, axis=1)
     print('  after concat', df.keys())
     df = df.loc[:, ~df.columns.duplicated()]
+    print('  after remove dupes', df.keys())
     return df
 
 
