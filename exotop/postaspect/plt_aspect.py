@@ -26,20 +26,19 @@ def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches
     print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  saved to ', path, '!\n')
 
 
-def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
+def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_path=data_path_bullard,
               t1=None, load=None, postprocess_kwargs=None, return_all=False, **kwargs):
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     psuffixes = []
     if which_x in ['Ra_i', 'Ra_i_eff', 'h_components', 'Ra_F_eff']:
         psuffixes.append('_T')
-    else:
+    elif which_x is not 'eta':
         # probably in temp thign also
         print(' WARNING: possibly not implemented x variable')
         psuffixes.append('_T')
     if which_x in ['Ra_F_eff']:
         psuffixes.append('_Nu')
-    print('suffixes', psuffixes)
 
     df, df1 = None, None
     if not (not psuffixes):
@@ -103,7 +102,7 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
         x = pro.Ra_interior(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'])
 
     elif 'Ra_F_eff' in which_x:
-        print(df)
+        print(df.keys())
         x = pro.Ra_F_eff(d_eta=float(eta), T_i=df['T_i'], delta_L=df['delta_L'], q_sfc=df['Nu'])
 
     elif 'Ra' in which_x:
