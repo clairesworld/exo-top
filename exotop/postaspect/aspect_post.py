@@ -1066,9 +1066,9 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
 
         if legend:
             handles, labels = ax.get_legend_handles_labels()
-            newlabel = '({:.2e} +- {:.2e}) x^({:.3f} +- {:.3f})'.format(const, const_err)
+            newlabel = '({:.2e} +- {:.2e}) x'.format(const, const_err)
             if n_fitted > 1:
-                newlabel = newlabel + ' x^({:.3f} +- {:.3f})'.format(expon, expon_err)
+                newlabel = newlabel + '^({:.3f} +- {:.3f})'.format(expon, expon_err)
             if n_fitted > 2:
                 newlabel = newlabel + ' x2^({:.3f} +- {:.3f})'.format(expon2, expon2_err)
             if showchisq:
