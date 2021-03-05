@@ -56,8 +56,8 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
                 df_av = pd.DataFrame.from_dict(df_av)
                 df1 = df.mean(axis=0).transpose()  # mean of other parameters
                 print('df1\n', df1)
-                df.update(df_av)  # update with properly timefirst-averaged temperature params
-                print('df updated\n', df)
+                df1.update(df_av)  # update with properly timefirst-averaged temperature params
+                print('df updated\n', df1)
 
             else:
                 print('not-implemented timefirst average with this x variable')
