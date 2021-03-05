@@ -905,6 +905,13 @@ def Ra_i_eff(Ra_1=None, d_eta=None, T_i=None, T1=1, T0=0, T_l=None, Z=1, delta_L
     return Ra_eff(Ra_i, T1=T1, T_l=T_l, Z=Z, delta_L=delta_L)
 
 
+def Ra_F_eff(delta_L=None, q_sfc=None, T_i=None, d_eta=None, T1=1, T0=0, Z=1):
+    theta = np.log(d_eta)  # gamma for this delta eta
+    gamma = theta / (np.array(T1) - np.array(T0))
+    eta_i = np.exp(-gamma * np.array(T_i))
+    return (Z - delta_L)**4 * q_sfc / eta_i
+
+
 def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **kwargs):
     label = regime_grid[jj, ii]
     digi = np.nonzero(np.array(regime_names) == label)[0]

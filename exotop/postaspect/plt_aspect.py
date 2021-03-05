@@ -31,12 +31,14 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme=None, data_path=da
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     psuffixes = []
-    if which_x in ['Ra_i', 'Ra_i_eff', 'h_components']:
+    if which_x in ['Ra_i', 'Ra_i_eff', 'h_components', 'Ra_F_eff']:
         psuffixes.append('_T')
     else:
         # probably in temp thign also
         print(' WARNING: possibly not implemented x variable')
         psuffixes.append('_T')
+    if which_x in ['Ra_F_eff']:
+        psuffixes.append('_Nu')
 
     df, df1 = None, None
     if not (not psuffixes):
@@ -98,6 +100,9 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
                      T_l=df['T_l'], delta_L=df['delta_L'])
     elif 'Ra_i' in which_x:
         x = pro.Ra_interior(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'])
+
+    elif 'Ra_F_eff' in which_x:
+        x = pro.Ra_F_eff(d_eta=float(eta), T_i=df['T_i'], delta_L=df['delta_L'], q_sfc=df['Nu'])
 
     elif 'Ra' in which_x:
         x = float(Ra)
