@@ -348,24 +348,24 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                                                                      data_path=data_path, averagescheme=averagescheme,
                                                                      postprocess_kwargs=postprocess_kwargs, **kwargs)
 
-                # calculate Mahalanobis distance for chi square later
-                div = int(np.ceil(len(h_rms_times) / len(x_times)))
-                try:
-                    data = pd.DataFrame({'y': np.log10(h_rms_times[::div]), 'x': np.log10(x_times)})
-                except (TypeError, AttributeError) as e:
-                    pee = np.asarray(h_rms_times).astype(np.float64)[::div]
-                    poo = np.asarray(x_times).astype(np.float64)
-                    data = pd.DataFrame({'y': np.log10(pee), 'x': np.log10(poo)})
-                # V = np.cov(np.array([np.log10(h_rms_times[::div]), np.log10(x_times)]).T)
+                # # calculate Mahalanobis distance for chi square later
+                # div = int(np.ceil(len(h_rms_times) / len(x_times)))
                 # try:
-                #     IV = np.linalg.inv(V)
-                # except np.linalg.LinAlgError:
-                #     IV = np.linalg.pinv(V)  # pseudo-inverse
-                d_m = mahalanobis(x=data, data=data, cov=None)
-                # d_m = distance.mahalanobis(np.log10(h_rms_times[::div]), np.log10(x_times), IV)
-                D_m2 = np.mean(d_m**2)
-                # D_m2 = np.var(np.log10(h_rms_times))
-                D_m2_all.append(D_m2)
+                #     data = pd.DataFrame({'y': np.log10(h_rms_times[::div]), 'x': np.log10(x_times)})
+                # except (TypeError, AttributeError) as e:
+                #     pee = np.asarray(h_rms_times).astype(np.float64)[::div]
+                #     poo = np.asarray(x_times).astype(np.float64)
+                #     data = pd.DataFrame({'y': np.log10(pee), 'x': np.log10(poo)})
+                # # V = np.cov(np.array([np.log10(h_rms_times[::div]), np.log10(x_times)]).T)
+                # # try:
+                # #     IV = np.linalg.inv(V)
+                # # except np.linalg.LinAlgError:
+                # #     IV = np.linalg.pinv(V)  # pseudo-inverse
+                # d_m = mahalanobis(x=data, data=data, cov=None)
+                # # d_m = distance.mahalanobis(np.log10(h_rms_times[::div]), np.log10(x_times), IV)
+                # D_m2 = np.mean(d_m**2)
+                # # D_m2 = np.var(np.log10(h_rms_times))
+                # D_m2_all.append(D_m2)
 
                 # calculate statistics
                 sdy = np.nanstd(h_rms_times)

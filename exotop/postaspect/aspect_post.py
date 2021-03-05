@@ -753,7 +753,7 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
 
     def func_lin0(beta, u):
         a = beta
-        return a + u[0]
+        return a + u
 
     if not slope:
         beta0 = [np.log10(2)]
@@ -1018,7 +1018,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
 
 
 def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=False,
+                      c='xkcd:periwinkle', sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=True,
                       **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
