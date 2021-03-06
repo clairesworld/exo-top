@@ -282,7 +282,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
         pass
 
     if fit:
-        ax = pro.fit_cases_on_plot(yx_rms_all, ax, dist=D_m2_all,
+        ax = fit_cases_on_plot(yx_rms_all, ax, dist=D_m2_all,
                                    c_list=colorize(np.log10(np.unique(z_vec)), cmap=cmap, vmin=vmin, vmax=vmax)[0],
                                    labelsize=labelsize, n_fitted=len(which_xs) + 1, cmap=cmap, **kwargs)
 
@@ -466,7 +466,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             yerr = 1
         if c_fit is None:
             c_fit = c_rms
-        ax = pro.fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
+        ax = fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
                                    xerr=xerr, yerr=yerr, legend=legend, lw=lw,
                                    sigma=sigma, **kwargs)
 
@@ -622,7 +622,7 @@ def plot_Ra_scaling(Ra_data=None, y_data=None, fig_path=fig_path_bullard,
 
     if fit:
         yx_all = [(y, r) for r, y in zip(Ra_data, y_data)]
-        ax = pro.fit_cases_on_plot(yx_all, ax, weights=None, c=c_scatter, labelsize=labelsize, **kwargs)
+        ax = fit_cases_on_plot(yx_all, ax, weights=None, c=c_scatter, labelsize=labelsize, **kwargs)
 
     if logx:
         ax.set_xscale('log')
