@@ -27,7 +27,7 @@ load = True  # load_grid
 # Ra_F
 _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_F_eff',
-                   beta0=[0.1, -0.15], sigma=1,
+                   beta0=[0.1, -0.15], sigma=1, fiterror=False,
                    include_regimes=['chaotic'], save=True, fname='h_RaF_chaotic_timeavg', labelsize=16, legend=True,
                    xlabel=r'Ra$_{F,eff}$', ylabel='dynamic topography',
                    title=r'fit to CRa$_{F,eff}^n$, averaging time first', showpeak=False,
@@ -72,7 +72,7 @@ _ = plat.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=en
 
 _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
-                   beta0=[0.1, -0.15], sigma=1,
+                   beta0=[0.1, -0.15], sigma=1, fiterror=False,
                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
                    xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
                    title=r'fit to CRa$_{i,eff}^n$, averaging time first', showpeak=False,
@@ -91,7 +91,7 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                  title=r'fit to $C\alpha \delta_{rh} \Delta T_{rh}$, averaging time first', showpeak=False,
                  c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', fit=True, logx=True, logy=True, hscale=1,
                  show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                 regime_grid=regime_grid_td)
+                 regime_grid=regime_grid_td, fiterror=False,)
 # #
 # _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
 #                  fig_path=fig_path, averagescheme='timelast', p_dimensionals=None, which_x='h_components',

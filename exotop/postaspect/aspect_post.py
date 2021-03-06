@@ -794,7 +794,12 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
 
     data = odr.RealData(logx, logh, sx=err_logx, sy=err_logh)
     model = odr.Model(func)
-    odrfit = odr.ODR(data, model, beta0)
+    try:
+        odrfit = odr.ODR(data, model, beta0)
+    except Exception as e:
+        print('logx', logx)
+        print('logh', logh)
+        raise e
     output = odrfit.run()
 
     if len(output.beta) == 1:
@@ -1034,6 +1039,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
                       **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
+
     if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
         flatx = [item for sublist in x for item in sublist]
         flaty = [item for sublist in y for item in sublist]

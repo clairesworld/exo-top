@@ -313,9 +313,9 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
 
 def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
-              fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None,
+              fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None, fiterror=False,
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
-              save=True, fname='h', legend=False, sigma=1, fiterror=False, showpeak=False,
+              save=True, fname='h', legend=False, sigma=1, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=10, lw=1,
               xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None, ticksize=None,
