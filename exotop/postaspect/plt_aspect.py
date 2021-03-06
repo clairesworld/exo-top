@@ -230,20 +230,20 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                     len(x_all[1])
                 except TypeError:  # e.g. scalar
                     x_all[1] = [x_all[1]] * len(x_all[0])  # this way all three will always be same length
-
-                # calculate Mahalanobis distance for chi square later
-                div = int(np.ceil(len(h_rms_all) / len(x_all[0])))
-                try:
-                    data = pd.DataFrame(
-                        {'y': np.log10(h_rms_all[::div]), 'x0': np.log10(x_all[0]), 'x1': np.log10(x_all[1])})
-                except (TypeError, AttributeError) as e:
-                    pee = np.asarray(h_rms_all).astype(np.float64)[::div]
-                    poo = np.asarray(x_all[0]).astype(np.float64)
-                    poo2 = np.asarray(x_all[1]).astype(np.float64)
-                    data = pd.DataFrame({'y': np.log10(pee), 'x0': np.log10(poo), 'x1': np.log10(poo2)})
-                d_m = mahalanobis(x=data, data=data, cov=None)
-                D_m2 = np.mean(d_m ** 2)
-                D_m2_all.append(D_m2)
+                #
+                # # calculate Mahalanobis distance for chi square later
+                # div = int(np.ceil(len(h_rms_all) / len(x_all[0])))
+                # try:
+                #     data = pd.DataFrame(
+                #         {'y': np.log10(h_rms_all[::div]), 'x0': np.log10(x_all[0]), 'x1': np.log10(x_all[1])})
+                # except (TypeError, AttributeError) as e:
+                #     pee = np.asarray(h_rms_all).astype(np.float64)[::div]
+                #     poo = np.asarray(x_all[0]).astype(np.float64)
+                #     poo2 = np.asarray(x_all[1]).astype(np.float64)
+                #     data = pd.DataFrame({'y': np.log10(pee), 'x0': np.log10(poo), 'x1': np.log10(poo2)})
+                # d_m = mahalanobis(x=data, data=data, cov=None)
+                # D_m2 = np.mean(d_m ** 2)
+                # D_m2_all.append(D_m2)
 
                 # append to working
                 yx_peak_all.append((h_peak, x))
