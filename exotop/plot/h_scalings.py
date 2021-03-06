@@ -11,15 +11,15 @@ load = True  # load_grid
 
 # model versus data
 
-# fig, ax = plat.plot_model_data(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=load,
-#                                     end_grid=end_grid, literature_file=None, legend=True, which_x='h_components',
-#                                     postprocess_kwargs=postprocess_kwargs, c='k', averagescheme='timefirst',
-#                                     ylim=[6e-3, 2e-2], which_h='rms', data_path=data_path, save=True,
-#                                     fname='model-data-chaotic_timeavg', cbar='eta', include_regimes=['chaotic'],
-#                                     intercept=True, fig_fmt=fig_fmt)
-
-
-
+fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
+                                  end_grid=end_grid, literature_file=None, legend=False, cmap=None, ms=10,
+                                  postprocess_kwargs=postprocess_kwargs, averagescheme='timefirst',
+                                  ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
+                                  clist=['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow'], #figsize=(10, 10),
+                                  z_name='eta', fname='model-data-chaotic_timeavg',
+                                  save=True, include_regimes=['chaotic'], errs=[0.5, 0.2, 0.1, 0.05],
+                                  fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False,
+                                  ylabel=r'Model $\Delta h_{rms}^\prime$', xlabel=r'Data $\Delta h_{rms}^\prime$')
 
 
 # all eta on one axis
