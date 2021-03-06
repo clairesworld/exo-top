@@ -745,7 +745,7 @@ def fit_SE(x, h, beta, err_x=1, err_h=1, xn=None, num=20):
     print('         -> SE_y:', SE)
 
     # unlog
-    SE_unlog = 2.302585 * 10 ** loghn * SE_y
+    SE_unlog = 2.302585 * 10 ** loghn * SE
 
     return SE_unlog
 
