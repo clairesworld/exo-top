@@ -53,9 +53,12 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
                 T_av, y = pro.time_averaged_profile_from_df(df, 'T_av')
                 uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
                 df_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs) # actually a dict
+                for k in ['T_av', 'uv_mag_av', 'y']:
+                    df_av.pop(k, None)
+                    df = df.drop(k, axis=1)  # drop lists you don't need
                 df_av = pd.DataFrame.from_dict(df_av)
-                df1 = df.drop(['T_av', 'uv_mag_av', 'y'], axis=1)  # drop lists you don't need
-                df1 = df1.mean(axis=0).transpose()  # mean of other parameters
+                # problem is that creating df from dict fills out such that all columns are as long as the profile
+                df1 = df.mean(axis=0).transpose()  # mean of other parameters
                 print('df1\n', df1)
                 print('df_av\n', df_av)
                 df1.update(df_av)  # update with properly timefirst-averaged temperature params
