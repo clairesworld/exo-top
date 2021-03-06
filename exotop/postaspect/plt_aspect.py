@@ -53,12 +53,12 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
                 T_av, y = pro.time_averaged_profile_from_df(df, 'T_av')
                 uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
                 dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs) # actually a dict
+                # really hacky bit
                 for k in ['T_av', 'uv_mag_av', 'y']:
                     dic_av.pop(k, None)
                     df = df.drop(k, axis=1)  # drop lists you don't need
                 df_av = pd.DataFrame({key:value for (key,value) in dic_av.items()}, index=[0])
-                # problem is that creating df from dict fills out such that all columns are as long as the profile
-                df1 = df.mean(axis=0)  # mean of other parameters
+                df1 = df.mean(axis=0).to_frame()  # mean of other parameters
                 df1.set_index(pd.Series([0]))
                 print('df1\n', df1)
                 print('df1 trans\n', df1.transpose())
