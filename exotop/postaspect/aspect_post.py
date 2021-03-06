@@ -719,6 +719,7 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
 
 
 def fit_SE(x, h, beta, err_x=1, err_h=1, xn=None, num=20):
+    # only works for linear fit
     # convert to log
     try:
         logx1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
@@ -1060,7 +1061,7 @@ def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, **kwargs):
             expon = [beta[1]]
             expon_err = [sd_beta[1]]
         else:
-            expon = 1
+            expon = [1]
             expon_err = None
         if len(beta) > 2:
             expon.append(beta[2])
