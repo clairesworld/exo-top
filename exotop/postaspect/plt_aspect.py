@@ -1624,6 +1624,8 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
         h_fit = const * np.array(x0) ** expon[0] * np.array(x1) ** expon[1]
         fiterr = None
     else:
+        print('x_data_all', x_data_all)
+        print('h_data_all', h_data_all)
         x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
         n_fitted = 2
         if which_x == 'h_components':
