@@ -145,6 +145,8 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
         except AttributeError:
             # dunno
             pass
+    if iterable_not_string(x) and (averagescheme is not None):
+        x = x[0]
     return x
 
 
