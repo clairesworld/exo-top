@@ -71,6 +71,7 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
     x = getx_fromdf(Ra, eta, df=df1, case=case, which_x=which_x, averagescheme=averagescheme,
                     data_path=data_path_bullard,
                     t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
+    print('x', x, type(x))
 
     if return_all:
         x_all = getx_fromdf(Ra, eta, df=df, case=case, which_x=which_x, averagescheme=averagescheme,
@@ -1585,7 +1586,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     x, x_times = plot_getx(Ra_var[ii], eta_str, case=case, which_x=which_x, data_path=data_path,
                                            t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
                                            averagescheme=averagescheme, return_all=True, **kwargs)
-                    print('x', x)
+
                 # get the y values, depending on averaging scheme
                 h_rms, h_peak, h_rms_times, h_peak_times = plot_geth(case=case, t1=t1_ii, data_path=data_path,
                                                                      averagescheme=averagescheme,
