@@ -718,7 +718,7 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
 #     return (slope1, slope2), intercept
 
 
-def fit_SE(x, h, beta, err_x=1, err_h=1, num=20):
+def fit_SE(x, h, beta, err_x=1, err_h=1, xn=None, num=20):
     # convert to log
     try:
         logx1 = np.log10(np.array(x))  # this should work for time-series of all x corresponding to h
@@ -732,7 +732,10 @@ def fit_SE(x, h, beta, err_x=1, err_h=1, num=20):
 
     # standard error (single parameter only)
 
-    logxn1 = np.linspace(np.min(logx1), np.max(logx1), num)
+    if xn is None:
+        logxn1 = np.linspace(np.min(logx1), np.max(logx1), num)
+    else:
+        logxn1 = np.log10(xn)
     loghn = beta[0] + logxn1 * beta[1]
 
     sigma_logh = np.std(logh)
@@ -1039,157 +1042,34 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
 #                     print(df)
 
 
-def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=True,
-                      **kwargs):
-    x = [a[1] for a in yx_all]
-    y = [a[0] for a in yx_all]
+def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, **kwargs):
 
-    if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
-        flatx = [item for sublist in x for item in sublist]
-        flaty = [item for sublist in y for item in sublist]
-    else:
-        flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
-        h = flaty
         slope = True
-        if n_fitted == 3:  # fit to 3 parameter power law
-            flatx0 = [a[0] for a in flatx]
-            flatx1 = [a[1] for a in flatx]
-            x1 = flatx0
-            x2 = flatx1
-        else:
-            if n_fitted == 1:
-                slope = False
-            x1 = flatx
-            x2 = None
-
+        x1 = x
+        x2 = None
+        if n_fitted == 3:
+            x1 = x[0]
+            x2 = x[1]
+        elif n_fitted == 1:
+            slope = False
         beta, sd_beta, chisqr, MSE = fit_logerror(x1=x1, h=h, x2=x2, err_x=xerr, err_h=yerr, slope=slope, **kwargs)
-        const = 10**beta[0]
-        const_err = 2.302585 * 10**beta[0] * sd_beta[0]
-        newlabel = '(C = {:.2e} +- {:.2e})'.format(const, const_err)
+        const = 10 ** beta[0]
+        const_err = 2.302585 * 10 ** beta[0] * sd_beta[0]
         if len(beta) > 1:
-            expon = beta[1]
-            expon_err = sd_beta[1]
-            newlabel = newlabel + '\np = {:.3f} +- {:.3f}'.format(expon, expon_err)
+            expon = [beta[1]]
+            expon_err = [sd_beta[1]]
         else:
             expon = 1
-            expon_err = 0
+            expon_err = None
         if len(beta) > 2:
-            expon2 = beta[2]
-            expon2_err = sd_beta[2]
-            newlabel = newlabel + '\nq = {:.3f} +- {:.3f}'.format(expon2, expon2_err)
+            expon.append(beta[2])
+            expon_err.append(sd_beta[2])
 
-        # plot
-        if n_fitted == 3:
-            x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
-            z_vec = np.unique(flatx1)
-            if c_list is None:
-                c_list = colorize(np.log10(z_vec), cmap='winter')[0]
-            for ind, z in enumerate(z_vec):
-                hprime = const * x0prime ** expon * z ** expon2
-                h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=lw, zorder=100, label='dum')
-
-        else:
-            xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
-            hprime = const * xprime ** expon
-            h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
-
-        if legend:
-            if showchisq:
-                newlabel = newlabel + '\n' + r'$\chi^2_\nu$ = ' + '{:.4f}'.format(chisqr)
-            # handles, labels = ax.get_legend_handles_labels()
-            # try:
-            #     labels[-1] = newlabel
-            # except IndexError:
-            #     labels = newlabel
-            ax.text(0.95, 0.95, newlabel, fontsize=legsize,
-                 horizontalalignment='right',
-                 verticalalignment='top',
-                 transform=ax.transAxes)
-            # leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
-            # ax.add_artist(leg)
     else:
         print('    Not enough points to fit')
-    if showallscatter:
-        ax.scatter(flatx, flaty, c=c, alpha=0.05, s=10)
-    return ax
+        return [None]*6
 
-# def fit_cases_on_plot(yx_all, ax, yerr=None, xerr=None, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-#                       c='xkcd:periwinkle', weights=None, sigma=1, legsize=8, lw=1, legloc='lower left', showchisq=False, **kwargs):
-#     fiterror = (yerr is not None) or (xerr is not None)
-#     x = [a[1] for a in yx_all]
-#     y = [a[0] for a in yx_all]
-#     # try:
-#     #     weights = [len(a[0]) for a in yx_all]
-#     # except TypeError:
-#     #     weights = [1] * len(x)
-#     if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
-#         flatx = [item for sublist in x for item in sublist]
-#         flaty = [item for sublist in y for item in sublist]
-#     else:
-#         flatx, flaty = x, y
-#     if len(x) > 1:  # can only fit if at least 2 data
-#
-#         if n_fitted > 2:  # fit to 3 parameter power law
-#             flatx0 = [a[0] for a in flatx]
-#             flatx1 = [a[1] for a in flatx]
-#             x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
-#             expon, const = fit_2log(x1=flatx0, x2=flatx1, h=flaty)
-#             z_vec = np.unique(flatx1)
-#             if c_list is None:
-#                 c_list = colorize(np.log10(z_vec), cmap='winter')[0]
-#             for ind, z in enumerate(z_vec):
-#                 hprime = const * x0prime ** expon[0] * z ** expon[1]
-#                 h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=lw, zorder=100, label='dum')
-#
-#         else:
-#             xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
-#             # xprime = np.linspace(np.min(flatx), np.max(flatx), num=len(flatx))
-#             if fiterror:
-#                 const, expon, const_err, expon_err = fit_logerror(flatx, flaty, xerr, yerr, sigma=sigma, **kwargs)
-#                 const_up = const + sigma * const_err
-#                 const_dw = const - sigma * const_err
-#                 expon_up = expon + sigma * expon_err
-#                 expon_dw = expon - sigma * expon_err
-#                 hprime_up = const_up * xprime ** expon_up
-#                 hprime_dw = const_dw * xprime ** expon_dw
-#                 hprime_dw[hprime_dw < 0] = 0  # cannot be negative
-#                 ax.fill_between(xprime, hprime_up, hprime_dw, alpha=.25#, label=str(sigma) + '-sigma interval'
-#                                 )
-#             else:
-#                 expon, const = fit_log(flatx, flaty, weights=weights, **kwargs)
-#             hprime = const * xprime ** expon
-#             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
-#
-#         # print('fit: {:.2e} x^{:.3f}'.format(const, expon))
-#
-#         if legend:
-#             handles, labels = ax.get_legend_handles_labels()
-#             # handles.append(h3)
-#             # labels.append('{:.2e} x^{:.3f}'.format(const, expon))
-#             if n_fitted == 2:
-#                 if fiterror:
-#                     newlabel = '({:.2e} +- {:.2e}) x^({:.3f} +- {:.3f})'.format(const, const_err, expon, expon_err)
-#                 else:
-#                     newlabel = '{:.2e} x^{:.3f}'.format(const, expon)
-#             elif n_fitted == 3:
-#                 newlabel = '{:.3e} x0^{:.3f} x1^{:.3f}'.format(const, expon[0], expon[1])
-#             else:
-#                 print(' warning: Legend labelling for this n fitted parameters not implemented')
-#                 newlabel = ''
-#                 pass
-#             if showchisq:
-#                 chisq = reduced_chisq(O_y=np.log10(flaty), C_y=np.log10(hprime), n_fitted=n_fitted, **kwargs)
-#                 newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.4f}'.format(chisq)
-#             try:
-#                 labels[-1] = newlabel
-#             except IndexError:
-#                 labels = newlabel
-#             leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
-#             ax.add_artist(leg)
-#     else:
-#         print('    Not enough points to fit')
-#     if showallscatter:
-#         ax.scatter(flatx, flaty, c=c, alpha=0.05, s=10)
-#     return ax
+    return const, expon, const_err, expon_err, chisqr, MSE
+
+

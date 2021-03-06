@@ -43,7 +43,7 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
     df, df1 = None, None
     if not (not psuffixes):
         df = pro.pickleio_multi(case, psuffixes=psuffixes, t1=t1, load=load,
-                            data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
+                                data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
         if averagescheme == 'timelast':
             df1 = df.mean(axis=0)
@@ -52,12 +52,13 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
                 # load time-averages
                 T_av, y = pro.time_averaged_profile_from_df(df, 'T_av')
                 uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
-                dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **postprocess_kwargs, **kwargs) # actually a dict
+                dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y,
+                                                 **postprocess_kwargs, **kwargs)  # actually a dict
                 # really hacky bit
                 for k in ['T_av', 'uv_mag_av', 'y']:
                     dic_av.pop(k, None)
                     df = df.drop(k, axis=1)  # drop lists you don't need
-                df_av = pd.DataFrame({key:value for (key,value) in dic_av.items()}, index=[0])
+                df_av = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
                 df1 = df.mean(axis=0).to_frame().transpose()  # mean of other parameters
                 df1.set_index(pd.Series([0]))
                 df1.update(df_av)  # update with properly timefirst-averaged temperature params
@@ -82,7 +83,6 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
 
 def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
                 t1=None, load=None, postprocess_kwargs=None, **kwargs):
-
     if df is not None:
         try:
             keys = df.columns
@@ -107,11 +107,12 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
                 print('    Calculating T components')
             else:
                 print('    Unrecognized conditions: hoping for the best')
-            x = pro.T_components_of_h(case, df=df, data_path=data_path, t1=t1, load=load, **postprocess_kwargs, **kwargs)
+            x = pro.T_components_of_h(case, df=df, data_path=data_path, t1=t1, load=load, **postprocess_kwargs,
+                                      **kwargs)
 
     elif 'Ra_i_eff' in which_x:  # calculate effective Ra using time-mean of T field params
         x = pro.Ra_i_eff(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'],
-                     T_l=df['T_l'], delta_L=df['delta_L'])
+                         T_l=df['T_l'], delta_L=df['delta_L'])
     elif 'Ra_i' in which_x:
         x = pro.Ra_interior(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'])
 
@@ -143,7 +144,7 @@ def plot_geth(case=None, averagescheme=None, data_path=data_path_bullard, return
 
     if averagescheme in ['timelast', 'timefirst']:
         df = pro.pickleio_multi(case, psuffixes=['_h_all'], t1=t1, load=load,
-                            data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
+                                data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
         h_rms = df.h_rms.mean()
         h_peak = df.h_peak.mean()
     # elif averagescheme == 'timefirst':
@@ -155,7 +156,7 @@ def plot_geth(case=None, averagescheme=None, data_path=data_path_bullard, return
     else:
         # use each xy point (y=h) for fitting
         df = pro.pickleio_multi(case, psuffixes=['_h'], t1=t1, load=load,
-                            data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
+                                data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
         h_rms = df.h_rms.to_numpy()
         h_peak = df.h_peak.to_numpy()
 
@@ -174,7 +175,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                          fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs={}, regime_names=None, **kwargs):
     # for fitting h to 2 component power law, which_xs is iterable of x values, the first of which is the plotting one
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = pro.reshape_inputs(Ra, eta,
-                                                                          (t1_grid, load_grid, end_grid, regime_grid))
+                                                                              (t1_grid, load_grid, end_grid,
+                                                                               regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
     if clabel is None:
@@ -210,7 +212,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                                                                  postprocess_kwargs=postprocess_kwargs, **kwargs)
                 try:
                     len(x_all[0])
-                except TypeError: # e.g. scalar
+                except TypeError:  # e.g. scalar
                     x_all[0] = [x_all[0]] * len(h_rms_all)
                 try:
                     len(x_all[1])
@@ -218,24 +220,25 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
                     x_all[1] = [x_all[1]] * len(x_all[0])  # this way all three will always be same length
 
                 # calculate Mahalanobis distance for chi square later
-                div = int(np.ceil(len(h_rms_all)/len(x_all[0])))
+                div = int(np.ceil(len(h_rms_all) / len(x_all[0])))
                 try:
-                    data = pd.DataFrame({'y': np.log10(h_rms_all[::div]), 'x0': np.log10(x_all[0]), 'x1': np.log10(x_all[1])})
+                    data = pd.DataFrame(
+                        {'y': np.log10(h_rms_all[::div]), 'x0': np.log10(x_all[0]), 'x1': np.log10(x_all[1])})
                 except (TypeError, AttributeError) as e:
                     pee = np.asarray(h_rms_all).astype(np.float64)[::div]
                     poo = np.asarray(x_all[0]).astype(np.float64)
                     poo2 = np.asarray(x_all[1]).astype(np.float64)
                     data = pd.DataFrame({'y': np.log10(pee), 'x0': np.log10(poo), 'x1': np.log10(poo2)})
                 d_m = mahalanobis(x=data, data=data, cov=None)
-                D_m2 = np.mean(d_m**2)
+                D_m2 = np.mean(d_m ** 2)
                 D_m2_all.append(D_m2)
 
                 # append to working
                 yx_peak_all.append((h_peak, x))
                 yx_rms_all.append((h_rms, x))
                 qdict = pro.parameter_percentiles(case, df={'h_rms': h_rms_all, 'h_peak': h_peak_all,
-                                                        **{key: value for (key, value) in zip(which_xs, x_all)}},
-                                              keys=quants.keys(), sigma=sigma, plot=False)
+                                                            **{key: value for (key, value) in zip(which_xs, x_all)}},
+                                                  keys=quants.keys(), sigma=sigma, plot=False)
                 for key in quants.keys():
                     try:
                         quants[key] = np.vstack((quants[key], qdict[key]))
@@ -268,8 +271,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
     if fit:
         ax = pro.fit_cases_on_plot(yx_rms_all, ax, dist=D_m2_all,
-                               c_list=colorize(np.log10(np.unique(z_vec)), cmap=cmap, vmin=vmin, vmax=vmax)[0],
-                               labelsize=labelsize, n_fitted=len(which_xs) + 1, cmap=cmap, **kwargs)
+                                   c_list=colorize(np.log10(np.unique(z_vec)), cmap=cmap, vmin=vmin, vmax=vmax)[0],
+                                   labelsize=labelsize, n_fitted=len(which_xs) + 1, cmap=cmap, **kwargs)
 
     if show_isoviscous:
         df_JFR = pro.read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
@@ -321,12 +324,13 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=10, lw=1,
               xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None, ticksize=None,
-              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7,7), c_fit=None,
+              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7), c_fit=None,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = pro.reshape_inputs(Ra, eta,
-                                                                          (t1_grid, load_grid, end_grid, regime_grid))
+                                                                              (t1_grid, load_grid, end_grid,
+                                                                               regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
     if ax is None:
@@ -390,9 +394,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 # calculate statistics
                 sdy = np.nanstd(h_rms_times)
                 sdx = np.nanstd(x_times)
-                qdict = pro.parameter_percentiles(case, df={'h_rms': h_rms_times, 'h_peak': h_peak_times, which_x: x_times},
-                                              keys=quants.keys(), plot=False, sigma=2)
-
+                qdict = pro.parameter_percentiles(case,
+                                                  df={'h_rms': h_rms_times, 'h_peak': h_peak_times, which_x: x_times},
+                                                  keys=quants.keys(), plot=False, sigma=2)
 
                 # append to working
                 yx_peak_all.append((h_peak, x))
@@ -418,15 +422,15 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         for key in quants.keys():
             err[key] = np.asarray([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
         if showpeak:
-            ax.errorbar(means[which_x], means['h_peak'], yerr=sdy_all,#err['h_peak'],
-                        xerr=sdx_all,#err[which_x],
+            ax.errorbar(means[which_x], means['h_peak'], yerr=sdy_all,  # err['h_peak'],
+                        xerr=sdx_all,  # err[which_x],
                         elinewidth=0.5, ms=ms,
                         fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
         mark = 'o'
         if colourful:
             for pp in range(len(means[which_x])):
-                ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:,pp]]).T,
-                            xerr=np.asarray([err[which_x][:,pp]]).T, elinewidth=elw,
+                ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:, pp]]).T,
+                            xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw,
                             fmt=mark, c=c_rms[jj_all[pp]], capsize=ecapsize, ms=ms)
         else:
             ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=elw,
@@ -451,15 +455,14 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         if c_fit is None:
             c_fit = c_rms
         ax = pro.fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
-                               xerr=xerr, yerr=yerr, legend=legend, lw=lw,
-                               sigma=sigma, **kwargs)
+                                   xerr=xerr, yerr=yerr, legend=legend, lw=lw,
+                                   sigma=sigma, **kwargs)
 
     if show_isoviscous:
         df_JFR = pro.read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
         Ra_iso = df_JFR['Ra']
         h_rms_iso = df_JFR['RMS_topo']
         ax.plot(Ra_iso, h_rms_iso, c='k', ls='--', lw=0.5)
-
 
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
@@ -480,7 +483,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             return u / (p_dimensionals['alpha_m'] * p_dimensionals['dT_m'] * p_dimensionals['d_m'])
 
         ax2 = ax.secondary_yaxis('right', functions=(h_todim, h_tonondim))
-        ax2.set_ylabel(y2label, fontsize=labelsize, labelpad=ylabelpad+60, rotation=270)
+        ax2.set_ylabel(y2label, fontsize=labelsize, labelpad=ylabelpad + 60, rotation=270)
         ax2.tick_params(axis='y', which='major', labelsize=ticksize)
         axes = (ax, ax2)
 
@@ -685,8 +688,8 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
                 dfs = []
                 for ip, suffix in enumerate(psuffixes):
                     df1 = pro.pickleio(case, suffix=suffix, t1=t1_ii,
-                                   dat_new=dat, data_path=data_path, load=load_ii,
-                                   postprocess_kwargs=postprocess_kwargs, **kwargs)
+                                       dat_new=dat, data_path=data_path, load=load_ii,
+                                       postprocess_kwargs=postprocess_kwargs, **kwargs)
                     dfs.append(df1)
                 try:
                     df = pd.concat(dfs, axis=1)
@@ -701,7 +704,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
                     T_av, y = pro.time_averaged_profile_from_df(df, 'T_av')
                     uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
                     df_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, **postprocess_kwargs,
-                                                **kwargs)
+                                                    **kwargs)
                     if 'Nu' in keys:
                         df_av['Nu'] = np.mean(df['Nu'])  # using average flux anyways so scheme doesn't matter
                     df = df_av
@@ -713,7 +716,7 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
                     plot_data[key].append(np.median(df[key]))
                 if Ra_i == 'eff':
                     plot_data['Ra'].append(pro.Ra_i_eff(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i']),
-                                                    T_l=np.median(df['T_l']), delta_L=np.median(df['delta_L'])))
+                                                        T_l=np.median(df['T_l']), delta_L=np.median(df['delta_L'])))
                 elif Ra_i:
                     plot_data['Ra'].append(pro.Ra_interior(Ra_1=Ra_ii, d_eta=float(eta_str), T_i=np.median(df['T_i'])))
                 else:
@@ -788,7 +791,6 @@ def subplots_Ra_scaling(Ra_ls=None, eta_ls=None, t1_grid=None, end_grid='', keys
     return fig, axes
 
 
-
 def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=True, dt_xlim=(0.0, 0.065),
                    fname='cases', data_path=data_path_bullard, fig_path=fig_path_bullard, fig_fmt='.png',
                    load='auto', includegraphic=False, c_rms='xkcd:forest green', c_peak='xkcd:periwinkle',
@@ -832,8 +834,8 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
             if show_sols:  # load df
                 if t1[ii] < 1:
-                    sol_df = pro.pickleio(case, suffix='_T',  t1=t1_ii,
-                                      dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
+                    sol_df = pro.pickleio(case, suffix='_T', t1=t1_ii,
+                                          dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
                 else:
                     show_sols = False  # automatically override processing
 
@@ -865,7 +867,8 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 if t1_ii < 1:
                     if not show_sols:
                         sol_df = pro.pickleio(case, suffix='_T', t1=t1_ii,
-                                          dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
+                                              dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
+                                              **kwargs)
 
                     fig, ax = plot_T_profile(case, T_params=sol_df, n='mean', data_path=data_path, setylabel=False,
                                              setxlabel=setxlabel, save=False, fig_path=fig_path, fig=fig, ax=ax,
@@ -884,8 +887,8 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 ax = axes[ii, icol]
                 if t1_ii < 1:
                     ts_df = pro.pickleio(case, suffix='_h_all', t1=t1_ii,
-                                     dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
-                                      **kwargs)
+                                         dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
+                                         **kwargs)
 
                     fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'], fig=fig, ax=ax, save=False,
                                        settitle=False, setxlabel=setxlabel, legend=legend, labelsize=labelsize,
@@ -934,7 +937,7 @@ def get_h_average(Ra, eta, which_h='rms', end=None, data_path=data_path_bullard,
         return peak
     else:
         raise Exception('invalid which h')
-    
+
 
 def plot_fit_parameter_grid(Ra_ls, eta_ls, data_path=data_path_bullard, fig_path=fig_path_bullard, load_grid=None,
                             vmin=None, vmax=None, averagescheme=None, which_x=None, regime_grid=None,
@@ -1117,7 +1120,7 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
                    legend=True, labelsize=16, **kwargs):
     if T_params is None:
         T_params = pro.pickleio(case, suffix='_T', t1=t1,
-                            dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+                                dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
     if fig is None:
         fig, ax = plt.subplots(figsize=(4, 4))
 
@@ -1264,7 +1267,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                 dfs = []
                 for ip, suffix in enumerate(psuffixes):
                     df1 = pro.pickleio(case, suffix=suffix, t1=t1_ii,
-                                   dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
+                                       dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
                     dfs.append(df1)
                 try:
                     df = pd.concat(dfs, axis=1)
@@ -1319,13 +1322,13 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
 
 
 def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbins=20,
-                         load_grid='auto', psuffixes=None,
-                         fig_path=fig_path_bullard, fname='hist-evol', fig_fmt='.png', end_grid=None, normtime=True,
-                         labelsize=14, xlabels=None, keys=None, title='', legsize=10,
-                         xlabelpad=8,alpha=0.5,
-                         fig=None, axes=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
-                         regime_names=None,
-                         data_path=data_path_bullard, **kwargs):
+                  load_grid='auto', psuffixes=None,
+                  fig_path=fig_path_bullard, fname='hist-evol', fig_fmt='.png', end_grid=None, normtime=True,
+                  labelsize=14, xlabels=None, keys=None, title='', legsize=10,
+                  xlabelpad=8, alpha=0.5,
+                  fig=None, axes=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
+                  regime_names=None,
+                  data_path=data_path_bullard, **kwargs):
     # plot histograms of time evolution for single Ra (only eta-colouring is implemented)
 
     if psuffixes is None:
@@ -1343,7 +1346,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
     else:
         nkeys = 1
     if fig is None:
-        fig, axes = plt.subplots(len(eta_ls), nkeys, figsize=(nkeys * 2, len(eta_ls)*3), sharex='col')
+        fig, axes = plt.subplots(len(eta_ls), nkeys, figsize=(nkeys * 2, len(eta_ls) * 3), sharex='col')
         if nkeys == 1:
             axes = np.array([axes])
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
@@ -1371,7 +1374,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                 dfs = []
                 for ip, suffix in enumerate(psuffixes):
                     df1 = pro.pickleio(case, suffix=suffix, t1=t1_ii,
-                                   dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
+                                       dat_new=dat, data_path=data_path, load=load_ii, **kwargs)
                     dfs.append(df1)
                 try:
                     df = pd.concat(dfs, axis=1)
@@ -1389,10 +1392,11 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                     ax.hist(data, histtype='step', bins=nbins, color=c_jj, density=True)
                     ax.axvline(np.mean(data), c=c_jj, ls='--')
                     ax.axvline(np.median(data), c=c_jj, ls='-')
-                    ax.text(0.95, 0.95, 'n = '+str(len(data)), fontsize=10, c='k', horizontalalignment='right',verticalalignment='top',transform = ax.transAxes)
+                    ax.text(0.95, 0.95, 'n = ' + str(len(data)), fontsize=10, c='k', horizontalalignment='right',
+                            verticalalignment='top', transform=ax.transAxes)
 
     # legend proxy artist
-    ax = axes[0,0]
+    ax = axes[0, 0]
     # scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, s=markersize,
     #                   vmin=vmin, vmax=vmax)  # dummy - neeeds matplotlib 3.1.1
     # legend1 = ax.legend(*scat.legend_elements(num=len(logeta_fl)),
@@ -1407,7 +1411,7 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
     ax.add_artist(legend1)
 
     legend2 = ax.legend(handles=[mlines.Line2D([], [], lw=2, ls='--', color='k', label='mean'),
-                         mlines.Line2D([], [], lw=2, ls='-', color='k', label='median')],
+                                 mlines.Line2D([], [], lw=2, ls='-', color='k', label='median')],
                         bbox_to_anchor=(0.05, 1.05), fontsize=legsize, frameon=True, loc="lower left")
     ax.add_artist(legend2)
 
@@ -1471,13 +1475,78 @@ def plot_topo_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=
         plot_save(fig, case + '_h_' + '{:05}'.format(ts), fig_path=fig_path, fig_fmt=fig_fmt)
 
 
+def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=False, n_fitted=2, c_list=None,
+                      c='xkcd:periwinkle', legsize=8, lw=1, legloc='lower left', showchisq=True,
+                      **kwargs):
+    x = [a[1] for a in yx_all]
+    y = [a[0] for a in yx_all]
+
+    if np.array(x[0]).ndim > 0 and np.array(y[0]).ndim > 0:
+        flatx = [item for sublist in x for item in sublist]
+        flaty = [item for sublist in y for item in sublist]
+    else:
+        flatx, flaty = x, y
+
+    if n_fitted == 3:  # fit to 3 parameter power law
+        flatx0 = [a[0] for a in flatx]
+        flatx1 = [a[1] for a in flatx]
+        flatx = [flatx0, flatx1]
+
+    const, expon, const_err, expon_err, chisqr, MSE = pro.fit_wrapper(flatx, flaty, yerr=yerr, xerr=xerr,
+                                                                      n_fitted=n_fitted, **kwargs)
+
+    newlabel = 'C = {:.2e} +- {:.2e}'.format(const, const_err)
+    if expon is not None:
+        newlabel = newlabel + '\np = {:.3f} +- {:.3f}'.format(expon[0], expon_err[0])
+
+    if len(expon) > 1:
+        newlabel = newlabel + '\nq = {:.3f} +- {:.3f}'.format(expon[1], expon_err[1])
+
+    # plot
+    xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
+    if n_fitted == 3:
+        z_vec = np.unique(flatx1)
+        if c_list is None:
+            c_list = colorize(np.log10(z_vec), cmap='winter')[0]
+        for ind, z in enumerate(z_vec):
+            hprime = const * xprime ** expon[0] * z ** expon[1]
+            h2, = ax.plot(xprime, hprime, c=c_list[ind], ls='--', lw=lw, zorder=100, label='dum')
+
+    else:
+        hprime = const * xprime ** expon
+        h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
+
+    if legend:
+        if showchisq:
+            newlabel = newlabel + '\n' + r'$\chi^2_\nu$ = ' + '{:.4f}'.format(chisqr)
+        # handles, labels = ax.get_legend_handles_labels()
+        # try:
+        #     labels[-1] = newlabel
+        # except IndexError:
+        #     labels = newlabel
+        ax.text(0.95, 0.95, newlabel, fontsize=legsize,
+                horizontalalignment='right',
+                verticalalignment='top',
+                transform=ax.transAxes)
+        # leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
+        # ax.add_artist(leg)
+
+    if showallscatter:
+        ax.scatter(flatx, flaty, c=c, alpha=0.05, s=10)
+    return ax
+
+
 def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
-                    literature_file=None, ms=30, fig=None, ax=None, figsize=(7, 5), xlabelpad=10, ylabelpad=10,
-                    legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
-                    c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
-                    save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
-                    cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None, cticklabels=None,
-                              ylabel='Model', xlabel='Data', errs=None, elw=1, ecapsize=5, crot=0, discrete=True, errorsize=9, sigma=2, **kwargs):
+                              literature_file=None, ms=30, fig=None, ax=None, figsize=(7, 5), xlabelpad=10,
+                              ylabelpad=10,
+                              legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
+                              c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms',
+                              data_path=data_path_bullard,
+                              save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
+                              cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None,
+                              cticklabels=None,
+                              ylabel='Model', xlabel='Data', errs=None, elw=1, ecapsize=5, crot=0, discrete=True,
+                              errorsize=9, sigma=2, **kwargs):
     if averagescheme is None:
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
@@ -1511,12 +1580,14 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                                    averagescheme=averagescheme, **kwargs) for xx in which_x]
                 else:
                     x, x_times = plot_getx(Ra_var[ii], eta_str, case=case, which_x=which_x, data_path=data_path,
-                                  t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
-                                  averagescheme=averagescheme, return_all=True, **kwargs)
+                                           t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
+                                           averagescheme=averagescheme, return_all=True, **kwargs)
 
                 # get the y values, depending on averaging scheme
-                h_rms, h_peak, h_rms_times, h_peak_times = plot_geth(case=case, t1=t1_ii, data_path=data_path, averagescheme=averagescheme,
-                                          postprocess_kwargs=postprocess_kwargs, return_all=True, **kwargs)
+                h_rms, h_peak, h_rms_times, h_peak_times = plot_geth(case=case, t1=t1_ii, data_path=data_path,
+                                                                     averagescheme=averagescheme,
+                                                                     postprocess_kwargs=postprocess_kwargs,
+                                                                     return_all=True, **kwargs)
                 """^ paste"""
 
                 if which_h == 'rms':
@@ -1537,7 +1608,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     z_data_all.append(regime_grid[jj][ii])
 
                 qdict = pro.parameter_percentiles(case, df={'h_data': h_times, 'x': x_times},
-                                              keys=quants.keys(), plot=False, sigma=sigma)
+                                                  keys=quants.keys(), plot=False, sigma=sigma)
 
                 for key in quants.keys():
                     try:
@@ -1545,21 +1616,23 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     except ValueError:  # haven't added anything yet
                         quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
 
-
     if twocomponent:
         x0 = [a[0] for a in x_data_all]
         x1 = [a[1] for a in x_data_all]
         h_data = h_data_all
-        expon, const = pro.fit_2log(x1=x0, x2=x1, h=h_data_all)
+        const, expon, const_err, expon_err, chisqr, MSE = pro.fit_wrapper([x0, x1], h_data, n_fitted=3, **kwargs)
         h_fit = const * np.array(x0) ** expon[0] * np.array(x1) ** expon[1]
-
+        fiterr = None
     else:
         x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
-        expon, const = pro.fit_log(x_data, h_data, weights=None, **kwargs)
+        n_fitted = 2
+        if which_x == 'h_components':
+            n_fitted = 1
+        const, expon, const_err, expon_err, chisqr, MSE = pro.fit_wrapper(x_data, h_data, n_fitted=n_fitted, **kwargs)
         h_fit = const * np.array(x_data) ** expon
-        print('const, expon', const, expon)
+        fiterr = pro.fit_SE(x_data, h_data, [np.log10(const), expon], xn=x_data)
     if z_name is None:
-        clist = ['k']*len(h_data)
+        clist = ['k'] * len(h_data)
         z_vec = range(len(h_data))
     else:
         if twocomponent:
@@ -1587,8 +1660,8 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
             err[key] = np.asarray([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
         mark = 'o'
         for pp in range(len(h_data)):
-            ax.errorbar(h_data[pp], h_fit[pp], yerr=None,
-                        xerr=np.asarray([err['h_data'][:,pp]]).T, elinewidth=elw,
+            ax.errorbar(h_data[pp], h_fit[pp], yerr=fiterr,
+                        xerr=np.asarray([err['h_data'][:, pp]]).T, elinewidth=elw,
                         fmt=mark, c=clist[z_vec[pp]], capsize=ecapsize, ms=ms, zorder=10)
 
     except TypeError as e:
@@ -1615,7 +1688,8 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
                     legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
                     c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms', data_path=data_path_bullard,
                     save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
-                    cmap='magma', cbar=None, include_regimes=None, show_cbar=True,  **kwargs):
+                    cmap='magma', cbar=None, include_regimes=None, show_cbar=True, **kwargs):
+    # outdated.........................
     if averagescheme is None:
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
@@ -1767,18 +1841,19 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
                 fX = interp1d(y, x0)
                 if log:
                     if i == 0:  # top error
-                        pos = [10**((np.log10(x0[0]) + np.log10(fX(y0[-1]))) / 2.),
-                               10**((np.log10(fY(x0[0])) + np.log10(y0[-1])) / 2.)]
+                        pos = [10 ** ((np.log10(x0[0]) + np.log10(fX(y0[-1]))) / 2.),
+                               10 ** ((np.log10(fY(x0[0])) + np.log10(y0[-1])) / 2.)]
                     elif i == 1:
                         pos = [10 ** ((np.log10(fX(y0[0])) + np.log10(x0[-1])) / 2.),
                                10 ** ((np.log10(y0[0]) + np.log10(fY(x0[-1]))) / 2.)]
                 else:
                     pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
-                print('pos' , pos)
+                print('pos', pos)
                 # transform data points to screen space
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
                 # if (x0[0] < pos[0] < x0[1]) and (y0[0] < pos[1] < y0[1]):
-                ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=fontsize, rotation=rot, color=l.get_color(),
+                ltex = ax.text(pos[0], pos[1], '{0:.0f}%'.format(err * 100), size=fontsize, rotation=rot,
+                               color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec=fc, fc=fc))
     return fig, ax
