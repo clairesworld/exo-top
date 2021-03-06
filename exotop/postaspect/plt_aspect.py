@@ -1676,7 +1676,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
             err[key] = np.asarray([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
         mark = 'o'
         for pp in range(len(h_data)):
-            ax.errorbar(h_data[pp], h_fit[pp], yerr=fiterr,
+            ax.errorbar(h_data[pp], h_fit[pp], yerr=fiterr[pp],
                         xerr=np.asarray([err['h_data'][:, pp]]).T, elinewidth=elw,
                         fmt=mark, c=clist[z_vec[pp]], capsize=ecapsize, ms=ms, zorder=10)
 
