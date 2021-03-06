@@ -33,7 +33,7 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
     psuffixes = []
     if which_x in ['Ra_i', 'Ra_i_eff', 'h_components', 'Ra_F_eff']:
         psuffixes.append('_T')
-    elif which_x is not 'eta':
+    elif which_x not in ['eta', 'Ra']:
         # probably in temp thign also
         print(' WARNING: possibly not implemented x variable')
         psuffixes.append('_T')
@@ -82,11 +82,13 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
 
 def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, data_path=data_path_bullard,
                 t1=None, load=None, postprocess_kwargs=None, **kwargs):
-    try:
-        keys = df.columns
-    except AttributeError:
-        keys = df.keys()
-    if ('h_components' in which_x) or (which_x in keys):
+
+    if df is not None:
+        try:
+            keys = df.columns
+        except AttributeError:
+            keys = df.keys()
+    if ('h_components' in which_x) or ((df is not None) and (which_x in keys)):
         try:
             missing = (which_x not in df.columns) or ((which_x in df.columns) and df[which_x].isnull().values.any())
         except AttributeError:
@@ -126,7 +128,7 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
         raise Exception('Invalid variable for x-axis / not implemented: ' + which_x)
 
     try:
-        np.log10(x)  # make sure u can do number things
+        np.log10(x)  # make sure u can do numpy things
     except TypeError:
         x = x.to_numpy()
     except Exception as e:
