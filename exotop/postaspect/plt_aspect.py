@@ -1582,7 +1582,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     x, x_times = plot_getx(Ra_var[ii], eta_str, case=case, which_x=which_x, data_path=data_path,
                                            t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,
                                            averagescheme=averagescheme, return_all=True, **kwargs)
-
+                    print('x', x)
                 # get the y values, depending on averaging scheme
                 h_rms, h_peak, h_rms_times, h_peak_times = plot_geth(case=case, t1=t1_ii, data_path=data_path,
                                                                      averagescheme=averagescheme,
