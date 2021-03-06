@@ -1643,6 +1643,8 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
         if which_x == 'h_components':
             n_fitted = 1
         const, expon, const_err, expon_err, chisqr, MSE = pro.fit_wrapper(x_data, h_data, n_fitted=n_fitted, **kwargs)
+        expon = expon[0]
+        expon_err = expon_err[0]
         h_fit = const * np.array(x_data) ** expon
         fiterr = pro.fit_SE(x_data, h_data, [np.log10(const), expon], xn=x_data)
     if z_name is None:
