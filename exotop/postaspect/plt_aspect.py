@@ -1864,7 +1864,7 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
                                10 ** ((np.log10(y0[0]) + np.log10(fY(x0[-1]))) / 2.)]
                 else:
                     pos = [(x0[-2] + x0[-1]) / 3., (y[-2] + y[-1]) / 3.]
-                print('pos', pos)
+
                 # transform data points to screen space
                 xscreen = ax.transData.transform(np.array((x0[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
