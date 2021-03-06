@@ -58,10 +58,11 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
                     dic_av.pop(k, None)
                     df = df.drop(k, axis=1)  # drop lists you don't need
                 df_av = pd.DataFrame({key:value for (key,value) in dic_av.items()}, index=[0])
-                df1 = df.mean(axis=0).to_frame()  # mean of other parameters
+                df1 = df.mean(axis=0).to_frame().transpose()  # mean of other parameters
+                print('df1\n', df1)
                 df1.set_index(pd.Series([0]))
                 print('df1\n', df1)
-                print('df1 trans\n', df1.transpose())
+                # print('df1 trans\n', df1.transpose())
                 print('df_av\n', df_av)
                 df1.update(df_av)  # update with properly timefirst-averaged temperature params
                 print('df updated\n', df1)
