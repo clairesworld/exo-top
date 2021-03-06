@@ -845,7 +845,7 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
     print('         -> chi sqr:', chisqr)
     print('         -> MSE:', MSE)
 
-    return output.beta, output.sd_beta, chisqr
+    return output.beta, output.sd_beta, chisqr, MSE
 
 
 def dimensionalise_h(hprime, p):
@@ -1051,19 +1051,38 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
     else:
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
-
+        h = flaty
         if n_fitted == 3:  # fit to 3 parameter power law
             flatx0 = [a[0] for a in flatx]
             flatx1 = [a[1] for a in flatx]
-            x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
-            beta, sd_beta, chisqr = fit_logerror(x1=flatx0, h=flaty, x2=flatx1, err_x=xerr, err_h=yerr, **kwargs)
+            x1 = flatx0
+            x2 = flatx1
+        else:
+            slope = True
+            if n_fitted == 1:
+                slope = False
+            x1 = flatx
+            x2 = None
 
-            const = 10**beta[0]
-            const_err = 2.302585 * 10**beta[0] * sd_beta[0]
+        beta, sd_beta, chisqr, MSE = fit_logerror(x1=x1, h=h, x2=x2, err_x=xerr, err_h=yerr, slope=slope, **kwargs)
+        const = 10**beta[0]
+        const_err = 2.302585 * 10**beta[0] * sd_beta[0]
+        newlabel = '(C = {:.2e} +- {:.2e})'.format(const, const_err)
+        if len(beta) > 1:
             expon = beta[1]
             expon_err = sd_beta[1]
+            newlabel = newlabel + '\np = {:.3f} +- {:.3f}'.format(expon, expon_err)
+        else:
+            expon = 1
+            expon_err = 0
+        if len(beta) > 2:
             expon2 = beta[2]
             expon2_err = sd_beta[2]
+            newlabel = newlabel + '\nq = {:.3f} +- {:.3f}'.format(expon2, expon2_err)
+
+        # plot
+        if n_fitted == 3:
+            x0prime = np.linspace(np.min(flatx0), np.max(flatx0), num=len(flatx0))
             z_vec = np.unique(flatx1)
             if c_list is None:
                 c_list = colorize(np.log10(z_vec), cmap='winter')[0]
@@ -1072,37 +1091,24 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
                 h2, = ax.plot(x0prime, hprime, c=c_list[ind], ls='--', lw=lw, zorder=100, label='dum')
 
         else:
-            slope = True
-            if n_fitted==1:
-                slope = False
             xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
-            beta, sd_beta, chisqr = fit_logerror(x1=flatx, h=flaty, err_x=xerr, err_h=yerr, slope=slope, **kwargs)
-            const = 10**beta[0]
-            const_err = 2.302585 * 10**beta[0] * sd_beta[0]
-            if slope:
-                expon = beta[1]
-                expon_err = sd_beta[1]
-            else:
-                expon = 1
-                expon_err = 0
             hprime = const * xprime ** expon
             h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
 
         if legend:
-            handles, labels = ax.get_legend_handles_labels()
-            newlabel = '({:.2e} +- {:.2e}) x'.format(const, const_err)
-            if n_fitted > 1:
-                newlabel = newlabel + '^({:.3f} +- {:.3f})'.format(expon, expon_err)
-            if n_fitted > 2:
-                newlabel = newlabel + ' x2^({:.3f} +- {:.3f})'.format(expon2, expon2_err)
             if showchisq:
-                newlabel = newlabel + r'; $\chi^2_\nu$ = ' + '{:.4f}'.format(chisqr)
-            try:
-                labels[-1] = newlabel
-            except IndexError:
-                labels = newlabel
-            leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
-            ax.add_artist(leg)
+                newlabel = newlabel + '\n' + r'$\chi^2_\nu$ = ' + '{:.4f}'.format(chisqr)
+            # handles, labels = ax.get_legend_handles_labels()
+            # try:
+            #     labels[-1] = newlabel
+            # except IndexError:
+            #     labels = newlabel
+            ax.text(0.95, 0.95, newlabel, fontsize=legsize,
+                 horizontalalignment='right',
+                 verticalalignment='top',
+                 transform=ax.transAxes)
+            # leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
+            # ax.add_artist(leg)
     else:
         print('    Not enough points to fit')
     if showallscatter:
