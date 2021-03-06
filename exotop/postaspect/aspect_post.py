@@ -1052,13 +1052,13 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
         flatx, flaty = x, y
     if len(x) > 1:  # can only fit if at least 2 data
         h = flaty
+        slope = True
         if n_fitted == 3:  # fit to 3 parameter power law
             flatx0 = [a[0] for a in flatx]
             flatx1 = [a[1] for a in flatx]
             x1 = flatx0
             x2 = flatx1
         else:
-            slope = True
             if n_fitted == 1:
                 slope = False
             x1 = flatx
