@@ -760,6 +760,9 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
         a = beta
         return a + u
 
+    if len(np.shape(x1)) != 1:
+        x1 = np.array(x1).reshape(np.shape(h))
+
     if not slope:
         beta0 = [np.log10(2)]
         func = func_lin0
@@ -767,14 +770,10 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
     elif x2 is None:
         beta0 = [np.log10(0.1), -0.1]
         func = func_lin
-        if len(np.shape(x1)) != 1:
-            x1 = np.array(x1).reshape(np.shape(h))
         x = x1
     else:
         beta0 = [np.log10(0.1), -0.1, -0.1]
         func = func_lin2
-        if len(np.shape(x1)) != 1:
-            x1 = np.array(x1).reshape(np.shape(h))
         if len(np.shape(x2)) != 1:
             x2 = np.array(x2).reshape(np.shape(h))
         x = np.row_stack((x1, x2))  # odr doesn't seem to work with column_stack
