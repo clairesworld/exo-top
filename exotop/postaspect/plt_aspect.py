@@ -138,10 +138,13 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
     if (isinstance(x, pd.Series)):
         convert = True
     if convert:
-        print('x', x)
-        x = x.to_numpy()
-        print('converted', x)
-
+        try:
+            # print('x', x)
+            x = x.to_numpy()
+            # print('converted', x)
+        except AttributeError:
+            # dunno
+            pass
     return x
 
 
