@@ -112,13 +112,13 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
                                       **kwargs)
 
     elif 'Ra_i_eff' in which_x:  # calculate effective Ra using time-mean of T field params
-        x = pro.Ra_i_eff(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'],
-                         T_l=df['T_l'], delta_L=df['delta_L'])
+        x = pro.Ra_i_eff(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'].to_numpy(),
+                         T_l=df['T_l'].to_numpy(), delta_L=df['delta_L'].to_numpy())
     elif 'Ra_i' in which_x:
-        x = pro.Ra_interior(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'])
+        x = pro.Ra_interior(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'].to_numpy())
 
     elif 'Ra_F_eff' in which_x:
-        x = pro.Ra_F_eff(d_eta=float(eta), T_i=df['T_i'], delta_L=df['delta_L'], q_sfc=df['Nu'])
+        x = pro.Ra_F_eff(d_eta=float(eta), T_i=df['T_i'].to_numpy(), delta_L=df['delta_L'].to_numpy(), q_sfc=df['Nu'].to_numpy())
 
     elif 'Ra' in which_x:
         x = float(Ra)
@@ -139,6 +139,7 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
         convert = True
     if convert:
         x = x.to_numpy()
+
     return x
 
 
