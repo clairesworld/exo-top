@@ -128,13 +128,16 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
     else:
         raise Exception('Invalid variable for x-axis / not implemented: ' + which_x)
 
+    # make sure u can do numpy things
+    convert = False
     try:
-        np.log10(x)  # make sure u can do numpy things
+        np.log10(x)
     except TypeError:
+        convert = True
+    if (isinstance(x, pd.Series)):
+        convert = True
+    if convert:
         x = x.to_numpy()
-    except Exception as e:
-        print('x', x)
-        raise e
     return x
 
 
