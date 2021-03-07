@@ -71,7 +71,6 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
     x = getx_fromdf(Ra, eta, df=df1, case=case, which_x=which_x, averagescheme=averagescheme,
                     data_path=data_path_bullard,
                     t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
-    print('x', x, type(x))
 
     if return_all:
         x_all = getx_fromdf(Ra, eta, df=df, case=case, which_x=which_x, averagescheme=averagescheme,
