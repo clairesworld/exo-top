@@ -49,6 +49,7 @@ data_path_home = '/home/claire/Works/aspect/runs/model-output/'
 data_path = data_path_bullard
 fig_path = fig_path_bullard
 fig_fmt = '.png'
+cmap_path = 'exotop/plot/cmaps/'
 
 c_rms = 'xkcd:forest green'
 c_peak = 'xkcd:periwinkle'

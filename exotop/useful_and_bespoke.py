@@ -40,12 +40,41 @@ def colorize(vector,cmap='plasma', vmin=None, vmax=None):
     return vcolors, scalarmap, cNorm
 
 
-from matplotlib.colors import LinearSegmentedColormap
 def cmap_from_list(clist, n_bin=None, cmap_name=''):
+    from matplotlib.colors import LinearSegmentedColormap
     if n_bin is None:
         n_bin = len(clist)
     cm = LinearSegmentedColormap.from_list(cmap_name, clist, N=n_bin)
     return cm
+
+
+def cmap_from_ascii(name, path='', end='.txt', ncol=4):
+    from matplotlib.colors import ListedColormap
+    # ncol = 4 for alpha channel
+    palette = open(path+name+end)
+    lines = palette.readlines()
+    carray = np.zeros([len(lines), ncol])
+    for num, line in enumerate(lines):
+        carray[num, :] = [float(val) for val in line.strip().split()]
+    cmap = ListedColormap(carray, name=name)
+    return cmap
+
+
+def discrete_cmap(N, base_cmap=None):
+    """Create an N-bin discrete colormap from the specified input map"""
+    # By Jake VanderPlas
+    # License: BSD-style
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    # Note that if base_cmap is a string or None, you can simply do
+    #    return plt.cm.get_cmap(base_cmap, N)
+    # The following works for string, None, or a colormap instance:
+
+    base = plt.cm.get_cmap(base_cmap)
+    color_list = base(np.linspace(0, 1, N))
+    cmap_name = base.name + str(N)
+    return base.from_list(cmap_name, color_list, N)
 
 
 def iterable_not_string(obj):

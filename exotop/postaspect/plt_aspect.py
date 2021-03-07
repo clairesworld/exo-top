@@ -11,9 +11,9 @@ import matplotlib.lines as mlines  # noqa: E402
 from scipy.interpolate import interp1d
 from postaspect import aspectdata as ad  # noqa: E402
 from postaspect import aspect_post as pro  # noqa: E402
-from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour  # noqa: E402
+from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour, cmap_path  # noqa: E402
 from useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, not_iterable, \
-    colourbar, not_string, minmaxnorm, mahalanobis  # noqa: E402
+    colourbar, cmap_from_ascii, not_string, minmaxnorm, mahalanobis  # noqa: E402
 
 
 def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
@@ -334,7 +334,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
               save=True, fname='h', legend=False, sigma=1, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
-              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', ms=10, lw=1,
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, ms=10, lw=1,
               xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None, ticksize=None,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7), c_fit=None,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
@@ -357,7 +357,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     if xlim is not None:
         ax.set_xlim(xlim)
     colourful = False
-    if iterable_not_string(c_rms):
+    if iterable_not_string(c_rms) or (cmap is not None):
         colourful = True
     quants = dict.fromkeys(['h_rms', 'h_peak', which_x])
     yx_peak_all, yx_rms_all = [], []
@@ -440,6 +440,13 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
         mark = 'o'
         if colourful:
+            if (cmap is not None) and (c_rms is None):
+                try:
+                    c_rms = colorize(means[which_x], cmap=cmap)[0]
+                except Exception as e:
+                    print(e)
+                    cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
+                    c_rms = colorize(means[which_x], cmap=cmap)[0]
             for pp in range(len(means[which_x])):
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:, pp]]).T,
                             xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw,
@@ -498,7 +505,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         ax2.set_ylabel(y2label, fontsize=labelsize, labelpad=ylabelpad + 60, rotation=270)
         ax2.tick_params(axis='y', which='major', labelsize=ticksize)
         axes = (ax, ax2)
-
     else:
         axes = (ax,)
 
