@@ -76,7 +76,8 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
                     t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
     if return_all:
-        x_all = getx_fromdf(Ra, eta, df=df, case=case, which_x=which_x, averagescheme=averagescheme,
+        print('df\n', df)
+        x_all = getx_fromdf(Ra, eta, df=df, case=case, which_x=which_x, averagescheme=None,
                             data_path=data_path_bullard,
                             t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
         return x, x_all
@@ -1517,14 +1518,14 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
                                                                       n_fitted=n_fitted, **kwargs)
 
     # newlabel = 'C = {:.2e} +- {:.2e}'.format(const, const_err)
-    newlabel = r'$C = {:.3f} \pm {:.3f}$'.format(const, const_err)
+    newlabel = r'$C = {:.2f} \pm {:.2f}$'.format(const, const_err)
     if expon is not None:
         # newlabel = newlabel + '\np = {:.3f} +- {:.3f}'.format(expon[0], expon_err[0])
-        newlabel = newlabel + '\n'+r'$p = {:.3f} \pm {:.3f}$'.format(expon[0], expon_err[0])
+        newlabel = newlabel + '\n'+r'$p = {:.2f} \pm {:.2f}$'.format(expon[0], expon_err[0])
 
     if len(expon) > 1:
         # newlabel = newlabel + '\nq = {:.3f} +- {:.3f}'.format(expon[1], expon_err[1])
-        newlabel = newlabel + '\n'+r'$q = {:.3f} \pm {:.3f}$'.format(expon[1], expon_err[1])
+        newlabel = newlabel + '\n'+r'$q = {:.2f} \pm {:.2f}$'.format(expon[1], expon_err[1])
 
     # plot
     xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
@@ -1677,7 +1678,12 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
     ax.set_title(title, fontsize=labelsize)
 
     if clist is None:
-        clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+        try:
+            clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+        except Exception as e:
+            print(e)
+            cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
+            clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
     # get errorbars and plot them
     err = dict.fromkeys(quants.keys())

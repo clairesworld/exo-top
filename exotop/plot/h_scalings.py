@@ -15,10 +15,10 @@ fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_
                                   end_grid=end_grid, literature_file=None, legend=False, cmap=None, ms=10,
                                   postprocess_kwargs=postprocess_kwargs, averagescheme='timefirst',
                                   ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
-                                  clist=['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow'], #figsize=(10, 10),
-                                  z_name='eta', fname='model-data-chaotic_timeavg',
+                                  # clist=['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow'],
+                                  cmap='latent', z_name='eta', fname='model-data-chaotic_timeavg',
                                   save=True, include_regimes=['chaotic'], errs=[0.5, 0.2, 0.1, 0.05],
-                                  fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False,
+                                  fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False, figsize=(5, 5),
                                   ylabel=r'Model $\Delta h_{rms}^\prime$', xlabel=r'Data $\Delta h_{rms}^\prime$')
 
 
@@ -33,7 +33,7 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                    title=r'fit to CRa$_{i,eff}^p$, averaging time first', showpeak=False,
                    cmap='mellon_ball_surprise', c_rms=None, fit=True, logx=True, logy=True, hscale=1,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td)
+                   regime_grid=regime_grid_td, figsize=(5, 5))
 
 
 # Ra_F
