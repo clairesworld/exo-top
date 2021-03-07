@@ -12,7 +12,7 @@ load = True  # load_grid
 # model versus data
 
 fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
-                                  end_grid=end_grid, literature_file=None, legend=False, cmap=None, ms=10,
+                                  end_grid=end_grid, literature_file=None, legend=False, ms=10,
                                   postprocess_kwargs=postprocess_kwargs, averagescheme='timefirst',
                                   ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
                                   # clist=['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow'],
