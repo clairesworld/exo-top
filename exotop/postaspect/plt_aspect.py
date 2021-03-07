@@ -1520,7 +1520,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
     newlabel = r'$C = {:.3f} \pm {:.3f}$'.format(const, const_err)
     if expon is not None:
         # newlabel = newlabel + '\np = {:.3f} +- {:.3f}'.format(expon[0], expon_err[0])
-        newlabel = newlabel + '\n'+r'$p = {:.3f} \pm {:.3f}}$'.format(expon[0], expon_err[0])
+        newlabel = newlabel + '\n'+r'$p = {:.3f} \pm {:.3f}$'.format(expon[0], expon_err[0])
 
     if len(expon) > 1:
         # newlabel = newlabel + '\nq = {:.3f} +- {:.3f}'.format(expon[1], expon_err[1])
