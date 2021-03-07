@@ -17,7 +17,7 @@ from useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, no
 from matplotlib import rc
 
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
-rc('text', usetex=True)
+# rc('text', usetex=True)
 
 def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
     path = fig_path + fname + fig_fmt
