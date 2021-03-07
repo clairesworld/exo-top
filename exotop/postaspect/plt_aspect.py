@@ -333,9 +333,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
               save=True, fname='h', legend=False, sigma=1, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
-              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, ms=10, lw=1,
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, c_fit='k', ms=10, lw=1,
               xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None, ticksize=None,
-              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7), c_fit=None,
+              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7),
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
@@ -472,8 +472,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             xerr = 1
             yerr = 1
-        if c_fit is None:
-            c_fit = c_rms
+
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
                                    xerr=xerr, yerr=yerr, legend=legend, lw=lw,
                                    sigma=sigma, **kwargs)
@@ -1646,8 +1645,6 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
         h_fit = const * np.array(x0) ** expon[0] * np.array(x1) ** expon[1]
         fiterr = None
     else:
-        print('x_data_all', x_data_all)
-        print('h_data_all', h_data_all)
         x_data, h_data = [list(tup) for tup in zip(*sorted(zip(x_data_all, h_data_all)))]  # sort according to x
         n_fitted = 2
         if which_x == 'h_components':
