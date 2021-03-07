@@ -14,7 +14,10 @@ from postaspect import aspect_post as pro  # noqa: E402
 from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour, cmap_path  # noqa: E402
 from useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, not_iterable, \
     colourbar, cmap_from_ascii, not_string, minmaxnorm, mahalanobis  # noqa: E402
+from matplotlib import rc
 
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
+rc('text', usetex=True)
 
 def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
     path = fig_path + fname + fig_fmt
@@ -1514,14 +1517,14 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
                                                                       n_fitted=n_fitted, **kwargs)
 
     # newlabel = 'C = {:.2e} +- {:.2e}'.format(const, const_err)
-    newlabel = r'$C = {{:.3f}} \pm {{:.3f}}$'.format(const, const_err)
+    newlabel = r'$C = {:.3f} \pm {:.3f}$'.format(const, const_err)
     if expon is not None:
         # newlabel = newlabel + '\np = {:.3f} +- {:.3f}'.format(expon[0], expon_err[0])
-        newlabel = newlabel + '\n'+r'$p = {{:.3f}} \pm {{:.3f}}$'.format(expon[0], expon_err[0])
+        newlabel = newlabel + '\n'+r'$p = {:.3f} \pm {:.3f}}$'.format(expon[0], expon_err[0])
 
     if len(expon) > 1:
         # newlabel = newlabel + '\nq = {:.3f} +- {:.3f}'.format(expon[1], expon_err[1])
-        newlabel = newlabel + '\n'+r'$q = {{:.3f}} \pm {{:.3f}}$'.format(expon[1], expon_err[1])
+        newlabel = newlabel + '\n'+r'$q = {:.3f} \pm {:.3f}$'.format(expon[1], expon_err[1])
 
     # plot
     xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
@@ -1539,7 +1542,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
 
     if legend:
         if showchisq:
-            newlabel = newlabel + '\n' + r'$\chi^2_\nu = {{:.4f}}$'.format(MSE)
+            newlabel = newlabel + '\n' + r'$\chi^2_\nu = {:.4f}$'.format(MSE)
         # handles, labels = ax.get_legend_handles_labels()
         # try:
         #     labels[-1] = newlabel
