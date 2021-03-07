@@ -76,7 +76,6 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
                     t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
     if return_all:
-        print('df\n', df)
         x_all = getx_fromdf(Ra, eta, df=df, case=case, which_x=which_x, averagescheme=None,
                             data_path=data_path_bullard,
                             t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
@@ -336,7 +335,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None, fiterror=False,
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
               save=True, fname='h', legend=False, sigma=1, showpeak=False,
-              labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='',
+              labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', alpha=1,
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, c_fit='k', ms=10, lw=1,
               xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None, ticksize=None,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7),
@@ -440,21 +439,20 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             ax.errorbar(means[which_x], means['h_peak'], yerr=sdy_all,  # err['h_peak'],
                         xerr=sdx_all,  # err[which_x],
                         elinewidth=0.5, ms=ms,
-                        fmt='d', c=c_peak, alpha=0.8, capsize=5, markeredgecolor=highlight_colour)
+                        fmt='d', c=c_peak, alpha=alpha, capsize=5, markeredgecolor=highlight_colour)
         mark = 'o'
         if colourful:
             if (cmap is not None) and (c_rms is None):
                 try:
                     c_rms = colorize(means[which_x], cmap=cmap)[0]
                 except Exception as e:
-                    print(e)
                     cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
                     c_rms = colorize(means[which_x], cmap=cmap)[0]
             print('c list', c_rms)
             for pp in range(len(means[which_x])):
                 print('c = ', c_rms[jj_all[pp]])
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:, pp]]).T,
-                            xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw,
+                            xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw, alpha=alpha,
                             fmt=mark, c=c_rms[jj_all[pp]], capsize=ecapsize, ms=ms)
         else:
             ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=elw,
@@ -1566,7 +1564,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                               ylabelpad=10,
                               legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
                               c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms',
-                              data_path=data_path_bullard,
+                              data_path=data_path_bullard, alpha=1,
                               save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
                               cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None,
                               cticklabels=None,
@@ -1681,7 +1679,6 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
         try:
             clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
         except Exception as e:
-            print(e)
             cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
             clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
@@ -1693,7 +1690,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
         mark = 'o'
         for pp in range(len(h_data)):
             ax.errorbar(h_data[pp], h_fit[pp], yerr=fiterr[pp],
-                        xerr=np.asarray([err['h_data'][:, pp]]).T, elinewidth=elw,
+                        xerr=np.asarray([err['h_data'][:, pp]]).T, elinewidth=elw, alpha=alpha,
                         fmt=mark, c=clist[z_vec[pp]], capsize=ecapsize, ms=ms, zorder=10)
 
     except TypeError as e:

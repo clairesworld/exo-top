@@ -31,7 +31,7 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
                    xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
                    title=r'fit to CRa$_{i,eff}^p$, averaging time first', showpeak=False,
-                   cmap='mellon_ball_surprise', c_rms=None, fit=True, logx=True, logy=True, hscale=1,
+                   cmap='latent', c_rms=None, fit=True, logx=True, logy=True, hscale=1,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
                    regime_grid=regime_grid_td, figsize=(5, 5))
 
