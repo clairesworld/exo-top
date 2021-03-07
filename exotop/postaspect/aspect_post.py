@@ -1062,7 +1062,7 @@ def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, **kwargs):
             expon_err = [sd_beta[1]]
         else:
             expon = [1]
-            expon_err = None
+            expon_err = [0]
         if len(beta) > 2:
             expon.append(beta[2])
             expon_err.append(sd_beta[2])

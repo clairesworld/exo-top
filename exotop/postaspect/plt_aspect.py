@@ -1488,7 +1488,7 @@ def plot_topo_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=
 
 
 def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', legsize=8, lw=1, legloc='lower left', showchisq=True,
+                      c='xkcd:periwinkle', legsize=12, lw=1, legloc='lower left', showchisq=True,
                       **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
@@ -1507,12 +1507,15 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
     const, expon, const_err, expon_err, chisqr, MSE = pro.fit_wrapper(flatx, flaty, yerr=yerr, xerr=xerr,
                                                                       n_fitted=n_fitted, **kwargs)
 
-    newlabel = 'C = {:.2e} +- {:.2e}'.format(const, const_err)
+    # newlabel = 'C = {:.2e} +- {:.2e}'.format(const, const_err)
+    newlabel = r'$C = {{:.3f}} \pm {{:.3f}}$'.format(const, const_err)
     if expon is not None:
-        newlabel = newlabel + '\np = {:.3f} +- {:.3f}'.format(expon[0], expon_err[0])
+        # newlabel = newlabel + '\np = {:.3f} +- {:.3f}'.format(expon[0], expon_err[0])
+        newlabel = newlabel + '\n'+r'$p = {{:.3f}} \pm {{:.3f}}$'.format(expon[0], expon_err[0])
 
     if len(expon) > 1:
-        newlabel = newlabel + '\nq = {:.3f} +- {:.3f}'.format(expon[1], expon_err[1])
+        # newlabel = newlabel + '\nq = {:.3f} +- {:.3f}'.format(expon[1], expon_err[1])
+        newlabel = newlabel + '\n'+r'$q = {{:.3f}} \pm {{:.3f}}$'.format(expon[1], expon_err[1])
 
     # plot
     xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
@@ -1530,7 +1533,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
 
     if legend:
         if showchisq:
-            newlabel = newlabel + '\n' + r'$\chi^2_\nu$ = ' + '{:.4f}'.format(chisqr)
+            newlabel = newlabel + '\n' + r'$\chi^2_\nu = {{:.4f}}$'.format(MSE)
         # handles, labels = ax.get_legend_handles_labels()
         # try:
         #     labels[-1] = newlabel
