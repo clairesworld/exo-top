@@ -51,11 +51,13 @@ def cmap_from_list(clist, n_bin=None, cmap_name=''):
 def cmap_from_ascii(name, path='', end='.txt', ncol=4):
     from matplotlib.colors import ListedColormap
     # ncol = 4 for alpha channel
-    palette = open(path+name+end)
-    lines = palette.readlines()
-    carray = np.zeros([len(lines), ncol])
-    for num, line in enumerate(lines):
-        carray[num, :] = [float(val) for val in line.strip().split()]
+    file = path+name+end
+    # palette = open(path+name+end)
+    # lines = palette.readlines()
+    # carray = np.zeros([len(lines), ncol])
+    # for num, line in enumerate(lines):
+    #     carray[num, :] = [float(val) for val in line.strip().split()]
+    carray = np.genfromtxt(file, comments='#')
     cmap = ListedColormap(carray, name=name)
     return cmap
 
