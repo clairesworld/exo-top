@@ -1561,7 +1561,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
 
 def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
                               literature_file=None, ms=30, fig=None, ax=None, figsize=(7, 5), xlabelpad=10,
-                              ylabelpad=10,
+                              ylabelpad=10, title=None,
                               legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
                               c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms',
                               data_path=data_path_bullard, alpha=1,
@@ -1666,13 +1666,14 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
             z_vec = [q for _, q in sorted(zip(x_data_all, z_data_all))]
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
-    if twocomponent:
-        title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(
-            expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])
-    elif which_x == 'h_components':
-        title = 'Fit to h = ({:.2f}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
-    elif 'Ra' in which_x:
-        title = 'Fit to h = ({:.2f}'.format(const) + ') Ra^{:.3f}'.format(expon)
+    if title is None:
+        if twocomponent:
+            title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(
+                expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])
+        elif which_x == 'h_components':
+            title = 'Fit to h = ({:.2f}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
+        elif 'Ra' in which_x:
+            title = 'Fit to h = ({:.2f}'.format(const) + ') Ra^{:.3f}'.format(expon)
     ax.set_title(title, fontsize=labelsize)
 
     if clist is None:

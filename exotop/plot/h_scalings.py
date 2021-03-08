@@ -8,17 +8,23 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
 from postaspect import plt_aspect as plat  # noqa: E402
 
 load = True  # load_grid
+cmap = 'art-nouveau-03'
+labelsize = 16
+ms = 10
+legsize = 12
 
 # model versus data
 
 fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
-                                  end_grid=end_grid, literature_file=None, legend=False, ms=10,
+                                  end_grid=end_grid, literature_file=None, legend=False, ms=ms,
                                   postprocess_kwargs=postprocess_kwargs, averagescheme='timefirst',
                                   ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
                                   # clist=['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow'],
-                                  cmap='latent', z_name='eta', fname='model-data-chaotic_timeavg',
+                                  cmap=cmap, z_name='eta', fname='model-data-chaotic_timeavg',
                                   save=True, include_regimes=['chaotic'], errs=[0.5, 0.2, 0.1, 0.05],
-                                  fig_fmt=fig_fmt, vmin=1, vmax=3, show_cbar=False, figsize=(5, 5),
+                                  fig_fmt=fig_fmt, vmin=1, vmax=3,
+                                  show_cbar=False, figsize=(5, 5),
+                                  title=r'Fit to $C$ Ra$_{i,eff}^p$',
                                   ylabel=r'Model $\Delta h_{rms}^\prime$', xlabel=r'Data $\Delta h_{rms}^\prime$')
 
 
@@ -28,10 +34,20 @@ fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_
 _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
                    beta0=[0.1, -0.15], sigma=1, fiterror=False,
-                   include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=16, legend=True,
+                   include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=labelsize, legend=True,
                    xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
-                   title=r'fit to CRa$_{i,eff}^p$, averaging time first', showpeak=False,
-                   cmap='latent', c_rms=None, fit=True, logx=True, logy=True, hscale=1,
+                   title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False,
+                   cmap=cmap, c_rms=None, fit=True, logx=True, logy=True, hscale=1, ms=ms,
+                   show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                   regime_grid=regime_grid_td, figsize=(5, 5))
+
+_ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                   fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra',
+                   beta0=[0.1, -0.15], sigma=1, fiterror=False,
+                   include_regimes=['chaotic'], save=True, fname='h_Ra_chaotic_timeavg', labelsize=labelsize, legend=True,
+                   xlabel=r'Ra$', ylabel='dynamic topography',
+                   title=r'Fit to $C$ Ra$^p$', showpeak=False,
+                   cmap=cmap, c_rms=None, fit=True, logx=True, logy=True, hscale=1, ms=ms,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
                    regime_grid=regime_grid_td, figsize=(5, 5))
 

@@ -862,7 +862,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
     return fig, axes
 
 
-def read_JFR(fname='', path='benchmarks/JFR/'):
+def read_JFR(fname='', path='/home/claire/Works/exo-top/benchmarks/JFR/'):
     df = pd.read_csv(path + fname, header=0, index_col=False)
     Ra = np.array(df.Ra)
     h_peak = np.array(df.peak_topo)
