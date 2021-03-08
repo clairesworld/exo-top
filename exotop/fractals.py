@@ -1,9 +1,9 @@
-from exotop.postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
+from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, load_grid, p_Earth  # noqa: E402
-from exotop.postaspect import aspect_post as ap  # noqa: E402
-from exotop.postaspect import aspectdata as post  # noqa: E402
-from exotop.postaspect.plt_aspect import plot_save
-from exotop.useful_and_bespoke import dark_background, cmap_from_list, minmaxnorm
+from postaspect import aspect_post as ap  # noqa: E402
+from postaspect import aspectdata as post  # noqa: E402
+from postaspect.plt_aspect import plot_save
+from useful_and_bespoke import dark_background, cmap_from_list, minmaxnorm
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -19,7 +19,33 @@ elw = 2
 ecapsize = 8
 
 
-def dct_spectrum(x, )
+def dct_spectrum(case, n=None, x_res=1, norm=None, data_path=data_path, plot=False, fig_path=fig_path, **kwargs):
+    from scipy import fftpack
+
+    if os.path.exists(data_path + 'output-' + case):
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
+    else:
+        raise Exception('case not found')
+
+    if n is None:
+        n = dat.final_step()
+    ts0 = dat.find_time_at_sol(n, return_indices=True)
+
+    x_mids, h = ap.read_topo_stats(case, ts0, data_path=data_path)
+    x_red = x_mids[::x_res]
+    h_red = h[::x_res]
+
+    y = fftpack.dct(h_red, type=2, norm=norm)
+
+    if plot:
+        plt.plot(y, c='k', label='DCT-II')
+        plt.xlabel('$k$')
+        plt.ylabel('$h_k$')
+        plt.title(case)
+        plot_save(plt.gcf(), fname='DCT_'+case, fig_path=fig_path, **kwargs)
+
+    return y
+
 
 def haarFWT(signal, level=1):
     # https: // stackoverflow.com / questions / 57439509 / implementing - haar - wavelet - in -python - without - packages
@@ -260,4 +286,5 @@ kappa = k / (rho * c_p)
 
 for case in ['Ra3e8-eta1e6-wide', 'Ra3e8-eta1e7-wide-ascii', 'Ra3e8-eta1e8-wide-ascii',
              'Ra1e8-eta1e6-wide', 'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e8-wide-ascii']:
-    plot_MHF(case=case, x_res=1, t_res=10)
+    # plot_MHF(case=case, x_res=1, t_res=10)
+    dct_spectrum(case, n=None, x_res=1, norm=None, data_path=data_path, fig_path=fig_path, plot=True)
