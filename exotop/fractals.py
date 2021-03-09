@@ -91,9 +91,10 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, norm
             tsf = ap.find_ts(case, 1e9, data_path=data_path, verbose=False)  # use last
 
         psd_grid = []
+        print('    Averaging', len(np.arange(ts0, tsf+1, t_res)), 'timesteps')
         for ts in np.arange(ts0, tsf+1, t_res):
             psd_i, k = dct_spectrum(case, ts0=ts, x_res=x_res, norm=norm, data_path=data_path, plot=False,
-                                      L_x=L_x, dim=dim, d=d, dT=dT, alpha=alpha)
+                                      L_x=L_x, dim=dim, d=d, dT=dT, alpha=alpha, **kwargs)
             psd_grid.append(psd_i)
 
         # take mean

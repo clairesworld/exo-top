@@ -25,4 +25,4 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
         for jj, case in enumerate(cases):
             if regime_grid_td[ii][jj] in include_regimes:
                 fract.dct_spectrum_avg(case, t0=t1_grid[ii][jj], t_res=1000, x_res=1, norm='ortho', data_path=data_path,
-                                       fig_path=fig_path, plot=True, dim=True)
+                                       fig_path=fig_path, plot=True, dim=True, test=True)
