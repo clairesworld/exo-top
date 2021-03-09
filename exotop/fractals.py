@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import pickle as pkl
 
 def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_path, plot=False,
                  L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, R=6050, test=False, **kwargs):
@@ -61,11 +62,14 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     plt.ylim([1e-2, 1e9])
     ax.set_yscale('log')
     ax.set_xscale('log')
-    beta = fit_slope(psd, k, k_min=3e-4, k_max=5e-3, ax=ax, fmt='g--', **kwargs)
-    show_beta_guide(ax, x0=7e-4, y0=1e5, x1=2e-3, m=-2, c='k', lw=3, fontsize=10, log=True)
 
     if show_nat_scales:
         ax, wl_min, wl_max = nat_scales(case, ax=ax, alpha=alpha, d=d, **kwargs)
+    else:
+        wl_min, wl_max = nat_scales(case, ax=None, alpha=alpha, d=d, **kwargs)
+
+    beta = fit_slope(psd, k, k_min=1/wl_max, k_max=1/wl_min, ax=ax, fmt='g--', **kwargs)
+    show_beta_guide(ax, x0=7e-4, y0=1e5, x1=2e-3, m=-2, c='k', lw=3, fontsize=10, log=True)
 
     fig = plt.gcf()
     plt.tight_layout()
@@ -75,23 +79,29 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     return fig, ax
 
 
-def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, norm='ortho', data_path=data_path,
-                     plot=False, L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, **kwargs):
+def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, norm='ortho', data_path=data_path, fend='.pkl',
+                     plot=False, L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, load=False, dump=True, **kwargs):
+    file = data_path+'output-'+case+'/pickle/'+case+'_sph'+fend
+    if load and os.path.exists(file):
+        psd_mean, k = pkl.load(open(file, "rb"))
+    else:
+        if ts0 is None:
+            ts0 = ap.find_ts(case, t0, data_path=data_path, verbose=False)
+        if tsf is None:
+            tsf = ap.find_ts(case, 1e9, data_path=data_path, verbose=False)  # use last
 
-    if ts0 is None:
-        ts0 = ap.find_ts(case, t0, data_path=data_path, verbose=False)
-    if tsf is None:
-        tsf = ap.find_ts(case, 1e9, data_path=data_path, verbose=False)  # use last
+        psd_grid = []
+        for ts in np.arange(ts0, tsf+1, t_res):
+            psd_i, k = dct_spectrum(case, ts0=ts, x_res=x_res, norm=norm, data_path=data_path, plot=False,
+                                      L_x=L_x, dim=dim, d=d, dT=dT, alpha=alpha)
+            psd_grid.append(psd_i)
 
-    psd_grid = []
-    for ts in np.arange(ts0, tsf+1, t_res):
-        psd_i, k = dct_spectrum(case, ts0=ts, x_res=x_res, norm=norm, data_path=data_path, plot=False,
-                                  L_x=L_x, dim=dim, d=d, dT=dT, alpha=alpha)
-        psd_grid.append(psd_i)
+        # take mean
+        psd_grid = np.array(psd_grid)
+        psd_mean = np.mean(psd_grid, axis=0)
 
-    # take mean
-    psd_grid = np.array(psd_grid)
-    psd_mean = np.mean(psd_grid, axis=0)
+    if dump:
+        pkl.dump((psd_mean, k), open(file, "wb"))
 
     if plot:
         fig, ax = plot_fit_psd(psd_mean, k, dim=dim, case=case, alpha=alpha, d=d, **kwargs)
