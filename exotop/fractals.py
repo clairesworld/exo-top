@@ -61,7 +61,7 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     ax.set_yscale('log')
     ax.set_xscale('log')
     beta = fit_slope(psd, k, k_min=3e-4, k_max=5e-3, ax=ax, fmt='g--', **kwargs)
-    show_beta(ax, x0=4e-4, y0=1e6, x1=7e-4, m=-2, lw=3, c='k', log=True, fontsize=10)
+    show_beta_guide(ax, x0=7e-4, y0=1e5, x1=2e-3, m=-2, c='k', lw=3, fontsize=10, log=True)
 
     if show_nat_scales:
         ax, wl_min, wl_max = nat_scales(case, ax=ax, **kwargs)
@@ -120,7 +120,7 @@ def fit_slope(S, k, k_min=None, k_max=None, ax=None, i_min=0, i_max=-1, fmt='g-'
     return beta
 
 
-def show_beta(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log=True):
+def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log=True):
     if log:
         b = np.log10(y0) - m*np.log10(x0)
         y1 = 10**b * x1**m
