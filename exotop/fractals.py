@@ -132,7 +132,7 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log
 
 
 def nat_scales(case, ax=None, t1=0, d=2700, c='xkcd:light grey', lw=0.5, **kwargs):
-    df = ap.pickleio(case, psuffix='_T', t1=t1, load=True,  data_path=data_path,**kwargs)
+    df = ap.pickleio(case, suffix='_T', t1=t1, load=True,  data_path=data_path,**kwargs)
     min_scale = df['delta_rh']*d
     max_scale = 2*d
 
