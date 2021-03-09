@@ -14,8 +14,19 @@ from scipy.spatial import distance
 # import statsmodels.api as sm
 from postaspect import aspectdata as ad  # noqa: E402
 from postaspect.setup_postprocessing import data_path_bullard  # noqa: E402
-from useful_and_bespoke import colorize, iterable_not_string, not_iterable, \
+from useful_and_bespoke import colorize, iterable_not_string, not_iterable, find_nearest_idx, \
     not_string, minmaxnorm, reduced_chisq, mahalanobis  # noqa: E402
+
+
+def find_ts(case, t, dat=None, data_path=data_path_bullard, **kwargs):
+    if dat is None:
+        dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False,
+                               read_parameters=False, **kwargs)
+
+    dat.read_times(**kwargs)
+    time = dat.stats_time
+    ts = find_nearest_idx(time, t)
+    return ts
 
 
 def read_topo_stats(case, ts, data_path=data_path_bullard, **kwargs):

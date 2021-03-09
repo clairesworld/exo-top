@@ -1,5 +1,4 @@
-from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
-    c_regimes_td, fig_fmt, \
+from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, fig_fmt, \
     regime_grid_td, regime_names_td, load_grid, p_Earth, postprocess_kwargs
 import fractals as fract
 
@@ -17,9 +16,13 @@ ecapsize = 8
 
 # cases = ['Ra3e8-eta1e6-wide', 'Ra3e8-eta1e7-wide-ascii', 'Ra3e8-eta1e8-wide-ascii',
 #              'Ra1e8-eta1e6-wide', 'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e8-wide-ascii']
-cases = ['Ra1e8-eta1e8-wide-ascii', 'Ra3e8-eta1e8-wide-ascii']
-ts = [[133000, 133900],[137000, 137900]]
-for ii, case in enumerate(cases):
-    # fract.plot_MHF(case=case, x_res=1, t_res=10)
-    fract.dct_spectrum_avg(case, ts0=ts[ii][0], tsf=ts[ii][1], t_res=100, x_res=1, norm='ortho', data_path=data_path,
-                           fig_path=fig_path, plot=True, dim=True)
+# cases = ['Ra1e8-eta1e8-wide-ascii', 'Ra3e8-eta1e8-wide-ascii']
+# ts = [[133000, 133900],[137000, 137900]]
+
+include_regimes= ['chaotic']
+for ii, eta in enumerate(eta_ls):  # across eta_ls
+        cases = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
+        for jj, case in enumerate(cases):
+            if regime_names_td[ii][jj] in include_regimes:
+                fract.dct_spectrum_avg(case, t0=t1_grid[ii][jj], t_res=100, x_res=1, norm='ortho', data_path=data_path,
+                               fig_path=fig_path, plot=True, dim=True)

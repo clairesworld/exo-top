@@ -1,27 +1,20 @@
-from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
-    fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, load_grid, p_Earth  # noqa: E402
-from postaspect import aspect_post as ap  # noqa: E402
-from postaspect import aspectdata as post  # noqa: E402
+from postaspect.setup_postprocessing import data_path, fig_path
+from postaspect import aspect_post as ap
+from postaspect import aspectdata as post
 from postaspect.plt_aspect import plot_save
 import sh_things as sh
-from useful_and_bespoke import dark_background, cmap_from_list, minmaxnorm
+from useful_and_bespoke import minmaxnorm
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
-def dct_spectrum(case, ts0=None, n=None, x_res=1, norm='ortho', data_path=data_path, plot=False,
-                 L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, R=6050, dat=None, **kwargs):
+def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_path, plot=False,
+                 L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, R=6050, **kwargs):
     from scipy import fftpack
 
-    if dat is None:
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False,
-                               read_parameters=False, **kwargs)
-
     if ts0 is None:
-        if n is None:
-            n = dat.final_step()
-        ts0 = dat.find_time_at_sol(n, return_indices=True)
+        ts0 = ap.find_ts(case, t0, data_path=data_path, verbose=False)
 
     x_mids, h = ap.read_topo_stats(case, ts0, data_path=data_path)
     x_red = x_mids.to_numpy()[::x_res]
@@ -78,22 +71,15 @@ def plot_fit_psd(psd, k, dim=True, case='', save=True, fig_path=fig_path, **kwar
     return fig, ax
 
 
-def dct_spectrum_avg(case, ts0=None, tsf=None, n0=None, nf=None, x_res=1, t_res=100, norm='ortho', data_path=data_path,
-                     plot=False, fig_path=fig_path,  L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, **kwargs):
+def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, norm='ortho', data_path=data_path,
+                     plot=False, L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, **kwargs):
 
-    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False,
-                               read_parameters=False, **kwargs)
     if ts0 is None:
-        if n0 is None:
-            n0 = dat.final_step() - 1
-        ts0 = dat.find_time_at_sol(n0, return_indices=True)
+        ts0 = ap.find_ts(case, t0, data_path=data_path, verbose=False)
     if tsf is None:
-        if nf is None:
-            nf = dat.final_step()
-        tsf = dat.find_time_at_sol(nf, return_indices=True)
+        tsf = ap.find_ts(case, 1e9, data_path=data_path, verbose=False)  # use last
 
     psd_grid = []
-
     for ts in np.arange(ts0, tsf+1, t_res):
         psd_i, k = dct_spectrum(case, ts0=ts, x_res=x_res, norm=norm, data_path=data_path, plot=False,
                                   L_x=L_x, dim=dim, d=d, dT=dT, alpha=alpha)
@@ -104,7 +90,42 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, n0=None, nf=None, x_res=1, t_res=
     psd_mean = np.mean(psd_grid, axis=0)
 
     if plot:
-        plot_fit_psd(psd_mean, k, dim=dim, **kwargs)
+        fig, ax = plot_fit_psd(psd_mean, k, dim=dim, case=case, **kwargs)
+        return fig, ax
+    else:
+        return None, None
+
+
+def fit_slope(S, k, k_min=None, k_max=None, ax=None, i_min=0, i_max=-1, fmt='g-', **kwargs):
+    # find k range
+    if k_min is not None and (k_min > np.min(k)):
+        i_min = np.argmax(k >= k_min)
+    if k_max is not None and (k_max < np.max(k)):
+        i_max = np.argmax(k > k_max)
+    kv = k[i_min:i_max]
+    Sv = S[i_min:i_max]
+
+    intercept, slope = np.polynomial.polynomial.polyfit(np.log10(kv), np.log10(Sv), deg=1)
+    intercept = 10**intercept
+    print('slope, intercept:', slope, intercept)
+    beta = -slope
+
+    if ax is None:
+        ax = plt.gca()
+    ax.plot(kv, intercept * kv ** -beta, fmt, label=r'naive fit, $\beta$ = ' + '{:.2f}'.format(beta))
+    ax.legend()
+    return beta
+
+
+def show_beta(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log=True):
+    if log:
+        b = np.log10(y0) - m*np.log10(x0)
+        y1 = 10**b * x1**m
+    else:
+        b = y0 - m*x0
+        y1 = m*x1 + b
+    ax.plot((x0, x1), (y0, y1), c=c, lw=lw)
+    ax.text((x0+x1)/2, y0, r'$k^{-2}$', fontsize=fontsize, c=c)
 
 
 def haarFWT(signal, level=1):
@@ -285,73 +306,43 @@ def plot_MHF(case, fname='MHF_', L_max=None, save=True, **kwargs):
         plot_save(fig, fname+case, **kwargs)
 
 
-def plot_h_fractal_scaling(case, n=None, rho=3500, kappa=None, k=4, c_p=1200, alpha=3e-5, data_path=data_path, fig_path=fig_path,
-                           figsize=(7, 7), labelsize=16, c='k', lw=3, ni=10, **kwargs):
-
-    if kappa is None and k is not None:
-        kappa = k / (rho * c_p)
-
-    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
-    if n is None:
-        n = dat.final_step()
-    ts = dat.find_time_at_sol(n)
-
-    x_mids, h = ap.read_topo_stats(case, ts, data_path=data_path)
-    x_mids = np.array(x_mids)
-    h = np.array(h)
-
-    x, y, _, F = dat.read_vertical_heatflux(n)
-    F = post.reduce_dims(F)
-    F_surf = F[:, -1]
-    print('F_surf', np.shape(F_surf))
-    print('h', np.shape(h))
-    print('x', np.shape(x))
-    # todo: F and h are at different x points
-
-    h_t = haar(h, ni)  # apply haar wavelet
-    x_l = x
-    dh_l = np.zeros_like(x_l)
-    phi_l = np.zeros_like(x_l)
-    for i, xi in enumerate(x_l):
-        dh_l[i] = h_t[i] - h_t[0]  # change in topography at that distance scale
-        F_l = np.sum(F_surf[0:i])
-        phi_l[i] = kappa ** 3 * c_p * alpha * rho ** 2 * F_l ** -1
-
-    fig, ax = plt.subplots(figsize=figsize)
-    ax.plot(x_l, phi_l * x_l ** 0.5, c=c, lw=lw, label='predicted scaling')
-    ax.plot(x_l, dh_l, c=c, lw=lw, ls='--', label='ASPECT scaling')
-    ax.set_ylabel(r'$\Delta h', fontsize=labelsize)
-    ax.set_xlabel('L', fontsize=labelsize)
-    fig.savefig(fig_path + 'fractal-scaling.png', bbox_inches='tight')
-
-
-def fit_slope(S, k, k_min=None, k_max=None, ax=None, i_min=0, i_max=-1, fmt='g-', **kwargs):
-    # find k range
-    if k_min is not None and (k_min > np.min(k)):
-        i_min = np.argmax(k >= k_min)
-    if k_max is not None and (k_max < np.max(k)):
-        i_max = np.argmax(k > k_max)
-    kv = k[i_min:i_max]
-    Sv = S[i_min:i_max]
-
-    intercept, slope = np.polynomial.polynomial.polyfit(np.log10(kv), np.log10(Sv), deg=1)
-    intercept = 10**intercept
-    print('slope, intercept:', slope, intercept)
-    beta = -slope
-
-    if ax is None:
-        ax = plt.gca()
-    ax.plot(kv, intercept * kv ** -beta, fmt, label=r'naive fit, $\beta$ = ' + '{:.2f}'.format(beta))
-    ax.legend()
-    return beta
+# def plot_h_fractal_scaling(case, n=None, rho=3500, kappa=None, k=4, c_p=1200, alpha=3e-5, data_path=data_path, fig_path=fig_path,
+#                            figsize=(7, 7), labelsize=16, c='k', lw=3, ni=10, **kwargs):
+#
+#     if kappa is None and k is not None:
+#         kappa = k / (rho * c_p)
+#
+#     dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
+#     if n is None:
+#         n = dat.final_step()
+#     ts = dat.find_time_at_sol(n)
+#
+#     x_mids, h = ap.read_topo_stats(case, ts, data_path=data_path)
+#     x_mids = np.array(x_mids)
+#     h = np.array(h)
+#
+#     x, y, _, F = dat.read_vertical_heatflux(n)
+#     F = post.reduce_dims(F)
+#     F_surf = F[:, -1]
+#     print('F_surf', np.shape(F_surf))
+#     print('h', np.shape(h))
+#     print('x', np.shape(x))
+#     # todo: F and h are at different x points
+#
+#     h_t = haar(h, ni)  # apply haar wavelet
+#     x_l = x
+#     dh_l = np.zeros_like(x_l)
+#     phi_l = np.zeros_like(x_l)
+#     for i, xi in enumerate(x_l):
+#         dh_l[i] = h_t[i] - h_t[0]  # change in topography at that distance scale
+#         F_l = np.sum(F_surf[0:i])
+#         phi_l[i] = kappa ** 3 * c_p * alpha * rho ** 2 * F_l ** -1
+#
+#     fig, ax = plt.subplots(figsize=figsize)
+#     ax.plot(x_l, phi_l * x_l ** 0.5, c=c, lw=lw, label='predicted scaling')
+#     ax.plot(x_l, dh_l, c=c, lw=lw, ls='--', label='ASPECT scaling')
+#     ax.set_ylabel(r'$\Delta h', fontsize=labelsize)
+#     ax.set_xlabel('L', fontsize=labelsize)
+#     fig.savefig(fig_path + 'fractal-scaling.png', bbox_inches='tight')
 
 
-def show_beta(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log=True):
-    if log:
-        b = np.log10(y0) - m*np.log10(x0)
-        y1 = 10**b * x1**m
-    else:
-        b = y0 - m*x0
-        y1 = m*x1 + b
-    ax.plot((x0, x1), (y0, y1), c=c, lw=lw)
-    ax.text((x0+x1)/2, y0, r'$k^{-2}$', fontsize=fontsize, c=c)
