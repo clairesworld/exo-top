@@ -15,10 +15,10 @@ import collections
 import six
 import pandas as pd
 from scipy import interpolate
-from exotop import asharms as harm  # noqa: E402
+import sh_things as harm
 import matplotlib.animation as animation
-from exotop.useful_and_bespoke import age_index, dark_background, not_iterable, colorize, colourbar  # noqa: E402
-from exotop.model_1D.parameters import M_E  # noqa: E402
+from useful_and_bespoke import age_index, dark_background, not_iterable, colorize, colourbar
+from model_1D.parameters import M_E
 
 
 "                      PLOTTING                           "

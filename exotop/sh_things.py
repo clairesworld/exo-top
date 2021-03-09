@@ -117,7 +117,7 @@ def powerspectrum_RMS(path=None, power_lm=None, degree=None, amplitude=False,
 
 def parseval_rms(psd, k):
     # RMS from power spectral density using parseval's theorem
-    f = psd*k
+    f = psd
     I = np.trapz(f, k)
     rms = np.sqrt(I/(2*np.pi))
     return rms
