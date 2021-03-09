@@ -44,6 +44,7 @@ def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_p
 
 
 def plot_fit_psd(psd, k, dim=True, case='', save=True, fig_path=fig_path, **kwargs):
+    plt.figure()
     plt.plot(k, psd, c='xkcd:slate', label='Power spectral density from DCT-II')
     ax = plt.gca()
     if dim:
@@ -55,13 +56,13 @@ def plot_fit_psd(psd, k, dim=True, case='', save=True, fig_path=fig_path, **kwar
         plt.xlabel('$k$ (nondimensional distance)$^{-1}$')
         plt.ylabel('$P_k$ (nondimensional distance)$^2$')
     plt.title(case[:12])
-    plt.xlim([3e-4, 2e-2])
-    plt.ylim([1e-6, 1e12])
+    plt.xlim([3e-4, 7e-2])
+    plt.ylim([1e-2, 1e9])
     ax.set_yscale('log')
     ax.set_xscale('log')
     beta = fit_slope(psd, k, k_min=3e-4, k_max=5e-3, ax=ax, fmt='g--', **kwargs)
 
-    show_beta(ax, x0=4e-4, y0=1e6, x1=7e-4, m=-2, lw=1, c='k', log=True, fontsize=10)
+    show_beta(ax, x0=4e-4, y0=1e6, x1=7e-4, m=-2, lw=3, c='k', log=True, fontsize=10)
 
     fig = plt.gcf()
     plt.tight_layout()
