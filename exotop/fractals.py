@@ -140,6 +140,8 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:light grey', lw=
 
     min_scale = dic_av['delta_rh']*d
     max_scale = 2*d
+    print('min wl =', min_scale, ', k =', 1/min_scale)
+    print('max wl =', max_scale, ', k =', 1 /max_scale)
 
     if ax is not None:
         ax.axvline(x=1/min_scale, lw=lw, c=c)
