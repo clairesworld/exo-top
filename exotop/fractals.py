@@ -10,7 +10,7 @@ import pandas as pd
 import os
 
 def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_path, plot=False,
-                 L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, R=6050, **kwargs):
+                 L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, R=6050, test=False, **kwargs):
     from scipy import fftpack
 
     if ts0 is None:
@@ -32,10 +32,10 @@ def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_p
     psd = 4*D_x*abs(f)**2
     # psd_scale = 4*np.pi*R**2 * psd / (2*sh.to_wn(k, R=R) + 1)
 
-    rms_parseval = sh.parseval_rms(psd, k)
-    _, rms_prof = ap.peak_and_rms(h_red)
-
-    print('frequency rms =', rms_parseval, '| spatial rms =', rms_prof)
+    if test:
+        rms_parseval = sh.parseval_rms(psd, k)
+        _, rms_prof = ap.peak_and_rms(h_red)
+        print('frequency rms =', rms_parseval, '| spatial rms =', rms_prof)
 
     if plot:
         fig, ax = plot_fit_psd(psd, k, dim=dim, case=case, **kwargs)
