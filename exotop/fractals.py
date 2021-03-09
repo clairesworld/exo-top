@@ -43,7 +43,8 @@ def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_p
     return psd, k
 
 
-def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig_path=fig_path, **kwargs):
+def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig_path=fig_path,
+                 d=2700, dT=3000, alpha=2e-5, **kwargs):
     plt.figure()
     plt.plot(k, psd, c='xkcd:slate', label='Power spectral density from DCT-II')
     ax = plt.gca()
@@ -64,7 +65,7 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     show_beta_guide(ax, x0=7e-4, y0=1e5, x1=2e-3, m=-2, c='k', lw=3, fontsize=10, log=True)
 
     if show_nat_scales:
-        ax, wl_min, wl_max = nat_scales(case, ax=ax, **kwargs)
+        ax, wl_min, wl_max = nat_scales(case, ax=ax, alpha=alpha, d=d, **kwargs)
 
     fig = plt.gcf()
     plt.tight_layout()
@@ -93,7 +94,7 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, norm
     psd_mean = np.mean(psd_grid, axis=0)
 
     if plot:
-        fig, ax = plot_fit_psd(psd_mean, k, dim=dim, case=case, **kwargs)
+        fig, ax = plot_fit_psd(psd_mean, k, dim=dim, case=case, alpha=alpha, d=d, **kwargs)
         return fig, ax
     else:
         return None, None
@@ -131,11 +132,11 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log
     ax.text((x0+x1)/2, y0, r'$k^{-2}$', fontsize=fontsize, c=c)
 
 
-def nat_scales(case, ax=None, t1=0, d=2700, c='xkcd:light grey', lw=0.5, **kwargs):
+def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:light grey', lw=0.5, **kwargs):
     df = ap.pickleio(case, suffix='_T', t1=t1, load=True,  data_path=data_path,**kwargs)
     T_av, y = ap.time_averaged_profile_from_df(df, 'T_av')
     uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')
-    dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, **kwargs)
+    dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, alpha_m=alpha, **kwargs)
 
     min_scale = dic_av['delta_rh']*d
     max_scale = 2*d
