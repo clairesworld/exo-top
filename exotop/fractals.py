@@ -57,7 +57,7 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
         plt.xlabel('$k$ (nondimensional distance)$^{-1}$')
         plt.ylabel('$P_k$ (nondimensional distance)$^2$')
     plt.title(case[:12])
-    plt.xlim([3e-4, 7e-2])
+    plt.xlim([1e-4, 7e-2])
     plt.ylim([1e-2, 1e9])
     ax.set_yscale('log')
     ax.set_xscale('log')
