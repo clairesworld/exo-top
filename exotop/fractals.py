@@ -140,8 +140,8 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:light grey', lw=
 
     min_scale = dic_av['delta_rh']*d
     max_scale = 2*d
-    print('min wl =', min_scale, ', k =', 1/min_scale)
-    print('max wl =', max_scale, ', k =', 1 /max_scale)
+    # print('min wl =', min_scale, ', k =', 1/min_scale)
+    # print('max wl =', max_scale, ', k =', 1/max_scale)
 
     if ax is not None:
         ax.axvline(x=1/min_scale, lw=lw, c=c)
@@ -165,24 +165,24 @@ def haarFWT(signal, level=1):
     g = [1, -1]  # highpass filter
     f = len(h)  # length of the filter
 
-    t = signal;  # 'workspace' array
-    l = len(t);  # length of the current signal
-    y = [0] * l;  # initialise output
+    t = signal  # 'workspace' array
+    l = len(t)  # length of the current signal
+    y = [0] * l  # initialise output
 
-    t = t + [0, 0];  # padding for the workspace
+    t = t + [0, 0]  # padding for the workspace
 
     for i in range(level):
 
-        y[0:l] = [0] * l;  # initialise the next level
-        l2 = l // 2;  # half approximation, half detail
+        y[0:l] = [0] * l  # initialise the next level
+        l2 = l // 2  # half approximation, half detail
 
         for j in range(l2):
             for k in range(f):
-                y[j] += t[2 * j + k] * h[k] * s;
-                y[j + l2] += t[2 * j + k] * g[k] * s;
+                y[j] += t[2 * j + k] * h[k] * s
+                y[j + l2] += t[2 * j + k] * g[k] * s
 
-        l = l2;  # continue with the approximation
-        t[0:l] = y[0:l];
+        l = l2  # continue with the approximation
+        t[0:l] = y[0:l]
 
     return y
 
