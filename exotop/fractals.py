@@ -129,7 +129,7 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log
         b = y0 - m*x0
         y1 = m*x1 + b
     ax.plot((x0, x1), (y0, y1), c=c, lw=lw)
-    ax.text((x0+x1)/2, y0, r'$k^{-2}$', fontsize=fontsize, c=c)
+    ax.text((x0+x1)/2, (y0+y1)/2, r'$k^{-2}$', fontsize=fontsize, c=c)
 
 
 def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:light grey', lw=0.5, **kwargs):
@@ -147,8 +147,8 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:light grey', lw=
         ax.axvline(x=1/min_scale, lw=lw, c=c)
         ax.axvline(x=1/max_scale, lw=lw, c=c)
         ylim = ax.get_ylim()
-        yt = 10**(0.95*(np.log10(ylim[1]) - np.log10(ylim[0])))
-        ax.text(1/min_scale, yt, r'$2d$', va='top', ha='left', fontsize=11, c=c)
+        yt = 10**(0.95*(np.log10(ylim[1]) - np.log10(ylim[0])) + np.log10(ylim[0]))
+        ax.text(1 / min_scale, yt, r'$2d$', va='top', ha='left', fontsize=11, c=c)
         ax.text(1 / max_scale, yt, r'$\delta_{\rm rh}$', va='top', ha='left', fontsize=11, c=c)
 
         return ax, min_scale, max_scale
