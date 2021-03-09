@@ -43,7 +43,7 @@ def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_p
     return psd, k
 
 
-def plot_fit_psd(psd, k, dim=True, case='', save=True, fig_path=fig_path, **kwargs):
+def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig_path=fig_path, **kwargs):
     plt.figure()
     plt.plot(k, psd, c='xkcd:slate', label='Power spectral density from DCT-II')
     ax = plt.gca()
@@ -61,8 +61,10 @@ def plot_fit_psd(psd, k, dim=True, case='', save=True, fig_path=fig_path, **kwar
     ax.set_yscale('log')
     ax.set_xscale('log')
     beta = fit_slope(psd, k, k_min=3e-4, k_max=5e-3, ax=ax, fmt='g--', **kwargs)
-
     show_beta(ax, x0=4e-4, y0=1e6, x1=7e-4, m=-2, lw=3, c='k', log=True, fontsize=10)
+
+    if show_nat_scales:
+        ax, wl_min, wl_max = nat_scales(case, ax=ax, **kwargs)
 
     fig = plt.gcf()
     plt.tight_layout()
@@ -127,6 +129,19 @@ def show_beta(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log=True)
         y1 = m*x1 + b
     ax.plot((x0, x1), (y0, y1), c=c, lw=lw)
     ax.text((x0+x1)/2, y0, r'$k^{-2}$', fontsize=fontsize, c=c)
+
+
+def nat_scales(case, ax=None, t1=0, d=2700, c='xkcd:light grey', lw=0.5, **kwargs):
+    df = ap.pickleio(case, psuffix='_T', t1=t1, load=True,  data_path=data_path,**kwargs)
+    min_scale = df['delta_rh']*d
+    max_scale = 2*d
+
+    if ax is not None:
+        ax.axvline(x=1/min_scale, lw=lw, c=c)
+        ax.axvline(x=1/max_scale, lw=lw, c=c)
+        return ax, min_scale, max_scale
+    else:
+        return min_scale, max_scale
 
 
 def haarFWT(signal, level=1):
