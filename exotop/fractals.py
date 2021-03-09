@@ -3,6 +3,7 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
 from postaspect import aspect_post as ap  # noqa: E402
 from postaspect import aspectdata as post  # noqa: E402
 from postaspect.plt_aspect import plot_save
+import sh_things as sh
 from useful_and_bespoke import dark_background, cmap_from_list, minmaxnorm
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,34 +18,101 @@ lw = 5
 ms = 25
 elw = 2
 ecapsize = 8
+data_path = '/home/claire/Works/aspect/runs/model-output/'
 
 
-def dct_spectrum(case, n=None, x_res=1, norm=None, data_path=data_path, plot=False, fig_path=fig_path, **kwargs):
+def dct_spectrum(case, ts0=None, n=None, x_res=1, norm='ortho', data_path=data_path, plot=False, fig_path=fig_path,
+                 L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, R=6050, dat=None, **kwargs):
     from scipy import fftpack
 
-    if os.path.exists(data_path + 'output-' + case):
-        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
-    else:
-        raise Exception('case not found')
+    if dat is None:
+        dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False,
+                               read_parameters=False, **kwargs)
 
-    if n is None:
-        n = dat.final_step()
-    ts0 = dat.find_time_at_sol(n, return_indices=True)
+    if ts0 is None:
+        if n is None:
+            n = dat.final_step()
+        ts0 = dat.find_time_at_sol(n, return_indices=True)
 
     x_mids, h = ap.read_topo_stats(case, ts0, data_path=data_path)
-    x_red = x_mids[::x_res]
-    h_red = h[::x_res]
+    x_red = x_mids.to_numpy()[::x_res]
+    h_red = h.to_numpy()[::x_res]
+    if dim:
+        h_red = h_red*alpha*dT*d
+        D_x = d*L_x
+    else:
+        D_x = L_x
 
-    y = fftpack.dct(h_red, type=2, norm=norm)
+    f = fftpack.dct(h_red, type=2, norm=norm)
+    p = np.arange(len(f))
+    k = np.pi*p/D_x
+    wl = 1/k
+    psd = 4*D_x*abs(f)**2
+    # psd_scale = 4*np.pi*R**2 * psd / (2*sh.to_wn(k, R=R) + 1)
+
+    rms_parseval = sh.parseval_rms(psd, k)
+    _, rms_prof = ap.peak_and_rms(h_red)
+
+    print('frequency rms =', rms_parseval, '| spatial rms =', rms_prof)
 
     if plot:
-        plt.plot(y, c='k', label='DCT-II')
-        plt.xlabel('$k$')
-        plt.ylabel('$h_k$')
-        plt.title(case)
-        plot_save(plt.gcf(), fname='DCT_'+case, fig_path=fig_path, **kwargs)
+        plot_fit_psd(psd, k, dim=dim)
 
-    return y
+    return psd, k
+
+
+def plot_fit_psd(psd, k, dim=True, **kwargs):
+    plt.plot(k, psd, c='xkcd:slate', label='Power spectral density from DCT-II')
+    ax = plt.gca()
+    if dim:
+        plt.xlabel('$k$, km$^{-1}$')
+        plt.ylabel('$P_k$, km$^3$')
+        secax = ax.secondary_xaxis('top', functions=(sh.to_deg, sh.to_wn))
+        secax.set_xlabel('spherical harmonic degree')
+    else:
+        plt.xlabel('$k$ (nondimensional distance)$^{-1}$')
+        plt.ylabel('$P_k$ (nondimensional distance)$^2$')
+    plt.title(case[:12])
+    plt.xlim([3e-4, 2e-2])
+    plt.ylim([1e-6, 1e12])
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    beta = fit_slope(psd, k, k_min=3e-4, k_max=5e-3, ax=ax, fmt='g--', **kwargs)
+
+    show_beta(ax, x0=4e-4, y0=1e6, x1=7e-4, m=-2, lw=1, c='k', log=True, fontsize=10)
+
+    plt.tight_layout()
+    plt.show()
+    # plot_save(plt.gcf(), fname='DCT_'+case, fig_path=fig_path, **kwargs)
+
+
+def dct_spectrum_avg(case, ts0=None, tsf=None, n0=None, nf=None, x_res=1, t_res=100, norm='ortho', data_path=data_path,
+                     plot=False, fig_path=fig_path,  L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, **kwargs):
+
+    dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False,
+                               read_parameters=False, **kwargs)
+    if ts0 is None:
+        if n0 is None:
+            n0 = dat.final_step() - 1
+        ts0 = dat.find_time_at_sol(n0, return_indices=True)
+    if tsf is None:
+        if nf is None:
+            nf = dat.final_step()
+        tsf = dat.find_time_at_sol(nf, return_indices=True)
+
+    psd_grid = []
+
+    for ts in np.arange(ts0, tsf+1, t_res):
+        psd_i, k = dct_spectrum(case, ts0=ts, x_res=x_res, norm=norm, data_path=data_path, plot=False,
+                                  L_x=L_x, dim=dim, d=d, dT=dT, alpha=alpha)
+        psd_grid.append(psd_i)
+
+    # take mean
+    psd_grid = np.array(psd_grid)
+    psd_mean = np.mean(psd_grid, axis=0)
+
+    if plot:
+        plot_fit_psd(psd_mean, k, dim=dim, **kwargs)
 
 
 def haarFWT(signal, level=1):
@@ -225,8 +293,12 @@ def plot_MHF(case, fname='MHF_', L_max=None, save=True, **kwargs):
         plot_save(fig, fname+case, **kwargs)
 
 
-def plot_h_fractal_scaling(case, n=None, rho=1, kappa=1, c_p=1, alpha=1, data_path=data_path, fig_path=fig_path,
+def plot_h_fractal_scaling(case, n=None, rho=3500, kappa=None, k=4, c_p=1200, alpha=3e-5, data_path=data_path, fig_path=fig_path,
                            figsize=(7, 7), labelsize=16, c='k', lw=3, ni=10, **kwargs):
+
+    if kappa is None and k is not None:
+        kappa = k / (rho * c_p)
+
     dat = post.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False, **kwargs)
     if n is None:
         n = dat.final_step()
@@ -261,30 +333,45 @@ def plot_h_fractal_scaling(case, n=None, rho=1, kappa=1, c_p=1, alpha=1, data_pa
     fig.savefig(fig_path + 'fractal-scaling.png', bbox_inches='tight')
 
 
-def fit_slope(S, k, k_max=None, fig=None, ax=None, i_min=1, i_max=-1, fmt='g-', **kwargs):
-    # find k max
+def fit_slope(S, k, k_min=None, k_max=None, ax=None, i_min=0, i_max=-1, fmt='g-', **kwargs):
+    # find k range
+    if k_min is not None and (k_min > np.min(k)):
+        i_min = np.argmax(k >= k_min)
     if k_max is not None and (k_max < np.max(k)):
         i_max = np.argmax(k > k_max)
     kv = k[i_min:i_max]
     Sv = S[i_min:i_max]
-    slope, intercept = ap.fit_log(kv, Sv)
+
+    intercept, slope = np.polynomial.polynomial.polyfit(np.log10(kv), np.log10(Sv), deg=1)
+    intercept = 10**intercept
+    print('slope, intercept:', slope, intercept)
     beta = -slope
 
     if ax is None:
-        fig = plt.figure()
         ax = plt.gca()
-    ax.plot(kv, intercept * kv ** -beta, fmt, label=r'fit, $\beta$ = ' + '{:.2f}'.format(beta))
+    ax.plot(kv, intercept * kv ** -beta, fmt, label=r'naive fit, $\beta$ = ' + '{:.2f}'.format(beta))
     ax.legend()
     return beta
 
-rho = 3500
-alpha = 3e-5
-c_p = 1200
-k = 4
-kappa = k / (rho * c_p)
+
+def show_beta(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log=True):
+    if log:
+        b = np.log10(y0) - m*np.log10(x0)
+        y1 = 10**b * x1**m
+    else:
+        b = y0 - m*x0
+        y1 = m*x1 + b
+    ax.plot((x0, x1), (y0, y1), c=c, lw=lw)
+    ax.text((x0+x1)/2, y0, r'$k^{-2}$', fontsize=fontsize, c=c)
+
+
 # plot_h_fractal_scaling(case='Ra3e8-eta1e7-wide-ascii', ni=10, rho=rho, alpha=alpha, c_p=c_p, kappa=kappa)
 
-for case in ['Ra3e8-eta1e6-wide', 'Ra3e8-eta1e7-wide-ascii', 'Ra3e8-eta1e8-wide-ascii',
-             'Ra1e8-eta1e6-wide', 'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e8-wide-ascii']:
+# cases = ['Ra3e8-eta1e6-wide', 'Ra3e8-eta1e7-wide-ascii', 'Ra3e8-eta1e8-wide-ascii',
+#              'Ra1e8-eta1e6-wide', 'Ra1e8-eta1e7-wide', 'Ra1e8-eta1e8-wide-ascii']
+cases = ['Ra1e8-eta1e8-wide-ascii', 'Ra3e8-eta1e8-wide-ascii']
+ts = [[133000, 133900],[137000, 137900]]
+for ii, case in enumerate(cases):
     # plot_MHF(case=case, x_res=1, t_res=10)
-    dct_spectrum(case, n=None, x_res=1, norm=None, data_path=data_path, fig_path=fig_path, plot=True)
+    dct_spectrum_avg(case, ts0=ts[ii][0], tsf=ts[ii][1], t_res=100, x_res=1, norm='ortho', data_path=data_path,
+                     fig_path=fig_path, plot=True, dim=True)

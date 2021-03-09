@@ -79,7 +79,7 @@ class Aspect_Data():
             self.format='hdf5'
         elif pvd_check:
             self.format='vtu'
-        else:
+        elif verbose:
             print('No solution files found in folder '+directory)
         if verbose:
             print("Aspect data found in", self.format, "format")

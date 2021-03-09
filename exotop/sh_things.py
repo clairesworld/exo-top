@@ -113,3 +113,19 @@ def powerspectrum_RMS(path=None, power_lm=None, degree=None, amplitude=False,
     RMS = sum(RMS_l)
     # print('this RMS', RMS)
     return RMS
+
+
+def parseval_rms(psd, k):
+    # RMS from power spectral density using parseval's theorem
+    f = psd*k
+    I = np.trapz(f, k)
+    rms = np.sqrt(I/(2*np.pi))
+    return rms
+
+
+def to_deg(k, R=6050):
+    return k * np.pi * R - 0.5
+
+
+def to_wn(l, R=6050):
+    return (l + 0.5) / (np.pi * R)  # denominator is planet radius
