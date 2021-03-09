@@ -146,6 +146,11 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:light grey', lw=
     if ax is not None:
         ax.axvline(x=1/min_scale, lw=lw, c=c)
         ax.axvline(x=1/max_scale, lw=lw, c=c)
+        ylim = ax.get_ylim()
+        yt = 0.95*(np.log10(ylim[1]) - np.log10(ylim[0]))
+        ax.text(1/min_scale, yt, r'$2d$', va='top', ha='left')
+        ax.text(1 / max_scale, yt, r'$\delta_{\rm rh}$', va='top', ha='left', fontsize=12, c=c)
+
         return ax, min_scale, max_scale
     else:
         return min_scale, max_scale
