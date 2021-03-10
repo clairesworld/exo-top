@@ -282,17 +282,17 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
     # not animated
 
     fig = plt.figure()
-    gs = fig.add_gridspec(5, 9, wspace=0.05, hspace=0.05)
+    gs = fig.add_gridspec(5, 9, wspace=0.1, hspace=0.1)
 
     ax0 = fig.add_subplot(gs[1, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
                         ticksize=ticksize, i_ts=-1, **kwargs)
 
-    ax1 = fig.add_subplot(gs[1:,:-1])
+    ax1 = fig.add_subplot(gs[2:,:-1])
     fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
                               labelsize=labelsize, ticksize=ticksize, i_n=-1, cbar=False, **kwargs)
 
-    ax2 = fig.add_subplot(gs[1:,-1])
+    ax2 = fig.add_subplot(gs[2:,-1])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
                              ticksize=ticksize, leg=False, **kwargs)
 
