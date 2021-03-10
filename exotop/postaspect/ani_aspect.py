@@ -254,7 +254,8 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         T_n = np.array(T_n)
         T_im = np.mean(T_n, axis=0)
     else:
-        T_im = T_n[i_n]
+        T_im = T_n[0]
+        # T_im = T_n[i_n]
 
     # set up initial image
     x = dat.x
