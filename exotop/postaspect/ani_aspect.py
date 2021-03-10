@@ -108,7 +108,7 @@ def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
 
 
 def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, dark=False,
-             return_artists=False, c='k', save=True, i_ts=0, avg=False, fig=None, ax=None, **kwargs):
+             xlabel='', ylabel='', return_artists=False, c='k', save=True, i_ts=0, avg=False, fig=None, ax=None, **kwargs):
     if dark:
         foreground = 'xkcd:off white'
     else:
@@ -131,8 +131,8 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
 
     if fig is None and ax is None:
         fig, ax = plt.subplots(figsize=(20, 1))
-    ax.set_xlabel('', fontsize=labelsize, labelpad=20)
-    ax.set_ylabel('', fontsize=labelsize, labelpad=20)
+    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=20)
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=20)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
     ax.set_xticks([])
     # ax.set_yticks([])
@@ -185,7 +185,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
         D_l_n = dic_av['y_L']
         # df_n = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
 
-        for ii in len(n):
+        for ii in range(len(n)):
             df_n = df.iloc[ii]
             T_ii = np.array(df_n['T_av'].tolist())
             y_ii = np.array(df_n['y'].tolist())
@@ -294,7 +294,7 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
 
     ax0 = fig.add_subplot(gs[1, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
-                        ticksize=ticksize, i_ts=-1, **kwargs)
+                        ticksize=ticksize, i_ts=-1, ylabel='$h^\prime$', **kwargs)
 
     ax1 = fig.add_subplot(gs[2:,:-1])
     fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
