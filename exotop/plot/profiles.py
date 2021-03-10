@@ -14,15 +14,15 @@ for ii, eta in enumerate(eta_ls):  # eta_ls
     if ii in i_plot:
         for jj, Ra in enumerate(Ra_ls):
             ### plot just T(z) at final timestep (or mean?), and extract all temperature params
-            case = 'Ra' + Ra + '-eta' + eta + end_grid[ii, jj]
-            T_params = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol],
-                                     t1=t1_grid[ii, jj], load=False, data_path=data_path)
-
-            fig, ax = plat.plot_T_profile(case, T_params=T_params, n=-1, data_path=data_path, t1=t1_grid[ii, jj],
-                                          setylabel=True,
-                                          setxlabel=True, save=True, fig_path=fig_path+'case_profiles/', fend='_T-z', fig_fmt=fig_fmt,
-                                          legend=True,
-                                          load=load_grid[ii, jj])
+            # case = 'Ra' + Ra + '-eta' + eta + end_grid[ii, jj]
+            # T_params = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol],
+            #                          t1=t1_grid[ii, jj], load=False, data_path=data_path)
+            #
+            # fig, ax = plat.plot_T_profile(case, T_params=T_params, n=-1, data_path=data_path, t1=t1_grid[ii, jj],
+            #                               setylabel=True,
+            #                               setxlabel=True, save=True, fig_path=fig_path+'case_profiles/', fend='_T-z', fig_fmt=fig_fmt,
+            #                               legend=True,
+            #                               load=load_grid[ii, jj])
 
             ### look at distribution of T parameters over time
 
