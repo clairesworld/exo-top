@@ -153,7 +153,8 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
 
 
 def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, legsize=20, dark=False,
-                  return_artists=False, c='k', alpha=0.9, save=True, i_n=0, avg=False, fig=None, ax=None, leg=True, **kwargs):
+                  return_artists=False, c='k', alpha=0.9, save=True, i_n=0, avg=False, fig=None, ax=None, leg=True,
+                  xlabel='', ylabel='', **kwargs):
 
     if dark:
         foreground = 'xkcd:off white'
@@ -166,8 +167,8 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
     # T profile
     if fig is None and ax is None:
         fig, ax = plt.subplots(figsize=(2, 4))
-    ax.set_xlabel('', fontsize=labelsize, labelpad=20)
-    ax.set_ylabel('', fontsize=labelsize, labelpad=20)
+    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=20)
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=20)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
     ax.set_xticks([0, 0.5, 1])
     ax.set_yticks([])
@@ -213,7 +214,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
 
 def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
                    shading='nearest', return_artists=False, save=True, i_n=0, avg=False, c='k', cbar=True, dark=False,
-                   fig=None, ax=None):
+                   title='Nondimensional temperature', fig=None, ax=None):
     if dark:
         foreground = 'xkcd:off white'
     else:
@@ -248,10 +249,13 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
     ax.set_xlabel('x', fontsize=labelsize, labelpad=20)
     ax.set_ylabel('y', fontsize=labelsize, labelpad=20)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    # ax.tick_params(axis='both', which='major', labelsize=ticksize)
+    ax.set_title(title, fontsize=labelsize, pad=90, color=foreground)
+    # ax.set_xticks([])
+    # ax.set_yticks([])
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
     ax.axis('equal')
+
+    im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
 
     if cbar:
         divider = make_axes_locatable(ax)
@@ -259,8 +263,6 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         fig.add_axes(cax)
         cax.set_xlabel('Temperature', fontsize=18)
         cax.tick_params(axis='x', which='major', labelsize=ticksize)
-        ax.set_title('Nondimensional temperature', fontsize=labelsize, pad=90, color='xkcd:off white')
-        im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
         cb = fig.colorbar(im, cax=cax, orientation="horizontal")
         cax.xaxis.tick_top()
         cax.xaxis.set_label_position('top')
@@ -282,7 +284,7 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
     # not animated
 
     fig = plt.figure()
-    gs = fig.add_gridspec(5, 9, wspace=0.1, hspace=0.1)
+    gs = fig.add_gridspec(5, 12, wspace=0.1, hspace=0.1)
 
     ax0 = fig.add_subplot(gs[1, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
@@ -294,7 +296,7 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
 
     ax2 = fig.add_subplot(gs[2:,-1])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
-                             ticksize=ticksize, leg=False, **kwargs)
+                             ticksize=ticksize, leg=False, xlabel='$T^\prime$', **kwargs)
 
     if save:
         sc.plot_save(fig, case + '_T_h_gridspec', fig_path=fig_path)
