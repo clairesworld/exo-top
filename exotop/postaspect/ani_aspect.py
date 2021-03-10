@@ -153,7 +153,7 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
 
 
 def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, legsize=20, dark=False,
-                  return_artists=False, c='k', alpha=0.9, save=True, i_n=0, avg=False, fig=None, ax=None, **kwargs):
+                  return_artists=False, c='k', alpha=0.9, save=True, i_n=0, avg=False, fig=None, ax=None, leg=True, **kwargs):
 
     if dark:
         foreground = 'xkcd:off white'
@@ -192,15 +192,12 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
         delta_rh_n = np.array(df_n['delta_rh'])
         D_l_n = np.array(df_n['y_L'])
 
-    print('D_l_n', D_l_n)
-    print('len(T_f)', len(T_f))
-    print('y1', [D_l_n] * len(T_f))
-
     line, = ax.plot(T_f, y_f, c=foreground, lw=3)
     ax.fill_between(T_f, [D_l_n - delta_rh_n] * len(T_f), [D_l_n] * len(T_f), fc='xkcd:tangerine', alpha=alpha,
                     label='Thermal bdy layer')
     #                 label='Thermal bdy layer\n' + r'$\delta$ = ' + '{:04.3f}'.format(delta_rh_n))
-    ax.legend(frameon=False, fontsize=legsize, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
+    if leg:
+        ax.legend(frameon=False, fontsize=legsize, ncol=1, bbox_to_anchor=(1.05, 1), loc='upper left')
     ax.set_xlim([0, 1])
     ax.set_ylim([0, 1])
 
@@ -239,9 +236,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
     if avg:
         T_n = np.array(T_n)
-        print('T_n', np.shape(T_n))
         T_im = np.mean(T_n, axis=0)
-        print('T_im', np.shape(T_im))
     else:
         T_im = T_n[i_n]
 
@@ -283,9 +278,23 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
 
 def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
-                   shading='nearest', save=True, i_n=0, avg=False, c='k', dark=True):
+                 save=True, c='k', **kwargs):
     # not animated
 
-    gs = gridspec.GridSpec(1, 9)
-    ax = plt.subplot(gs[:-1])
-    fig, ax = static_T_field(case, data_path=data_path, )
+    fig = plt.figure(constrained_layout=True)
+    gs = gridspec.GridSpec(2, 9)
+
+    ax0 = plt.subplot(gs[0, :-1])
+    fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize, ticksize=ticksize)
+
+    ax1 = plt.subplot(gs[1,:-1])
+    fig, ax1 = static_T_field(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
+                              labelsize=labelsize, ticksize=ticksize, **kwargs)
+
+    ax2 = plt.subplot(gs[1,-1])
+    fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize, ticksize=ticksize)
+
+    if save:
+        sc.plot_save(fig, case + '_T_h_gridspec', fig_path=fig_path)
+
+    return fig, (ax0, ax1, ax2)
