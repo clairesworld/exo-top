@@ -183,7 +183,13 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
             dic_av.pop(k, None)
         delta_rh_n = dic_av['delta_rh']
         D_l_n = dic_av['y_L']
-        df_n = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
+        # df_n = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
+
+        for ii in len(n):
+            df_n = df.iloc[ii]
+            T_ii = np.array(df_n['T_av'].tolist())
+            y_ii = np.array(df_n['y'].tolist())
+            ax.plot(T_ii, y_ii, c=foreground, lw=0.5, alpha=0.5)
 
     else:
         df_n = df.iloc[i_n]
@@ -283,8 +289,8 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
                  save=True, c='k', **kwargs):
     # not animated
 
-    fig = plt.figure(figsize=(32, 10))
-    gs = fig.add_gridspec(5, 16, wspace=0.1, hspace=0.1)
+    fig = plt.figure(figsize=(40, 10))
+    gs = fig.add_gridspec(5, 20, wspace=0.1, hspace=0.1)
 
     ax0 = fig.add_subplot(gs[1, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
