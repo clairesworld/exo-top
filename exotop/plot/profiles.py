@@ -1,6 +1,6 @@
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, load_grid, data_path, fig_path, fig_fmt
 from postaspect import plt_aspect as plat
-from postaspect.aspect_post import T_parameters_at_sol, get_cases_list, h_at_ts, Nu_at_ts  # noqa: E402
+from postaspect.aspect_post import T_parameters_at_sol, get_cases_list, pickleio, h_at_ts, Nu_at_ts  # noqa: E402
 from postaspect import ani_aspect as anims
 import os
 
@@ -15,7 +15,7 @@ for ii, eta in enumerate(eta_ls):  # eta_ls
         for jj, Ra in enumerate(Ra_ls):
             ### plot just T(z) at final timestep (or mean?), and extract all temperature params
             case = 'Ra' + Ra + '-eta' + eta + end_grid[ii, jj]
-            T_params = plat.pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol],
+            T_params = pickleio(case, suffix='_T', postprocess_functions=[T_parameters_at_sol],
                                      t1=t1_grid[ii, jj], load=False, data_path=data_path)
 
             fig, ax = plat.plot_T_profile(case, T_params=T_params, n=-1, data_path=data_path, t1=t1_grid[ii, jj],
