@@ -283,8 +283,8 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
                  save=True, c='k', **kwargs):
     # not animated
 
-    fig = plt.figure(figsize=(24, 10))
-    gs = fig.add_gridspec(5, 12, wspace=0.1, hspace=0.1)
+    fig = plt.figure(figsize=(32, 10))
+    gs = fig.add_gridspec(5, 16, wspace=0.1, hspace=0.1)
 
     ax0 = fig.add_subplot(gs[1, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
