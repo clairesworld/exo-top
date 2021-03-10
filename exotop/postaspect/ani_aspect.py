@@ -6,7 +6,7 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
     load_grid    # noqa: E402
 from postaspect import plt_aspect as sc  # noqa: E402
 from postaspect import aspectdata as ap
-from postaspect.aspect_post import pickleio
+from postaspect.aspect_post import pickleio, read_topo_stats, trapznorm, peak_and_rms
 from useful_and_bespoke import hide_log_ticklabels, not_iterable, dark_background
 import numpy as np
 import matplotlib.pyplot as plt
@@ -121,9 +121,9 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
 
     h_n, h_peak, h_rms = [], [], []
     for i in range(len(n)):
-        x, h = sc.read_topo_stats(case, ts[i], data_path=data_path)
-        h_norm = sc.trapznorm(h)  # normalize to 0 mean
-        peak, rms = sc.peak_and_rms(h_norm)
+        x, h = read_topo_stats(case, ts[i], data_path=data_path)
+        h_norm = trapznorm(h)  # normalize to 0 mean
+        peak, rms = peak_and_rms(h_norm)
         h_n.append(h_norm)
         h_peak.append(peak)
         h_rms.append(rms)
