@@ -282,7 +282,7 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
     # not animated
 
     fig = plt.figure(constrained_layout=True)
-    gs = gridspec.GridSpec(2, 9)
+    gs = fig.add_gridspec(2, 9)
 
     ax0 = plt.subplot(gs[0, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
