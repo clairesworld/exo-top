@@ -285,14 +285,16 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
     gs = gridspec.GridSpec(2, 9)
 
     ax0 = plt.subplot(gs[0, :-1])
-    fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize, ticksize=ticksize)
+    fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
+                        ticksize=ticksize, i_ts=-1, **kwargs)
 
     ax1 = plt.subplot(gs[1,:-1])
-    fig, ax1 = static_T_field(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
-                              labelsize=labelsize, ticksize=ticksize, **kwargs)
+    fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
+                              labelsize=labelsize, ticksize=ticksize, i_n=-1, **kwargs)
 
     ax2 = plt.subplot(gs[1,-1])
-    fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize, ticksize=ticksize)
+    fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
+                             ticksize=ticksize, **kwargs)
 
     if save:
         sc.plot_save(fig, case + '_T_h_gridspec', fig_path=fig_path)

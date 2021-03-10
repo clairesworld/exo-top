@@ -36,18 +36,22 @@ for ii, eta in enumerate(eta_ls):  # eta_ls
                     cases, cases_var = get_cases_list(Ra_ls, etastr, end_grid[jj])
                     for ii, case in enumerate(cases):
                         if (os.path.exists(data_path + 'output-' + case)) and (ii >= 4):
-                            fig, ax = anims.static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30,
-                                                     ticksize=16, c='k', save=True, i_ts=-1, fig=None, ax=None)
-                            fig, ax = anims.static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30,
-                                                     ticksize=16, c='k', save=True, avg=True, fig=None, ax=None)
-                            fig, ax = anims.static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30,
-                                                           ticksize=16, cmap='gist_heat',
-                                                          shading='nearest', save=True, i_n=0, avg=True, c='k', dark=True,
-                                                          fig=None, ax=None)
+                            # fig, ax = anims.static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30,
+                            #                          ticksize=16, c='k', save=True, i_ts=-1, fig=None, ax=None)
+                            # fig, ax = anims.static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30,
+                            #                          ticksize=16, c='k', save=True, avg=True, fig=None, ax=None)
+                            # fig, ax = anims.static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30,
+                            #                                ticksize=16, cmap='gist_heat',
+                            #                               shading='nearest', save=True, i_n=0, avg=True, c='k', dark=True,
+                            #                               fig=None, ax=None)
+
+                            fig, axes = anims.T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16,
+                                                            cmap='gist_heat', save=True, c='k')
 
                             # anims.animate_T_field(case, data_path=data_path_bullard, fig_path=fig_path_bullard+'animations/', labelsize=30, ticksize=16,
                             #                 shading='nearest',#'gouraud',
                             #                 cmap='gist_heat')
                             # anims.animate_T_prof(case, data_path=data_path_bullard, fig_path=fig_path_bullard + 'animations/', labelsize=30, ticksize=16)
                             # anims.animate_h(case, data_path=data_path_bullard, fig_path=fig_path_bullard + 'animations/', labelsize=30, ticksize=16)
+
                             print('finished case')
