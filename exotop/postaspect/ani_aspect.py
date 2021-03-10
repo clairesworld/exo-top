@@ -183,7 +183,6 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
         delta_rh_n = dic_av['delta_rh']
         D_l_n = dic_av['y_L']
         df_n = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
-        print('df_n\n', df_n)
 
     else:
         df_n = df.iloc[i_n]
@@ -281,20 +280,20 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
                  save=True, c='k', **kwargs):
     # not animated
 
-    fig = plt.figure(constrained_layout=True)
+    fig = plt.figure()
     gs = fig.add_gridspec(2, 9)
 
-    ax0 = plt.subplot(gs[0, :-1])
+    ax0 = fig.add_subplot(gs[0, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
                         ticksize=ticksize, i_ts=-1, **kwargs)
 
-    ax1 = plt.subplot(gs[1,:-1])
+    ax1 = fig.add_subplot(gs[1,:-1])
     fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
                               labelsize=labelsize, ticksize=ticksize, i_n=-1, **kwargs)
 
-    ax2 = plt.subplot(gs[1,-1])
+    ax2 = fig.add_subplot(gs[1,-1])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
-                             ticksize=ticksize, **kwargs)
+                             ticksize=ticksize, leg=False, **kwargs)
 
     if save:
         sc.plot_save(fig, case + '_T_h_gridspec', fig_path=fig_path)
