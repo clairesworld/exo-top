@@ -182,6 +182,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
             dic_av.pop(k, None)
         df_n = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
         print('df_n\n', df_n)
+
     else:
         df_n = df.iloc[i_n]
         T_f = np.array(df_n['T_av'].tolist())
@@ -189,6 +190,10 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
 
     delta_rh_n = np.array(df_n['delta_rh'])
     D_l_n = np.array(df_n['y_L'])
+
+    print('D_l_n', D_l_n)
+    print('len(T_f)', len(T_f))
+    print('y1', [D_l_n] * len(T_f))
 
     line, = ax.plot(T_f, y_f, c=foreground, lw=3)
     ax.fill_between(T_f, [D_l_n - delta_rh_n] * len(T_f), [D_l_n] * len(T_f), fc='xkcd:tangerine', alpha=alpha,
