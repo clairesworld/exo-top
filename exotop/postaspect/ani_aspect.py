@@ -180,6 +180,8 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
                                          **postprocess_kwargs, **kwargs)  # actually a dict
         for k in ['T_av', 'uv_mag_av', 'y']:
             dic_av.pop(k, None)
+        delta_rh_n = dic_av['delta_rh']
+        D_l_n = dic_av['y_L']
         df_n = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
         print('df_n\n', df_n)
 
@@ -187,9 +189,8 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
         df_n = df.iloc[i_n]
         T_f = np.array(df_n['T_av'].tolist())
         y_f = np.array(df_n['y'].tolist())
-
-    delta_rh_n = np.array(df_n['delta_rh'])
-    D_l_n = np.array(df_n['y_L'])
+        delta_rh_n = np.array(df_n['delta_rh'])
+        D_l_n = np.array(df_n['y_L'])
 
     print('D_l_n', D_l_n)
     print('len(T_f)', len(T_f))
