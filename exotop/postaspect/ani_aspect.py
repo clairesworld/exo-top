@@ -195,7 +195,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
             delta_all.append(np.array(df_n['delta_rh']))
             D_all.append(np.array(df_n['y_L']))
         ax.plot(T_ii, [np.max(D_all)] * len(T_ii), c='xkcd:tangerine', lw=0.5, alpha=0.5)
-        ax.plot(T_ii, [np.min(D_all - delta_all)] * len(T_ii), c='xkcd:tangerine', lw=0.5, alpha=0.5)
+        ax.plot(T_ii, [np.min(np.array(D_all) - np.array(delta_all))] * len(T_ii), c='xkcd:tangerine', lw=0.5, alpha=0.5)
 
     else:
         df_n = df.iloc[i_n]
@@ -241,7 +241,11 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         n = n[::2]
 
     T_n = []
-    for nn in n:
+    if return_artists or avg:
+        iter = n
+    else:
+        iter = [i_n]
+    for nn in iter:
         x, y, _, T = dat.read_temperature(nn, verbose=False)
         T_n.append(T)
     print('loaded', len(n), 'T fields')
