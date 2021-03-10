@@ -6,7 +6,7 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
     load_grid    # noqa: E402
 from postaspect import plt_aspect as sc  # noqa: E402
 from postaspect import aspectdata as ap
-from postaspect.aspect_post import pickleio, read_topo_stats, trapznorm, peak_and_rms
+from postaspect import aspect_post as pro
 from useful_and_bespoke import hide_log_ticklabels, not_iterable, dark_background
 import numpy as np
 import matplotlib.pyplot as plt
@@ -115,15 +115,15 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
         foreground = c
 
     # preload data
-    df = pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
     ts = df.index.to_numpy()
 
     h_n, h_peak, h_rms = [], [], []
     for i in range(len(n)):
-        x, h = read_topo_stats(case, ts[i], data_path=data_path)
-        h_norm = trapznorm(h)  # normalize to 0 mean
-        peak, rms = peak_and_rms(h_norm)
+        x, h = pro.read_topo_stats(case, ts[i], data_path=data_path)
+        h_norm = pro.trapznorm(h)  # normalize to 0 mean
+        peak, rms = pro.peak_and_rms(h_norm)
         h_n.append(h_norm)
         h_peak.append(peak)
         h_rms.append(rms)
@@ -160,7 +160,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
     else:
         foreground = c
 
-    df = pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
 
     # T profile
@@ -174,9 +174,9 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
 
     if avg:
         # load time-averages
-        T_f, y_f = ap.time_averaged_profile_from_df(df, 'T_av')
-        uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')
-        dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_f, uv_mag_av=uv_mag_av, y=y_f,
+        T_f, y_f = pro.time_averaged_profile_from_df(df, 'T_av')
+        uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
+        dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_f, uv_mag_av=uv_mag_av, y=y_f,
                                          **postprocess_kwargs, **kwargs)  # actually a dict
         for k in ['T_av', 'uv_mag_av', 'y']:
             dic_av.pop(k, None)
@@ -218,7 +218,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
     # preload data
     dat = ap.Aspect_Data(directory=data_path + 'output-' + case + '/')
-    df = pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
 
     if len(n) > 100:
