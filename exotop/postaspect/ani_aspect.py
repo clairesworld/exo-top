@@ -6,6 +6,7 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
     load_grid    # noqa: E402
 from postaspect import plt_aspect as sc  # noqa: E402
 from postaspect import aspectdata as ap
+from postaspect.aspect_post import pickleio
 from useful_and_bespoke import hide_log_ticklabels, not_iterable, dark_background
 import numpy as np
 import matplotlib.pyplot as plt
@@ -114,7 +115,7 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
         foreground = c
 
     # preload data
-    df = sc.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    df = pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
     ts = df.index.to_numpy()
 
@@ -159,7 +160,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
     else:
         foreground = c
 
-    df = sc.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    df = pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
 
     # T profile
@@ -217,7 +218,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
     # preload data
     dat = ap.Aspect_Data(directory=data_path + 'output-' + case + '/')
-    df = sc.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    df = pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
     n = df.sol.to_numpy()
 
     if len(n) > 100:
