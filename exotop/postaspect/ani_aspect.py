@@ -181,6 +181,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
         for k in ['T_av', 'uv_mag_av', 'y']:
             dic_av.pop(k, None)
         df_n = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
+        print('df_n\n', df_n)
     else:
         df_n = df.iloc[i_n]
         T_f = np.array(df_n['T_av'].tolist())

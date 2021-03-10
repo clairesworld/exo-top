@@ -42,7 +42,7 @@ for ii, eta in enumerate(eta_ls):  # eta_ls
                                                      ticksize=16, c='k', save=True, avg=True, fig=None, ax=None)
                             fig, ax = anims.static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30,
                                                            ticksize=16, cmap='gist_heat',
-                                                          shading='nearest', save=True, i_n=0, avg=False, c='k', dark=True,
+                                                          shading='nearest', save=True, i_n=0, avg=True, c='k', dark=True,
                                                           fig=None, ax=None)
 
                             # anims.animate_T_field(case, data_path=data_path_bullard, fig_path=fig_path_bullard+'animations/', labelsize=30, ticksize=16,
