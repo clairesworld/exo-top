@@ -212,7 +212,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
 
 
 def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
-                   shading='nearest', return_artists=False, save=True, i_n=0, avg=False, c='k', dark=False,
+                   shading='nearest', return_artists=False, save=True, i_n=0, avg=False, c='k', cbar=True, dark=False,
                    fig=None, ax=None):
     if dark:
         foreground = 'xkcd:off white'
@@ -253,17 +253,18 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     # ax.tick_params(axis='both', which='major', labelsize=ticksize)
     ax.axis('equal')
 
-    divider = make_axes_locatable(ax)
-    cax = divider.new_vertical(size='10%', pad=0.3)
-    fig.add_axes(cax)
-    cax.set_xlabel('Temperature', fontsize=18)
-    cax.tick_params(axis='x', which='major', labelsize=ticksize)
-    ax.set_title('Nondimensional temperature', fontsize=labelsize, pad=90, color='xkcd:off white')
-    im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
-    cb = fig.colorbar(im, cax=cax, orientation="horizontal")
-    cax.xaxis.tick_top()
-    cax.xaxis.set_label_position('top')
-    cax.xaxis.set_ticks_position('top')
+    if cbar:
+        divider = make_axes_locatable(ax)
+        cax = divider.new_vertical(size='10%', pad=0.3)
+        fig.add_axes(cax)
+        cax.set_xlabel('Temperature', fontsize=18)
+        cax.tick_params(axis='x', which='major', labelsize=ticksize)
+        ax.set_title('Nondimensional temperature', fontsize=labelsize, pad=90, color='xkcd:off white')
+        im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
+        cb = fig.colorbar(im, cax=cax, orientation="horizontal")
+        cax.xaxis.tick_top()
+        cax.xaxis.set_label_position('top')
+        cax.xaxis.set_ticks_position('top')
 
     if dark:
         fig, ax, cax = dark_background(fig, [ax, cax])
@@ -281,17 +282,17 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
     # not animated
 
     fig = plt.figure()
-    gs = fig.add_gridspec(2, 9)
+    gs = fig.add_gridspec(5, 9, wspace=0.05, hspace=0.05)
 
-    ax0 = fig.add_subplot(gs[0, :-1])
+    ax0 = fig.add_subplot(gs[1, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
                         ticksize=ticksize, i_ts=-1, **kwargs)
 
-    ax1 = fig.add_subplot(gs[1,:-1])
+    ax1 = fig.add_subplot(gs[1:,:-1])
     fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
-                              labelsize=labelsize, ticksize=ticksize, i_n=-1, **kwargs)
+                              labelsize=labelsize, ticksize=ticksize, i_n=-1, cbar=False, **kwargs)
 
-    ax2 = fig.add_subplot(gs[1,-1])
+    ax2 = fig.add_subplot(gs[1:,-1])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
                              ticksize=ticksize, leg=False, **kwargs)
 
