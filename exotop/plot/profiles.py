@@ -32,7 +32,7 @@ for ii, eta in enumerate(eta_ls):  # eta_ls
 
 
             for jj, etastr in enumerate(eta_ls):
-                if jj <= 20:
+                if jj >= 2:
                     cases, cases_var = get_cases_list(Ra_ls, etastr, end_grid[jj])
                     for ii, case in enumerate(cases):
                         if (os.path.exists(data_path + 'output-' + case)) and (ii >= 4):
