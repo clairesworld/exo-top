@@ -1345,11 +1345,11 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
     lines = []
     for ii, Ra in enumerate(Ra_ls):
         if colour_by == 'eta':
-            c = c_list[ii]
-            marker = 'o'
-        elif colour_by == 'Ra':
             c = 'k'
             marker = markers[ii]
+        elif colour_by == 'Ra':
+            c = c_list[ii]
+            marker = 'o'
         p = mlines.Line2D([], [], lw=0, color=c, marker=marker, markersize=markersize / 4, label=Ra, alpha=alpha)
         lines.append(p)
     legend2 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="lower right",
