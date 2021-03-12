@@ -61,10 +61,10 @@ def reshape_inputs(Ra_ls, eta_ls, grids, defaults=None):
 
     grids_new = []
     for grid, default in zip(grids, defaults):
-        try:
-            grids_new.append(reshape_one_input(grid, proper, default))
-        except ValueError:
-            raise Exception('Problem reshaping input grid', grid, 'check indexing in first function call')
+        # try:
+        grids_new.append(reshape_one_input(grid, proper, default))
+        # except ValueError:
+        #     raise Exception('Problem reshaping input grid', grid, 'check indexing in first function call')
 
     # make sure Ra and eta are iterable the right way
     if not not_string(Ra_ls):  # if a string
