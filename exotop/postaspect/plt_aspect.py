@@ -1238,7 +1238,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=10,
                          xlabelpad=8, ylabelpad=-2, markers=None, markersize=20, alpha=0.5,
                          fig=None, axes=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
-                         regime_names=None,
+                         regime_names=None, colour_by='Ra', zoom=True,
                          data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
 
@@ -1263,16 +1263,25 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
         if nkeys == 1:
             axes = np.array([axes])
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
-    c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+    logRa_fl = [np.log10(float(a)) for a in Ra_ls]
+    if colour_by == 'eta':
+        c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+    elif colour_by == 'Ra':
+        c_list = colorize(logRa_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
+    mins = np.ones(len(keys))
+    maxes = np.zeros(len(keys))
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = pro.get_cases_list(Ra_ls, eta_str, end_grid[jj])
-        c_jj = c_list[jj]
+        if colour_by == 'eta':
+            c = c_list[jj]
 
         for ii, case in enumerate(cases):
             t1_ii = t1_grid[jj][ii]
             load_ii = load_grid[jj][ii]
             marker_ii = markers[ii]
+            if colour_by == 'Ra':
+                c = c_list[ii]
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
                     regime_grid[jj][ii] in include_regimes):
@@ -1308,18 +1317,24 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                     ax.set_ylabel(ylabels[k], fontsize=labelsize, labelpad=ylabelpad)
                     if k == len(keys) - 1:
                         ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
-                    ax.scatter(x_data, y_data, color=c_jj, s=markersize, marker=marker_ii, alpha=alpha)
-                    ax.plot(x_data, y_data, color=c_jj, lw=0.8, alpha=alpha)
+                    ax.scatter(x_data, y_data, color=c, s=markersize, marker=marker_ii, alpha=alpha)
+                    ax.plot(x_data, y_data, color=c, lw=0.8, alpha=alpha)
+                    if np.min(y_data) < mins[k]:
+                        mins[k] = np.min(y_data)
+                    if np.max(y_data) > maxes[k]:
+                        maxes[k] = np.max(y_data)
 
     # legend proxy artist
     ax = axes[0]
-    # scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, s=markersize,
-    #                   vmin=vmin, vmax=vmax)  # dummy - neeeds matplotlib 3.1.1
-    # legend1 = ax.legend(*scat.legend_elements(num=len(logeta_fl)),
-    #                     loc="upper left", title=r"log $\Delta \eta$", fontsize=legsize)
     lines = []
     for jj, leta in enumerate(logeta_fl):
-        p = mlines.Line2D([], [], lw=0, color=c_list[jj], marker='o', markersize=markersize / 4, label=leta,
+        if colour_by == 'eta':
+            c = c_list[jj]
+            marker = 'o'
+        elif colour_by == 'Ra':
+            c = 'k'
+            marker = markers[jj]
+        p = mlines.Line2D([], [], lw=0, color=c, marker=marker, markersize=markersize / 4, label=leta,
                           alpha=alpha)
         lines.append(p)
     legend1 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="upper left",
@@ -1329,11 +1344,22 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
     ax = axes[-1]
     lines = []
     for ii, Ra in enumerate(Ra_ls):
-        p = mlines.Line2D([], [], lw=0, color='k', marker=markers[ii], markersize=markersize / 4, label=Ra, alpha=alpha)
+        if colour_by == 'eta':
+            c = c_list[ii]
+            marker = 'o'
+        elif colour_by == 'Ra':
+            c = 'k'
+            marker = markers[ii]
+        p = mlines.Line2D([], [], lw=0, color=c, marker=marker, markersize=markersize / 4, label=Ra, alpha=alpha)
         lines.append(p)
     legend2 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="lower right",
                         title="Ra", )
     ax.add_artist(legend2)
+
+    if zoom:
+        # zoom to data limits
+        for k, ax in enumerate(axes):
+            ax.set_ylim((mins[k], maxes[k]))
 
     plt.suptitle(title, fontsize=labelsize, y=1.02)
     if save:
