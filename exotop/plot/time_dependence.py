@@ -39,7 +39,7 @@ plat.subplots_evol_at_sol(Ra_ls[-2:], eta_ls[1:], regime_grid=regime_grid_td[1:,
                         keys=['y_L', 'T_l', 'dT_rh', 'delta_rh', 'h_components'],
                         ylabels=['y_L', 'T_L', 'dT_rh', 'delta_rh', r'$\alpha \Delta T{_{rh} \delta_{rh}$'], title='', xlabelpad=8,
                         ylabelpad=8, markers=None, markersize=24, cmap=cmap, colour_by='Ra',
-                        data_path=data_path, postprocess_kwargs=postprocess_kwargs)
+                        data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)
 
 plat.subplots_evol_at_sol(Ra_ls[-2], eta_ls[1:], regime_grid=regime_grid_td[1:, -2], save=True, t1_grid=t1_grid[1:, -2], load_grid=True,
                           psuffixes=['_T'], fig_path=fig_path,
