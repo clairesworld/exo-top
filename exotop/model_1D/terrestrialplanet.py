@@ -51,6 +51,7 @@ class TerrestrialPlanet():
                             
                             # viscosity defaults
                             a_rh=2.44, # for beta=1/3 from Thiriet+ (2019)
+                            eta_pre=None,
                             eta_0 = 1e21, # reference eta from Thiriet+ (2019)
                             T_ref = 1600, # reference T from Thiriet+ (2019)
                             Ea=300e3, # activation energy in J, K&W (1993) dry olivine

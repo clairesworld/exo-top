@@ -19,15 +19,17 @@ import sh_things as harm
 import matplotlib.animation as animation
 from useful_and_bespoke import age_index, dark_background, not_iterable, colorize, colourbar
 from model_1D.parameters import M_E
-
+import matplotlib.ticker as ticker
+import matplotlib.lines as mlines
 
 "                      PLOTTING                           "
 
 
 def plot_save(fig, fname, fig_path='plat/', fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
     path = fig_path + fname + fig_fmt
-    directory = os.path.dirname(path)
-    os.makedirs(directory, exist_ok=True)
+    if fig_path is not '':
+        directory = os.path.dirname(path)
+        os.makedirs(directory, exist_ok=True)
     if tight_layout:
         fig.tight_layout()
     fig.savefig(path, bbox_inches=bbox_inches, **kwargs)
@@ -77,7 +79,8 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
                 ax.set_yscale('log')  # y = np.log10(y)
             plot_one(ax, t * 1e-9 / parameters.years2sec, y * ylabels[n][1], xlabel='', ylabel=yl, ticksize=ticksize,
                      labelpad=labelpad,
-                     label=label, fontname=fontname, labelsize=labelsize, legsize=legsize, line_args=line_args,**kwargs)
+                     label=label, fontname=fontname, labelsize=labelsize, legsize=legsize, line_args=line_args,
+                     **kwargs)
             if compare_dir is not None:
                 # if data exists to benchmark this param
                 try:
@@ -341,7 +344,7 @@ def plot_one(ax, x, y, xlabel, ylabel, labelsize=15, legsize=16, ticksize=12, li
     try:
         ax.plot(x[mask], y[mask], label=label, **line_args)
     except TypeError:
-        ax.plot(x[mask], [y]*len(x[mask]), label=label, **line_args)
+        ax.plot(x[mask], [y] * len(x[mask]), label=label, **line_args)
     ax.set_xlim(xlim)
     if ylim is not None:
         ax.set_ylim(ylim)
@@ -438,6 +441,235 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
         plot_qsfc_error(pl, ident=ident, **kwargs)
     if show_Tavg:
         plot_Tavg(pl, **kwargs)
+    return fig, axes
+
+
+def ensemble_distribution(yvar, default='baseline',
+                      num=100, update_kwargs=None, run_kwargs=None, yscale=1,
+                      names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
+                      mini=[240e3, 1.5e10, 1000, 2000, 100e3],
+                      maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
+                      n_sigma=1, log=False, **kwargs):
+    # generate ensemble of planets depending on x independent variable over some random variations of other parameters and plot evol
+    if default is not None:
+        pl_kwargs = eval('inputs.' + default + '_in')
+        model_kwargs = eval('inputs.' + default + '_run')
+    else:
+        pl_kwargs = {}  # use defaults given in terrestrialplanet.py
+        model_kwargs = {}  # initial conditions defaults given in thermal.py
+    if update_kwargs is not None:
+        pl_kwargs.update(update_kwargs)
+    if run_kwargs is not None:
+        model_kwargs.update(run_kwargs)
+
+    pl_ensemble = evol.bulk_planets_mc(n=num, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
+                                       model_kwargs=model_kwargs, **kwargs)
+
+    # mean, std
+    y_all = []
+    for pl in pl_ensemble:
+        t = pl.t * parameters.sec2Gyr
+        y = eval('pl.' + yvar) * yscale
+        y_all.append(y)
+
+    y_all = np.array(y_all)
+    y_av = np.mean(y_all, axis=0)
+    y_std = np.std(y_all, axis=0)
+    y_upper = y_av + y_std * n_sigma  # todo for log scape
+    y_lower = y_av - y_std * n_sigma
+
+    return t, y_av, y_upper, y_lower
+
+
+
+def plot_distribution(yvars, default='baseline',
+                      # xmin=0.1*M_E, xmax=6*M_E, logx=True, xres=100,
+                      num=100, update_kwargs=None, run_kwargs=None,
+                      names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
+                      mini=[240e3, 1.5e10, 1000, 2000, 100e3],
+                      maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
+                      xlabelpad=None, ylabelpad=None, n_sigma=1, ylims=None, tickpad=10,
+                      fig=None, axes=None, c='k', lw=0.5, alpha=0.7, c_mean='k', log=None, xticks=None, yticks=None,
+                      xlabel='Time (Gyr)', ylabels=None, yscales=None, labelsize=16, ticksize=12, save=False,
+                      fname='evol_dist', fig_path='', legtext=None, legsize=16, **kwargs):
+    # generate ensemble of planets depending on x independent variable over some random variations of other parameters and plot evol
+    if yscales is None:
+        yscales = [1] * len(yvars)
+    if ylabels is None:
+        ylabels = [''] * len(yvars)
+    if log is None:
+        log = [False] * len(yvars)
+    if default is not None:
+        pl_kwargs = eval('inputs.' + default + '_in')
+        model_kwargs = eval('inputs.' + default + '_run')
+    else:
+        pl_kwargs = {}  # use defaults given in terrestrialplanet.py
+        model_kwargs = {}  # initial conditions defaults given in thermal.py
+    if update_kwargs is not None:
+        pl_kwargs.update(update_kwargs)
+    if run_kwargs is not None:
+        model_kwargs.update(run_kwargs)
+
+    # if logx:
+    #     xvec = np.logspace(np.log10(xmin), np.log10(xmax), xres)
+    # else:
+    #     xvec = np.linspace(xmin, xmax, xres)
+    # for x in xvec:
+    #     pl_kwargs.update({xvar: x})
+
+    pl_ensemble = evol.bulk_planets_mc(n=num, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
+                                       model_kwargs=model_kwargs, **kwargs)
+
+    # plot ensemble
+    if fig is None and axes is None:
+        fig, axes = plt.subplots(len(yvars), 1, figsize=(2.5, 2 * len(yvars)))
+
+    for ii, yvar in enumerate(yvars):
+        try:
+            ax = axes[ii]
+        except TypeError:
+            ax = axes
+        y_all = []
+        for pl in pl_ensemble:
+            t = pl.t * parameters.sec2Gyr
+            y = eval('pl.' + yvar) * yscales[ii]
+            y_all.append(y)
+            ax.plot(t, y, c=c, lw=lw, alpha=alpha)
+
+        # mean, std
+        y_all = np.array(y_all)
+        y_av = np.mean(y_all, axis=0)
+        ax.plot(t, y_av, c=c_mean, lw=4)
+        y_std = np.std(y_all, axis=0)
+        y_upper = y_av + y_std * n_sigma  # todo for log scape
+        y_lower = y_av - y_std * n_sigma
+        ax.plot(y, y_lower, c=c_mean, lw=1, ls='--')
+        ax.plot(y, y_upper, c=c_mean, lw=1, ls='--')
+
+        # format
+        if ii == len(yvars) - 1:
+            ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
+            ax.tick_params(axis='x', labelsize=ticksize, pad=tickpad)
+            if xticks is not None:
+                ax.set_xticks(xticks)
+        else:
+            ax.set_xticks([])
+
+        ax.set_ylabel(ylabels[ii], fontsize=labelsize, labelpad=ylabelpad)
+        if log[ii]:
+            ax.set_yscale('log')
+        if yticks is not None:
+            ax.set_yticks(yticks[ii])
+        ax.tick_params(axis='y', labelsize=ticksize, pad=tickpad)
+        ax.set_xlim(t[0], t[-1])
+        if ylims is not None:
+            ax.set_ylim(ylims[ii])
+
+        if legtext is not None and ii == 0:
+            ax.text(0.95, 0.95, legtext, fontsize=legsize, transform=ax.transAxes, ha='right', va='top')
+
+    plt.tight_layout()
+    if save:
+        plot_save(fig, fname, fig_path=fig_path)
+    else:
+        plt.show()
+    return fig, axes
+
+
+def plot_h_v_obvs(default='baseline', age=4.5, labelsize=28, legsize=16, ticksize=20, xlabelpad=20, fig_path='', show_ss=False, leg=True,
+                  ylabel='$\Delta h_{rms}$ (m)', log=True, nplanets=20, save=False, x_vars=['t', 'M_p', 'H_0', 'CMF', 'Ea'],
+                                      units=['Gyr', '$M_E$', 'pW kg$^{-1}$', 'CMF', 'kJ mol$^{-1}$'],
+                  x_range=[(1.5, 4.5), (0.1 * parameters.M_E, 6 * parameters.M_E), (10e-12, 40e-12),
+                           (0.1, 0.7), (250e3, 350e3)],
+                  xticks=[[1, 2, 4], [0.1, 1, 6], [10, 20, 40], [0.1, 0.2, 0.5], [300, 350]],
+                  xscales=[parameters.sec2Gyr, parameters.M_E ** -1, 1e12, 1, 1e-3], ylim=(500, 1000), yticks=[500, 600, 700, 800, 900, 1000],
+                  xlabels=['Age\n(Gyr)', 'Planet mass\n($M_E$)',
+                           'Rad. heating $t_0$\n(pW kg$^{-1}$)',
+                           'Core mass fraction', 'Activation energy\n(kJ mol$^{-1}$)'], dark=False, show_Huang=False,
+                  models=['dyn_top_rms'],
+                  **kwargs):
+    # how h varies across key input parameters
+    textc='k'
+    if dark:
+        textc = 'w'
+
+    fig, axes = plot_h_relative_multi(default=default, age=age, alpha=1, wspace=0.15, legsize=legsize,
+                                      ticksize=ticksize, labelsize=labelsize, fig_height=6,
+                                      yset_ylim=False, legend=True, labels=x_vars,
+                                      lw=4,  # legtitle=r'\textbf{\textit{Model}}',
+                                      ylabel=ylabel,
+                                      nplanets=nplanets, log=False,
+                                      relative=False, x_vars=x_vars, units=units,
+                                      labelpad=20, legendtop=True, tickwidth=2,
+                                      initial_kwargs={'T_m0': 1000, 'T_c0': 3000},
+                                      models=models,
+                                     x_range=x_range, xscales=xscales, xlabels=xlabels,
+                                      c=['#d88868', '#749af3'], textc=textc, **kwargs)
+
+    for ax in axes:
+        if log:
+            ax.set_xscale('log')
+            ax.set_yscale('log')
+            ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
+            ax.xaxis.set_minor_formatter(ticker.NullFormatter())
+        ax.set_ylim(ylim)
+    axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
+    axes[0].yaxis.set_minor_formatter(ticker.NullFormatter())
+    # axes[0].set_ylabel('$\Delta h_{rms}$ (m)', fontsize=labelsize, c='xkcd:off white')
+    axes[0].set_yticks(yticks)
+
+    if leg:
+        handles = [mlines.Line2D([], [], color='#d88868', ls='-',
+                                 markersize=0, lw=4, label='$\Delta h^\prime = 0.094$ Ra$_{i, eff}^{-0.151}$')]
+
+        if show_ss:
+            handles.append(
+                   mlines.Line2D([], [], color='xkcd:goldenrod', marker='$V$',
+                                 markersize=15, lw=0, label=r'Venus'))
+        if show_Huang:
+            handles.append(mlines.Line2D([], [], color='xkcd:orchid', marker='^',
+                                                    markersize=15, lw=0, label=r'Huang+ (2013) 3D model'))
+
+        legend = axes[0].legend(handles=handles, frameon=False, fontsize=legsize,
+                                borderaxespad=0,
+                                loc='lower left', bbox_to_anchor=(0.0, 1.01), ncol=3, )
+
+    if dark:
+        fig, *axes = dark_background(fig, axes)
+
+
+    for i, ax in enumerate(axes):
+        if x_vars[i] == 't':
+            ax.set_xlim(x_range[i])
+        else:
+            ax.set_xlim((x_range[i][0] * xscales[i], x_range[i][1] * xscales[i]))
+        if xticks is not None:
+            ax.set_xticks(xticks[i])
+
+    if show_ss:
+        # VENUS: 850 m
+        h_Venus = 865.4906656355711
+        M_Venus = 0.815
+
+        h_Mars = 6688.627942023225
+        M_Mars = 0.107
+
+        ax = axes[1]
+        # imscatter(M_Venus, h_Venus, planet_icon_path + 'Venus.png', zoom=0.04, ax=ax)
+        # imscatter(M_Mars, h_Mars, planet_icon_path + 'Mars.png', zoom=0.08, ax=ax)
+
+        ax.scatter(M_Venus, h_Venus, marker='$V$', c='xkcd:goldenrod', s=200, zorder=100)
+
+    if show_Huang:
+        # Huang cases 1-13, 15
+        h_Huang = np.array([200.15279436132423 , 688.2014927583677 , 673.7880493468331 , 402.07565967751117 , 695.2136989391211 , 672.4561163950626 , 214.12066607342535 , 488.4601789919337 , 878.5607285545191 , 292.43829959982384 , 311.3352436867767 , 339.3664129742059 , 640.1361418805931 , 430.1894190342128 ])
+        for h in h_Huang:
+            ax.scatter(M_Venus, h, marker='^', s=70, alpha=0.5, c='xkcd:orchid', label=r'Huang+ (2013)', zorder=1)
+
+    if save:
+        plot_save(fig, fname='h_obvs', fig_path=fig_path)
+    else:
+        plt.show()
     return fig, axes
 
 
@@ -749,9 +981,9 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
             if verbose:
                 print('generating planets across', x_var, '...')
             planets = evol.bulk_planets(n=nplanets, name=x_var, mini=xmin, maxi=xmax,
-                                   like=defaults,
-                                   t_eval=pl_baseline.t, random=False, verbose=verbose,
-                                   initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
+                                        like=defaults,
+                                        t_eval=pl_baseline.t, random=False, verbose=verbose,
+                                        initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
             fig, ax = plot_vs_x(lplanets=planets, xname={x_var: (xlabels[i_ax], xscales[i_ax])},
                                 ynames={model_param: ('', yscale)}, fig=fig, axes=axes[i_ax], legsize=legsize,
                                 legend=legendd, snap=age, plots_save=False, set_ylabel=ylabel, set_xlim=True, log=log,
@@ -791,8 +1023,8 @@ def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_
                           ylabel='$\Delta h$ / $\Delta h_0$  ', **kwargs):
     initial_kwargs.update({'tf': age})
     pl_baseline = evol.build_planet_from_id(ident=defaults,
-                               initial_kwargs=initial_kwargs, update_kwargs=update_kwargs,
-                               postprocessors=['topography'], t_eval=None)
+                                            initial_kwargs=initial_kwargs, update_kwargs=update_kwargs,
+                                            postprocessors=['topography'], t_eval=None)
     legendd = False
     for ii, h_param in enumerate(models):
         if ii == len(models) - 1:
@@ -817,9 +1049,10 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
     phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
     h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
-    pl0 = evol.bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults, t_eval=None,
-                       random=False, phi0=phi0, h_rms0=h_rms0, postprocessors=['topography', 'ocean_capacity'],
-                       **kwargs)[0]
+    pl0 = \
+    evol.bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults, t_eval=None,
+                      random=False, phi0=phi0, h_rms0=h_rms0, postprocessors=['topography', 'ocean_capacity'],
+                      **kwargs)[0]
     fig, axes = plt.subplots(figsize=figsize)
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0,
                                               textc=textc,

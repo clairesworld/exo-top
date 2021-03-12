@@ -296,3 +296,21 @@ def dark_background(fig, ax, fgc='xkcd:off white', bgc='xkcd:black'):
     print('Remember to add facecolor=fig.get_facecolor() to savefig()')
 
     return (fig, *ax)
+
+
+def cornertext(ax, text, pos='top right', size=12):
+    if 'top' in pos:
+        y = 0.95
+        va = 'top'
+    elif 'bottom' in pos:
+        y = 0.05
+        va = 'bottom'
+    if 'left' in pos:
+        x = 0.05
+        ha = 'left'
+    elif 'right' in pos:
+        x = 0.95
+        ha = 'right'
+
+    ax.text(x, y, text, ha=ha, va=va, transform=ax.transAxes, fontsize=size)
+    return ax

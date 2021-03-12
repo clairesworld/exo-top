@@ -47,6 +47,33 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, random=False,
     return planets
 
 
+def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model_kwargs={}, **kwargs):
+    """varying multiple parameters in 'names' between mini and maxi, use default values otherwise.
+    update_kwargs can include any TerrestrialPlanet attribute
+    initial_kwargs can include T_m0, T_c0, D_l0, t0, tf. names, mini, and maxi are in order and must have same lenghts"""
+
+    planets = []
+    ii = 0
+    while ii < n:
+        new_kwargs_pl = pl_kwargs.copy()
+        new_kwargs_model = model_kwargs.copy()
+        for iii, name in enumerate(names):
+            val = rand.uniform(mini[iii], maxi[iii])
+            if name in ['T_m0', 'T_c0', 'D_l0']:
+                new_kwargs_model.update({name: val})
+            else:
+                new_kwargs_pl.update({name: val})
+
+        if ii == 0:
+            t_eval = None
+        else:
+            t_eval = planets[0].t
+        pl = build_planet(new_kwargs_pl, new_kwargs_model, t_eval=t_eval, **kwargs)
+        planets.append(pl)
+        ii += 1
+    return planets
+
+
 def build_planet_from_id(ident='Earthbaseline', run_kwargs=None, update_kwargs=None, **kwargs):
     planet_kwargs = eval('inputs.' + ident + '_in')
     model_kwargs = eval('inputs.' + ident + '_run')
@@ -93,7 +120,11 @@ def solve(pl, run_kwargs={}, t0=0, t_eval=None, verbose=False, **kwargs):
     if verbose:
         print('Solving 1D thermal history with T_m0 =', T_m0, 'K, T_c0 =', T_c0, 'K, D_l0 =', D_l0, 'm, tf =', tf,
               'Gyr')
-        print('\nrun kwargs:\n', run_kwargs)
+        back = run_kwargs['backwards_cooling']
+        if back:
+            print('radiogenic calculated backwards =', back, 'H_f =', pl.H_f*1e12, 'pW/kg')
+        else:
+            print('radiogenic calculated backwards =', back, 'H_0 =', pl.H_0 * 1e12, 'pW/kg')
         # print('\nplanet object', pprint(vars(pl)))
 
     t0 = t0 * 1e9 * p.years2sec  # convert input times to Gyr
@@ -133,11 +164,11 @@ def LHS(t, y, pl=None, **kwargs):
 def recalculate(t, pl, verbose=False, **kwargs):
     """ calcualte all the thermal convection parameters (single time step or postprocess all timesteps"""
 
-    if verbose:
-        print('\nrecalculate kwargs:\n', kwargs)
-        print('\nplanet:')
-        for attr in dir(pl):
-            print("pl.%s = %r" % (attr, getattr(pl, attr)))
+    # if verbose:
+    #     print('\nrecalculate kwargs:\n', kwargs)
+    #     print('\nplanet:')
+    #     for attr in dir(pl):
+    #         print("pl.%s = %r" % (attr, getattr(pl, attr)))
 
     # check if there are any weird issues
     try:

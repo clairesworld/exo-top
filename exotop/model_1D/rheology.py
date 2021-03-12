@@ -36,7 +36,8 @@ def nu_Dorn(T, pl=None, nu_0=1.6e20, Ea=300e3, T_0=1800, **kwargs):
     return nu_0 * np.exp(Ea / p.R_b * (T ** -1 - T_0 ** -1))
 
 
-def eta_KW(T, pl=None, P=0, Ea=300e3, V_rh=6e-6, mu=80e9, A_rh=8.7e15, h_rh=2.07e-3, B_rh=0.5e-9, m_rh=2.5, **kwargs):
+def eta_KW(T, pl=None, P=0, Ea=300e3, V_rh=6e-6, mu=80e9, A_rh=8.7e15, h_rh=2.07e-3, B_rh=0.5e-9, m_rh=2.5,
+           eta_pre=None, **kwargs):
     """ Karato & Wu 1993, defaults are diffusion creep for dry olivine 
     V = activation volume
     mu = shear modulus
@@ -53,8 +54,13 @@ def eta_KW(T, pl=None, P=0, Ea=300e3, V_rh=6e-6, mu=80e9, A_rh=8.7e15, h_rh=2.07
         B_rh = pl.B_rh
         m_rh = pl.m_rh
         h_rh = pl.h_rh
+        eta_pre = pl.eta_pre
     Q = Ea + P * V_rh  # activation enthalpy
-    b = mu / (2 * A_rh) * (h_rh / B_rh) ** m_rh
+
+    if eta_pre is None:
+        b = mu / (2 * A_rh) * (h_rh / B_rh) ** m_rh
+    else:
+        b = eta_pre
 
     return b * np.exp(Q / (p.R_b * T))
 

@@ -1,3 +1,38 @@
+baseline_in = dict(
+    ident='Earthbaseline',  # must match dict name ****_in
+    M_p=5.972e24,
+    sma=1,
+    Alb=0,
+    CMF=0.3,
+    Ra_crit_u=450,
+    rho_m=3300,
+    rho_c=7200,
+    c_m=1200,
+    c_c=7800,
+    beta_u=1/3,
+    k_m=3,
+    alpha_m=3e-5,
+    # H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0  based on below
+    H_f=4.6e-12,  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
+    T_s=273,
+    eta_pre=2.5e11,  # arrhenius pre-exponential factor
+
+    #     # viscosity
+    #     nu_0 = 0.27e17, # use for constant visc option
+    #     a_rh=2.44, # for beta=1/3 from Thiriet+ (2019)
+    #     eta_0 = 1e21, # reference eta from Thiriet+ (2019)
+    #     T_ref = 1600, # reference T from Thiriet+ (2019)
+    #     Ea=300e3, # activation energy in J, K&W (1993) dry olivine
+    #     V_rh=6e-6, # activation volume in m^3, K&W (1993)  dry olivine
+    #     mu=80e9, # shear modulus in Pa, K&W (1993)  dry olivine
+    #     A_rh=8.7e15, # pre-exponential factor in s^-1, K&W (1993)  dry olivine
+    #     h_rh=2.07e-3, # grain size in m, K&W (1993)  dry olivine
+    #     B_rh=0.5e-9, # Burgers vector, K&W (1993)  dry olivine
+    #     m_rh=2.5, # grain size exponent, K&W (1993)  dry olivine
+)
+baseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW', backwards_cooling=True)  # model params
+
+
 Earthbaseline_in = dict(
     ident='Earthbaseline',  # must match dict name ****_in
     M_p=5.972e24,

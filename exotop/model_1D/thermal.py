@@ -108,11 +108,11 @@ def h_rad(t, tf=None, H_0=None, H_f=None, c_n=None, p_n=None, lambda_n=None, bac
     h_n = x_n / x_tot  # heat produced per kg of isotope normalized to total U (hence a ratio; unitless)
 
     if backwards_cooling:  # H_f refers to tf (nominally 4.5 Gyr)
-        print('WARNING: possible bug in backwards cooling (confuses H_0 and H_f)')
-        if verbose and H_0 is not None:
-            print('WARNING: radiogenic heating calculated backwards from present but H_0 is given')
-            print('   H_0:', H_0)
-            print('   H_f:', H_f)
+        # print('WARNING: possible bug in backwards cooling (confuses H_0 and H_f)')
+        # if verbose and H_0 is not None:
+        #     print('WARNING: radiogenic heating calculated backwards from present but H_0 is given')
+        #     print('   H_0:', H_0)
+        #     print('   H_f:', H_f)
         try:
             #         h = H_f*sum([x*np.exp(y*(tf-t)) for x, y in zip(h_n, lambda_n)])
             h = H_f * sum(h_n * np.exp(lambda_n * (tf - t)))
@@ -123,10 +123,10 @@ def h_rad(t, tf=None, H_0=None, H_f=None, c_n=None, p_n=None, lambda_n=None, bac
                 h[ii] = H_f * sum(h_n * np.exp(lambda_n * (tf - t_val)))
 
     else:  # H_0 is W/kg at t0
-        if verbose and H_f is not None:
-            print('WARNING: radiogenic heating calculated forwards from t0 but H_f is given')
-            print('   H_0:', H_0)
-            print('   H_f:', H_f)
+        # if verbose and H_f is not None:
+        #     print('WARNING: radiogenic heating calculated forwards from t0 but H_f is given')
+        #     print('   H_0:', H_0)
+        #     print('   H_f:', H_f)
         try:
             h = H_0 / sum(h_n * np.exp(lambda_n * t))
         except ValueError:
