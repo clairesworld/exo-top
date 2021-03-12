@@ -36,6 +36,7 @@ def read_topo_stats(case, ts, data_path=data_path_bullard, **kwargs):
 
 
 def reshape_one_input(A, proper, default):
+
     if not_iterable(A) and not_string(A):
         B = np.empty_like(proper, dtype=object)
         if A is None:
@@ -46,6 +47,7 @@ def reshape_one_input(A, proper, default):
         B = np.reshape(A, np.shape(proper))
     else:
         B = A
+
     return B
 
 
@@ -59,7 +61,10 @@ def reshape_inputs(Ra_ls, eta_ls, grids, defaults=None):
 
     grids_new = []
     for grid, default in zip(grids, defaults):
-        grids_new.append(reshape_one_input(grid, proper, default))
+        try:
+            grids_new.append(reshape_one_input(grid, proper, default))
+        except ValueError:
+            raise Exception('Problem reshaping input grid', grid, 'check indexing in first function call')
 
     # make sure Ra and eta are iterable the right way
     if not not_string(Ra_ls):  # if a string

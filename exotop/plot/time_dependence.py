@@ -54,21 +54,21 @@ plat.subplots_evol_at_sol(Ra_ls[-1], eta_ls[1:], regime_grid=regime_grid_td[1:, 
                           ylabelpad=8, markers=None, markersize=24, cmap='viridis', colour_by='eta',
                           data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)
 
-plat.subplots_evol_at_sol(Ra_ls[-2:], eta_ls[1], regime_grid=regime_grid_td, save=True, t1_grid=t1_grid[1,-2:], load_grid=True,
-                        psuffixes=['_T'], fig_path=fig_path,
-                        fname='evol-eta1e6', fig_fmt=fig_fmt, end_grid=end_grid[1,-2:], normtime=True, labelsize=14, xlabel=r'Time',
+plat.subplots_evol_at_sol(Ra_ls[-2:], eta_ls[1], regime_grid=regime_grid_td[1, -2:], save=True, t1_grid=t1_grid[1,-2:],
+                        psuffixes=['_T'], fig_path=fig_path, end_grid=end_grid[1,-2:],  load_grid=True,
+                        fname='evol-eta1e6', fig_fmt=fig_fmt, normtime=True, labelsize=14, xlabel=r'Time',
                         ylabels=None, keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_components'], title='', xlabelpad=8,
                         ylabelpad=8, markers=None, markersize=24, cmap='viridis', colour_by='Ra',
                         data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)
 
-plat.subplots_evol_at_sol(Ra_ls[-2:], eta_ls[2], regime_grid=regime_grid_td, save=True, t1_grid=t1_grid[2,-2:], load_grid=True,
+plat.subplots_evol_at_sol(Ra_ls[-2:], eta_ls[2], regime_grid=regime_grid_td[2,-2:], save=True, t1_grid=t1_grid[2,-2:], load_grid=True,
                         psuffixes=['_T'], fig_path=fig_path,
                         fname='evol-eta1e7', fig_fmt=fig_fmt, end_grid=end_grid[2,-2:], normtime=True, labelsize=14, xlabel=r'Time',
                         ylabels=None, keys=['y_L', 'T_l', 'dT_rh', 'delta_rh', 'h_components'], title='', xlabelpad=8,
                         ylabelpad=8, markers=None, markersize=24, cmap='viridis', colour_by='Ra',
                         data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)
 
-plat.subplots_evol_at_sol(Ra_ls[-2:], eta_ls[3], regime_grid=regime_grid_td, save=True, t1_grid=t1_grid[3,-2:], load_grid=True,
+plat.subplots_evol_at_sol(Ra_ls[-2:], eta_ls[3], regime_grid=regime_grid_td[3,-2:], save=True, t1_grid=t1_grid[3,-2:], load_grid=True,
                         psuffixes=['_T'], fig_path=fig_path,
                         fname='evol-eta1e8', fig_fmt=fig_fmt, end_grid=end_grid[3,-2:], normtime=True, labelsize=14, xlabel=r'Time',
                         ylabels=None, keys=['y_L', 'T_l',  'dT_rh', 'delta_rh', 'h_components'], title='', xlabelpad=8,
