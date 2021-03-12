@@ -1375,7 +1375,8 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                   fig=None, axes=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
                   regime_names=None, colour_by='eta', overlap=False,
                   data_path=data_path_bullard, **kwargs):
-    # plot histograms of time evolution (implemented for single Ra or single eta)
+    # plot histograms of time evolution (implemented for single Ra or single eta - marginilization must be opposite
+    # to 'colour_by')
 
     if psuffixes is None:
         psuffixes = ['_T']
@@ -1391,11 +1392,14 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
         raise Exception('No x-axis keys provided!')
     else:
         nkeys = 1
+    if overlap:
+        nrows = 1
+    if colour_by == 'Ra':
+        nrows = len(Ra_ls)
+    elif colour_by == 'eta':
+        nrows == len(eta_ls)
     if fig is None:
-        if overlap:
-            fig, axes = plt.subplots(1, nkeys, figsize=(nkeys * 2, 3), sharex='col')
-        else:
-            fig, axes = plt.subplots(len(eta_ls), nkeys, figsize=(nkeys * 2, len(eta_ls) * 3), sharex='col')
+        fig, axes = plt.subplots(nrows, nkeys, figsize=(nkeys * 2, nrows * 3), sharex='col')
         if nkeys == 1:
             axes = np.array([axes])
 
@@ -1408,10 +1412,6 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = pro.get_cases_list(Ra_ls, eta_str, end_grid[jj])
-        if overlap:
-            axs = axes
-        else:
-            axs = axes[jj]
 
         for ii, case in enumerate(cases):
             t1_ii = t1_grid[jj][ii]
@@ -1420,6 +1420,13 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                 c = c_list[jj]
             elif colour_by == 'Ra':
                 c = c_list[ii]
+            if overlap:
+                axs = axes
+            else:
+                if colour_by == 'eta':
+                    axs = axes[jj]
+                elif colour_by == 'Ra':
+                    axs = axes[ii]
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
                     regime_grid[jj][ii] in include_regimes):
