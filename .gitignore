@@ -1,6 +1,7 @@
 **/*.pdf
 **/figs/
-**/figs_scratch/
+**/figs_scratch/*.png
+**/figs_scratch/*.gif
 
 # python cache
 **/.ipynb_checkpoints/

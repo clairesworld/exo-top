@@ -1373,9 +1373,9 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                   labelsize=14, xlabels=None, keys=None, title='', legsize=10,
                   xlabelpad=8, alpha=0.5,
                   fig=None, axes=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
-                  regime_names=None,
+                  regime_names=None, colour_by='eta', overlap=False,
                   data_path=data_path_bullard, **kwargs):
-    # plot histograms of time evolution for single Ra (only eta-colouring is implemented)
+    # plot histograms of time evolution (implemented for single Ra or single eta)
 
     if psuffixes is None:
         psuffixes = ['_T']
@@ -1392,20 +1392,34 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
     else:
         nkeys = 1
     if fig is None:
-        fig, axes = plt.subplots(len(eta_ls), nkeys, figsize=(nkeys * 2, len(eta_ls) * 3), sharex='col')
+        if overlap:
+            fig, axes = plt.subplots(1, nkeys, figsize=(nkeys * 2, 3), sharex='col')
+        else:
+            fig, axes = plt.subplots(len(eta_ls), nkeys, figsize=(nkeys * 2, len(eta_ls) * 3), sharex='col')
         if nkeys == 1:
             axes = np.array([axes])
+
     logeta_fl = [np.log10(float(a)) for a in eta_ls]
-    c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+    logRa_fl = [np.log10(float(a)) for a in Ra_ls]
+    if colour_by == 'eta':
+        c_list = colorize(logeta_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+    elif colour_by == 'Ra':
+        c_list = colorize(logRa_fl, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = pro.get_cases_list(Ra_ls, eta_str, end_grid[jj])
-        c_jj = c_list[jj]
-        axs = axes[jj]
+        if overlap:
+            axs = axes
+        else:
+            axs = axes[jj]
 
         for ii, case in enumerate(cases):
             t1_ii = t1_grid[jj][ii]
             load_ii = load_grid[jj][ii]
+            if colour_by == 'eta':
+                c = c_list[jj]
+            elif colour_by == 'Ra':
+                c = c_list[ii]
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
                     regime_grid[jj][ii] in include_regimes):
@@ -1435,25 +1449,33 @@ def subplots_hist(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None, nbin
                     ax = axs[k]
                     data = df[key].dropna()
                     ax.set_xlabel(xlabels[k], fontsize=labelsize, labelpad=xlabelpad)
-                    ax.hist(data, histtype='step', bins=nbins, color=c_jj, density=True)
-                    ax.axvline(np.mean(data), c=c_jj, ls='--')
-                    ax.axvline(np.median(data), c=c_jj, ls='-')
+                    ax.hist(data, histtype='step', bins=nbins, color=c, density=True)
+                    ax.axvline(np.mean(data), c=c, ls='--')
+                    ax.axvline(np.median(data), c=c, ls='-')
                     ax.text(0.95, 0.95, 'n = ' + str(len(data)), fontsize=10, c='k', horizontalalignment='right',
                             verticalalignment='top', transform=ax.transAxes)
 
     # legend proxy artist
-    ax = axes[0, 0]
-    # scat = ax.scatter(logeta_fl, logeta_fl, visible=False, c=np.array(logeta_fl), cmap=cmap, s=markersize,
-    #                   vmin=vmin, vmax=vmax)  # dummy - neeeds matplotlib 3.1.1
-    # legend1 = ax.legend(*scat.legend_elements(num=len(logeta_fl)),
-    #                     loc="upper left", title=r"log $\Delta \eta$", fontsize=legsize)
+    if overlap:
+        ax = axes[0]
+    else:
+        ax = axes[0, 0]
     lines = []
-    for jj, leta in enumerate(logeta_fl):
-        p = mlines.Line2D([], [], lw=2, color=c_list[jj], label=leta,
-                          alpha=alpha)
-        lines.append(p)
+    if colour_by == 'eta':
+        for jj, leta in enumerate(logeta_fl):
+            p = mlines.Line2D([], [], lw=2, color=c_list[jj], label=leta,
+                              alpha=alpha)
+            lines.append(p)
+        legtitle = r"log $\Delta \eta$"
+    elif colour_by == 'Ra':
+        for ii, lRa in enumerate(logRa_fl):
+            p = mlines.Line2D([], [], lw=2, color=c_list[ii], label=lRa,
+                              alpha=alpha)
+            lines.append(p)
+        legtitle = r"log Ra"
+
     legend1 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="upper left",
-                        title=r"log $\Delta \eta$", )
+                        title=legtitle)
     ax.add_artist(legend1)
 
     legend2 = ax.legend(handles=[mlines.Line2D([], [], lw=2, ls='--', color='k', label='mean'),
@@ -1478,6 +1500,7 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
     if ax is None:
         fig = plt.figure()
         ax = plt.gca()
+
     time, y = pro.read_evol(case, col, dat=dat)
     ax.plot(time, y * yscale, c=c, lw=0.5, label=label)
     ax.set_xlim(0, ax.get_xlim()[1])

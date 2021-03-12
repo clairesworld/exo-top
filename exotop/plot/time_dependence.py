@@ -13,10 +13,19 @@ from postaspect import plt_aspect as plat  # noqa: E402
 
 # plat.subplots_hist(Ra_ls[-2], eta_ls[1:], regime_grid=regime_grid_td[1:, -2], save=True, t1_grid=t1_grid[1:, -2], load_grid=True,
 #                    psuffixes=['_T', '_h'], fig_path=fig_path,
-#                    fname='hist-Ra1e8_subsampled', fig_fmt=fig_fmt, end_grid=end_grid[1:,-2], labelsize=14,
+#                    fname='hist-Ra1e8', fig_fmt=fig_fmt, end_grid=end_grid[1:,-2], labelsize=14,
 #                    keys=['y_L', 'T_l', 'T_i', 'dT_rh', 'delta_rh', 'h_rms'], title='Ra 1e8', xlabelpad=8,
 #                    cmap='magma', vmin=5, vmax=8.5, nbins=10,
 #                    data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)
+
+
+plat.subplots_hist(Ra_ls[:], eta_ls[-1], regime_grid=regime_grid_td[-1, :], save=True, t1_grid=t1_grid[-1, :], load_grid=True,
+                   psuffixes=['_T', '_h'], fig_path=fig_path,
+                   fname='hist-eta1e8', fig_fmt=fig_fmt, end_grid=end_grid[1:,-2], labelsize=14,
+                   keys=['y_L', 'T_l', 'dT_rh', 'delta_rh', 'h_rms'], title='eta 1e8', xlabelpad=8,
+                   cmap='viridis', nbins=10, colour_by='Ra',
+                   data_path=data_path, regime_names=regime_names_td, postprocess_kwargs=postprocess_kwargs)
+
 
 
 # # plot evolutions for debugging T components
