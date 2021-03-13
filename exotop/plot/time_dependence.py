@@ -38,7 +38,7 @@ plat.subplots_hist(Ra_ls[-2:], eta_ls[-2], regime_grid=regime_grid_td[-2, -2:], 
 
 plat.subplots_hist(Ra_ls[-2:], eta_ls[-3], regime_grid=regime_grid_td[-3, -2:],  t1_grid=t1_grid[-3, -2:],
                    load_grid=True, end_grid=end_grid[-3, -2:],
-                   psuffixes=['_T', '_h' '_Nu'], fig_path=fig_path, save=True,
+                   psuffixes=['_T', '_h', '_Nu'], fig_path=fig_path, save=True,
                    fname='hist-eta1e6', fig_fmt=fig_fmt, labelsize=14,
                    keys=['y_L', 'T_l', 'dT_rh', 'delta_rh', 'h_rms', 'Nu'], title='eta 1e6', xlabelpad=8,
                    cmap=cmap, nbins=10, colour_by='Ra',
