@@ -86,10 +86,10 @@ def animate_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     ani2.save(fig_path+case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig2.get_facecolor()})
 
 
-def animate_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, fps=15, dark=True):
+def animate_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, fps=15, dark=True, **kwargs):
 
     fig2, ax, line, line2, df = static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=labelsize,
-                                       ticksize=ticksize, dark=dark, return_artists=True, save=False)
+                                       ticksize=ticksize, dark=dark, return_artists=True, save=False, **kwargs)
 
     def init2():
         line.set_xdata(([np.nan] * len(np.array(df.iloc[0]['y'].tolist()))))
@@ -328,7 +328,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
 def static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, legsize=20, dark=False,
                   return_artists=False, c='k', alpha=0.9, save=True, i_n=0, avg=False, fig=None, ax=None, leg=True,
-                  xlabel='', ylabel='', **kwargs):
+                  xlabel='', ylabel='', xlim=None, **kwargs):
 
     if dark:
         foreground = 'xkcd:off white'
@@ -362,7 +362,8 @@ def static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
             y_ii = np.array(df_n['y'].tolist())
             ax.plot(uv_ii, y_ii, c=foreground, lw=0.5, alpha=0.5)
             D_all.append(np.array(df_n['y_L']))
-        ax.plot(uv_ii, [np.max(D_all)] * len(uv_ii), c='xkcd:tangerine', lw=0.5, alpha=0.5)
+        ax.plot(uv_ii, [np.max(D_all)] * len(uv_ii), c='xkcd:tangerine', lw=1, ls='--')
+        ax.plot(uv_ii, [np.min(D_all)] * len(uv_ii), c='xkcd:tangerine', lw=1, ls='--')
 
     else:
         df_n = df.iloc[i_n]
@@ -371,8 +372,9 @@ def static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         D_l_n = np.array(df_n['y_L'])
 
     line, = ax.plot(uv_mag_av, y_f, c=foreground, lw=3)
-    line2, = ax.plot(uv_mag_av, [np.max(D_l_n)] * len(uv_ii), c='xkcd:tangerine', lw=1, alpha=1)
-    # ax.set_xlim([0, 1])
+    line2, = ax.plot(uv_mag_av, [D_l_n] * len(uv_mag_av), c='xkcd:tangerine', lw=2, alpha=1)
+    if xlim is not None:
+        ax.set_xlim(xlim)
     ax.set_ylim([0, 1])
 
     if dark:
