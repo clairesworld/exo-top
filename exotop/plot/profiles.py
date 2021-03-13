@@ -4,10 +4,13 @@ from postaspect.aspect_post import T_parameters_at_sol, get_cases_list, pickleio
 from postaspect import ani_aspect as anims
 import os
 
-fig, axes = anims.T_h_gridspec(case='Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
-                               cmap='gist_heat', save=True, c='k')
-fig, axes = anims.T_h_gridspec(case='Ra1e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
-                               cmap='gist_heat', save=True, c='k')
+fig, ax = anims.static_uv_prof('Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30,
+                         ticksize=16, c='k', save=True, avg=True, fig=None, ax=None)
+
+# fig, axes = anims.T_h_gridspec(case='Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
+#                                cmap='gist_heat', save=True, c='k')
+# fig, axes = anims.T_h_gridspec(case='Ra1e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
+#                                cmap='gist_heat', save=True, c='k')
 
 # cases = ['Ra1e7-eta1e5-wide', 'Ra3e7-eta1e5-wide', 'Ra1e8-eta1e5-wide', 'Ra3e8-eta1e5-wide', 'Ra3e8-eta1e6-wide']
 # for case in cases:

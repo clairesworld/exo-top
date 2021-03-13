@@ -86,6 +86,34 @@ def animate_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     ani2.save(fig_path+case + '-prof.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig2.get_facecolor()})
 
 
+def animate_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, fps=15, dark=True):
+
+    fig2, ax, line, line2, df = static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=labelsize,
+                                       ticksize=ticksize, dark=dark, return_artists=True, save=False)
+
+    def init2():
+        line.set_xdata(([np.nan] * len(np.array(df.iloc[0]['y'].tolist()))))
+        line2.set_xdata(([np.nan] * len(np.array(df.iloc[0]['y'].tolist()))))
+        return line, line2,
+
+    def animate2(i, df):
+        df_n = df.iloc[i]
+        T_f = np.array(df_n['T_av'].tolist())
+        D_l_n = np.array(df_n['y_L'])
+        line.set_xdata(T_f)  # update the data.
+        line2.set_ydata(D_l_n)  # update the data.
+        return line,
+
+    ani2 = animation.FuncAnimation(fig2, animate2, frames=len(df),
+                                                                init_func=init2,
+                                  fargs=(df,), blit=False, repeat=True,
+                                  interval=200, )  # interval: delay between frames in ms
+    # HTML(ani.to_jshtml())
+    ani2.save(fig_path+case + '-prof-uv.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig2.get_facecolor()})
+
+
+
+
 def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, fps=15, dark=True):
 
     fig, ax, hprof, hmean, h_n, h_rms = static_h(case, data_path=data_path, fig_path=fig_path, labelsize=labelsize,
@@ -294,6 +322,69 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         return fig, ax, im, n, T_n
     else:
         return fig, ax
+
+
+
+
+def static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, legsize=20, dark=False,
+                  return_artists=False, c='k', alpha=0.9, save=True, i_n=0, avg=False, fig=None, ax=None, leg=True,
+                  xlabel='', ylabel='', **kwargs):
+
+    if dark:
+        foreground = 'xkcd:off white'
+    else:
+        foreground = c
+
+    df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    n = df.sol.to_numpy()
+
+    # T profile
+    if fig is None and ax is None:
+        fig, ax = plt.subplots(figsize=(2, 4))
+    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=20)
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=20)
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
+    # ax.set_xticks([0, 0.5, 1])
+    ax.set_yticks([])
+
+    if avg:
+        # load time-averages
+        T_f, y_f = pro.time_averaged_profile_from_df(df, 'T_av')
+        uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
+        dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_f, uv_mag_av=uv_mag_av, y=y_f,
+                                         **postprocess_kwargs, **kwargs)  # actually a dict
+        D_l_n = dic_av['y_L']
+
+        D_all = []
+        for ii in range(len(n)):
+            df_n = df.iloc[ii]
+            uv_ii = np.array(df_n['uv_mag_av'].tolist())
+            y_ii = np.array(df_n['y'].tolist())
+            ax.plot(uv_ii, y_ii, c=foreground, lw=0.5, alpha=0.5)
+            D_all.append(np.array(df_n['y_L']))
+        ax.plot(uv_ii, [np.max(D_all)] * len(uv_ii), c='xkcd:tangerine', lw=0.5, alpha=0.5)
+
+    else:
+        df_n = df.iloc[i_n]
+        uv_mag_av = np.array(df_n['uv_mag_av'].tolist())
+        y_f = np.array(df_n['y'].tolist())
+        D_l_n = np.array(df_n['y_L'])
+
+    line, = ax.plot(uv_mag_av, y_f, c=foreground, lw=3)
+    line2, = ax.plot(uv_mag_av, [np.max(D_l_n)] * len(uv_ii), c='xkcd:tangerine', lw=1, alpha=1)
+    # ax.set_xlim([0, 1])
+    ax.set_ylim([0, 1])
+
+    if dark:
+        fig, ax = dark_background(fig, ax)
+    if save:
+        sc.plot_save(fig, case + '_uv_prof', fig_path=fig_path)
+
+    if return_artists:
+        return fig, ax, line, line2, df
+    else:
+        return fig, ax
+
 
 
 def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
