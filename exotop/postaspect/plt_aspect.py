@@ -434,7 +434,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         avg = np.mean(d_times[key])
                         SE_vec = np.array([avg - SE_mean, avg, avg + SE_mean])
                         print(key, 'mean:', avg, 'SE of mean:', SE_mean)
-                        quants[key+'_SE'] = SE_mean
+                        d_times[key+'_SE'] = SE_mean
                         try:
                             quants[key] = np.vstack((quants[key], SE_vec))  # add to array of errors
                         except ValueError:  # haven't added anything yet
@@ -486,8 +486,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             xerr = sdx_all
             yerr = sdy_all
         elif fiterror and errortype is 'standard':
-            xerr = quants[which_x+'_SE']
-            yerr = quants['h_rms_SE']
+            xerr = d_times[which_x+'_SE']
+            yerr = d_times['h_rms_SE']
         else:
             xerr = 1
             yerr = 1
