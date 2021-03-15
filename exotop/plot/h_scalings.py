@@ -25,7 +25,7 @@ fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_
                                   fig_fmt=fig_fmt, vmin=1, vmax=3,
                                   show_cbar=False, figsize=(5, 5),
                                   title=r'Fit to $C$ Ra$_{i,eff}^p$',
-                                  ylabel=r'Model $\Delta h_{rms}^\prime$', xlabel=r'Data $\Delta h_{rms}^\prime$')
+                               ylabel=r'Model $\Delta h_{rms}^\prime$', xlabel=r'Data $\Delta h_{rms}^\prime$')
 
 
 # all eta on one axis
@@ -39,7 +39,7 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False,
                    cmap=cmap, c_rms=None, fit=True, logx=True, logy=True, hscale=1, ms=ms,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td, figsize=(5, 5))
+                   regime_grid=regime_grid_td, figsize=(5, 5), errortype='standard')
 
 _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra',
@@ -49,7 +49,7 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                    title=r'Fit to $C$ Ra$^p$', showpeak=False,
                    cmap=cmap, c_rms=None, fit=True, logx=True, logy=True, hscale=1, ms=ms,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td, figsize=(5, 5))
+                   regime_grid=regime_grid_td, figsize=(5, 5), errortype='standard')
 
 
 # Ra_F
