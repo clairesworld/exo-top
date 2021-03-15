@@ -1569,7 +1569,7 @@ def plot_topo_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=
 
 
 def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', legsize=12, lw=1, legloc='lower left', showchisq=True,
+                      c='xkcd:periwinkle', legsize=12, lw=1, legloc='lower left', showchisq=False,
                       **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
