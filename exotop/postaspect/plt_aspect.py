@@ -1728,7 +1728,7 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                     elif errortype is 'standard':
                         SE_mean = np.std(d_times[key]) / np.sqrt(len(d_times[key]))  # todo: log!
                         avg = np.mean(d_times[key])
-                        SE_vec = [avg - SE_mean, avg, avg + SE_mean]
+                        SE_vec = np.array([avg - SE_mean, avg, avg + SE_mean])
                         try:
                             quants[key] = np.vstack((quants[key], SE_vec))  # add to array of errors
                         except ValueError:  # haven't added anything yet
