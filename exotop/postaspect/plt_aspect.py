@@ -1614,13 +1614,9 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
 
         # error
         SE_y = pro.fit_SE(flatx, flaty, [np.log10(const), expon], xn=xprime)
-        # un-log and make sure it looks the same
-        SE_y_unlog = 2.302585 * 10 ** np.log10(hprime) * SE_y
-        yn_upper = hprime + SE_y_unlog
-        yn_lower = hprime - SE_y_unlog
-        print('xprime', xprime)
-        print('yn_lower', yn_lower)
-        print('yn_upper', yn_upper)
+
+        yn_upper = hprime + SE_y
+        yn_lower = hprime - SE_y
         ax.fill_between(xprime, yn_lower, yn_upper, fc='k', alpha=0.3)
 
     if legend:
