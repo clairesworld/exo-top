@@ -427,10 +427,14 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         except ValueError:  # haven't added anything yet
                             quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
                     elif errortype is 'standard':
-                        SE_mean = np.std(d_times[key]) / np.sqrt(len(d_times[key]))  # todo: log!
+                        try:
+                            SE_mean = np.std(d_times[key]) / np.sqrt(len(d_times[key]))  # todo: log!
+                        except TypeError:  # key is a scalar
+                            SE_mean = 0
                         avg = np.mean(d_times[key])
                         SE_vec = np.array([avg - SE_mean, avg, avg + SE_mean])
                         print(key, 'mean:', avg, 'SE of mean:', SE_mean)
+                        quants[key+'_SE'] = SE_mean
                         try:
                             quants[key] = np.vstack((quants[key], SE_vec))  # add to array of errors
                         except ValueError:  # haven't added anything yet
@@ -478,9 +482,12 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             n_fitted = 1
         else:
             n_fitted = 2
-        if fiterror:
+        if fiterror and errortype is 'time':
             xerr = sdx_all
             yerr = sdy_all
+        elif fiterror and errortype is 'standard':
+            xerr = quants[which_x+'_SE']
+            yerr = quants['h_rms_SE']
         else:
             xerr = 1
             yerr = 1
@@ -1604,6 +1611,14 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
     else:
         hprime = const * xprime ** expon
         h3, = ax.plot(xprime, hprime, c=c, ls='--', lw=lw, zorder=100, label='dum')
+
+        # error
+        SE_y = pro.fit_SE(flatx, flaty, [np.log10(const), expon], xn=xprime)
+        # un-log and make sure it looks the same
+        SE_y_unlog = 2.302585 * 10 ** np.log10(hprime) * SE_y
+        yn_upper = hprime + SE_y_unlog
+        yn_lower = hprime - SE_y_unlog
+        ax.fill_between(xprime, yn_lower, yn_upper, fc='k', alpha=0.3)
 
     if legend:
         if showchisq:
