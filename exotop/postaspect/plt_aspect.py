@@ -337,7 +337,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               save=True, fname='h', legend=False, sigma=1, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', alpha=1,
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, c_fit='k', ms=10, lw=1,
-              xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errs=None, ticksize=None,
+              xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errortype='time', ticksize=None,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7),
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
@@ -408,8 +408,9 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 # calculate statistics
                 sdy = np.nanstd(h_rms_times)
                 sdx = np.nanstd(x_times)
+                d_times = {'h_rms': h_rms_times, 'h_peak': h_peak_times, which_x: x_times}
                 qdict = pro.parameter_percentiles(case,
-                                                  df={'h_rms': h_rms_times, 'h_peak': h_peak_times, which_x: x_times},
+                                                  df=d_times,
                                                   keys=quants.keys(), plot=False, sigma=2)
 
                 # append to working
@@ -420,10 +421,21 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 jj_all.append(jj)
 
                 for key in quants.keys():
-                    try:
-                        quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
-                    except ValueError:  # haven't added anything yet
-                        quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
+                    if errortype is 'time':
+                        try:
+                            quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
+                        except ValueError:  # haven't added anything yet
+                            quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
+                    elif errortype is 'standard':
+                        SE_mean = np.std(d_times[key]) / np.sqrt(len(d_times[key]))  # todo: log!
+                        avg = np.mean(d_times[key])
+                        SE_vec = [avg - SE_mean, avg, avg + SE_mean]
+                        print(key, 'mean:', avg, 'SE of mean:', SE_mean)
+                        try:
+                            quants[key] = np.vstack((quants[key], SE_vec))  # add to array of errors
+                        except ValueError:  # haven't added anything yet
+                            quants[key] = SE_vec.reshape((1, 3))  # reshape so it works if you just have one row
+
 
     # get errorbars and plot them
     err = dict.fromkeys(quants.keys())
@@ -448,9 +460,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 except Exception as e:
                     cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
                     c_rms = colorize(means[which_x], cmap=cmap)[0]
-            print('c list', c_rms)
             for pp in range(len(means[which_x])):
-                print('c = ', c_rms[jj_all[pp]])
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:, pp]]).T,
                             xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw, alpha=alpha,
                             fmt=mark, c=c_rms[jj_all[pp]], capsize=ecapsize, ms=ms)
