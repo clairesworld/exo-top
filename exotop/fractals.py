@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import pickle as pkl
+import matplotlib
+matplotlib.use('TkAgg')
+
 
 def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_path, plot=False,
                  L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, R=6050, test=False, **kwargs):
@@ -26,11 +29,11 @@ def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_p
     else:
         D_x = L_x
 
-    f = fftpack.dct(h_red, type=2, norm=norm)
+    f = fftpack.dct(h_red, type=2, norm=norm) / 2
     p = np.arange(len(f))
-    k = np.pi*p/D_x
+    k = p/D_x
     wl = 1/k
-    psd = 4*D_x*abs(f)**2
+    psd = D_x * f**2
     # psd_scale = 4*np.pi*R**2 * psd / (2*sh.to_wn(k, R=R) + 1)
 
     if test:
@@ -45,7 +48,7 @@ def dct_spectrum(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path=data_p
 
 
 def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig_path=fig_path,
-                 d=2700, dT=3000, alpha=2e-5, **kwargs):
+                 d=2700, dT=3000, alpha=2e-5, l_max=None, l_min=None, **kwargs):
     plt.figure()
     plt.plot(k, psd, c='xkcd:slate', label='Power spectral density from DCT-II')
     ax = plt.gca()
@@ -68,14 +71,22 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     else:
         wl_min, wl_max = nat_scales(case, ax=None, alpha=alpha, d=d, **kwargs)
 
-    beta = fit_slope(psd, k, k_min=1/wl_max, k_max=1/wl_min, ax=ax, fmt='g--', **kwargs)
+    if l_min is not None and l_max is not None:
+        k_min = sh.to_wn(l_min, R=6050)
+        k_max = sh.to_wn(l_max, R=6050)
+    else:
+        k_min = 1/wl_max
+        k_max = 1/wl_min
+    beta = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
     show_beta_guide(ax, x0=7e-4, y0=1e5, x1=2e-3, m=-2, c='k', lw=3, fontsize=10, log=True)
 
     fig = plt.gcf()
     plt.tight_layout()
-    # plt.show()
+
     if save:
         plot_save(fig, fname='DCT_'+case, fig_path=fig_path, **kwargs)
+    else:
+        plt.show()
     return fig, ax
 
 
@@ -105,7 +116,7 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, norm
         pkl.dump((psd_mean, k), open(file, "wb"))
 
     if plot:
-        fig, ax = plot_fit_psd(psd_mean, k, dim=dim, case=case, alpha=alpha, d=d, **kwargs)
+        fig, ax = plot_fit_psd(psd_mean, k, dim=dim, case=case, alpha=alpha, d=d, data_path=data_path, **kwargs)
         return fig, ax
     else:
         return None, None
@@ -143,13 +154,17 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, fontsize=12, log
     ax.text((x0+x1)/2, (y0+y1)/2, r'$k^{-2}$', fontsize=fontsize, c=c)
 
 
-def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:light grey', lw=0.5, **kwargs):
-    df = ap.pickleio(case, suffix='_T', t1=t1, load=True,  data_path=data_path,**kwargs)
-    T_av, y = ap.time_averaged_profile_from_df(df, 'T_av')
-    uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')
-    dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, alpha_m=alpha, **kwargs)
+def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:light grey', lw=0.5, data_path=data_path, **kwargs):
 
-    min_scale = dic_av['delta_rh']*d
+    df = ap.pickleio(case, suffix='_T', t1=t1, load=True,  data_path=data_path, **kwargs)
+    try:
+        T_av, y = ap.time_averaged_profile_from_df(df, 'T_av')
+        uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')
+        dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, alpha_m=alpha,
+                                        data_path=data_path, **kwargs)
+        min_scale = dic_av['delta_rh']*d
+    except KeyError:
+        min_scale = np.mean(df.delta_rh.to_numpy())
     max_scale = 2*d
     # print('min wl =', min_scale, ', k =', 1/min_scale)
     # print('max wl =', max_scale, ', k =', 1/max_scale)

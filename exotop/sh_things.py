@@ -124,8 +124,9 @@ def parseval_rms(psd, k):
 
 
 def to_deg(k, R=6050):
-    return k * np.pi * R - 0.5
+    return k * 2* np.pi * R - 0.5
 
 
 def to_wn(l, R=6050):
-    return (l + 0.5) / (np.pi * R)  # denominator is planet radius
+    return (l + 0.5) / (2*np.pi*R)
+    # return (l + 0.5) / (np.pi * R)  # denominator is planet radius

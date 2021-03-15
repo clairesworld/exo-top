@@ -1623,9 +1623,13 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                               data_path=data_path_bullard, alpha=1,
                               save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
                               cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None,
-                              cticklabels=None,
+                              cticklabels=None, errortype='time',
                               ylabel='Model', xlabel='Data', errs=None, elw=1, ecapsize=5, crot=0, discrete=True,
                               errorsize=9, sigma=2, **kwargs):
+
+
+    print('errortype = standard to use errorbars are SE of the mean - TODO check log errorbars')
+
     if averagescheme is None:
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:
@@ -1686,14 +1690,24 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                 elif z_name == 'regime':
                     z_data_all.append(regime_grid[jj][ii])
 
-                qdict = pro.parameter_percentiles(case, df={'h_data': h_times, 'x': x_times},
+                d_times = {'h_data': h_times, 'x': x_times}
+                qdict = pro.parameter_percentiles(case, df=d_times,
                                                   keys=quants.keys(), plot=False, sigma=sigma)
 
                 for key in quants.keys():
-                    try:
-                        quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
-                    except ValueError:  # haven't added anything yet
-                        quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
+                    if errortype is 'time':
+                        try:
+                            quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
+                        except ValueError:  # haven't added anything yet
+                            quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
+                    elif errortype is 'standard':
+                        SE_mean = np.std(d_times[key]) / np.sqrt(len(d_times[key]))  # todo: log!
+                        avg = np.mean(d_times[key])
+                        SE_vec = [avg - SE_mean, avg, avg + SE_mean]
+                        try:
+                            quants[key] = np.vstack((quants[key], SE_vec))  # add to array of errors
+                        except ValueError:  # haven't added anything yet
+                            quants[key] = SE_vec.reshape((1, 3))  # reshape so it works if you just have one row
 
     if twocomponent:
         x0 = [a[0] for a in x_data_all]

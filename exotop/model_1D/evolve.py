@@ -227,7 +227,7 @@ def recalculate(t, pl, verbose=False, **kwargs):
 
     # core
 
-    pl.TBL_c = th.bdy_thickness(dT=pl.dT_m, d_m=pl.d_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c,
+    pl.TBL_c = th.bdy_thickness(dT=abs(pl.T_c - pl.dT_m), d_m=pl.d_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c,
                                 kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, rho_m=pl.rho_m, **kwargs)
     pl.q_core = th.q_bl(deltaT=pl.T_c - pl.T_m, k=pl.k_lm, d_bl=pl.TBL_c, beta=pl.beta_c, **kwargs)
     pl.Q_core = th.Q_bl(q=pl.q_core, R=pl.R_c)
