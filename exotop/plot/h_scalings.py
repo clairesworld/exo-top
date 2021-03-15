@@ -33,7 +33,7 @@ fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_
 
 _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
-                   beta0=[0.1, -0.15], sigma=1, fiterror=True,
+                   beta0=[0.1, -0.15], sigma=1, fiterror=False,
                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=labelsize, legend=True,
                    xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False,
