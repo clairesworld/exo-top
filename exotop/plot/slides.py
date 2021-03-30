@@ -5,7 +5,6 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
 from postaspect import plt_aspect as plat  # noqa: E402
 from useful_and_bespoke import dark_background, cmap_from_list
 import matplotlib.lines as mlines
-import matplotlib.ticker as ticker
 
 ticksize = 22
 axissize = 40

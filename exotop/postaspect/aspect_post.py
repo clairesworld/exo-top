@@ -29,10 +29,13 @@ def find_ts(case, t, dat=None, data_path=data_path_bullard, **kwargs):
     return ts
 
 
-def read_topo_stats(case, ts, data_path=data_path_bullard, **kwargs):
+def read_topo_stats(case, ts, data_path=data_path_bullard, fast=False, **kwargs):
+    if fast:
+        pass
+
     df = pd.read_csv(data_path + 'output-' + case + '/dynamic_topography_surface.' + '{:05}'.format(ts), header=None,
                      names=['x', 'y', 'h'], skiprows=1, index_col=False, delimiter=r"\s+", engine='python')
-    return df['x'], df['h']
+    return df['x'].to_numpy(), df['h'].to_numpy()
 
 
 def reshape_one_input(A, proper, default):
