@@ -12,13 +12,15 @@ R_p = 6371
 d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph
 # d, dT, alpha = 2700, 3000, 3e-5  # test
 
-eta_use =
+regimes_use = ['chaotic']
 for ii, eta in enumerate(eta_ls):  # across eta_ls
     cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
     labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
-        for jj, Ra in enumerate(Ra_ls):
+    for jj, Ra in enumerate(Ra_ls):
+        if regime_grid_td[ii, jj] in regimes_use:
             case = cases_ii[jj]
             t1 = t1_grid[ii, jj]
+            print('calculating spectrum for', case)
             fig, ax = sh.dct_spectrum_avg(case, L_x=8,
                                           dim=False, R_p=d, d=d, dT=dT, alpha=alpha,
                                           t0=t1, x_res=1, t_res=1,
@@ -27,4 +29,4 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
                                           plot=True, load=False, dump=True, save=True, y0_guide=1e0,
                                           # l_min=30, l_max=300,
                                           )
-            print('finished', case)
+            print('    finished')

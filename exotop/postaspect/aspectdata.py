@@ -676,23 +676,27 @@ class Aspect_Data():
                 spline = False
 
         if not spline:
-            # find index of max interior velocity
-            f_prime = np.gradient(uv_mag_av)  # differential approximation
-            idx = np.where(np.diff(np.sign(f_prime)))[0]  # Find the inflection point.
-            y_prime, mag_av_prime = y[idx:], uv_mag_av[idx:]
+            try:
+                # find index of max interior velocity
+                f_prime = np.gradient(uv_mag_av)  # differential approximation
+                idx = np.where(np.diff(np.sign(f_prime)))[0]  # Find the inflection point.
+                y_prime, mag_av_prime = y[idx:], uv_mag_av[idx:]
 
-            grad = np.diff(mag_av_prime, axis=0) / np.diff(y_prime)
-            grad_max = np.min(grad)  # actually want the minimum because you expect a negative slope
-            i_max = np.nonzero(grad == grad_max)[0][0]  # would add one to take right hand value
-            mag_grad_max = uv_mag_av[i_max]
-            y_grad_max = y_prime[i_max]
-            # intersection of this tangent with y-axis
-            x_grad_max0 = mag_av_prime[np.nonzero(grad == grad_max)[0][0] - tol]
-            y_grad_max0 = y_prime[np.nonzero(grad == grad_max)[0][0] - tol]
-            x_grad_max1 = mag_av_prime[np.nonzero(grad == grad_max)[0][0] + tol]
-            y_grad_max1 = y_prime[np.nonzero(grad == grad_max)[0][0] + tol]
-            m1 = (y_grad_max1 - y_grad_max0) / (x_grad_max1 - x_grad_max0)
-            b = y_grad_max - m1 * mag_grad_max
+                grad = np.diff(mag_av_prime, axis=0) / np.diff(y_prime)
+                grad_max = np.min(grad)  # actually want the minimum because you expect a negative slope
+                i_max = np.nonzero(grad == grad_max)[0][0]  # would add one to take right hand value
+                mag_grad_max = uv_mag_av[i_max]
+                y_grad_max = y_prime[i_max]
+                # intersection of this tangent with y-axis
+                x_grad_max0 = mag_av_prime[np.nonzero(grad == grad_max)[0][0] - tol]
+                y_grad_max0 = y_prime[np.nonzero(grad == grad_max)[0][0] - tol]
+                x_grad_max1 = mag_av_prime[np.nonzero(grad == grad_max)[0][0] + tol]
+                y_grad_max1 = y_prime[np.nonzero(grad == grad_max)[0][0] + tol]
+                m1 = (y_grad_max1 - y_grad_max0) / (x_grad_max1 - x_grad_max0)
+                b = y_grad_max - m1 * mag_grad_max
+            except Exception as e:
+                print('WARNING: error in lid thickness, setting nan')
+                n = np.nan
 
         if plot:
             ax.scatter(mag_grad_max, y_grad_max, c='k',
@@ -706,7 +710,7 @@ class Aspect_Data():
             raise Exception('ERROR in lid thickness: y_l ='+str(b))
         try:
             return b[0]  # y_L
-        except IndexError:
+        except (IndexError, TypeError):
             return b
     
     def lid_base_temperature(self, n=None, T=None, T_av=None, delta_L=None, uv_mag=None, y=None, plot=False,
