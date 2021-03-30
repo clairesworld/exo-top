@@ -696,7 +696,7 @@ class Aspect_Data():
                 b = y_grad_max - m1 * mag_grad_max
             except Exception as e:
                 print('WARNING: error in lid thickness, setting nan')
-                n = np.nan
+                b = np.nan
 
         if plot:
             ax.scatter(mag_grad_max, y_grad_max, c='k',
