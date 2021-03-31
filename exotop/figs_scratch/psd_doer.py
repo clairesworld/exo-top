@@ -18,7 +18,7 @@ fig, ax = sh.dct_spectrum_avg(case, L_x=8,
                               dim=False, R_p=d, d=d, dT=dT, alpha=alpha,
                               ts0=ts0, tsf=tsf, x_res=1, t_res=100,
                               test=False, data_path=data_path, check_norm=False,
-                              plot=True, load=True, dump=False, save=False, y0_guide=1e0,
+                              plot=True, load=False, dump=False, save=False, y0_guide=1e0,
                               #l_min=30, l_max=300,
                               )
 
@@ -32,8 +32,8 @@ P, k = sh.load_spectrum_wavenumber(fpath=path, fname=f, has_header=True, wl=True
 ax.plot(k, P, label='Hoggard')
 
 ax.legend(fontsize=16, frameon=False, bbox_to_anchor=(1.05, 1), loc='upper left', )
-plt.xlim([1e-4, 2e-2])
-plt.ylim([1e-2, 1e8])  # Hoggard: [1e-2, 1e3]
+# plt.xlim([1e-4, 2e-2])
+# plt.ylim([1e-2, 1e8])  # Hoggard: [1e-2, 1e3]
 # xticks = ax.get_xticks()
 # ax.set_xticks(xticks)
 # ax.set_xticklabels([1 / tick for tick in xticks])

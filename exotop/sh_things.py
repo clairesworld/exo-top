@@ -269,8 +269,10 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, data
             tsf = ap.find_ts(case, 1e9, data_path=data_path, verbose=False)  # use last
 
         psd_grid = []
-        print('    Averaging', len(np.arange(ts0, tsf+1, t_res)), 'timesteps')
+        print('Averaging', len(np.arange(ts0, tsf+1, t_res)), 'timesteps')
         for ts in np.arange(ts0, tsf+1, t_res):
+            if np.mod(ts, 1000) == 0:
+                print('    ts =', ts, '/', tsf)
             psd_i, k = dct_spectrum_jfr(case, ts0=ts, x_res=x_res, data_path=data_path, plot_test=False,
                                         L_x=L_x, dim=dim, d=d, dT=dT, alpha=alpha, **kwargs)
             psd_grid.append(psd_i)
@@ -317,7 +319,7 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
         secax.set_xlabel('spherical harmonic degree', fontsize=labelsize)
     else:
         plt.xlabel('$k$ (nondimensional distance)$^{-1}$', fontsize=labelsize)
-        plt.ylabel('$P_k$ (nondimensional distance)$^2$', fontsize=labelsize)
+        plt.ylabel('$P_k$ (nondimensional distance)$^3$', fontsize=labelsize)
     # plt.title(case[:12])
     ax.text(0.95, 0.95, case[:12], va='top', ha='right', transform=ax.transAxes, fontsize=labelsize)
     if xlim is not None:
@@ -338,9 +340,9 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     else:
         k_min = 1/wl_max
         k_max = 1/wl_min
-        print('k min', k_min, 'k max', k_max)
-        print('real k', np.min(k), '--', np.max(k))
-        print('l min', to_deg(k_min), 'l max', to_deg(k_max))
+        # print('k min', k_min, 'k max', k_max)
+        # print('real k', np.min(k), '--', np.max(k))
+        # print('l min', to_deg(k_min), 'l max', to_deg(k_max))
     beta = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
     show_beta_guide(ax, x0=x0_guide, y0=y0_guide, x1=x1_guide, m=-2, c='k', lw=3, log=True, **kwargs)
 
@@ -362,7 +364,13 @@ def fit_slope(S, k, k_min=None, k_max=None, ax=None, i_min=0, i_max=-1, fmt='g-'
     kv = k[i_min:i_max+1]
     Sv = S[i_min:i_max+1]
 
-    intercept, slope = np.polynomial.polynomial.polyfit(np.log10(kv), np.log10(Sv), deg=1)
+    try:
+        intercept, slope = np.polynomial.polynomial.polyfit(np.log10(kv), np.log10(Sv), deg=1)
+    except TypeError as e:
+        print('k', k)
+        print('  min, max', k_min, k_max)
+        raise e
+
     intercept = 10**intercept
     print('slope, intercept:', slope, intercept)
     beta = -slope
@@ -410,8 +418,8 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         ylim = ax.get_ylim()
         y_percent = 0.1
         yt = 10**(y_percent*(np.log10(ylim[1]) - np.log10(ylim[0])) + np.log10(ylim[0]))
-        ax.text(1 / max_scale, yt, r'$2d$', va='top', ha='left', fontsize=11, c=c)
-        ax.text(1 / min_scale, yt, r'$\delta_{\rm rh}$', va='top', ha='left', fontsize=11, c=c)
+        # ax.text(1 / max_scale, yt, r'$2d$', va='top', ha='left', fontsize=11, c=c)
+        # ax.text(1 / min_scale, yt, r'$\delta_{\rm rh}$', va='top', ha='left', fontsize=11, c=c)
 
         return ax, min_scale, max_scale
     else:

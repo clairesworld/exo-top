@@ -7,16 +7,20 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm, Normalize
-import matplotlib.lines as mlines  # noqa: E402
+import matplotlib.lines as mlines
 from scipy.interpolate import interp1d
-from postaspect import aspectdata as ad  # noqa: E402
-from postaspect import aspect_post as pro  # noqa: E402
-from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour, cmap_path  # noqa: E402
+from postaspect.ani_aspect import static_T_field
+from postaspect import aspectdata as ad
+from postaspect import aspect_post as pro
+from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour, \
+    cmap_path  # noqa: E402
 from useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, not_iterable, \
-    colourbar, cmap_from_ascii, not_string, minmaxnorm, mahalanobis  # noqa: E402
+    colourbar, cmap_from_ascii, not_string, minmaxnorm, mahalanobis
 from matplotlib import rc
 
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
+
+
 # rc('text', usetex=True)
 
 def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
@@ -120,7 +124,8 @@ def getx_fromdf(Ra, eta, df=None, case=None, which_x=None, averagescheme=None, d
         x = pro.Ra_interior(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'].to_numpy())
 
     elif 'Ra_F_eff' in which_x:
-        x = pro.Ra_F_eff(d_eta=float(eta), T_i=df['T_i'].to_numpy(), delta_L=df['delta_L'].to_numpy(), q_sfc=df['Nu'].to_numpy())
+        x = pro.Ra_F_eff(d_eta=float(eta), T_i=df['T_i'].to_numpy(), delta_L=df['delta_L'].to_numpy(),
+                         q_sfc=df['Nu'].to_numpy())
 
     elif 'Ra' in which_x:
         x = float(Ra)
@@ -285,8 +290,8 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
     if fit:
         ax = fit_cases_on_plot(yx_rms_all, ax, dist=D_m2_all,
-                                   c_list=colorize(np.log10(np.unique(z_vec)), cmap=cmap, vmin=vmin, vmax=vmax)[0],
-                                   labelsize=labelsize, n_fitted=len(which_xs) + 1, cmap=cmap, **kwargs)
+                               c_list=colorize(np.log10(np.unique(z_vec)), cmap=cmap, vmin=vmin, vmax=vmax)[0],
+                               labelsize=labelsize, n_fitted=len(which_xs) + 1, cmap=cmap, **kwargs)
 
     if show_isoviscous:
         df_JFR = pro.read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
@@ -434,12 +439,11 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         avg = np.mean(d_times[key])
                         SE_vec = np.array([avg - SE_mean, avg, avg + SE_mean])
                         print(key, 'mean:', avg, 'SE of mean:', SE_mean)
-                        d_times[key+'_SE'] = SE_mean
+                        d_times[key + '_SE'] = SE_mean
                         try:
                             quants[key] = np.vstack((quants[key], SE_vec))  # add to array of errors
                         except ValueError:  # haven't added anything yet
                             quants[key] = SE_vec.reshape((1, 3))  # reshape so it works if you just have one row
-
 
     # get errorbars and plot them
     err = dict.fromkeys(quants.keys())
@@ -486,15 +490,15 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             xerr = sdx_all
             yerr = sdy_all
         elif fiterror and errortype is 'standard':
-            xerr = d_times[which_x+'_SE']
+            xerr = d_times[which_x + '_SE']
             yerr = d_times['h_rms_SE']
         else:
             xerr = 1
             yerr = 1
 
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
-                                   xerr=xerr, yerr=yerr, legend=legend, lw=lw,
-                                   sigma=sigma, **kwargs)
+                               xerr=xerr, yerr=yerr, legend=legend, lw=lw,
+                               sigma=sigma, **kwargs)
 
     if show_isoviscous:
         df_JFR = pro.read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
@@ -945,11 +949,18 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                     ax.imshow(img)
                     print('    Grabbing graphical output for', case)
                 except FileNotFoundError:
-                    print('    Graphical output not found:', fgraph)
-                    ax.text(0.01, 0.95, '\n\n\nno image saved',
-                            horizontalalignment='left', verticalalignment='top',
-                            transform=ax.transAxes, fontsize=labelsize)
-                    # fig.delaxes(ax)
+                    try:
+                        fig, ax = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10,
+                                                 cmap='gist_heat', c='k', cbar=False, title='', fig=fig, ax=ax,
+                                                 shading='nearest', return_artists=False, save=False, i_n=-1, avg=False)
+                        print('    Plotting graphical output from solution for', case)
+                    except Exception as e:
+                        print(e)
+                        print('    Graphical output not found:', fgraph)
+                        ax.text(0.01, 0.95, '\n\n\nno image saved',
+                                horizontalalignment='left', verticalalignment='top',
+                                transform=ax.transAxes, fontsize=labelsize)
+                        # fig.delaxes(ax)
 
             numplotted += 1
         else:
@@ -1592,11 +1603,11 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
     newlabel = r'$C = {:.2f} \pm {:.2f}$'.format(const, const_err)
     if expon is not None:
         # newlabel = newlabel + '\np = {:.3f} +- {:.3f}'.format(expon[0], expon_err[0])
-        newlabel = newlabel + '\n'+r'$p = {:.2f} \pm {:.2f}$'.format(expon[0], expon_err[0])
+        newlabel = newlabel + '\n' + r'$p = {:.2f} \pm {:.2f}$'.format(expon[0], expon_err[0])
 
     if len(expon) > 1:
         # newlabel = newlabel + '\nq = {:.3f} +- {:.3f}'.format(expon[1], expon_err[1])
-        newlabel = newlabel + '\n'+r'$q = {:.2f} \pm {:.2f}$'.format(expon[1], expon_err[1])
+        newlabel = newlabel + '\n' + r'$q = {:.2f} \pm {:.2f}$'.format(expon[1], expon_err[1])
 
     # plot
     xprime = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1])
@@ -1650,8 +1661,6 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                               cticklabels=None, errortype='time',
                               ylabel='Model', xlabel='Data', errs=None, elw=1, ecapsize=5, crot=0, discrete=True,
                               errorsize=9, sigma=2, **kwargs):
-
-
     print('errortype = standard to use errorbars are SE of the mean - TODO check log errorbars')
 
     if averagescheme is None:
@@ -1765,7 +1774,8 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
             title = 'Fit to h = ({:.2e}'.format(const) + r') Ra' + '^{:.3f}'.format(
                 expon[0]) + r' $\Delta \eta$' + '^{:.3f}'.format(expon[1])
         elif which_x == 'h_components':
-            title = 'Fit to h = ({:.2f}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(expon)
+            title = 'Fit to h = ({:.2f}'.format(const) + r') $\alpha \Delta T_{rh} \delta_{rh}$' + '^{:.3f}'.format(
+                expon)
         elif 'Ra' in which_x:
             title = 'Fit to h = ({:.2f}'.format(const) + ') Ra^{:.3f}'.format(expon)
     ax.set_title(title, fontsize=labelsize)

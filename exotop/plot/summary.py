@@ -1,8 +1,9 @@
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, \
-    load_grid    # noqa: E402
+    load_grid  # noqa: E402
 from postaspect import plt_aspect as plat  # noqa: E402
 from postaspect import aspect_post as ap
+
 # import pstats
 
 
@@ -14,9 +15,9 @@ from postaspect import aspect_post as ap
 #                         data_path=data_path,
 #                         postprocess_kwargs=postprocess_kwargs)
 
-ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_Nu'], regime_names=regime_names_td,
-                          t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
-                          load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
+ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
+                        t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
+                        load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
 # ## plot summaries across delta eta
 
@@ -29,10 +30,10 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
             cases_ii, labels=labels_ii, t1=t1_grid[ii], save=True, load=load_grid[ii],
             fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta, c_rms=c_rms, c_peak=c_peak,
             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td[ii],
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
+            regime_grid=regime_grid_td[ii],
             postprocess_kwargs=postprocess_kwargs,
         )
-
 
 # plot summaries across Ra
 
@@ -43,12 +44,12 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
         labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
         plat.subplots_cases(
             cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
-            fname='all-Ra' + Ra, suptitle='Ra = '+Ra, c_rms=c_rms, c_peak=c_peak,
+            fname='all-Ra' + Ra, suptitle='Ra = ' + Ra, c_rms=c_rms, c_peak=c_peak,
             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt, regime_grid=regime_grid_td.T[ii],
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
+            regime_grid=regime_grid_td.T[ii],
             postprocess_kwargs=postprocess_kwargs,
         )
-
 
 # compare 64 and 129 resolution for Ra=3e7
 # fig, ax = plat.case_subplots(
@@ -58,14 +59,13 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
 #     includepd=True, # turn on once you know where steady state starts
 #    )
 
-# eta 1e9
-fig, ax = plat.subplots_cases(
-    ['Ra1e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
-       labels=['Ra 1e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path,
-    t1=[0, 0], load='auto', fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
-    includepd=False, includeTz=False, # turn on once you know where steady state starts
-   )
-
+# # eta 1e9 --> this has been subsumed into above
+# fig, ax = plat.subplots_cases(
+#     ['Ra1e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
+#     labels=['Ra 1e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path,
+#     t1=[0.085, 0.07], load='auto', fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
+#     includepd=False, includeTz=False,  # turn on once you know where steady state starts
+# )
 
 ## look at individual case data
 #
