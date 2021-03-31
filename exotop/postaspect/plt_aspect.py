@@ -501,10 +501,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     elif legend and colourful:
         # show colours outside
         clist = []
-        print('zz_all unique', np.unique(zz_all))
         for zz, colour in enumerate(c_rms): # only used z vec
             if zz in np.unique(zz_all):
-                print('appending colour at', zz)
                 clist.append(colour)
         ax = colourised_legend(ax, clist=clist, cleglabels=cleglabels, lw=0, ls='--', marker=mark, markersize=ms,
                                legsize=legsize, ncol=1)
@@ -2020,5 +2018,65 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
     return fig, ax
 
 
-def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', data_path=data_path_bullard, fig_path=fig_path_bullard):
-    pass
+def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=None, include_regimes=None,
+                      data_path=data_path_bullard, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
+                      fig=None, ax=None, figsize=(5,5), z_name='Ra', vmin=None, vmax=None, alpha=1, labelsize=16, ticksize=12,
+                      marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density', save=True,
+                      norm='l2', **kwargs):
+    import pickle as pkl
+    from sh_things import k_to_l, l_to_k
+
+    if fig is None and ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=figsize)
+    if z_name == 'Ra':
+        z_vec = [float(z) for z in Ra_ls]
+    elif z_name == 'eta':
+        z_vec = [float(z) for z in eta_ls]
+
+    zz_all = []
+    k_all = []
+    psd_all = []
+    # load spectra
+    for jj, eta_str in enumerate(eta_ls):
+        cases, Ra_var = pro.get_cases_list(Ra_ls, eta_str, end_grid[jj])
+        for ii, case in enumerate(cases):
+            if regime_grid[jj][ii] in include_regimes:
+                fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
+                if os.path.isfile(fname):
+                    psd, k = pkl.load(open(fname, "rb"))
+                    k_all.append(k)
+                    psd_all.append(psd)
+                    if z_name == 'Ra':
+                        zz_all.append(ii)
+                    elif z_name == 'eta':
+                        zz_all.append(jj)
+                else:
+                    print(fname, 'not found')
+
+    # plot
+    if vmin is None:
+        vmin = np.min(zz_all)
+    if vmax is None:
+        vmax = np.max(zz_all)
+    clist = colorize(zz_all, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+
+    for zz in range(len(zz_all)):
+        k = k_all[zz]
+        psd = psd_all[zz]
+        if k[0] == 0:  # only wavenumbers greater than 0
+            k = k[1:]
+            psd = psd[1:]
+        if norm == 'l2':
+            l = k_to_l(k)
+            print('l', l)
+            psd_norm = psd/psd[0]
+        ax.plot(k, psd_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
+
+    ax.loglog()
+    ax.set_xlabel(xlabel, fontsize=labelsize)
+    ax.set_ylabel(ylabel, fontsize=labelsize)
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
+
+    if save:
+        plot_save(fig, fname=figname, **kwargs)
+    return fig, ax

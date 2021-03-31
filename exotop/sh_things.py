@@ -297,10 +297,9 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, data
 
 def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig_path='', xlim=None, ylim=None,
                  d=2700, dT=3000, alpha=2e-5, l_max=None, l_min=None, labelsize=18, R_p=6050, c_spec='xkcd:slate',
-                 x0_guide=7e-4, y0_guide=1e5, x1_guide=2e-3, **kwargs):
+                 x0_guide=7e-4, y0_guide=1e5, x1_guide=2e-3, show_deg=False, show=True, **kwargs):
     import matplotlib.ticker as ticker
     global R
-    R = R_p
 
     def to_deg(k):
         return k * 2 * np.pi * R - 0.5
@@ -309,17 +308,26 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
         return (l + 0.5) / (2 * np.pi * R)
         # return (l + 0.5) / (np.pi * R)  # denominator is planet radius
 
+    if k[0] == 0:  # only wavenumbers greater than 0
+        k = k[1:]
+        psd = psd[1:]
+
     plt.figure()
-    plt.plot(k, psd, '.-', lw=0.5, alpha=-.5, c=c_spec, label='Power spectral density from DCT-II')
+    plt.plot(k, psd, '.-', lw=0.5, alpha=0.5, c=c_spec, label='Power spectral density from DCT-II')
     ax = plt.gca()
     if dim:
         plt.xlabel('$k$, km$^{-1}$', fontsize=labelsize)
         plt.ylabel('$P_k$, km$^3$', fontsize=labelsize)
-        secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
-        secax.set_xlabel('spherical harmonic degree', fontsize=labelsize)
+        R = R_p
     else:
         plt.xlabel('$k$ (nondimensional distance)$^{-1}$', fontsize=labelsize)
         plt.ylabel('$P_k$ (nondimensional distance)$^3$', fontsize=labelsize)
+        R = 1
+    if show_deg:
+        print('k', k)
+        print('l', to_deg(k))
+        secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
+        secax.set_xlabel('spherical harmonic degree', fontsize=labelsize)
     # plt.title(case[:12])
     ax.text(0.95, 0.95, case[:12], va='top', ha='right', transform=ax.transAxes, fontsize=labelsize)
     if xlim is not None:
@@ -340,9 +348,6 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     else:
         k_min = 1/wl_max
         k_max = 1/wl_min
-        # print('k min', k_min, 'k max', k_max)
-        # print('real k', np.min(k), '--', np.max(k))
-        # print('l min', to_deg(k_min), 'l max', to_deg(k_max))
     beta = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
     show_beta_guide(ax, x0=x0_guide, y0=y0_guide, x1=x1_guide, m=-2, c='k', lw=3, log=True, **kwargs)
 
@@ -350,8 +355,8 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     plt.tight_layout()
     if save:
         plot_save(fig, fname='DCT_'+case, fig_path=fig_path, **kwargs)
-    # else:
-    #     plt.show()
+    elif show:
+        plt.show()
     return fig, ax
 
 
@@ -425,3 +430,10 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
     else:
         return min_scale, max_scale
 
+
+def k_to_l(k, R):
+    return k * 2 * np.pi * R - 0.5
+
+
+def l_to_k(l, R):
+    return (l + 0.5) / (2 * np.pi * R)
