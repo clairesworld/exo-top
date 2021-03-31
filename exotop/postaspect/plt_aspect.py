@@ -2041,8 +2041,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                     fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
                     if os.path.isfile(fname):
                         zn = plot_getx(Ra_ls[ii], eta_str, case=case, which_x='Ra_i_eff', averagescheme='timefirst',
-                                       data_path=data_path, load=True, postprocess_kwargs=None, return_all=False,
+                                       data_path=data_path, load=True, postprocess_kwargs=None, return_all=False, t1=0,
                                        **kwargs)
+                        print('zn', zn)
                         z_grid[jj, ii] = zn
         z_vec = z_grid.flatten()
 
