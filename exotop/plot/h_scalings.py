@@ -8,13 +8,14 @@ from postaspect import plt_aspect as plat
 
 load = True  # load_grid
 cmap = 'rainbow'  # 'art-nouveau-03'
+c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
 labelsize = 16
 ms = 10
 legsize = 12
 vmin = None  # 1
 vmax = None  # 3
 cleglabels = [r'$\Delta \eta = 10^{6}$', r'$\Delta \eta = 10^{7}$', r'$\Delta \eta = 10^{8}$', r'$\Delta \eta = 10^{9}$']
-figsize = (8, 5)  # (5, 5)
+figsize = (7, 5)  # (5, 5)
 
 """model versus data"""
 
@@ -40,7 +41,8 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=labelsize,
                    xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography', legsize=legsize, cleglabels=cleglabels,
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False, vmin=vmin, vmax=vmax,
-                   cmap=cmap, c_rms=None, fit=True, logx=True, logy=True, hscale=1, ms=ms,
+                   cmap=None, c_rms=c_rms,
+                   fit=True, logx=True, logy=True, ms=ms,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
                    regime_grid=regime_grid_td, figsize=figsize, errortype='standard', cbar=False)
 

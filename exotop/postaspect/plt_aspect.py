@@ -491,7 +491,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=True)
     elif legend and colourful:
         # show colours outside
-        ax = colourised_legend(ax, clist=c_rms, cleglabels=cleglabels, lw=0, ls='--', marker='o', markersize=ms,
+        ax = colourised_legend(ax, clist=c_rms, cleglabels=cleglabels, lw=0, ls='--', marker=mark, markersize=ms,
                                legsize=legsize, ncol=1)
 
     if fit:
