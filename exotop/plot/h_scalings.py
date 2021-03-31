@@ -30,7 +30,7 @@ fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_
                                          ylabel=r'Model $\Delta h_{rms}^\prime$',
                                          xlabel=r'Data $\Delta h_{rms}^\prime$')
 
-# all eta on one axis
+"""all eta on one axis"""
 
 
 _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,

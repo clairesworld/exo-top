@@ -15,7 +15,7 @@ from postaspect import aspect_post as pro
 from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour, \
     cmap_path  # noqa: E402
 from useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, not_iterable, \
-    colourbar, cmap_from_ascii, not_string, minmaxnorm, mahalanobis
+    colourbar, cmap_from_ascii, not_string, minmaxnorm, mahalanobis, colourised_legend
 from matplotlib import rc
 
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
@@ -2004,15 +2004,6 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
                                color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec=fc, fc=fc))
     return fig, ax
-
-
-def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersize=20, legsize=25, ncol=1):
-    handles = []
-    for jj, label in cleglabels:
-        handles.append(mlines.Line2D([], [], color=clist[jj], marker=marker, ls=ls,
-                                     markersize=markersize, lw=lw, label=label))
-    ax.legend(handles=handles, frameon=False, fontsize=legsize, ncol=ncol, bbox_to_anchor=(1.01, 1), loc='upper left')
-    return ax
 
 
 def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', data_path=data_path_bullard, fig_path=fig_path_bullard):
