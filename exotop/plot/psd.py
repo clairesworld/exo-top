@@ -18,7 +18,7 @@ regimes_use = ['chaotic']
 fig, ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
                                  include_regimes=regimes_use,
                                  data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
-                                 fig=None, ax=None, figsize=(8, 5), z_name='Ra', vmin=np.log10(1e8), vmax=np.log10(3e8),
+                                 fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', vmin=np.log10(1e8), vmax=np.log10(3e8),
                                  labelsize=16, ticksize=12,
                                  marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density',
                                  save=True,
