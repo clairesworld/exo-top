@@ -13,12 +13,21 @@ R_p = 6371
 # d, dT, alpha = 2700, 3000, 2e-5  # Venus
 d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph
 # d, dT, alpha = 2700, 3000, 3e-5  # test
+dim = False
+
+if dim:
+    y0_guide = 1e0
+    x0_guide, x1_guide = 7e-4, 2e-3
+else:
+    y0_guide = 1e0
+    x0_guide, x1_guide = 1e0, 3e0
 
 fig, ax = sh.dct_spectrum_avg(case, L_x=8,
-                              dim=True, R_p=d, d=d, dT=dT, alpha=alpha,
+                              dim=dim, R_p=d, d=d, dT=dT, alpha=alpha,
+                              y0_guide=y0_guide, x0_guide=x0_guide, x1_guide=x1_guide,
                               ts0=ts0, tsf=tsf, x_res=1, t_res=100,
                               test=False, data_path=data_path, check_norm=False,
-                              plot=True, load=False, dump=False, save=False, show=True, y0_guide=1e0, show_deg=True,
+                              plot=True, load=False, dump=False, save=False, show=True, show_deg=True,
                               #l_min=30, l_max=300,
                               )
 

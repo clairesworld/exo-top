@@ -400,7 +400,7 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
 
 def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=True, **kwargs):
 
-    df = ap.pickleio(case, suffix='_T', t1=t1, load=True,  data_path=data_path, **kwargs)
+    df = ap.pickleio(case, suffix='_T', t1=t1, load=True, data_path=data_path, **kwargs)
     try:
         T_av, y = ap.time_averaged_profile_from_df(df, 'T_av')
         uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')

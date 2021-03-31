@@ -2024,18 +2024,16 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density', save=True,
                       norm='l2', dim=False, d=1, alpha_m=1, dT=1, **kwargs):
     import pickle as pkl
-    from sh_things import k_to_l, l_to_k
+    from sh_things import k_to_l, l_to_k, nat_scales
 
     if fig is None and ax is None:
         fig, ax = plt.subplots(1, 1, figsize=figsize)
     if z_name == 'Ra':
-        z_vec = [float(z) for z in Ra_ls]
+        z_vec = [np.log10(float(z)) for z in Ra_ls]
     elif z_name == 'eta':
-        z_vec = [float(z) for z in eta_ls]
+        z_vec = [np.log10(float(z)) for z in eta_ls]
+    clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
-    zz_all = []
-    k_all = []
-    psd_all = []
     # load spectra
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = pro.get_cases_list(Ra_ls, eta_str, end_grid[jj])
@@ -2043,34 +2041,36 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             if regime_grid[jj][ii] in include_regimes:
                 fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
                 if os.path.isfile(fname):
-                    psd, k = pkl.load(open(fname, "rb"))
-                    k_all.append(k)
-                    psd_all.append(psd)
                     if z_name == 'Ra':
-                        zz_all.append(ii)
+                        zz = ii
                     elif z_name == 'eta':
-                        zz_all.append(jj)
+                        zz = jj
+
+                    S, k = pkl.load(open(fname, "rb"))
+                    if k[0] == 0:  # only wavenumbers greater than 0
+                        k = k[1:]
+                        S = S[1:]
+
+                    # wavenumber range where spectrum makes sense
+                    wl_min, wl_max = nat_scales(case, ax=None, alpha=alpha, d=d, dim=dim, data_path=data_path, **kwargs)
+                    k_min, k_max = 1 / wl_max, 1 / wl_min
+                    if k_min is not None and (k_min > np.min(k)):
+                        i_min = np.argmax(k >= k_min)
+                    if k_max is not None and (k_max < np.max(k)):
+                        i_max = np.argmax(k >= k_max)
+                    kv = k[i_min:i_max + 1]
+                    Sv = S[i_min:i_max + 1]
+
+                    if norm == 'l2':
+                        l = k_to_l(k, R=d)  # should be l=1.9674 at the top
+                        Sv_norm = Sv / Sv[0]  # actually normalise to first point inside k range
+                        S_norm = Sv / Sv[0]
+
+                    ax.plot(kv, Sv_norm, c=clist[zz], alpha=1, lw=lw, marker=marker)
+                    # ax.plot(k, S_norm, c=clist[zz], alpha=0.1, lw=lw, marker=marker)  # not in range
+
                 else:
                     print(fname, 'not found')
-
-    # plot
-    if vmin is None:
-        vmin = np.min(zz_all)
-    if vmax is None:
-        vmax = np.max(zz_all)
-    clist = colorize(zz_all, cmap=cmap, vmin=vmin, vmax=vmax)[0]
-
-    for zz in range(len(zz_all)):
-        k = k_all[zz]
-        psd = psd_all[zz]
-        if k[0] == 0:  # only wavenumbers greater than 0
-            k = k[1:]
-            psd = psd[1:]
-        if norm == 'l2':
-            l = k_to_l(k, R=d)
-            print('l', l)
-            psd_norm = psd/psd[0]
-        ax.plot(k, psd_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
 
     ax.loglog()
     ax.set_xlabel(xlabel, fontsize=labelsize)
