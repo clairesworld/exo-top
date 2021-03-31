@@ -184,11 +184,11 @@ def colourbar(mappable=None, ax=None, vmin=None, vmax=None, label='', labelsize=
     return cbar
 
 
-def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersize=20, legsize=25, ncol=1):
+def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersize=20, alpha=1, legsize=25, ncol=1):
     import matplotlib.lines as mlines
     handles = []
     for jj, label in enumerate(cleglabels):
-        handles.append(mlines.Line2D([], [], color=clist[jj], marker=marker, ls=ls,
+        handles.append(mlines.Line2D([], [], color=clist[jj], marker=marker, ls=ls, alpha=alpha,
                                      markersize=markersize, lw=lw, label=label))
     ax.legend(handles=handles, frameon=False, fontsize=legsize, ncol=ncol, bbox_to_anchor=(1.01, 1), loc='upper left')
     return ax

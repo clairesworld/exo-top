@@ -508,20 +508,19 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             xerr = 1
             yerr = 1
-
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
                                xerr=xerr, yerr=yerr, legend=legend, lw=lw,
                                sigma=sigma, **kwargs)
+
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
+    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
+    ax.set_title(title, fontsize=labelsize)
 
     if show_isoviscous:
         df_JFR = pro.read_JFR('2Dcart_fixed_T_stats_updated.csv', path='/raid1/cmg76/aspect/benchmarks/JFR/')
         Ra_iso = df_JFR['Ra']
         h_rms_iso = df_JFR['RMS_topo']
         ax.plot(Ra_iso, h_rms_iso, c='k', ls='--', lw=0.5)
-
-    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
-    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
-    ax.set_title(title, fontsize=labelsize)
     if legend and showpeak:
         leg = ax.legend(handles=[mlines.Line2D([], [], color=c_peak, marker='d', alpha=0.5,
                                                markersize=10, markeredgecolor=highlight_colour,
@@ -529,7 +528,6 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                                  mlines.Line2D([], [], color=c_rms, marker='o', alpha=0.5,
                                                markersize=10, label=r'$h_{rms}$, data')], fontsize=legsize)
         ax.add_artist(leg)
-
     if p_dimensionals is not None:
         def h_todim(u):
             return u * p_dimensionals['alpha_m'] * p_dimensionals['dT_m'] * p_dimensionals['d_m']

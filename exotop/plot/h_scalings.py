@@ -7,28 +7,29 @@ from postaspect import plt_aspect as plat
 """setup"""
 
 load = True  # load_grid
-cmap = 'art-nouveau-03'
+cmap = 'rainbow'  # 'art-nouveau-03'
 labelsize = 16
 ms = 10
 legsize = 12
 vmin = None  # 1
 vmax = None  # 3
-cleglabels = [r'$\Delta \eta = 10^{5}$', r'$\Delta \eta = 10^{6}$', r'$\Delta \eta = 10^{7}$', r'$\Delta \eta = 10^{8}$']
+cleglabels = [r'$\Delta \eta = 10^{6}$', r'$\Delta \eta = 10^{7}$', r'$\Delta \eta = 10^{8}$', r'$\Delta \eta = 10^{9}$']
+figsize = (8, 5)  # (5, 5)
 
 """model versus data"""
 
-fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
-                                         end_grid=end_grid, literature_file=None, legend=False, ms=ms,
-                                         postprocess_kwargs=postprocess_kwargs, averagescheme='timefirst',
-                                         ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
-                                         # clist=['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow'],
-                                         cmap=cmap, z_name='eta', fname='model-data-chaotic_timeavg',
-                                         save=True, include_regimes=['chaotic'], errs=[0.5, 0.2, 0.1, 0.05],
-                                         fig_fmt=fig_fmt, vmin=vmin, vmax=vmax,
-                                         show_cbar=False, figsize=(5, 5), errortype='standard',
-                                         title=r'Fit to $C$ Ra$_{i,eff}^p$',
-                                         ylabel=r'Model $\Delta h_{rms}^\prime$',
-                                         xlabel=r'Data $\Delta h_{rms}^\prime$')
+# fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
+#                                          end_grid=end_grid, literature_file=None, legend=False, ms=ms,
+#                                          postprocess_kwargs=postprocess_kwargs, averagescheme='timefirst',
+#                                          ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
+#                                          # clist=['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow'],
+#                                          cmap=cmap, z_name='eta', fname='model-data-chaotic_timeavg',
+#                                          save=True, include_regimes=['chaotic'], errs=[0.5, 0.2, 0.1, 0.05],
+#                                          fig_fmt=fig_fmt, vmin=vmin, vmax=vmax,
+#                                          show_cbar=False, figsize=figsize, errortype='standard',
+#                                          title=r'Fit to $C$ Ra$_{i,eff}^p$',
+#                                          ylabel=r'Model $\Delta h_{rms}^\prime$',
+#                                          xlabel=r'Data $\Delta h_{rms}^\prime$')
 
 """all eta on one axis"""
 
@@ -41,8 +42,8 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False, vmin=vmin, vmax=vmax,
                    cmap=cmap, c_rms=None, fit=True, logx=True, logy=True, hscale=1, ms=ms,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td, figsize=(5, 5), errortype='standard', cbar=False)
-#
+                   regime_grid=regime_grid_td, figsize=figsize, errortype='standard', cbar=False)
+
 # _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
 #                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra',
 #                    beta0=[0.1, -0.15], sigma=1, fiterror=False,
