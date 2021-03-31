@@ -469,9 +469,11 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 except Exception as e:
                     cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
                     c_rms = colorize(means[which_x], cmap=cmap, vmin=vmin, vmax=vmax)[0]
-            elif c_rms is not None and (len(c_rms) != len(jj_all)):
+            elif (c_rms is not None) and (len(c_rms) != len(jj_all)):
                 # old version
-                c_rms = c_rms[jj_all]
+                print('c_rms', c_rms)
+                print('jj_all', jj_all)
+                c_rms = [c_rms[idx] for idx in jj_all]
             for pp in range(len(means[which_x])):
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:, pp]]).T,
                             xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw, alpha=alpha,
