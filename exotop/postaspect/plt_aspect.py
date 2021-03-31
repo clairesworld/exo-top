@@ -2022,7 +2022,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       data_path=data_path_bullard, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
                       fig=None, ax=None, figsize=(5,5), z_name='Ra', vmin=None, vmax=None, alpha=1, labelsize=16, ticksize=12,
                       marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density', save=True,
-                      norm='min_l', dim=False, d=1, alpha_m=1, dT=1, **kwargs):
+                      norm='min_l', dim=False, d=1, alpha_m=1, dT=1, cbar=False, **kwargs):
     import pickle as pkl
     import sh_things as sh
 
@@ -2099,6 +2099,14 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_ylabel(ylabel, fontsize=labelsize)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
+
+    if cbar:
+        if cmap is None:
+            print('cbar not implemented without cmap')
+        else:
+            cax = colourbar(mappable=None, ax=ax, vmin=vmin, vmax=vmax, label=z_name, labelsize=labelsize,
+                            ticksize=ticksize, ticks=None, ticklabels=None, labelpad=17,
+                            rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=True)
 
     if save:
         plot_save(fig, fname=figname, **kwargs)
