@@ -157,7 +157,7 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
                 dat_new.read_stats_heatflux(**kwargs)
                 if at_sol:
                     if not hasattr(dat_new, 'sol_files'):
-                        dat_new.read_stats_sol_files()
+                        dat_new.read_stats_sol_files(**kwargs)
                     sol_new = dat_new.sol_files
                     df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                               t1=np.maximum(t1, t1_new),  # whichever comes later in time
@@ -1014,8 +1014,10 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                     else:
                         load = 'auto'
                     for ip, suffix in enumerate(psuffixes):
+                        print('eta is 1e9', eta_str == '1e9')
                         if eta_str == '1e9':
                             col_vis = 23
+                            print('setting col vis', col_vis)
                         else:
                             col_vis = 20
                         pickleio(case, suffix=suffix, t1=t1_ii,
