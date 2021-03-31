@@ -379,19 +379,23 @@ class Aspect_Data():
         files = np.zeros(len(data), dtype=np.int64)
         #  find last instance that's not ""
         for n, d in enumerate(data):
-            s = d[-14:]
-            if not s.decode()=='""':
+            try:
+                s = d[-14:]
+            except IndexError as e:
+                print('s =', s)
+                raise e
+            if not s.decode() == '""':
                 last = int(re.search(r'\d+', s.decode()).group(0))
             files[n] = last
         self.sol_files = files
         return files
 
 
-    def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, i_vis=20, **kwargs):
+    def find_time_at_sol(self, n=None, sol_files=None, return_indices=True, **kwargs):
         # input solution file and get first timestep - for n or all solutions
         # n is the number in the solution filename
         if sol_files is None:
-            sol_files = self.read_stats_sol_files(col_vis=i_vis, **kwargs)
+            sol_files = self.read_stats_sol_files(**kwargs)
         u, indices = np.unique(sol_files, return_index=True)
         if return_indices:
             if n is None:

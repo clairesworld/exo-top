@@ -122,9 +122,9 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
                         if at_sol:
                             print('      Checking for new solutions...')
                             sol_f_old = df.sol.iat[-1]
-                            sol_new = dat_new.read_stats_sol_files()
+                            sol_new = dat_new.read_stats_sol_files(**kwargs)
                             sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
-                            t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False)
+                            t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False, **kwargs)
                         else:
                             print('      Checking for new timesteps...')
                             time_f_old = df.time.iat[-1]
@@ -1014,8 +1014,12 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                     else:
                         load = 'auto'
                     for ip, suffix in enumerate(psuffixes):
+                        if eta_str == '1e9':
+                            col_vis = 23
+                        else:
+                            col_vis = 20
                         pickleio(case, suffix=suffix, t1=t1_ii,
-                                 data_path=data_path, load=load, **kwargs)
+                                 data_path=data_path, load=load, col_vis=col_vis, **kwargs)
 
 
 # def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', data_path=data_path_bullard,
