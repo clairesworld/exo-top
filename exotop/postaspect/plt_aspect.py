@@ -2022,7 +2022,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       data_path=data_path_bullard, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
                       fig=None, ax=None, figsize=(5,5), z_name='Ra', vmin=None, vmax=None, alpha=1, labelsize=16, ticksize=12,
                       marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density', save=True,
-                      norm='l2', **kwargs):
+                      norm='l2', dim=False, d=1, alpha_m=1, dT=1, **kwargs):
     import pickle as pkl
     from sh_things import k_to_l, l_to_k
 
@@ -2067,7 +2067,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             k = k[1:]
             psd = psd[1:]
         if norm == 'l2':
-            l = k_to_l(k)
+            l = k_to_l(k, R=d)
             print('l', l)
             psd_norm = psd/psd[0]
         ax.plot(k, psd_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
