@@ -348,7 +348,7 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     else:
         k_min = 1/wl_max
         k_max = 1/wl_min
-    beta = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
+    beta, intercept = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
     show_beta_guide(ax, x0=x0_guide, y0=y0_guide, x1=x1_guide, m=-2, c='k', lw=3, log=True, **kwargs)
 
     fig = plt.gcf()
@@ -360,14 +360,18 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     return fig, ax
 
 
-def fit_slope(S, k, k_min=None, k_max=None, ax=None, i_min=0, i_max=-1, fmt='g-', **kwargs):
+def fit_slope(S, k, k_min=None, k_max=None, ax=None, fmt='g-', plot=True, **kwargs):
     # find k range
     if k_min is not None and (k_min > np.min(k)):
         i_min = np.argmax(k >= k_min)
+    else:
+        i_min = 0
     if k_max is not None and (k_max < np.max(k)):
-        i_max = np.argmax(k >= k_max)
-    kv = k[i_min:i_max+1]
-    Sv = S[i_min:i_max+1]
+        i_max = np.argmax(k >= k_max) + 1
+    else:
+        i_max = -1
+    kv = k[i_min:i_max]
+    Sv = S[i_min:i_max]
 
     try:
         intercept, slope = np.polynomial.polynomial.polyfit(np.log10(kv), np.log10(Sv), deg=1)
@@ -380,11 +384,12 @@ def fit_slope(S, k, k_min=None, k_max=None, ax=None, i_min=0, i_max=-1, fmt='g-'
     print('slope, intercept:', slope, intercept)
     beta = -slope
 
-    if ax is None:
-        ax = plt.gca()
-    ax.plot(kv, intercept * kv ** -beta, fmt, label=r'naive fit, $\beta$ = ' + '{:.2f}'.format(beta))
-    ax.legend()
-    return beta
+    if plot:
+        if ax is None:
+            ax = plt.gca()
+        ax.plot(kv, intercept * kv ** -beta, fmt, label=r'naive fit, $\beta$ = ' + '{:.2f}'.format(beta))
+        ax.legend()
+    return beta, intercept
 
 
 def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=True, **kwargs):

@@ -2024,7 +2024,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density', save=True,
                       norm='min_l', dim=False, d=1, alpha_m=1, dT=1, **kwargs):
     import pickle as pkl
-    from sh_things import k_to_l, l_to_k, nat_scales
+    import sh_things as sh
 
     if fig is None and ax is None:
         fig, ax = plt.subplots(1, 1, figsize=figsize)
@@ -2052,10 +2052,10 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                     if k[0] == 0:  # only wavenumbers greater than 0
                         k = k[1:]
                         S = S[1:]
-                    l = k_to_l(k, R=d)  # should be l=1.9674 at the top
+                    l = sh.k_to_l(k, R=d)  # should be l=1.9674 at the top
 
                     # wavenumber range where spectrum makes sense
-                    wl_min, wl_max = nat_scales(case, ax=None, alpha=alpha, d=d, dim=dim, data_path=data_path, **kwargs)
+                    wl_min, wl_max = sh.nat_scales(case, ax=None, alpha=alpha, d=d, dim=dim, data_path=data_path, **kwargs)
                     k_min, k_max = 1 / wl_max, 1 / wl_min
                     if k_min is not None and (k_min > np.min(k)):
                         i_min = np.argmax(k >= k_min)
@@ -2069,8 +2069,11 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                         Sv_norm = Sv / Sv[0]  # actually normalise to first point inside k range
                         S_norm = Sv / Sv[0]
                     elif norm == 'k2':
-                        Sv_norm = Sv / Sv[0] * kv**2  # actually normalise to first point inside k range
-                        # S_norm = Sv / Sv[0] * kv**2
+                        Sv_norm = Sv / Sv[0] * kv**2  # trying to emphasise k**-2 slope but doesn't rlly work
+                    elif norm == 'intercept':
+                        beta, intercept = sh.fit_slope(Sv, kv, k_min=None, k_max=None, plot=False)
+                        Sv_norm = Sv / intercept
+
                     ax.plot(kv, Sv_norm, c=clist[zz], alpha=1, lw=lw, marker=marker)
                     # ax.plot(k, S_norm, c=clist[zz], alpha=0.1, lw=lw, marker=marker)  # not in range
 
