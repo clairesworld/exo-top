@@ -9,15 +9,14 @@ from postaspect import aspect_post as ap
 
 # (re)process all
 
-# ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T'],  redo=True,
-#                         t1_grid=t1_grid, end_grid=end_grid, load_grid=load_grid, regime_grid=regime_grid_td,
-#                         include_regimes=['steady', 'trans.'],
-#                         data_path=data_path,
-#                         postprocess_kwargs=postprocess_kwargs)
+ap.reprocess_all_at_sol(Ra_ls, eta_ls[4], psuffixes=['_T', '_h', '_h_all', '_Nu'],  redo=True,
+                        t1_grid=t1_grid[4,:], end_grid=end_grid[4,:], load_grid=load_grid[4,:], regime_grid=regime_grid_td[4,:],
+                        include_regimes=['chaotic'],
+                        data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 
-ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
-                        t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
-                        load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
+# ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
+#                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
+#                         load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
 # ## plot summaries across delta eta
 
