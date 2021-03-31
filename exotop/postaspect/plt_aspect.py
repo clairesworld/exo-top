@@ -339,11 +339,11 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None, fiterror=False,
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
-              save=True, fname='h', legend=False, sigma=1, showpeak=False,
-              labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', alpha=1,
+              save=True, fname='h', legend=False, sigma=1, showpeak=False, cleglabels=None,
+              labelsize=16, legsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', alpha=1,
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, c_fit='k', ms=10, lw=1,
               xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errortype='time', ticksize=None, vmin=None, vmax=None,
-              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7),
+              fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7), cbar=False,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
         postprocess_kwargs = {}
@@ -423,7 +423,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 yx_rms_all.append((h_rms, x))
                 sdy_all.append(sdy)
                 sdx_all.append(sdx)
-                jj_all.append(jj)
+                jj_all.append(jj)  # the colourised vector
 
                 for key in quants.keys():
                     if errortype is 'time':
@@ -481,6 +481,19 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             raise e
 
+    if cbar and colourful:
+        if cmap is None:
+            print('cbar not implemented without cmap')
+        else:
+            cax = colourbar(mappable=None, ax=ax, vmin=vmin, vmax=vmax, label='', labelsize=labelsize,
+                            ticksize=ticksize, ticks=[float(j) for j in jj],
+                            ticklabels=None, labelpad=17,
+                            rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=True)
+    elif legend and colourful:
+        # show colours outside
+        ax = colourised_legend(ax, clist=c_rms, cleglabels=cleglabels, lw=0, ls='--', marker='o', markersize=ms,
+                               legsize=legsize, ncol=1)
+
     if fit:
         if which_x == 'h_components':
             n_fitted = 1
@@ -514,7 +527,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                                                markersize=10, markeredgecolor=highlight_colour,
                                                label=r'$h_{peak}$, data'),
                                  mlines.Line2D([], [], color=c_rms, marker='o', alpha=0.5,
-                                               markersize=10, label=r'$h_{rms}$, data')])
+                                               markersize=10, label=r'$h_{rms}$, data')], fontsize=legsize)
         ax.add_artist(leg)
 
     if p_dimensionals is not None:
@@ -1991,6 +2004,15 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
                                color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec=fc, fc=fc))
     return fig, ax
+
+
+def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersize=20, legsize=25, ncol=1):
+    handles = []
+    for jj, label in cleglabels:
+        handles.append(mlines.Line2D([], [], color=clist[jj], marker=marker, ls=ls,
+                                     markersize=markersize, lw=lw, label=label))
+    ax.legend(handles=handles, frameon=False, fontsize=legsize, ncol=ncol, bbox_to_anchor=(1.01, 1), loc='upper left')
+    return ax
 
 
 def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', data_path=data_path_bullard, fig_path=fig_path_bullard):

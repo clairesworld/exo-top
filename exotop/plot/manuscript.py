@@ -1,4 +1,4 @@
-""" ASPECT runs: good copy plots for some slides  """
+""" ASPECT runs: good copy plots for manuscript..?  """
 
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, \
      fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, p_Venus

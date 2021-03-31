@@ -1,10 +1,10 @@
 """ ASPECT runs: plot scalings of h vs. Ra or T-heuristic, with subplots by eta """
 
-# import sys
-# sys.path.insert(0, '/home/cmg76/Works/exo-top/')
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, c_rms, c_peak, \
     c_regimes_td, fig_fmt, regime_grid_td, regime_names_td, load_grid, p_Earth, postprocess_kwargs
 from postaspect import plt_aspect as plat
+
+"""setup"""
 
 load = True  # load_grid
 cmap = 'art-nouveau-03'
@@ -13,8 +13,9 @@ ms = 10
 legsize = 12
 vmin = None  # 1
 vmax = None  # 3
+cleglabels = [r'$\Delta \eta = 10^{5}$', r'$\Delta \eta = 10^{6}$', r'$\Delta \eta = 10^{7}$', r'$\Delta \eta = 10^{8}$']
 
-# model versus data
+"""model versus data"""
 
 fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
                                          end_grid=end_grid, literature_file=None, legend=False, ms=ms,
@@ -36,11 +37,11 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff',
                    beta0=[0.1, -0.15], sigma=1, fiterror=False, legend=True,
                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=labelsize,
-                   xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography',
+                   xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography', legsize=legsize, cleglabels=cleglabels,
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False, vmin=vmin, vmax=vmax,
                    cmap=cmap, c_rms=None, fit=True, logx=True, logy=True, hscale=1, ms=ms,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td, figsize=(5, 5), errortype='standard')
+                   regime_grid=regime_grid_td, figsize=(5, 5), errortype='standard', cbar=False)
 #
 # _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
 #                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra',

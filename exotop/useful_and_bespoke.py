@@ -158,8 +158,7 @@ def colourbar(mappable=None, ax=None, vmin=None, vmax=None, label='', labelsize=
     if log:
         norm = colors.LogNorm(vmin=vmin, vmax=vmax)
     else:
-        norm=None
-
+        norm = None
     if mappable is None:
         mappable = ax.scatter(np.arange(5), np.arange(5), c=np.arange(5), vmin=vmin, vmax=vmax, cmap=cmap, s=0, norm=norm)
 
