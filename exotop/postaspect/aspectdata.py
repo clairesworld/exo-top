@@ -322,7 +322,7 @@ class Aspect_Data():
         # print("csv.DictReader took %s seconds" % (time.time() - start_time))
 
         start_time = time.time()
-        data = np.genfromtxt(filename, comments='#')
+        data = np.genfromtxt(open(filename, 'r'), comments='#')
         # all_data = np.genfromtxt(filename, comments='#', dtype=None)
         self.stats_timestep = np.array([int(d) for d in data[:,0]])  # np.array([d[0] for d in all_data])
         self.stats_time = data[:,1]
@@ -357,7 +357,7 @@ class Aspect_Data():
         filename = self.directory + "statistics"
         if verbose:
             print("Reading times from", filename)
-        data = np.genfromtxt(filename, comments='#', usecols=[0, 1])
+        data = np.genfromtxt(open(filename, 'r'), comments='#', usecols=[0, 1])
         self.stats_timestep = np.array([int(d) for d in data[:,0]])  # np.array([d[0] for d in all_data])
         self.stats_time = data[:,1]
 
@@ -366,7 +366,7 @@ class Aspect_Data():
         filename = self.directory + "statistics"
         if verbose:
             print("Reading heat flux statistics from", filename)
-        data = np.genfromtxt(filename, comments='#', usecols=col)
+        data = np.genfromtxt(open(filename, 'r'), comments='#', usecols=col)
         self.stats_heatflux_top = data[:]
 
 
@@ -374,7 +374,7 @@ class Aspect_Data():
         filename = self.directory + "statistics"
         if verbose:
             print("Reading solution files from", filename)
-        data = np.genfromtxt(filename, comments='#', dtype=None, usecols=col_vis)
+        data = np.genfromtxt(open(filename, 'r'), comments='#', dtype=None, usecols=col_vis)
         last = 0
         files = np.zeros(len(data), dtype=np.int64)
         #  find last instance that's not ""
@@ -918,7 +918,7 @@ class Aspect_Data():
         filename = self.directory+"dynamic_topography." + str(timestep)
         scalefactor = 1.0/self.parameters['Material model']['Simple model']['Thermal expansion coefficient']
         
-        data = np.genfromtxt(filename, delimiter=' ')
+        data = np.genfromtxt(open(filename, 'r'), delimiter=' ')
 
         ind = np.lexsort((data[:,2], data[:, 1], data[:, 0]))
         data = data[ind]

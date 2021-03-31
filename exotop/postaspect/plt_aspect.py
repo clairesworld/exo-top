@@ -1991,3 +1991,6 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
                                color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec=fc, fc=fc))
     return fig, ax
+
+
+def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', data_path=data_path_bullard, fig_path=fig_path_bullard):

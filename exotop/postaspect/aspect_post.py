@@ -88,6 +88,13 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
     reprocess_flag = False
     t1_new = t1
 
+    # retrieve eta
+    eta_str = case[9:12]
+    if eta_str == '1e9':  # not sure what happened here but...
+        col_vis = 23
+    else:
+        col_vis = 20
+
     # auto-determine postprocessing based on pickle name
     if suffix == '_T':
         postprocess_functions = T_parameters_at_sol
@@ -1014,14 +1021,9 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                     else:
                         load = 'auto'
                     for ip, suffix in enumerate(psuffixes):
-                        print('eta is 1e9', eta_str == '1e9')
-                        if eta_str == '1e9':
-                            col_vis = 23
-                            print('setting col vis', col_vis)
-                        else:
-                            col_vis = 20
                         pickleio(case, suffix=suffix, t1=t1_ii,
-                                 data_path=data_path, load=load, col_vis=col_vis, **kwargs)
+                                 data_path=data_path, load=load, **kwargs)
+    print('>>>>>>>  done reprocessing!')
 
 
 # def pickleio_average(case, postprocess_fn=None, t1=0, load=True, suffix='', data_path=data_path_bullard,

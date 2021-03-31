@@ -3,24 +3,22 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
     load_grid  # noqa: E402
 from postaspect import plt_aspect as plat  # noqa: E402
 from postaspect import aspect_post as ap
-
 # import pstats
 
+"""(re)process all"""
 
-# (re)process all
-
-ap.reprocess_all_at_sol(Ra_ls, eta_ls[4], psuffixes=['_T', '_h', '_h_all', '_Nu'],  redo=True,
-                        t1_grid=t1_grid[4,:], end_grid=end_grid[4,:], load_grid=load_grid[4,:], regime_grid=regime_grid_td[4,:],
-                        include_regimes=['chaotic'],
-                        data_path=data_path, postprocess_kwargs=postprocess_kwargs)
+# ap.reprocess_all_at_sol(Ra_ls, eta_ls[4], psuffixes=['_T', '_h', '_h_all', '_Nu'],  redo=True,
+#                         t1_grid=t1_grid[4,:], end_grid=end_grid[4,:], load_grid=load_grid[4,:], regime_grid=regime_grid_td[4,:],
+#                         include_regimes=['chaotic'],
+#                         data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 
 # ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
 #                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
 #                         load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
-# ## plot summaries across delta eta
+"""plot summaries across delta eta and/or Ra """
 
-i_plot = list(range(len(eta_ls)))
+i_plot = [4]  # list(range(len(eta_ls)))
 for ii, eta in enumerate(eta_ls):  # across eta_ls
     if ii in i_plot:
         cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
@@ -34,9 +32,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
             postprocess_kwargs=postprocess_kwargs,
         )
 
-# plot summaries across Ra
-
-i_plot = list(range(len(Ra_ls)))  # range(4,5)
+i_plot = range(4, 5)  # list(range(len(Ra_ls)))  # range(4,5)
 for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
     if ii in i_plot:
         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
@@ -66,8 +62,8 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
 #     includepd=False, includeTz=False,  # turn on once you know where steady state starts
 # )
 
-## look at individual case data
-#
+"""look at individual case data"""
+
 # case = 'Ra3e8-eta1e5-wide'
 # pro.print_solution_data(case, suffix='_T', keys=None, data_path=data_path)
 # pro.print_solution_data(case, suffix='_h', keys=None, data_path=data_path)

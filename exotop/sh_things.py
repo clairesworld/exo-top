@@ -424,3 +424,4 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         return ax, min_scale, max_scale
     else:
         return min_scale, max_scale
+

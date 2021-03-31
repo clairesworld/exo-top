@@ -10,13 +10,14 @@ R_p = 6371
 d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph
 # d, dT, alpha = 2700, 3000, 3e-5  # test
 
+regimes_use = ['chaotic']
 
-""" """
+""" plot normalised spectra on single axis """
 
 
 """ get all time-averaged spectra and store """
 
-regimes_use = ['chaotic']
+
 for ii, eta in enumerate(eta_ls):  # across eta_ls
     cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
     labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
