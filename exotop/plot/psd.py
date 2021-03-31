@@ -22,7 +22,7 @@ fig, ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_gri
                                  labelsize=16, ticksize=12,
                                  marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density',
                                  save=True,
-                                 norm='l2')
+                                 norm='k2')
 
 """ get all time-averaged spectra and store """
 

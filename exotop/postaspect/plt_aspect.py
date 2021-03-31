@@ -2022,7 +2022,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       data_path=data_path_bullard, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
                       fig=None, ax=None, figsize=(5,5), z_name='Ra', vmin=None, vmax=None, alpha=1, labelsize=16, ticksize=12,
                       marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density', save=True,
-                      norm='l2', dim=False, d=1, alpha_m=1, dT=1, **kwargs):
+                      norm='min_l', dim=False, d=1, alpha_m=1, dT=1, **kwargs):
     import pickle as pkl
     from sh_things import k_to_l, l_to_k, nat_scales
 
@@ -2045,11 +2045,14 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                         zz = ii
                     elif z_name == 'eta':
                         zz = jj
+                    elif z_name == 'Ra_i_eff':
+                        zz = jj
 
                     S, k = pkl.load(open(fname, "rb"))
                     if k[0] == 0:  # only wavenumbers greater than 0
                         k = k[1:]
                         S = S[1:]
+                    l = k_to_l(k, R=d)  # should be l=1.9674 at the top
 
                     # wavenumber range where spectrum makes sense
                     wl_min, wl_max = nat_scales(case, ax=None, alpha=alpha, d=d, dim=dim, data_path=data_path, **kwargs)
@@ -2060,12 +2063,14 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                         i_max = np.argmax(k >= k_max)
                     kv = k[i_min:i_max + 1]
                     Sv = S[i_min:i_max + 1]
+                    print('kv', kv)
 
-                    if norm == 'l2':
-                        l = k_to_l(k, R=d)  # should be l=1.9674 at the top
+                    if norm == 'min_l':
                         Sv_norm = Sv / Sv[0]  # actually normalise to first point inside k range
                         S_norm = Sv / Sv[0]
-
+                    elif norm == 'k2':
+                        Sv_norm = Sv / Sv[0] * kv**2  # actually normalise to first point inside k range
+                        # S_norm = Sv / Sv[0] * kv**2
                     ax.plot(kv, Sv_norm, c=clist[zz], alpha=1, lw=lw, marker=marker)
                     # ax.plot(k, S_norm, c=clist[zz], alpha=0.1, lw=lw, marker=marker)  # not in range
 
