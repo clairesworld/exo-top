@@ -341,7 +341,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
               save=True, fname='h', legend=False, sigma=1, showpeak=False, cleglabels=None,
               labelsize=16, legsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', alpha=1,
-              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, c_fit='k', ms=10, lw=1,
+              c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, c_fit='k', ms=10, lw=1, z_name='eta',
               xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errortype='time', ticksize=None, vmin=None, vmax=None,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7), cbar=False,
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
@@ -363,6 +363,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
     if xlim is not None:
         ax.set_xlim(xlim)
+    if z_name == 'eta':
+        z_vec = [float(eee) for eee in eta]  # the colourised vector
+    else:
+        raise Exception('not implemented colouring scheme, use z_name=eta')
     colourful = False
     if iterable_not_string(c_rms) or (cmap is not None):
         colourful = True
@@ -370,7 +374,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     yx_peak_all, yx_rms_all = [], []
     D_m2_all = []
     sdy_all, sdx_all = [], []
-    jj_all = []
+    zz_all = []  # the colourised vector
 
     # loop over cases
     for jj, etastr in enumerate(eta):
@@ -423,7 +427,8 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 yx_rms_all.append((h_rms, x))
                 sdy_all.append(sdy)
                 sdx_all.append(sdx)
-                jj_all.append(jj)  # the colourised vector
+                if z_name == 'eta':
+                    zz_all.append(jj)  # the colourised vector
 
                 for key in quants.keys():
                     if errortype is 'time':
@@ -469,15 +474,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 except Exception as e:
                     cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
                     c_rms = colorize(means[which_x], cmap=cmap, vmin=vmin, vmax=vmax)[0]
-            elif (c_rms is not None) and (len(c_rms) != len(jj_all)):
-                # old version
-                print('c_rms', c_rms)
-                print('jj_all', jj_all)
-                c_rms = [c_rms[idx] for idx in jj_all]
             for pp in range(len(means[which_x])):
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:, pp]]).T,
                             xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw, alpha=alpha,
-                            fmt=mark, c=c_rms[pp], capsize=ecapsize, ms=ms)
+                            fmt=mark, c=c_rms[zz_all[pp]], capsize=ecapsize, ms=ms)
         else:
             ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=elw,
                         fmt=mark, c=c_rms, capsize=ecapsize, ms=ms)
@@ -492,12 +492,18 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             print('cbar not implemented without cmap')
         else:
             cax = colourbar(mappable=None, ax=ax, vmin=vmin, vmax=vmax, label='', labelsize=labelsize,
-                            ticksize=ticksize, ticks=[float(j) for j in jj_all],
+                            ticksize=ticksize, ticks=[float(z) for z in z_vec],
                             ticklabels=None, labelpad=17,
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=True)
     elif legend and colourful:
         # show colours outside
-        ax = colourised_legend(ax, clist=c_rms, cleglabels=cleglabels, lw=0, ls='--', marker=mark, markersize=ms,
+        clist = []
+        print('zz_all unique', np.unique(zz_all))
+        for zz, colour in enumerate(c_rms): # only used z vec
+            if zz in np.unique(zz_all):
+                print('appending colour at', zz)
+                clist.append(colour)
+        ax = colourised_legend(ax, clist=clist, cleglabels=cleglabels, lw=0, ls='--', marker=mark, markersize=ms,
                                legsize=legsize, ncol=1)
 
     if fit:
@@ -1841,6 +1847,7 @@ def plot_model_data(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=Non
                     save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
                     cmap='magma', cbar=None, include_regimes=None, show_cbar=True, **kwargs):
     # outdated.........................
+    print('WARNING: outdated method!!!!')
     if averagescheme is None:
         raise Exception('Averaging scheme not implemeted, must be timefirst or timelast')
     if postprocess_kwargs is None:

@@ -1,4 +1,5 @@
 """ ASPECT runs: good copy plots for some slides  """
+from matplotlib import ticker
 
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, \
      fig_fmt, regime_grid_td, postprocess_kwargs, regime_names_td, load_grid, p_Venus  # noqa: E402
@@ -19,6 +20,7 @@ regimes = ['chaotic']
 for regime in regimes:
     if regime == 'all':
         include_regimes = ['steady', 'trans.', 'chaotic']
+        c_rms = c_rms[:]
         ylim = [6e-3, 4e-2]
         xlim = [0.7e5, 3e7]
         yticks = [6e-3, 1e-2, 2e-2, 4e-2]
@@ -36,6 +38,7 @@ for regime in regimes:
                                  markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
     elif regime == 'chaotic':
         include_regimes = ['chaotic']
+        c_rms = c_rms[1:]
         ylim = [6e-3, 1.4e-2]
         xlim = [1e6, 3e7]
         yticks = [6e-3, 8e-3, 1e-2, 1.2e-2, 1.4e-2]
