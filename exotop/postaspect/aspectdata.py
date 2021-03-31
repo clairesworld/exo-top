@@ -382,7 +382,7 @@ class Aspect_Data():
             try:
                 s = d[-14:]
             except IndexError as e:
-                print('s =', s)
+                print('d =', d)
                 raise e
             if not s.decode() == '""':
                 last = int(re.search(r'\d+', s.decode()).group(0))
