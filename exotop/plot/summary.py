@@ -32,7 +32,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
             postprocess_kwargs=postprocess_kwargs,
         )
 
-i_plot = range(4, 5)  # list(range(len(Ra_ls)))  # range(4,5)
+i_plot = range(4, 6)  # list(range(len(Ra_ls)))  # range(4,5)
 for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
     if ii in i_plot:
         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]

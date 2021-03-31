@@ -342,7 +342,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
               save=True, fname='h', legend=False, sigma=1, showpeak=False,
               labelsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', alpha=1,
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, c_fit='k', ms=10, lw=1,
-              xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errortype='time', ticksize=None,
+              xlabelpad=10, ylabelpad=10, elw=1, ecapsize=5, errortype='time', ticksize=None, vmin=None, vmax=None,
               fit=False, logx=True, logy=True, hscale=1, show_isoviscous=False, figsize=(7, 7),
               fig=None, ax=None, ylim=None, xlim=None, postprocess_kwargs=None, regime_names=None, **kwargs):
     if postprocess_kwargs is None:
@@ -464,10 +464,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         if colourful:
             if (cmap is not None) and (c_rms is None):
                 try:
-                    c_rms = colorize(means[which_x], cmap=cmap)[0]
+                    c_rms = colorize(means[which_x], cmap=cmap, vmin=vmin, vmax=vmax)[0]
                 except Exception as e:
                     cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
-                    c_rms = colorize(means[which_x], cmap=cmap)[0]
+                    c_rms = colorize(means[which_x], cmap=cmap, vmin=vmin, vmax=vmax)[0]
             for pp in range(len(means[which_x])):
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:, pp]]).T,
                             xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw, alpha=alpha,
