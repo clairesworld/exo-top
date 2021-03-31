@@ -2045,11 +2045,12 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                     elif z_name == 'eta':
                         z_vec.append(np.log10(float(eta_str)))
                     elif z_name == 'Ra_i_eff':
-                        z_vec.append(plot_getx(Ra_ls[ii], eta_str, case=case, which_x='Ra_i_eff', averagescheme='timefirst',
+                        z_vec.append(np.log10(plot_getx(Ra_ls[ii], eta_str, case=case, which_x='Ra_i_eff', averagescheme='timefirst',
                                        data_path=data_path, load=True, postprocess_kwargs=None, return_all=False, t1=0,
-                                       alpha_m=alpha_m, **kwargs))
+                                       alpha_m=alpha_m, **kwargs)))
                 else:
                     print(fname, 'not found')
+    print('z vec', z_vec)
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
     # load spectra
@@ -2095,6 +2096,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         ax.plot(kv, Sv_norm, c=clist[zz], alpha=1, lw=lw, marker=marker)
         # ax.plot(k, S_norm, c=clist[zz], alpha=0.1, lw=lw, marker=marker)  # not in range
 
+        zz = zz + 1
+
     ax.loglog()
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_ylabel(ylabel, fontsize=labelsize)
@@ -2106,7 +2109,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         else:
             cax = colourbar(mappable=None, ax=ax, vmin=vmin, vmax=vmax, label=z_name, labelsize=labelsize,
                             ticksize=ticksize, ticks=None, ticklabels=None, labelpad=17,
-                            rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=True)
+                            rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=False)
 
     if save:
         plot_save(fig, fname=figname, **kwargs)
