@@ -771,7 +771,7 @@ def fit_SE(x, h, beta, err_x=1, err_h=1, xn=None, num=20):
     xbar = np.mean(logx1)
     n = len(logh)
     SE = sigma_logh * np.sqrt(1 / n + (logxn1 - xbar) ** 2 / np.sum((logxn1 - xbar) ** 2))
-    print('         -> SE_y:', SE)
+    print('         -> average SE_y:', np.mean(SE))
 
     # unlog
     SE_unlog = 2.302585 * 10 ** loghn * SE

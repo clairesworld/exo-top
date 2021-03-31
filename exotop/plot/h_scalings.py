@@ -11,8 +11,8 @@ cmap = 'art-nouveau-03'
 labelsize = 16
 ms = 10
 legsize = 12
-vmin = 1
-vmax = 3
+vmin = None  # 1
+vmax = None  # 3
 
 # model versus data
 
