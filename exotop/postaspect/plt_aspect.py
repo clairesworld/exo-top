@@ -364,7 +364,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     if xlim is not None:
         ax.set_xlim(xlim)
     if z_name == 'eta':
-        z_vec = [float(eee) for eee in eta]  # the colourised vector
+        z_vec = [float(eee) for eee in eta]  # the colourised vector, must be numeric
     else:
         raise Exception('not implemented colouring scheme, use z_name=eta')
     colourful = False
@@ -467,13 +467,16 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                         fmt='d', c=c_peak, alpha=alpha, capsize=5, markeredgecolor=highlight_colour)
         mark = 'o'
         if colourful:
-            print('length of colourised vector:', len(means[which_x]))
+            if vmin is None:
+                vmin = np.min(zz_all)
+            if vmax is None:
+                vmax = np.max(zz_all)
             if (cmap is not None) and (c_rms is None):
                 try:
-                    c_rms = colorize(means[which_x], cmap=cmap, vmin=vmin, vmax=vmax)[0]
+                    c_rms = colorize(zz_all, cmap=cmap, vmin=vmin, vmax=vmax)[0]
                 except Exception as e:
                     cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
-                    c_rms = colorize(means[which_x], cmap=cmap, vmin=vmin, vmax=vmax)[0]
+                    c_rms = colorize(zz_all, cmap=cmap, vmin=vmin, vmax=vmax)[0]
             for pp in range(len(means[which_x])):
                 ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:, pp]]).T,
                             xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw, alpha=alpha,
