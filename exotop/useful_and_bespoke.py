@@ -147,7 +147,8 @@ def printe(name, obj, showall=False):
         pass
 
 
-def colourbar(mappable=None, ax=None, vmin=None, vmax=None, label='', labelsize=16, ticksize=14, ticks=None, ticklabels=None, labelpad=17,
+def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='', labelsize=16, ticksize=14,
+              ticks=None, ticklabels=None, labelpad=17,
               rot=None, discrete=False, cmap='rainbow', tickformatter=None, c='k', pad=0.05, log=False):
     from mpl_toolkits.axes_grid1 import make_axes_locatable
     import matplotlib.colors as colors
@@ -160,7 +161,17 @@ def colourbar(mappable=None, ax=None, vmin=None, vmax=None, label='', labelsize=
     else:
         norm = None
     if mappable is None:
-        mappable = ax.scatter(np.arange(5), np.arange(5), c=np.arange(5), vmin=vmin, vmax=vmax, cmap=cmap, s=0, norm=norm)
+        try:
+            n = len(vector)
+            if vmin is None:
+                vmin = np.min(vector)
+            if vmax is None:
+                vmax = np.max(vector)
+        except TypeError as e:
+            print(e)
+            raise Exception('colourbar: if mappable is None, must provide vector')
+        dum = np.linspace(vmin, vmax, n)
+        mappable = ax.scatter(dum, dum, c=dum, vmin=vmin, vmax=vmax, cmap=cmap, s=0, norm=norm)
 
     fig = ax.figure
     divider = make_axes_locatable(ax)
