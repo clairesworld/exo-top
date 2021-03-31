@@ -501,7 +501,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     elif legend and colourful:
         # show colours outside
         clist = []
-        for zz, colour in enumerate(c_rms): # only used z vec
+        for zz, colour in enumerate(c_rms):  # only used z vec
             if zz in np.unique(zz_all):
                 clist.append(colour)
         ax = colourised_legend(ax, clist=clist, cleglabels=cleglabels, lw=0, ls='--', marker=mark, markersize=ms,
@@ -2020,11 +2020,13 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
 
 def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=None, include_regimes=None,
                       data_path=data_path_bullard, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
-                      fig=None, ax=None, figsize=(5,5), z_name='Ra', vmin=None, vmax=None, alpha=1, labelsize=16, ticksize=12,
-                      marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density', save=True,
-                      norm='min_l', dim=False, d=1, alpha_m=1, dT=1, cbar=False, **kwargs):
+                      marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density',
+                      x2label='spherical harmonic degree', save=True, alpha=1, labelsize=16, ticksize=12,
+                      fig=None, ax=None, figsize=(5, 5), z_name='Ra', vmin=None, vmax=None,
+                      norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True, **kwargs):
     import pickle as pkl
     import sh_things as sh
+    global R
 
     if fig is None and ax is None:
         fig, ax = plt.subplots(1, 1, figsize=figsize)
@@ -2045,9 +2047,10 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                     elif z_name == 'eta':
                         z_vec.append(np.log10(float(eta_str)))
                     elif z_name == 'Ra_i_eff':
-                        z_vec.append(np.log10(plot_getx(Ra_ls[ii], eta_str, case=case, which_x='Ra_i_eff', averagescheme='timefirst',
-                                       data_path=data_path, load=True, postprocess_kwargs=None, return_all=False, t1=0,
-                                       alpha_m=alpha_m, **kwargs)))
+                        z_vec.append(np.log10(
+                            plot_getx(Ra_ls[ii], eta_str, case=case, which_x='Ra_i_eff', averagescheme='timefirst',
+                                      data_path=data_path, load=True, postprocess_kwargs=None, return_all=False, t1=0,
+                                      alpha_m=alpha_m, **kwargs)))
                 else:
                     print(fname, 'not found')
     print('z vec', z_vec)
@@ -2060,19 +2063,11 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         print('case', case)
         fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
-        # if z_name == 'Ra':
-        #     zz = ix
-        # elif z_name == 'eta':
-        #     zz = jx
-        # elif z_name == 'Ra_i_eff':
-        #     zz = np.ravel_multi_index((jj, ii), np.shape(z_grid))
-        #     print('zz', zz)
-
         S, k = pkl.load(open(fname, "rb"))
         if k[0] == 0:  # only wavenumbers greater than 0
             k = k[1:]
             S = S[1:]
-        l = sh.k_to_l(k, R=d)  # should be l=1.9674 at the top
+        # l = sh.k_to_l(k, R=d)  # should be l=1.9674 at the top
 
         # wavenumber range where spectrum makes sense
         wl_min, wl_max = sh.nat_scales(case, ax=None, alpha=alpha, d=d, dim=dim, data_path=data_path, **kwargs)
@@ -2088,7 +2083,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             Sv_norm = Sv / Sv[0]  # actually normalise to first point inside k range
             S_norm = Sv / Sv[0]
         elif norm == 'k2':
-            Sv_norm = Sv / Sv[0] * kv**2  # trying to emphasise k**-2 slope but doesn't rlly work
+            Sv_norm = Sv / Sv[0] * kv ** 2  # trying to emphasise k**-2 slope but doesn't rlly work
         elif norm == 'intercept':
             beta, intercept = sh.fit_slope(Sv, kv, k_min=None, k_max=None, plot=False)
             Sv_norm = Sv / intercept
@@ -2110,6 +2105,21 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             cax = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=z_name, labelsize=labelsize,
                             ticksize=ticksize, ticks=None, ticklabels=None, labelpad=17,
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=False)
+    if show_degrees:
+        if dim:
+            R = R_p
+        else:
+            R = d
+
+        def to_deg(k):
+            return k * 2 * np.pi * R - 0.5
+
+        def to_wn(l):
+            return (l + 0.5) / (2 * np.pi * R)
+
+        secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
+        secax.set_xlabel(x2label, fontsize=labelsize)
+        secax.tick_params(axis='both', which='major', labelsize=ticksize)
 
     if save:
         plot_save(fig, fname=figname, **kwargs)
