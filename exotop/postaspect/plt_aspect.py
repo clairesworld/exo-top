@@ -2032,6 +2032,20 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         z_vec = [np.log10(float(z)) for z in Ra_ls]
     elif z_name == 'eta':
         z_vec = [np.log10(float(z)) for z in eta_ls]
+    elif z_name == 'Ra_i_eff':
+        z_grid = np.zeros((len(eta_ls), len(Ra_ls)), dtype=np.float64)
+        for jj, eta_str in enumerate(eta_ls):
+            cases, Ra_var = pro.get_cases_list(Ra_ls, eta_str, end_grid[jj])
+            for ii, case in enumerate(cases):
+                if regime_grid[jj][ii] in include_regimes:
+                    fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
+                    if os.path.isfile(fname):
+                        zn = plot_getx(Ra_ls[ii], eta_str, case=case, which_x='Ra_i_eff', averagescheme='timefirst',
+                                       data_path=data_path, load=True, postprocess_kwargs=None, return_all=False,
+                                       **kwargs)
+                        z_grid[jj, ii] = zn
+        z_vec = z_grid.flatten()
+
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
     # load spectra
@@ -2046,7 +2060,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                     elif z_name == 'eta':
                         zz = jj
                     elif z_name == 'Ra_i_eff':
-                        zz = jj
+                        zz = np.ravel_multi_index((jj, ii), np.shape(z_grid))
+                        print('zz', zz)
 
                     S, k = pkl.load(open(fname, "rb"))
                     if k[0] == 0:  # only wavenumbers greater than 0
@@ -2063,7 +2078,6 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                         i_max = np.argmax(k >= k_max)
                     kv = k[i_min:i_max + 1]
                     Sv = S[i_min:i_max + 1]
-                    print('kv', kv)
 
                     if norm == 'min_l':
                         Sv_norm = Sv / Sv[0]  # actually normalise to first point inside k range
