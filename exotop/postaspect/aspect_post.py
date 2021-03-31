@@ -129,9 +129,10 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
                         if at_sol:
                             print('      Checking for new solutions...')
                             sol_f_old = df.sol.iat[-1]
-                            sol_new = dat_new.read_stats_sol_files(**kwargs)
+                            sol_new = dat_new.read_stats_sol_files(col_vis=col_vis)
                             sol1_new = sol_new[np.argmax(sol_new > sol_f_old)]  # first solution after latest saved
-                            t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False, **kwargs)
+                            t1_new = dat_new.find_time_at_sol(n=sol1_new, sol_files=sol_new, return_indices=False,
+                                                              col_vis=col_vis)
                         else:
                             print('      Checking for new timesteps...')
                             time_f_old = df.time.iat[-1]
@@ -164,11 +165,12 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
                 dat_new.read_stats_heatflux(**kwargs)
                 if at_sol:
                     if not hasattr(dat_new, 'sol_files'):
-                        dat_new.read_stats_sol_files(**kwargs)
+                        dat_new.read_stats_sol_files(col_vis=col_vis)
                     sol_new = dat_new.sol_files
                     df = process_at_solutions(case, postprocess_functions=postprocess_functions, dat=dat_new,
                                               t1=np.maximum(t1, t1_new),  # whichever comes later in time
-                                              data_path=data_path, sol_files=sol_new, df_to_extend=df, **kwargs)
+                                              data_path=data_path, sol_files=sol_new, df_to_extend=df, col_vis=col_vis,
+                                              **kwargs)
                     dump_flag = True  # always save if you did something
 
                 else:
