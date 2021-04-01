@@ -2106,7 +2106,10 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                             ticksize=ticksize, ticks=None, ticklabels=None, labelpad=17,
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=False)
     if show_degrees:
-        R = R_p
+        if dim:
+            R = R_p
+        else:
+            R = 1
 
         def to_deg(k):
             return k * 2 * np.pi * R - 0.5
