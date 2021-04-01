@@ -501,10 +501,12 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     elif legend and colourful:
         # show colours outside
         clist = []
+        clabels = []
         for zz, colour in enumerate(c_rms):  # only used z vec
             if zz in np.unique(zz_all):
                 clist.append(colour)
-        ax = colourised_legend(ax, clist=clist, cleglabels=cleglabels, lw=0, ls='--', marker=mark, markersize=ms,
+                clabels.append(cleglabels[zz])
+        ax = colourised_legend(ax, clist=clist, cleglabels=clabels, lw=0, ls='--', marker=mark, markersize=ms,
                                legsize=legsize, ncol=1)
 
     if fit:
@@ -2075,7 +2077,6 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         if k[0] == 0:  # only wavenumbers greater than 0
             k = k[1:]
             S = S[1:]
-        # l = sh.k_to_l(k, R=d)  # should be l=1.9674 at the top
 
         if dim:
             k = k * d**-1

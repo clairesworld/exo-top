@@ -14,7 +14,8 @@ vmin = None  # 1
 vmax = None  # 3
 cmap = 'rainbow'  # 'art-nouveau-03'
 c_rms = ['k', 'xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']  # update: must correspond to entire z range i.e. eta_ls
-cleglabels = [r'$\Delta \eta = 10^{6}$', r'$\Delta \eta = 10^{7}$', r'$\Delta \eta = 10^{8}$'] #,  r'$\Delta \eta = 10^{9}$']  # these correspond to used cases only
+cleglabels = [r'$\Delta \eta = 10^{5}$', r'$\Delta \eta = 10^{6}$', r'$\Delta \eta = 10^{7}$',
+              r'$\Delta \eta = 10^{8}$',  r'$\Delta \eta = 10^{9}$']  # these correspond to entire z range as well
 figsize = (7, 5)  # (5, 5)
 
 """model versus data"""

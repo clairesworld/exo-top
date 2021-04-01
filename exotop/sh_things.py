@@ -521,3 +521,40 @@ def k_to_l(k, R):
 
 def l_to_k(l, R):
     return (l + 0.5) / (2 * np.pi * R)
+
+
+def make_baseline_spectrum(case, data_path='', fig_path='', newfname='base_spectrum', pend='_sph', fend='.pkl',):
+    import pickle as pkl
+    fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
+
+    S, k = pkl.load(open(fname, "rb"))
+    if k[0] == 0:  # only wavenumbers greater than 0
+        k = k[1:]
+        S = S[1:]
+
+    # wavenumber range where spectrum makes sense
+    ax, wl_min, wl_max = nat_scales(case, dim=False, data_path=data_path, plot=False, bl_fudge=5, )
+    k_min, k_max = 2 * np.pi / wl_max, 2 * np.pi / wl_min
+    if k_min is not None and (k_min > np.min(k)):
+        i_min = 0  # np.argmax(k >= k_min)
+    if k_max is not None and (k_max < np.max(k)):  # cut off short wl
+        i_max = np.argmax(k >= k_max)
+    try:
+        kv = k[i_min:i_max + 1]
+        Sv = S[i_min:i_max + 1]
+    except UnboundLocalError:
+        raise Exception('kmin, kmax out of bounds')
+
+    # somehow get exact degrees?
+    l = k_to_l(kv, R=1)  # should be l=1.9674 at the top
+    print('l at R=d', l)
+    l = k_to_l(kv, R=2)  # should be l=1.9674 at the top
+    print('l at R=2d', l)
+
+    lmax = np.max(l)
+    l = np.arange(lmax+1)
+    Sl = Sv
+    pkl.dump((l, Sl), open(fig_path + newfname + fend, "wb"))
+
+
+
