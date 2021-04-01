@@ -551,7 +551,7 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
     wl_min, wl_max = nat_scales(case, dim=False, data_path=data_path, plot=False, bl_fudge=5, )
     k_min, k_max = 2 * np.pi / wl_max, 2 * np.pi / wl_min
     if k_min is not None and (k_min > np.min(k)):
-        i_min = 0  # np.argmax(k >= k_min)
+        i_min = np.argmax(k >= k_min)
     if k_max is not None and (k_max < np.max(k)):  # cut off short wl
         i_max = np.argmax(k >= k_max)
     try:
@@ -578,6 +578,7 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
     p0 = Sl[0]
     Sl = np.insert(np.array(Sl), 0, [p0] * (lmin - 2))
     Sl = np.insert(np.array(Sl), 0, [0.0] * 2)
+    l = np.insert(np.array(l), 0, np.arange(lmin))
 
     print('l', l[:20])
     print('Sl', Sl[:20])
