@@ -490,6 +490,7 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         min_scale = dic_av['delta_rh']
     except KeyError:
         min_scale = np.mean(df.delta_rh.to_numpy())
+    print('min wavelength', min_scale)
     if dim:
         min_scale = min_scale * d
         max_scale = max_scale * d
