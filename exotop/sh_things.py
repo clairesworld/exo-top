@@ -422,7 +422,7 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
         b = y0 - m*x0
         y1 = m*x1 + b
     ax.plot((x0, x1), (y0, y1), c=c, lw=lw)
-    ax.text((x0+x1)/2, (y0+y1)/2, r'$k^{-2}$', fontsize=legsize, c=c)
+    ax.text((x0+x1)/2, y0, r'$k^{-2}$', fontsize=legsize, c=c)  # (y0+y1)/2
     return ax
 
 
