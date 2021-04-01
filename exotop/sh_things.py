@@ -455,7 +455,7 @@ def fit_slope(S, k, k_min=None, k_max=None, ax=None, fmt='g-', plot=True, **kwar
         raise e
 
     intercept = 10**intercept
-    print('slope, intercept:', slope, intercept)
+    print('         slope, intercept:', slope, intercept)
     beta = -slope
 
     if plot:

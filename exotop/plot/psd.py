@@ -23,7 +23,7 @@ fig, ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_gri
                                  xlim=(1e-3, 3e-2),
                                  xlabel=r'Wavenumber ((length)$^{-1}$)', ylabel='Normalised power spectral density',
                                  x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, {\rm eff}}$)',
-                                 norm='min_l', dim=True, d=d, dT=dT, alpha_m=alpha, R_p=d,
+                                 norm='intercept', dim=True, d=d, dT=dT, alpha_m=alpha, R_p=d,
                                  # add_files=[benchmark_path + 'lees_topo_grids/psd_hoggard.csv'], add_label=['Hoggard+ (2016)']
                                  )
 
