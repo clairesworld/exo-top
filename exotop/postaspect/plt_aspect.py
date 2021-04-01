@@ -2057,7 +2057,6 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                                       alpha_m=alpha_m, **kwargs)))
                 else:
                     print(fname, 'not found')
-    print('z vec', z_vec)
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
     # load spectra
@@ -2137,7 +2136,6 @@ def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, pl
     df = pd.read_csv(filepath, header=header, names=['x', 'y'], index_col=False, comment='#')
     x, y = df['x'].to_numpy(), df['y'].to_numpy()
     if additional_mod_fn is not None:
-        print('x', x, 'y', y)
         x, y = additional_mod_fn(x, y, **kwargs)
     ax.plot(x, y, label=label, **plot_kwargs)
     return ax

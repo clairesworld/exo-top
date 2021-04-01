@@ -45,12 +45,12 @@ def norm_spectrum(k, S, norm='min_l'):
         S_norm = S / S[0] * k ** 2  # trying to emphasise k**-2 slope but doesn't rlly work
     elif norm == 'intercept':
         beta, intercept = fit_slope(S, k, k_min=None, k_max=None, plot=False)
+        prin
         S_norm = S / intercept
     return k, S_norm
 
 
 def mod_loaded_spectrum(k, S, is_wl=False, is_2D=False, is_not_density=False, normalise=False, **kwargs):
-    print('k', k, 'S', S)
     if is_wl:
         k = 1.0/k
     if is_2D:
