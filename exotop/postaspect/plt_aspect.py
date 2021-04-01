@@ -2108,7 +2108,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         ax.set_ylim(ylim)
 
     if show_beta_guide:
-        ax = sh.show_beta_guide(ax, x0=kv[1], y0=Sv_norm[1] * 1e-3, x1=kv[3], m=-2, c='xkcd:slate', lw=1,
+        ax = sh.show_beta_guide(ax, x0=kv[1], y0=Sv_norm[1] * 1e-3, x1=kv[3], m=-2, c='xkcd:slate', lw=3,
                                 legsize=legsize)
 
     if cbar:
