@@ -19,18 +19,18 @@ figsize = (7, 5)  # (5, 5)
 
 """model versus data"""
 
-# fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
-#                                          end_grid=end_grid, literature_file=None, legend=False, ms=ms,
-#                                          postprocess_kwargs=postprocess_kwargs, averagescheme='timefirst',
-#                                          ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
-#                                          # clist=['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow'],
-#                                          cmap=cmap, z_name='eta', fname='model-data-chaotic_timeavg',
-#                                          save=True, include_regimes=['chaotic'], errs=[0.5, 0.2, 0.1, 0.05],
-#                                          fig_fmt=fig_fmt, vmin=vmin, vmax=vmax,
-#                                          show_cbar=False, figsize=figsize, errortype='standard',
-#                                          title=r'Fit to $C$ Ra$_{i,eff}^p$',
-#                                          ylabel=r'Model $\Delta h_{rms}^\prime$',
-#                                          xlabel=r'Data $\Delta h_{rms}^\prime$')
+fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
+                                         end_grid=end_grid, literature_file=None, legend=False, ms=ms,
+                                         postprocess_kwargs=postprocess_kwargs, averagescheme='timefirst',
+                                         ylim=[6e-3, 2e-2], which_x='Ra_i_eff', which_h='rms', data_path=data_path,
+                                         # clist=['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow'],
+                                         cmap=cmap, z_name='eta', fname='model-data-chaotic_timeavg',
+                                         save=True, include_regimes=['chaotic'], errs=[0.5, 0.2, 0.1, 0.05],
+                                         fig_fmt=fig_fmt, vmin=vmin, vmax=vmax,
+                                         show_cbar=False, figsize=figsize, errortype='standard',
+                                         title=r'Fit to $C$ Ra$_{i,eff}^p$',
+                                         ylabel=r'Model $\Delta h_{rms}^\prime$',
+                                         xlabel=r'Data $\Delta h_{rms}^\prime$')
 
 """all eta on one axis"""
 
