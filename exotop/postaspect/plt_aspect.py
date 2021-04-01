@@ -2072,9 +2072,10 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             S = S[1:]
         # l = sh.k_to_l(k, R=d)  # should be l=1.9674 at the top
 
-        if dim:
-            k = k * d**-1
-            S = S * d**3 * dT**2 * alpha_m**2
+        # if dim:
+        #     # messy to do this before normalising because 1) S_norm will be nondimensional, 2) y-intercept moves
+        #     k = k * d**-1
+        #     S = S * d**3 * dT**2 * alpha_m**2
 
         # wavenumber range where spectrum makes sense
         wl_min, wl_max = sh.nat_scales(case, ax=None, alpha=alpha_m, d=d, dim=dim, data_path=data_path, **kwargs)
@@ -2087,6 +2088,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         Sv = S[i_min:i_max + 1]
 
         kv, Sv_norm = sh.norm_spectrum(kv, Sv, norm=norm)
+
+        if dim:
+            kv = kv * d**-1
 
         ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
         # ax.plot(k, S_norm, c=clist[zz], alpha=0.1, lw=lw, marker=marker)  # not in range
