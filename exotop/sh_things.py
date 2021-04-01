@@ -527,7 +527,7 @@ def l_to_k(l, R):
     return (l + 0.5) / (2 * np.pi * R)
 
 
-def make_baseline_spectrum(case, data_path='', fig_path='', newfname='base_spectrum', pend='_sph', fend='.pkl',):
+def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_spectrum', pend='_sph', fend='.pkl',):
     import pickle as pkl
     fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
@@ -549,15 +549,17 @@ def make_baseline_spectrum(case, data_path='', fig_path='', newfname='base_spect
     except UnboundLocalError:
         raise Exception('kmin, kmax out of bounds')
 
-    # somehow get exact degrees?
-    l = k_to_l(kv, R=1)  # should be l=1.9674 at the top
-    print('l at R=d', l)
-    l = k_to_l(kv, R=2)  # should be l=1.9674 at the top
-    print('l at R=2d', l)
+    # somehow get exact degrees? must do fit...
+    beta, intercept = fit_slope(S, k, k_min=None, k_max=None, plot=False)
 
-    lmax = np.max(l)
+    lv = k_to_l(kv, R)  # should be l=1.9674 at the top
+    print('l at R=', R, lv)
+
+    lmax = np.max(lv)
     l = np.arange(lmax+1)
-    Sl = Sv
+    kl = l_to_k(l, R)
+    Sl = intercept * kl ** -beta  # intercept at natural min wavenumber - constant for given d
+
     pkl.dump((l, Sl), open(fig_path + newfname + fend, "wb"))
     return l, Sl
 
