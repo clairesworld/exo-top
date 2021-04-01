@@ -2131,10 +2131,13 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
     return fig, ax
 
 
-def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, plot_kwargs={}, **kwargs):
+def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, plot_kwargs=None, **kwargs):
+    if plot_kwargs is None:
+        plot_kwargs = {}
     df = pd.read_csv(filepath, header=header, names=['x', 'y'], index_col=False, comment='#')
     x, y = df['x'].to_numpy, df['y'].to_numpy()
     if additional_mod_fn is not None:
+        print('x', x, 'y', y)
         x, y = additional_mod_fn(x, y, **kwargs)
     ax.plot(x, y, label=label, **plot_kwargs)
     return ax

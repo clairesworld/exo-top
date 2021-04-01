@@ -50,8 +50,9 @@ def norm_spectrum(k, S, norm='min_l'):
 
 
 def mod_loaded_spectrum(k, S, is_wl=False, is_2D=False, is_not_density=False, normalise=False, **kwargs):
+    print('k', k, 'S', S)
     if is_wl:
-        k = 1/k
+        k = 1.0/k
     if is_2D:
         S = S*k
     if is_not_density:
