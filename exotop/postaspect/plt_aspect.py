@@ -2090,7 +2090,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             Sv = S[i_min:i_max + 1]
         except UnboundLocalError:
             raise Exception('kmin, kmax out of bounds')
-        kv, Sv_norm = sh.norm_spectrum(kv, Sv, norm=norm)
+        kv, Sv_norm = sh.norm_spectrum(kv, Sv, k_min=k_min, norm=norm)
 
         ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
         # ax.plot(k, S_norm, c=clist[zz], alpha=0.1, lw=lw, marker=marker)  # not in range

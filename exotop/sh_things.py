@@ -89,7 +89,7 @@ def load_spectrum_wavenumber(fpath='', fname='', has_header=True, wl=False, two_
     return power, k
 
 
-def norm_spectrum(k, S, norm='min_l'):
+def norm_spectrum(k, S, norm='min_l', k_min=None):
     if norm == 'min_l':
         S_norm = S / S[0]  # actually normalise to first point inside k range
         S_norm = S / S[0]
@@ -97,8 +97,8 @@ def norm_spectrum(k, S, norm='min_l'):
         S_norm = S / S[0] * k ** 2  # trying to emphasise k**-2 slope but doesn't rlly work
     elif norm == 'intercept':
         beta, intercept = fit_slope(S, k, k_min=None, k_max=None, plot=False)
-        print('norm: S0', S[0], 'y-intercept', intercept)
-        S_norm = S / intercept
+        Shat = intercept * k_min**-beta  # intercept at natural min wavenumber - constant for given d
+        S_norm = S / Shat
     return k, S_norm
 
 
@@ -490,11 +490,13 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         min_scale = dic_av['delta_rh']
     except KeyError:
         min_scale = np.mean(df.delta_rh.to_numpy())
-    print('min wavelength', min_scale)
+    print('delta rh', min_scale, 'nondimensional')
     if dim:
+        print('dim', dim)
         min_scale = min_scale * d
         max_scale = max_scale * d
 
+    print('min wavelength', min_scale, 'km')
     if ax is not None:
         ax.axvline(x=2*np.pi/min_scale, lw=lw, c=c)
         ax.axvline(x=2*np.pi/max_scale, lw=lw, c=c)
