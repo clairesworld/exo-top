@@ -479,7 +479,7 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
 
 
 def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=True,
-               min_type='delta_rh', bl_fudge=1, **kwargs):
+               min_type='delta_rh', bl_fudge=1, plot=True, **kwargs):
 
     max_scale = 2  # 2 * d=1
     df = ap.pickleio(case, suffix='_T', t1=t1, load=True, data_path=data_path, **kwargs)
@@ -500,7 +500,7 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         min_scale = min_scale * d
         max_scale = max_scale * d
 
-    if ax is not None:
+    if plot:
         ax.axvline(x=2*np.pi/min_scale, lw=lw, c=c)
         ax.axvline(x=2*np.pi/max_scale, lw=lw, c=c)
         # ylim = ax.get_ylim()
@@ -509,6 +509,7 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         # ax.text(1 / max_scale, yt, r'$2d$', va='top', ha='left', fontsize=11, c=c)
         # ax.text(1 / min_scale, yt, r'$\delta_{\rm rh}$', va='top', ha='left', fontsize=11, c=c)
 
+    if ax is not None:
         return ax, min_scale, max_scale
     else:
         return min_scale, max_scale
