@@ -371,7 +371,7 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
         k_min = 1/wl_max
         k_max = 1/wl_min
     beta, intercept = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
-    show_beta_guide(ax, x0=x0_guide, y0=y0_guide, x1=x1_guide, m=-2, c='k', lw=3, log=True, **kwargs)
+    ax = show_beta_guide(ax, x0=x0_guide, y0=y0_guide, x1=x1_guide, m=-2, c='k', lw=3, log=True, **kwargs)
 
     fig = plt.gcf()
     plt.tight_layout()
@@ -423,6 +423,7 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
         y1 = m*x1 + b
     ax.plot((x0, x1), (y0, y1), c=c, lw=lw)
     ax.text((x0+x1)/2, (y0+y1)/2, r'$k^{-2}$', fontsize=legsize, c=c)
+    return ax
 
 
 def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=True, **kwargs):
