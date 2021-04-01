@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None, plot=False, figsize=(12, 7),
-                     cmap='nipy_spectral',
+                     cmap='nipy_spectral', fig_path='',
                      labelsize=16, save=True, figname='data', **kwargs):
     if units != 'km':
         raise Exception('spectrum_to_grid: units other than km not implemented')
