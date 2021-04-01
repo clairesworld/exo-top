@@ -2085,9 +2085,11 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             i_min = np.argmax(k >= k_min)
         if k_max is not None and (k_max < np.max(k)):
             i_max = np.argmax(k >= k_max)
-        kv = k[i_min:i_max + 1]
-        Sv = S[i_min:i_max + 1]
-
+        try:
+            kv = k[i_min:i_max + 1]
+            Sv = S[i_min:i_max + 1]
+        except UnboundLocalError:
+            raise Exception('kmin, kmax out of bounds')
         kv, Sv_norm = sh.norm_spectrum(kv, Sv, norm=norm)
 
         if dim:
