@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None, plot=False, figsize=(12, 7),
                      cmap='nipy_spectral',
-                     labelsize=16, save=True, figname='grid', **kwargs):
+                     labelsize=16, save=True, figname='data', **kwargs):
     if units != 'km':
         raise Exception('spectrum_to_grid: units other than km not implemented')
     if psd:
@@ -21,6 +21,7 @@ def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None
         if lmax is None:
             lmax = np.max(l)
         if lmin > 0:
+            print('lmin > 0')
             # I think power spectrum must start at 0
             p0 = power[0]
             power = np.insert(np.array(power), 0, [p0]*lmin)
@@ -30,19 +31,22 @@ def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None
     coeffs_global = pyshtools.SHCoeffs.from_random(power)
     topo = coeffs_global.expand(lmax=lmax, grid='DH2', )
 
-    grid = topo.data  # * 1e-3
+    fig1, ax1 = coeffs_global.plot_spectrum(unit="per_l", xscale='lin', yscale='log', convention="l2norm", lw=4, c='k')
+    fig1.savefig(fig_path + 'test_rand_spectrum.png', transparent=True, bbox_inches='tight')
+
+    data = topo.data  # * 1e-3
     lats = topo.lats()
     lons = topo.lons()
 
-    print('data RMS', np.sqrt(np.mean(grid ** 2)))
+    print('data RMS', np.sqrt(np.mean(data ** 2)))
 
     if plot:
         # try:
         #     # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
         #     lons = np.hstack([lons, np.array([360.0])])
-        #     v = grid[:, 0]
+        #     v = data[:, 0]
         #     v = v.reshape((v.shape[0], 1))
-        #     grid = np.hstack([grid, v])
+        #     data = np.hstack([data, v])
         #
         #     data_crs = ccrs.PlateCarree()
         #     proj_crs = ccrs.Mollweide(central_longitude=22.5)
@@ -50,10 +54,10 @@ def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None
         #     fig = plt.figure(figsize=figsize)
         #     ax = plt.axes(projection=proj_crs)
         #     ax.set_global()
-        #     cf = ax.contourf(lons, lats, grid, cmap=cmap,
+        #     cf = ax.contourf(lons, lats, data, cmap=cmap,
         #                      transform=data_crs, extend="both")
         #
-        #     ct = ax.contour(lons, lats, grid,
+        #     ct = ax.contour(lons, lats, data,
         #                     colors='black', linewidths=0.5,
         #                     linestyles='solid', transform=data_crs)
         #     cbar = plt.colorbar(cf, orientation='horizontal', label='Dynamic topography (km)', fontsize=labelsize,
@@ -61,17 +65,17 @@ def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None
 
         # except:
         print('cartopy failure')
-        fig, ax = grid.plot(show=False, cmap='nipy_spectral')
+        fig, ax = topo.plot(show=False, cmap='nipy_spectral')
 
         ax.set_xlabel('Latitude', fontsize=labelsize)
         ax.set_ylabel('Longitude', fontsize=labelsize)
 
         if save:
             plot_save(fig, figname, **kwargs)
-        return grid, fig, ax
+        return data, fig, ax
 
     else:
-        return grid
+        return data
 
 
 def hpeak_from_spectrum(power, norm='4pi', lmax=40, n=10, **kwargs):
@@ -562,11 +566,11 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
 
     # somehow get exact degrees? must do fit...
     beta, intercept = fit_slope(Sv, kv, k_min=k_min, k_max=k_max, plot=False)
-    print('Sv', Sv[:20])
-    print('RMS', parseval_rms(Sv, kv))
+    # print('Sv', Sv[:20])
+    # print('RMS', parseval_rms(Sv, kv))
 
     lv = k_to_l(kv, R)  # should be l=1.9674 at the top
-    print('lv', lv[:20])
+    # print('lv', lv[:20])
 
     lmin = int(np.ceil(np.min(lv)))
     lmax = int(np.floor(np.max(lv)))
@@ -581,9 +585,9 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
     l = np.insert(np.array(l), 0, np.arange(lmin))
     kl = np.insert(np.array(kl), 0, l_to_k(np.arange(lmin), R))
 
-    print('l', l[:20])
-    print('Sl', Sl[:20])
-    print('RMS', parseval_rms(Sl, kl))
+    # print('l', l[:20])
+    # print('Sl', Sl[:20])
+    print('Sl RMS', parseval_rms(Sl, kl))
 
     fig, ax = plt.subplots(1, 1)
     ax.plot(l, Sl)
