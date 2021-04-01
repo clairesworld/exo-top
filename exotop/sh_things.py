@@ -34,6 +34,10 @@ def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None
     lats = topo.lats()
     lons = topo.lons()
 
+    print('data', data)
+    print('lats', lats)
+    print('lons', lons)
+
     if plot:
         # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
         lons = np.hstack([lons, np.array([360.0])])
@@ -553,12 +557,11 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
     beta, intercept = fit_slope(S, k, k_min=None, k_max=None, plot=False)
 
     lv = k_to_l(kv, R)  # should be l=1.9674 at the top
-    print('l at R=', R, lv)
 
     lmax = np.max(lv)
     l = np.arange(lmax+1)
     kl = l_to_k(l, R)
-    Sl = intercept * kl ** -beta  # intercept at natural min wavenumber - constant for given d
+    Sl = intercept * kl ** -beta  # psd at wavenumber corresponding to range of l
 
     pkl.dump((l, Sl), open(fig_path + newfname + fend, "wb"))
     return l, Sl
