@@ -554,7 +554,7 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
         raise Exception('kmin, kmax out of bounds')
 
     # somehow get exact degrees? must do fit...
-    beta, intercept = fit_slope(S, k, k_min=None, k_max=None, plot=False)
+    beta, intercept = fit_slope(Sv, kv, k_min=k_min, k_max=k_max, plot=False)
 
     lv = k_to_l(kv, R)  # should be l=1.9674 at the top
 
