@@ -481,7 +481,7 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
 def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=True,
                min_type='delta_rh', bl_fudge=1, plot=True, **kwargs):
 
-    max_scale = 1.5 #2  # 2 * d=1
+    max_scale = 1 #2  # 2 * d=1
     df = ap.pickleio(case, suffix='_T', t1=t1, load=True, data_path=data_path, **kwargs)
     if min_type == 'delta_rh':
         try:
