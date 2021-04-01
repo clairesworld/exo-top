@@ -2135,7 +2135,7 @@ def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, pl
     if plot_kwargs is None:
         plot_kwargs = {}
     df = pd.read_csv(filepath, header=header, names=['x', 'y'], index_col=False, comment='#')
-    x, y = df['x'].to_numpy, df['y'].to_numpy()
+    x, y = df['x'].to_numpy(), df['y'].to_numpy()
     if additional_mod_fn is not None:
         print('x', x, 'y', y)
         x, y = additional_mod_fn(x, y, **kwargs)
