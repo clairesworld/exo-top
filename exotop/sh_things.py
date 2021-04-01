@@ -439,7 +439,6 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
     if dim:
         min_scale = min_scale * d
         max_scale = max_scale * d
-    else:
 
     # print('min wl =', min_scale, ', k =', 1/min_scale)
     # print('max wl =', max_scale, ', k =', 1/max_scale)
