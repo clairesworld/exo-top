@@ -2022,17 +2022,21 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       data_path=data_path_bullard, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
                       marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density',
                       x2label='spherical harmonic degree', save=True, alpha=1, labelsize=16, ticksize=12,
-                      fig=None, ax=None, figsize=(5, 5), z_name='Ra', vmin=None, vmax=None,
-                      norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True, **kwargs):
+                      fig=None, ax=None, figsize=(5, 5), z_name='Ra', vmin=None, vmax=None, clabel=None,
+                      norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True,
+                      add_files=None, add_label=None, legsize=12, **kwargs):
     import pickle as pkl
     import sh_things as sh
     global R
+    if R_p is None:
+        R_p = d
 
     if fig is None and ax is None:
         fig, ax = plt.subplots(1, 1, figsize=figsize)
+    if clabel is None:
+        xlabel = z_name
 
     # get colouring
-
     ji_use = []
     z_vec = []
     for jj, eta_str in enumerate(eta_ls):
@@ -2069,8 +2073,12 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             S = S[1:]
         # l = sh.k_to_l(k, R=d)  # should be l=1.9674 at the top
 
+        if dim:
+            k = k * d**-1
+            S = S * d**3 * dT**2 * alpha**2
+
         # wavenumber range where spectrum makes sense
-        wl_min, wl_max = sh.nat_scales(case, ax=None, alpha=alpha, d=d, dim=dim, data_path=data_path, **kwargs)
+        wl_min, wl_max = sh.nat_scales(case, ax=None, alpha=alpha_m, d=d, dim=dim, data_path=data_path, **kwargs)
         k_min, k_max = 1 / wl_max, 1 / wl_min
         if k_min is not None and (k_min > np.min(k)):
             i_min = np.argmax(k >= k_min)
@@ -2079,16 +2087,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         kv = k[i_min:i_max + 1]
         Sv = S[i_min:i_max + 1]
 
-        if norm == 'min_l':
-            Sv_norm = Sv / Sv[0]  # actually normalise to first point inside k range
-            S_norm = Sv / Sv[0]
-        elif norm == 'k2':
-            Sv_norm = Sv / Sv[0] * kv ** 2  # trying to emphasise k**-2 slope but doesn't rlly work
-        elif norm == 'intercept':
-            beta, intercept = sh.fit_slope(Sv, kv, k_min=None, k_max=None, plot=False)
-            Sv_norm = Sv / intercept
+        kv, Sv_norm = sh.norm_spectrum(kv, Sv, norm=norm)
 
-        ax.plot(kv, Sv_norm, c=clist[zz], alpha=1, lw=lw, marker=marker)
+        ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
         # ax.plot(k, S_norm, c=clist[zz], alpha=0.1, lw=lw, marker=marker)  # not in range
 
         zz = zz + 1
@@ -2102,14 +2103,11 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         if cmap is None:
             print('cbar not implemented without cmap')
         else:
-            cax = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=z_name, labelsize=labelsize,
+            cax = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=clabel, labelsize=labelsize,
                             ticksize=ticksize, ticks=None, ticklabels=None, labelpad=17,
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=False)
     if show_degrees:
-        if dim:
-            R = R_p
-        else:
-            R = d
+        R = R_p
 
         def to_deg(k):
             return k * 2 * np.pi * R - 0.5
@@ -2121,6 +2119,22 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         secax.set_xlabel(x2label, fontsize=labelsize)
         secax.tick_params(axis='both', which='major', labelsize=ticksize)
 
+    if add_files is not None:
+        for ii, f in enumerate(add_files):
+            ax = plot_from_txt(f, ax, label=add_label[ii], header=0,
+                               additional_mod_fn=sh.mod_loaded_spectrum,
+                               plot_kwargs={'c': 'k'}, is_2D=True, is_wl=True, normalise=True, norm=norm)
+        ax.legend(frameon=False, fontsize=legsize)
+
     if save:
         plot_save(fig, fname=figname, **kwargs)
     return fig, ax
+
+
+def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, plot_kwargs={}, **kwargs):
+    df = pd.read_csv(filepath, header=header, names=['x', 'y'], index_col=False, comment='#')
+    x, y = df['x'].to_numpy, df['y'].to_numpy()
+    if additional_mod_fn is not None:
+        x, y = additional_mod_fn(x, y, **kwargs)
+    ax.plot(x, y, label=label, **plot_kwargs)
+    return ax

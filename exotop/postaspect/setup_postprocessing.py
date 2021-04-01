@@ -55,6 +55,7 @@ data_path = data_path_bullard
 fig_path = fig_path_bullard
 fig_fmt = '.png'
 cmap_path = 'exotop/plot/cmaps/'
+benchmark_path = '/home/cmg76/Works/exo-top/benchmarks/'
 
 c_rms = 'xkcd:forest green'
 c_peak = 'xkcd:periwinkle'

@@ -2,7 +2,7 @@ import sh_things as sh
 import numpy as np
 import postaspect.plt_aspect as plat
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, \
-    fig_fmt, regime_grid_td, load_grid, p_Earth, postprocess_kwargs
+    fig_fmt, regime_grid_td, load_grid, p_Earth, postprocess_kwargs, benchmark_path
 
 """ set dimensionalisation factors """
 R_p = 6371
@@ -19,10 +19,11 @@ fig, ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_gri
                                  include_regimes=regimes_use,
                                  data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
                                  fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True,
-                                 labelsize=16, ticksize=12,
+                                 labelsize=16, ticksize=12, clabel=r'Ra$_{i, {\rm eff}}$',
                                  marker='.', lw=0.5, xlabel='Wavenumber', ylabel='Normalised power spectral density',
-                                 save=True,
-                                 norm='intercept')
+                                 save=True, x2label='Spherical harmonic degree',
+                                 norm='intercept', dim=True, d=d, dT=dT, alpha_m=alpha, R_p=d,
+                                 add_files=[benchmark_path + 'lees_topo_grids/psd_hoggard.csv'], add_label=['Hoggard+ (2016)'])
 
 """ get all time-averaged spectra and store """
 

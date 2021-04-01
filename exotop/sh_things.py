@@ -33,11 +33,32 @@ def load_spectrum_wavenumber(fpath='', fname='', has_header=True, wl=False, two_
     df = pd.read_csv(fpath + fname, header=header, names=names, index_col=False, comment='#')
     k = df['k'][1:].to_numpy()
     power = df['S'][1:].to_numpy()
-    if wl:
-        k = 1/k
-    if two_d:
-        power = power*k
+    k, power = mod_loaded_spectrum(k, power, is_wl=wl, is_2D=two_d)
     return power, k
+
+
+def norm_spectrum(k, S, norm='min_l'):
+    if norm == 'min_l':
+        S_norm = S / S[0]  # actually normalise to first point inside k range
+        S_norm = S / S[0]
+    elif norm == 'k2':
+        S_norm = S / S[0] * k ** 2  # trying to emphasise k**-2 slope but doesn't rlly work
+    elif norm == 'intercept':
+        beta, intercept = fit_slope(S, k, k_min=None, k_max=None, plot=False)
+        S_norm = S / intercept
+    return k, S_norm
+
+
+def mod_loaded_spectrum(k, S, is_wl=False, is_2D=False, is_not_density=False, normalise=False, **kwargs):
+    if is_wl:
+        k = 1/k
+    if is_2D:
+        S = S*k
+    if is_not_density:
+        pass
+    if normalise:
+        k, S = norm_spectrum(k, S, **kwargs)
+    return k, S
 
 
 def scale_spectrum(h_rms, h_rms0=None, phi0=None, degree=None, pl=None, pl0=None, h_func=None, age=4.5, **kwargs):
@@ -405,6 +426,7 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
 
 def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=True, **kwargs):
 
+    max_scale = 2  # 2 * d=1
     df = ap.pickleio(case, suffix='_T', t1=t1, load=True, data_path=data_path, **kwargs)
     try:
         T_av, y = ap.time_averaged_profile_from_df(df, 'T_av')
@@ -416,9 +438,9 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         min_scale = np.mean(df.delta_rh.to_numpy())
     if dim:
         min_scale = min_scale * d
-        max_scale = 2*d
+        max_scale = max_scale * d
     else:
-        max_scale = 2
+
     # print('min wl =', min_scale, ', k =', 1/min_scale)
     # print('max wl =', max_scale, ', k =', 1/max_scale)
 
