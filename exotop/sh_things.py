@@ -487,9 +487,9 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')
         dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, alpha_m=alpha,
                                         data_path=data_path, **kwargs)
-        min_scale = dic_av['delta_rh']
+        min_scale = dic_av['delta_rh'] * 2
     except KeyError:
-        min_scale = np.mean(df.delta_rh.to_numpy())
+        min_scale = np.mean(df.delta_rh.to_numpy()) * 2
     print('delta rh', min_scale, 'nondimensional')
     if dim:
         print('dim', dim)
