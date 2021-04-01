@@ -28,41 +28,50 @@ def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None
         power = np.array(power) * (2 * np.array(l) + 1)
 
     coeffs_global = pyshtools.SHCoeffs.from_random(power)
-    topo = coeffs_global.expand(lmax=lmax)
+    topo = coeffs_global.expand(lmax=lmax, grid='DH2', )
 
-    data = topo.data  # * 1e-3
+    grid = topo.data  # * 1e-3
     lats = topo.lats()
     lons = topo.lons()
 
-    print('data RMS', np.sqrt(np.mean(data**2)))
+    print('data RMS', np.sqrt(np.mean(grid ** 2)))
 
     if plot:
-        # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
-        lons = np.hstack([lons, np.array([360.0])])
-        v = data[:, 0]
-        v = v.reshape((v.shape[0], 1))
-        data = np.hstack([data, v])
+        try:
+            # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
+            lons = np.hstack([lons, np.array([360.0])])
+            v = grid[:, 0]
+            v = v.reshape((v.shape[0], 1))
+            grid = np.hstack([grid, v])
 
-        data_crs = ccrs.PlateCarree()
-        proj_crs = ccrs.Mollweide(central_longitude=22.5)
+            data_crs = ccrs.PlateCarree()
+            proj_crs = ccrs.Mollweide(central_longitude=22.5)
 
-        fig = plt.figure(figsize=figsize)
-        ax = plt.axes(projection=proj_crs)
-        ax.set_global()
+            fig = plt.figure(figsize=figsize)
+            ax = plt.axes(projection=proj_crs)
+            ax.set_global()
+            cf = ax.contourf(lons, lats, grid, cmap=cmap,
+                             transform=data_crs, extend="both")
 
-        cf = ax.contourf(lons, lats, data, cmap=cmap,
-                         transform=data_crs, extend="both")
-        ct = ax.contour(lons, lats, data,
-                        colors='black', linewidths=0.5,
-                        linestyles='solid', transform=data_crs)
-        cbar = plt.colorbar(cf, orientation='horizontal', label='Dynamic topography (km)', fontsize=labelsize, fraction=0.07)
+            ct = ax.contour(lons, lats, grid,
+                            colors='black', linewidths=0.5,
+                            linestyles='solid', transform=data_crs)
+            cbar = plt.colorbar(cf, orientation='horizontal', label='Dynamic topography (km)', fontsize=labelsize,
+                                fraction=0.07)
+
+        except:
+            print('cartopy failure')
+            fig, ax = grid.plot(show=False, cmap='nipy_spectral')
+
+            ax.set_xlabel('Latitude', fontsize=labelsize)
+            ax.set_ylabel('Longitude', fontsize=labelsize)
 
         if save:
             plot_save(fig, figname, **kwargs)
-        return data, fig, ax
+        return grid, fig, ax
 
     else:
-        return data
+        return grid
 
 
 def hpeak_from_spectrum(power, norm='4pi', lmax=40, n=10, **kwargs):
@@ -553,18 +562,25 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
 
     # somehow get exact degrees? must do fit...
     beta, intercept = fit_slope(Sv, kv, k_min=k_min, k_max=k_max, plot=False)
-    print('Sv', Sv[:10])
+    print('Sv', Sv[:20])
     print('RMS', parseval_rms(Sv, kv))
 
     lv = k_to_l(kv, R)  # should be l=1.9674 at the top
+    print('lv', lv[:20])
 
-    lmax = np.max(lv)
-    l = np.arange(lmax+1)
+    lmin = np.ceil(np.min(lv))
+    lmax = np.floor(np.max(lv))
+    l = np.arange(lmin, lmax+1)
     kl = l_to_k(l, R)
     Sl = intercept * kl ** -beta  # psd at wavenumber corresponding to range of l
 
-    print('l', l[:10])
-    print('Sl', Sl[:10])
+    # insert lower degrees
+    p0 = Sl[0]
+    Sl = np.insert(np.array(Sl), 0, [p0] * (lmin - 2))
+    Sl = np.insert(np.array(Sl), 0, [0.0] * 2)
+
+    print('l', l[:20])
+    print('Sl', Sl[:20])
 
     pkl.dump((l, Sl), open(fig_path + newfname + fend, "wb"))
     return l, Sl
