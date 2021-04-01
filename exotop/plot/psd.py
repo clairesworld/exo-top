@@ -17,12 +17,12 @@ regimes_use = ['chaotic']
 
 fig, ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
                                  include_regimes=regimes_use, save=True,
-                                 data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
+                                 data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked_dim',
                                  fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True,
                                  labelsize=16, ticksize=12, marker='.', lw=0.5,
                                  xlabel=r'Wavenumber (km$^{-1}$)', ylabel='Normalised power spectral density',
                                  x2label='Spherical harmonic degree', clabel=r'Ra$_{i, {\rm eff}}$',
-                                 norm='intercept', dim=False, d=d, dT=dT, alpha_m=alpha, R_p=d,
+                                 norm='intercept', dim=True, d=d, dT=dT, alpha_m=alpha, R_p=d,
                                  # add_files=[benchmark_path + 'lees_topo_grids/psd_hoggard.csv'], add_label=['Hoggard+ (2016)']
                                  )
 
