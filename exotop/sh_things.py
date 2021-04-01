@@ -7,6 +7,58 @@ from postaspect import aspectdata as post
 from postaspect.plt_aspect import plot_save
 import matplotlib.pyplot as plt
 
+
+def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None, plot=False, figsize=(12, 7), cmap='nipy_spectral',
+                     labelsize=16, **kwargs):
+    if units != 'km':
+        raise Exception('spectrum_to_grid: units other than km not implemented')
+    if psd:
+        # convert from 1D-PSD in km^3 to power spectrum in km^2 - l must correspond to values of psd
+        if l is None:
+            raise Exception('need degree to convert psd to power spectrum')
+        lmin = np.min(l)
+        if lmax is None:
+            lmax = np.max(l)
+        if lmin > 0:
+            # I think power spectrum must start at 0
+            p0 = power[0]
+            power = np.insert(np.array(power), 0, [p0]*lmin)
+            l = np.arange(lmax + 1)
+        power = np.array(power) * (2 * np.array(l) + 1)
+
+    coeffs_global = pyshtools.SHCoeffs.from_random(power)
+    topo = coeffs_global.expand(lmax=lmax)
+
+    data = topo.data  # * 1e-3
+    lats = topo.lats()
+    lons = topo.lons()
+
+    if plot:
+        # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
+        lons = np.hstack([lons, np.array([360.0])])
+        v = data[:, 0]
+        v = v.reshape((v.shape[0], 1))
+        data = np.hstack([data, v])
+
+        data_crs = ccrs.PlateCarree()
+        proj_crs = ccrs.Mollweide(central_longitude=22.5)
+
+        fig = plt.figure(figsize=figsize)
+        ax = plt.axes(projection=proj_crs)
+        ax.set_global()
+
+        cf = ax.contourf(lons, lats, data, cmap=cmap,
+                         transform=data_crs, extend="both")
+        ct = ax.contour(lons, lats, data,
+                        colors='black', linewidths=0.5,
+                        linestyles='solid', transform=data_crs)
+        cbar = plt.colorbar(cf, orientation='horizontal', label='Dynamic topography (km)', fontsize=labelsize, fraction=0.07)
+        return data, fig, ax
+
+    else:
+        return data
+
+
 def hpeak_from_spectrum(power, norm='4pi', lmax=40, n=10, **kwargs):
     ii = 0
     h_peak = []
@@ -50,13 +102,13 @@ def norm_spectrum(k, S, norm='min_l'):
     return k, S_norm
 
 
-def mod_loaded_spectrum(k, S, is_wl=False, is_2D=False, is_not_density=False, normalise=False, **kwargs):
+def mod_loaded_spectrum(k, S, is_wl=False, is_2D=False, is_amplitude=False, normalise=False, **kwargs):
     if is_wl:
         k = 1.0/k
     if is_2D:
         S = S*k
-    if is_not_density:
-        pass
+    if is_amplitude:
+        S = S**2
     if normalise:
         k, S = norm_spectrum(k, S, **kwargs)
     return k, S
@@ -368,8 +420,8 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
         k_min = to_wn(l_min)
         k_max = to_wn(l_max)
     else:
-        k_min = 1/wl_max
-        k_max = 1/wl_min
+        k_min = 2*np.pi/wl_max
+        k_max = 2*np.pi/wl_min
     beta, intercept = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
     ax = show_beta_guide(ax, x0=x0_guide, y0=y0_guide, x1=x1_guide, m=-2, c='k', lw=3, log=True, **kwargs)
 
@@ -442,15 +494,12 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         min_scale = min_scale * d
         max_scale = max_scale * d
 
-    # print('min wl =', min_scale, ', k =', 1/min_scale)
-    # print('max wl =', max_scale, ', k =', 1/max_scale)
-
     if ax is not None:
-        ax.axvline(x=1/min_scale, lw=lw, c=c)
-        ax.axvline(x=1/max_scale, lw=lw, c=c)
-        ylim = ax.get_ylim()
-        y_percent = 0.1
-        yt = 10**(y_percent*(np.log10(ylim[1]) - np.log10(ylim[0])) + np.log10(ylim[0]))
+        ax.axvline(x=2*np.pi/min_scale, lw=lw, c=c)
+        ax.axvline(x=2*np.pi/max_scale, lw=lw, c=c)
+        # ylim = ax.get_ylim()
+        # y_percent = 0.1
+        # yt = 10**(y_percent*(np.log10(ylim[1]) - np.log10(ylim[0])) + np.log10(ylim[0]))
         # ax.text(1 / max_scale, yt, r'$2d$', va='top', ha='left', fontsize=11, c=c)
         # ax.text(1 / min_scale, yt, r'$\delta_{\rm rh}$', va='top', ha='left', fontsize=11, c=c)
 
