@@ -492,7 +492,6 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
             min_scale = dic_av['delta_rh'] * bl_fudge
         except KeyError:
             min_scale = np.mean(df.delta_rh.to_numpy()) * bl_fudge
-        print('delta rh', min_scale, 'nondimensional')
     elif min_type == 'elastic':
         # https://www.essoar.org/pdfjs/10.1002/essoar.10504581.1 for elastic thickness based on heat flow (Borrelli)
         min_scale = 0.12  # 330 km, Lees
@@ -501,7 +500,6 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         min_scale = min_scale * d
         max_scale = max_scale * d
 
-    print('min wavelength', min_scale, 'km')
     if ax is not None:
         ax.axvline(x=2*np.pi/min_scale, lw=lw, c=c)
         ax.axvline(x=2*np.pi/max_scale, lw=lw, c=c)

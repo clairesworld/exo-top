@@ -2085,7 +2085,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         if k_min is not None and (k_min > np.min(k)):
             i_min = np.argmax(k >= k_min)
         if k_max is not None and (k_max < np.max(k)):
-            i_max = np.argmax(k >= k_max)
+            i_max = -2  #np.argmax(k >= k_max)
         try:
             kv = k[i_min:i_max + 1]
             Sv = S[i_min:i_max + 1]
