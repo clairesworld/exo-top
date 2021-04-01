@@ -583,6 +583,13 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
     print('l', l[:20])
     print('Sl', Sl[:20])
 
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(l, Sl)
+    ax.loglog()
+    ax.set_xlabel('degree')
+    ax.set_ylabel('PSD')
+    fig.save(fig_path + 'Sl_test.png', bbox_inches='tight')
+
     pkl.dump((l, Sl), open(fig_path + newfname + fend, "wb"))
     return l, Sl
 
