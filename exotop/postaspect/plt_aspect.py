@@ -2112,7 +2112,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         ax.set_ylim(ylim)
 
     if show_beta_guide:
-        ax = sh.show_beta_guide(ax, x0=kv[1], y0=Sv_norm[1] * 1e-3, x1=kv[3], m=-2, c='xkcd:slate', lw=3,
+        ax = sh.show_beta_guide(ax, x0=kv[1], y0=Sv_norm[1] * 1e-3, x1=kv[7], m=-2, c='xkcd:slate', lw=3,
                                 legsize=legsize)
 
     if cbar:
@@ -2120,8 +2120,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             print('cbar not implemented without cmap')
         else:
             cax = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=clabel, labelsize=labelsize,
-                            ticksize=ticksize, ticks=None, ticklabels=None, labelpad=17,
-                            rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.05, log=False)
+                            ticksize=ticksize, ticks=None, ticklabels=None, labelpad=25,
+                            rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.1, log=False)
     if show_degrees:
         if dim:
             R = R_p
