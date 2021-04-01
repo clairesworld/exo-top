@@ -2024,7 +2024,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       x2label='spherical harmonic degree', save=True, alpha=1, labelsize=16, ticksize=12,
                       fig=None, ax=None, figsize=(5, 5), z_name='Ra', vmin=None, vmax=None, clabel=None,
                       norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True,
-                      add_files=None, add_label=None, legsize=12, **kwargs):
+                      add_files=None, add_label=None, legsize=12, xlim=None, ylim=None, **kwargs):
     import pickle as pkl
     import sh_things as sh
     global R
@@ -2102,6 +2102,10 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
     ax.set_xlabel(xlabel, fontsize=labelsize)
     ax.set_ylabel(ylabel, fontsize=labelsize)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
 
     if cbar:
         if cmap is None:
