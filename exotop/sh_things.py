@@ -45,7 +45,6 @@ def norm_spectrum(k, S, norm='min_l'):
         S_norm = S / S[0] * k ** 2  # trying to emphasise k**-2 slope but doesn't rlly work
     elif norm == 'intercept':
         beta, intercept = fit_slope(S, k, k_min=None, k_max=None, plot=False)
-        prin
         S_norm = S / intercept
     return k, S_norm
 
