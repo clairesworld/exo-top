@@ -495,8 +495,8 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
     elif min_type == 'elastic':
         # https://www.essoar.org/pdfjs/10.1002/essoar.10504581.1 for elastic thickness based on heat flow (Borrelli)
         min_scale = 0.12  # 330 km, Lees
+
     if dim:
-        print('dim', dim)
         min_scale = min_scale * d
         max_scale = max_scale * d
 
