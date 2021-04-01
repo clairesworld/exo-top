@@ -568,8 +568,8 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
     lv = k_to_l(kv, R)  # should be l=1.9674 at the top
     print('lv', lv[:20])
 
-    lmin = np.ceil(np.min(lv))
-    lmax = np.floor(np.max(lv))
+    lmin = int(np.ceil(np.min(lv)))
+    lmax = int(np.floor(np.max(lv)))
     l = np.arange(lmin, lmax+1)
     kl = l_to_k(l, R)
     Sl = intercept * kl ** -beta  # psd at wavenumber corresponding to range of l
