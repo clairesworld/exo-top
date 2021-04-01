@@ -37,34 +37,34 @@ def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None
     print('data RMS', np.sqrt(np.mean(grid ** 2)))
 
     if plot:
-        try:
-            # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
-            lons = np.hstack([lons, np.array([360.0])])
-            v = grid[:, 0]
-            v = v.reshape((v.shape[0], 1))
-            grid = np.hstack([grid, v])
+        # try:
+        #     # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
+        #     lons = np.hstack([lons, np.array([360.0])])
+        #     v = grid[:, 0]
+        #     v = v.reshape((v.shape[0], 1))
+        #     grid = np.hstack([grid, v])
+        #
+        #     data_crs = ccrs.PlateCarree()
+        #     proj_crs = ccrs.Mollweide(central_longitude=22.5)
+        #
+        #     fig = plt.figure(figsize=figsize)
+        #     ax = plt.axes(projection=proj_crs)
+        #     ax.set_global()
+        #     cf = ax.contourf(lons, lats, grid, cmap=cmap,
+        #                      transform=data_crs, extend="both")
+        #
+        #     ct = ax.contour(lons, lats, grid,
+        #                     colors='black', linewidths=0.5,
+        #                     linestyles='solid', transform=data_crs)
+        #     cbar = plt.colorbar(cf, orientation='horizontal', label='Dynamic topography (km)', fontsize=labelsize,
+        #                         fraction=0.07)
 
-            data_crs = ccrs.PlateCarree()
-            proj_crs = ccrs.Mollweide(central_longitude=22.5)
+        # except:
+        print('cartopy failure')
+        fig, ax = grid.plot(show=False, cmap='nipy_spectral')
 
-            fig = plt.figure(figsize=figsize)
-            ax = plt.axes(projection=proj_crs)
-            ax.set_global()
-            cf = ax.contourf(lons, lats, grid, cmap=cmap,
-                             transform=data_crs, extend="both")
-
-            ct = ax.contour(lons, lats, grid,
-                            colors='black', linewidths=0.5,
-                            linestyles='solid', transform=data_crs)
-            cbar = plt.colorbar(cf, orientation='horizontal', label='Dynamic topography (km)', fontsize=labelsize,
-                                fraction=0.07)
-
-        except:
-            print('cartopy failure')
-            fig, ax = grid.plot(show=False, cmap='nipy_spectral')
-
-            ax.set_xlabel('Latitude', fontsize=labelsize)
-            ax.set_ylabel('Longitude', fontsize=labelsize)
+        ax.set_xlabel('Latitude', fontsize=labelsize)
+        ax.set_ylabel('Longitude', fontsize=labelsize)
 
         if save:
             plot_save(fig, figname, **kwargs)
@@ -579,9 +579,11 @@ def make_baseline_spectrum(case, R=1, data_path='', fig_path='', newfname='base_
     Sl = np.insert(np.array(Sl), 0, [p0] * (lmin - 2))
     Sl = np.insert(np.array(Sl), 0, [0.0] * 2)
     l = np.insert(np.array(l), 0, np.arange(lmin))
+    kl = np.insert(np.array(kl), 0, l_to_k(np.arange(lmin), R))
 
     print('l', l[:20])
     print('Sl', Sl[:20])
+    print('RMS', parseval_rms(Sl, kl))
 
     fig, ax = plt.subplots(1, 1)
     ax.plot(l, Sl)
