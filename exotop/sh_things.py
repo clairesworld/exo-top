@@ -104,7 +104,7 @@ def norm_spectrum(k, S, norm='min_l'):
 
 def mod_loaded_spectrum(k, S, is_wl=False, is_2D=False, is_amplitude=False, normalise=False, **kwargs):
     if is_wl:
-        k = 1.0/k
+        k = 2*np.pi/k
     if is_2D:
         S = S*k
     if is_amplitude:
