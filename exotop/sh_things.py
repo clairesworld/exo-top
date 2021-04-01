@@ -8,8 +8,9 @@ from postaspect.plt_aspect import plot_save
 import matplotlib.pyplot as plt
 
 
-def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None, plot=False, figsize=(12, 7), cmap='nipy_spectral',
-                     labelsize=16, **kwargs):
+def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None, plot=False, figsize=(12, 7),
+                     cmap='nipy_spectral',
+                     labelsize=16, save=True, figname='grid', **kwargs):
     if units != 'km':
         raise Exception('spectrum_to_grid: units other than km not implemented')
     if psd:
@@ -53,6 +54,9 @@ def spectrum_to_grid(power, units='km', psd=False, l=None, norm='4pi', lmax=None
                         colors='black', linewidths=0.5,
                         linestyles='solid', transform=data_crs)
         cbar = plt.colorbar(cf, orientation='horizontal', label='Dynamic topography (km)', fontsize=labelsize, fraction=0.07)
+
+        if save:
+            plot_save(fig, figname, **kwargs)
         return data, fig, ax
 
     else:
@@ -533,7 +537,7 @@ def make_baseline_spectrum(case, data_path='', fig_path='', newfname='base_spect
         S = S[1:]
 
     # wavenumber range where spectrum makes sense
-    ax, wl_min, wl_max = nat_scales(case, dim=False, data_path=data_path, plot=False, bl_fudge=5, )
+    wl_min, wl_max = nat_scales(case, dim=False, data_path=data_path, plot=False, bl_fudge=5, )
     k_min, k_max = 2 * np.pi / wl_max, 2 * np.pi / wl_min
     if k_min is not None and (k_min > np.min(k)):
         i_min = 0  # np.argmax(k >= k_min)
@@ -555,6 +559,7 @@ def make_baseline_spectrum(case, data_path='', fig_path='', newfname='base_spect
     l = np.arange(lmax+1)
     Sl = Sv
     pkl.dump((l, Sl), open(fig_path + newfname + fend, "wb"))
+    return l, Sl
 
 
 

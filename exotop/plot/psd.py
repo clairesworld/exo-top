@@ -30,7 +30,10 @@ regimes_use = ['chaotic']
 """ what does a cartesian projection look like? """
 
 base_case = 'Ra1e8-eta1e7-wide'
-sh.make_baseline_spectrum(base_case, data_path=data_path, fig_path=fig_path, newfname='base_spectrum')
+l, S = sh.make_baseline_spectrum(base_case, data_path=data_path, fig_path=fig_path, newfname='base_spectrum')
+
+sh.spectrum_to_grid(power=S * d**3 * alpha**2 * dT**2, units='km', psd=True, l=l, plot=True, cmap='nipy_spectral',
+                    labelsize=16, save=True, figname='grid', fig_path=fig_path)
 
 """ get all time-averaged spectra and store """
 
