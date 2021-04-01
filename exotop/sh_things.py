@@ -478,19 +478,23 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
     return ax
 
 
-def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=True, **kwargs):
+def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=True,
+               min_type='elastic', **kwargs):
 
     max_scale = 2  # 2 * d=1
     df = ap.pickleio(case, suffix='_T', t1=t1, load=True, data_path=data_path, **kwargs)
-    try:
-        T_av, y = ap.time_averaged_profile_from_df(df, 'T_av')
-        uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')
-        dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, alpha_m=alpha,
-                                        data_path=data_path, **kwargs)
-        min_scale = dic_av['delta_rh'] * 2
-    except KeyError:
-        min_scale = np.mean(df.delta_rh.to_numpy()) * 2
-    print('delta rh', min_scale, 'nondimensional')
+    if min_type == 'delta_rh':
+        try:
+            T_av, y = ap.time_averaged_profile_from_df(df, 'T_av')
+            uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')
+            dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, alpha_m=alpha,
+                                            data_path=data_path, **kwargs)
+            min_scale = dic_av['delta_rh'] * 2
+        except KeyError:
+            min_scale = np.mean(df.delta_rh.to_numpy()) * 2
+        print('delta rh', min_scale, 'nondimensional')
+    elif min_type == 'elastic':
+        # https://www.essoar.org/pdfjs/10.1002/essoar.10504581.1 for elastic thickness based on heat flow (Borrelli)
     if dim:
         print('dim', dim)
         min_scale = min_scale * d

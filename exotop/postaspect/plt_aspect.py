@@ -2077,7 +2077,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             S = S * d**3 * dT**2 * alpha_m**2
 
         # wavenumber range where spectrum makes sense
-        ax, wl_min, wl_max = sh.nat_scales(case, ax=ax, alpha=alpha_m, d=d, dim=dim, data_path=data_path, **kwargs)
+        wl_min, wl_max = sh.nat_scales(case, ax=None, alpha=alpha_m, d=d, dim=dim, data_path=data_path, **kwargs)
         # wl_min, wl_max = sh.nat_scales(case, dim=False, alpha=alpha_m, data_path=data_path, ax=None, **kwargs)
         k_min, k_max = 2*np.pi / wl_max, 2*np.pi / wl_min
         print('k max (dimensional)', k_max)
