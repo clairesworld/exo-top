@@ -3,6 +3,7 @@ import sh_things as sh
 import matplotlib.pyplot as plt
 from useful_and_bespoke import dark_background
 import postaspect.plt_aspect as plat
+import model_1D.the_results as results
 import matplotlib.ticker as ticker
 import numpy as np
 
@@ -40,11 +41,11 @@ labelsize = 20
 """ money plot """
 
 labelsize = 40
-fig, axes = plat.plot_ocean_capacity_relative(n_stats=10, relative=True, nplanets=25,
+fig, axes = results.plot_ocean_capacity_relative(n_stats=2, relative=True, nplanets=2,
                                                  legsize=20, ticksize=25, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False,
                                                  showwaterscale=True, log=True,
-                                                 defaults='Venusbaseline',  # textc='xkcd:off white',
+                                                 defaults='Venusbaseline', textc='xkcd:off white',
                                                  title='Ocean volume to submerge land',
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  # benchmark_path+'wei_Venus/',

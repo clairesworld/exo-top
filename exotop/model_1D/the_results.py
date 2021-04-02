@@ -1055,9 +1055,12 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
     # h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
     degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
 
+    print('degree', degree)
     pl0 = evol.bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults,
                             t_eval=None, random=False, phi0=phi0, postprocessors=['topography', 'ocean_capacity'],
                             **kwargs)[0]
+
+    print('pl0 max ocean', pl0.max_ocean[-1])
     fig, axes = plt.subplots(figsize=figsize)
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0,
                                               textc=textc,
