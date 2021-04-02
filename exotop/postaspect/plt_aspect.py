@@ -2123,6 +2123,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         ax = sh.show_beta_guide(ax, x0=kv[1], y0=Sv_norm[1] * 1e-3, x1=kv[7], m=-2, c=c_guide, lw=2,
                                 legsize=legsize)
 
+    axes = [ax,]
     if cbar:
         if cmap is None:
             print('cbar not implemented without cmap')
@@ -2130,6 +2131,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             cax = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=clabel, labelsize=labelsize,
                             ticksize=ticksize, ticks=None, ticklabels=None, labelpad=25,
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.1, log=False)
+        axes.append(cax)
     if show_degrees:
         if dim:
             R = R_p
@@ -2145,6 +2147,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
         secax.set_xlabel(x2label, fontsize=labelsize, labelpad=labelpad)
         secax.tick_params(axis='both', which='major', labelsize=ticksize)
+        axes.append(secax)
 
     if add_files is not None:
         for ii, f in enumerate(add_files):
@@ -2155,7 +2158,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
 
     if save:
         plot_save(fig, fname=figname, **kwargs)
-    return fig, ax
+    return (fig, *axes)
 
 
 def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, plot_kwargs=None, **kwargs):

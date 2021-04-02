@@ -11,6 +11,7 @@ data_path = '/home/claire/Works/aspect/runs/model-output/'
 case = 'Ra1e8-eta1e7-wide'
 # d, dT, alpha = 1, 1, 1
 d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph
+labelsize=20
 
 # only do this once
 # sh.make_model_spectrum(case, R=2, data_path=data_path, fig_path='', newfname='base_spectrum',
@@ -22,12 +23,15 @@ h_ratio = 1
 clm = sh.random_harms_from_psd(S, l, R=2, h_ratio=h_ratio, plot=False, verbose=False)
 
 h_rms, h_peak = sh.coeffs_to_grid(clm, plot_grid=False, plot_spectrum=True, d=d, alpha_m=alpha, dT=dT, R=2*d,
-                                  verbose=False, cbar=False, labelsize=20, cmap='nipy_spectral', cline='xkcd:off white')
+                                  verbose=False, cbar=False, labelsize=labelsize, cmap='nipy_spectral', cline='xkcd:off white')
 
 fig = plt.gcf()
 ax = plt.gca()
-ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
-
+ax.set_xlabel("Spherical harmonic degree", fontsize=labelsize, labelpad=16)
+ax.set_ylabel("Power (km$^2$ km$^2$)", fontsize=labelsize, labelpad=16)
+ax.set_xticks([2, 5, 10, 20, 50])
+# ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
+ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
 fig, ax = dark_background(fig, ax)
 fig.savefig('psd_example.png', bbox_inches='tight', transparent=True)
 # plt.show()
