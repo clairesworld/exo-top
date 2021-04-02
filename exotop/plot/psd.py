@@ -16,7 +16,7 @@ regimes_use = ['chaotic']
 
 """ plot normalised spectra on single axis """
 
-fig, (ax) = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
+fig, *ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
                                  include_regimes=regimes_use, save=False,
                                  data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked_slides',
                                  fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True, show_beta_guide=True,
@@ -28,8 +28,8 @@ fig, (ax) = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_g
                                  # add_files=[benchmark_path + 'lees_topo_grids/psd_hoggard.csv'], add_label=['Hoggard+ (2016)']
                                  )
 
-fig, ax = dark_background(fig, ax)
-fig.savefig(fig_path + 'psd_example.png', bbox_inches='tight', transparent=True)
+fig, *ax = dark_background(fig, *ax)
+fig.savefig(fig_path + 'psd_stacked_slides.png', bbox_inches='tight', transparent=True)
 
 """ what does a cartesian projection look like? """
 
