@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from useful_and_bespoke import dark_background
 import postaspect.plt_aspect as plat
 import model_1D.the_results as results
+import model_1D.parameters as p
 import matplotlib.ticker as ticker
 import numpy as np
 
