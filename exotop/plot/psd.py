@@ -29,7 +29,7 @@ fig, ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_gri
                                  )
 
 fig, ax = dark_background(fig, ax)
-fig.savefig('psd_example.png', bbox_inches='tight', transparent=True)
+fig.savefig(fig_path + 'psd_example.png', bbox_inches='tight', transparent=True)
 
 """ what does a cartesian projection look like? """
 
