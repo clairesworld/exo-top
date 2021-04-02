@@ -26,6 +26,7 @@ h_rms, h_peak = sh.coeffs_to_grid(clm, plot_grid=False, plot_spectrum=True, d=d,
 
 fig = plt.gcf()
 ax = plt.gca()
+ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
 
 fig, ax = dark_background(fig, ax)
 fig.savefig('psd_example.png', bbox_inches='tight', transparent=True)
