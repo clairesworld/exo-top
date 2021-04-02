@@ -2128,10 +2128,10 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         if cmap is None:
             print('cbar not implemented without cmap')
         else:
-            cax = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=clabel, labelsize=labelsize,
+            cb = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=clabel, labelsize=labelsize,
                             ticksize=ticksize, ticks=None, ticklabels=None, labelpad=25,
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.1, log=False)
-        axes.append(cax)
+        axes.append(cb.ax)
     if show_degrees:
         if dim:
             R = R_p
