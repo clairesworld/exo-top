@@ -164,8 +164,12 @@ def plot_geth(case=None, averagescheme=None, data_path=data_path_bullard, return
     if averagescheme in ['timelast', 'timefirst']:
         df = pro.pickleio_multi(case, psuffixes=['_h_all'], t1=t1, load=load,
                                 data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
-        h_rms = df.h_rms.mean()
-        h_peak = df.h_peak.mean()
+        try:
+            h_rms = df.h_rms.mean()
+            h_peak = df.h_peak.mean()
+        except AttributeError as e:
+            print(df.head())
+            raise e
     # elif averagescheme == 'timefirst':
     #     # load time-averages
     #     df_h = pickleio_average(case, suffix='_h_mean', postprocess_fn=h_timeaverage, t1=t1, load=load,
@@ -2026,7 +2030,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       x2label='spherical harmonic degree', save=True, alpha=1, labelsize=16, ticksize=12,
                       fig=None, ax=None, figsize=(5, 5), z_name='Ra', vmin=None, vmax=None, clabel=None,
                       norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True,
-                      add_files=None, add_label=None, legsize=12, xlim=None, ylim=None, show_beta_guide=False,**kwargs):
+                      add_files=None, add_label=None, legsize=12, xlim=None, ylim=None, show_beta_guide=False,
+                      max_dscale=2, bl_fudge=1, c_guide='xkcd:slate', labelpad=20,
+                      **kwargs):
     import pickle as pkl
     import sh_things as sh
     global R
@@ -2084,7 +2090,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
 
         # wavenumber range where spectrum makes sense
         ax, wl_min, wl_max = sh.nat_scales(case, ax=ax, alpha=alpha_m, d=d, dim=dim, data_path=data_path,
-                                           plot=False, bl_fudge=5, c=clist[zz], **kwargs)
+                                           plot=False, bl_fudge=bl_fudge, max_dscale=max_dscale,
+                                           c=clist[zz], **kwargs)
         # wl_min, wl_max = sh.nat_scales(case, dim=False, alpha=alpha_m, data_path=data_path, ax=None, **kwargs)
         k_min, k_max = 2*np.pi / wl_max, 2*np.pi / wl_min
         if k_min is not None and (k_min > np.min(k)):
@@ -2104,8 +2111,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         zz = zz + 1
 
     ax.loglog()
-    ax.set_xlabel(xlabel, fontsize=labelsize)
-    ax.set_ylabel(ylabel, fontsize=labelsize)
+    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=labelpad)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
     if xlim is not None:
         ax.set_xlim(xlim)
@@ -2113,7 +2120,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         ax.set_ylim(ylim)
 
     if show_beta_guide:
-        ax = sh.show_beta_guide(ax, x0=kv[1], y0=Sv_norm[1] * 1e-3, x1=kv[7], m=-2, c='xkcd:slate', lw=3,
+        ax = sh.show_beta_guide(ax, x0=kv[1], y0=Sv_norm[1] * 1e-3, x1=kv[7], m=-2, c=c_guide, lw=2,
                                 legsize=legsize)
 
     if cbar:
@@ -2136,7 +2143,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             return (l + 0.5) / (2 * np.pi * R)
 
         secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
-        secax.set_xlabel(x2label, fontsize=labelsize)
+        secax.set_xlabel(x2label, fontsize=labelsize, labelpad=labelpad)
         secax.tick_params(axis='both', which='major', labelsize=ticksize)
 
     if add_files is not None:

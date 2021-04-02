@@ -15,7 +15,7 @@ import collections
 import six
 import pandas as pd
 from scipy import interpolate
-import sh_things as harm
+import sh_things as sh
 import matplotlib.animation as animation
 from useful_and_bespoke import age_index, dark_background, not_iterable, colorize, colourbar
 from model_1D.parameters import M_E
@@ -445,11 +445,11 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
 
 
 def ensemble_distribution(yvar, default='baseline',
-                      num=100, update_kwargs=None, run_kwargs=None, yscale=1,
-                      names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
-                      mini=[240e3, 1.5e10, 1000, 2000, 100e3],
-                      maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
-                      n_sigma=1, log=False, **kwargs):
+                          num=100, update_kwargs=None, run_kwargs=None, yscale=1,
+                          names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
+                          mini=[240e3, 1.5e10, 1000, 2000, 100e3],
+                          maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
+                          n_sigma=1, log=False, **kwargs):
     # generate ensemble of planets depending on x independent variable over some random variations of other parameters and plot evol
     if default is not None:
         pl_kwargs = eval('inputs.' + default + '_in')
@@ -479,7 +479,6 @@ def ensemble_distribution(yvar, default='baseline',
     y_lower = y_av - y_std * n_sigma
 
     return t, y_av, y_upper, y_lower
-
 
 
 def plot_distribution(yvars, default='baseline',
@@ -576,20 +575,23 @@ def plot_distribution(yvars, default='baseline',
     return fig, axes
 
 
-def plot_h_v_obvs(default='baseline', age=4.5, labelsize=28, legsize=16, ticksize=20, xlabelpad=20, fig_path='', show_ss=False, leg=True,
-                  ylabel='$\Delta h_{rms}$ (m)', log=True, nplanets=20, save=False, x_vars=['t', 'M_p', 'H_0', 'CMF', 'Ea'],
-                                      units=['Gyr', '$M_E$', 'pW kg$^{-1}$', 'CMF', 'kJ mol$^{-1}$'],
+def plot_h_v_obvs(default='baseline', age=4.5, labelsize=28, legsize=16, ticksize=20, xlabelpad=20, fig_path='',
+                  show_ss=False, leg=True,
+                  ylabel='$\Delta h_{rms}$ (m)', log=True, nplanets=20, save=False,
+                  x_vars=['t', 'M_p', 'H_0', 'CMF', 'Ea'],
+                  units=['Gyr', '$M_E$', 'pW kg$^{-1}$', 'CMF', 'kJ mol$^{-1}$'],
                   x_range=[(1.5, 4.5), (0.1 * parameters.M_E, 6 * parameters.M_E), (10e-12, 40e-12),
                            (0.1, 0.7), (250e3, 350e3)],
                   xticks=[[1, 2, 4], [0.1, 1, 6], [10, 20, 40], [0.1, 0.2, 0.5], [300, 350]],
-                  xscales=[parameters.sec2Gyr, parameters.M_E ** -1, 1e12, 1, 1e-3], ylim=(500, 1000), yticks=[500, 600, 700, 800, 900, 1000],
+                  xscales=[parameters.sec2Gyr, parameters.M_E ** -1, 1e12, 1, 1e-3], ylim=(500, 1000),
+                  yticks=[500, 600, 700, 800, 900, 1000],
                   xlabels=['Age\n(Gyr)', 'Planet mass\n($M_E$)',
                            'Rad. heating $t_0$\n(pW kg$^{-1}$)',
                            'Core mass fraction', 'Activation energy\n(kJ mol$^{-1}$)'], dark=False, show_Huang=False,
                   models=['dyn_top_rms'],
                   **kwargs):
     # how h varies across key input parameters
-    textc='k'
+    textc = 'k'
     if dark:
         textc = 'w'
 
@@ -603,7 +605,7 @@ def plot_h_v_obvs(default='baseline', age=4.5, labelsize=28, legsize=16, ticksiz
                                       labelpad=20, legendtop=True, tickwidth=2,
                                       initial_kwargs={'T_m0': 1000, 'T_c0': 3000},
                                       models=models,
-                                     x_range=x_range, xscales=xscales, xlabels=xlabels,
+                                      x_range=x_range, xscales=xscales, xlabels=xlabels,
                                       c=['#d88868', '#749af3'], textc=textc, **kwargs)
 
     for ax in axes:
@@ -624,11 +626,11 @@ def plot_h_v_obvs(default='baseline', age=4.5, labelsize=28, legsize=16, ticksiz
 
         if show_ss:
             handles.append(
-                   mlines.Line2D([], [], color='xkcd:goldenrod', marker='$V$',
-                                 markersize=15, lw=0, label=r'Venus'))
+                mlines.Line2D([], [], color='xkcd:goldenrod', marker='$V$',
+                              markersize=15, lw=0, label=r'Venus'))
         if show_Huang:
             handles.append(mlines.Line2D([], [], color='xkcd:orchid', marker='^',
-                                                    markersize=15, lw=0, label=r'Huang+ (2013) 3D model'))
+                                         markersize=15, lw=0, label=r'Huang+ (2013) 3D model'))
 
         legend = axes[0].legend(handles=handles, frameon=False, fontsize=legsize,
                                 borderaxespad=0,
@@ -636,7 +638,6 @@ def plot_h_v_obvs(default='baseline', age=4.5, labelsize=28, legsize=16, ticksiz
 
     if dark:
         fig, *axes = dark_background(fig, axes)
-
 
     for i, ax in enumerate(axes):
         if x_vars[i] == 't':
@@ -662,7 +663,10 @@ def plot_h_v_obvs(default='baseline', age=4.5, labelsize=28, legsize=16, ticksiz
 
     if show_Huang:
         # Huang cases 1-13, 15
-        h_Huang = np.array([200.15279436132423 , 688.2014927583677 , 673.7880493468331 , 402.07565967751117 , 695.2136989391211 , 672.4561163950626 , 214.12066607342535 , 488.4601789919337 , 878.5607285545191 , 292.43829959982384 , 311.3352436867767 , 339.3664129742059 , 640.1361418805931 , 430.1894190342128 ])
+        h_Huang = np.array(
+            [200.15279436132423, 688.2014927583677, 673.7880493468331, 402.07565967751117, 695.2136989391211,
+             672.4561163950626, 214.12066607342535, 488.4601789919337, 878.5607285545191, 292.43829959982384,
+             311.3352436867767, 339.3664129742059, 640.1361418805931, 430.1894190342128])
         for h in h_Huang:
             ax.scatter(M_Venus, h, marker='^', s=70, alpha=0.5, c='xkcd:orchid', label=r'Huang+ (2013)', zorder=1)
 
@@ -1047,16 +1051,17 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                                  mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10, 10), ytitle=1.1,
                                  cmap='terrain_r',
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
-    phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
-    h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
-    pl0 = \
-    evol.bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults, t_eval=None,
-                      random=False, phi0=phi0, h_rms0=h_rms0, postprocessors=['topography', 'ocean_capacity'],
-                      **kwargs)[0]
+    # phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
+    # h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
+    degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
+
+    pl0 = evol.bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults,
+                            t_eval=None, random=False, phi0=phi0, postprocessors=['topography', 'ocean_capacity'],
+                            **kwargs)[0]
     fig, axes = plt.subplots(figsize=figsize)
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0,
                                               textc=textc,
-                                              label_l=None, c=c, ylabel=ylabel, age=age, h_rms0=h_rms0, legsize=legsize,
+                                              label_l=None, c=c, ylabel=ylabel, age=age, legsize=legsize,
                                               postprocessors=['topography', 'ocean_capacity'], phi0=phi0, log=log,
                                               fig=fig,
                                               axes=axes, ticksize=ticksize, labelsize=labelsize, relative=relative,

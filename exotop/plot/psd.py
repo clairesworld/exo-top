@@ -3,6 +3,7 @@ import numpy as np
 import postaspect.plt_aspect as plat
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, \
     fig_fmt, regime_grid_td, load_grid, p_Earth, postprocess_kwargs, benchmark_path
+from useful_and_bespoke import dark_background
 
 """ set dimensionalisation factors """
 R_p = 6371  # Earth
@@ -15,25 +16,27 @@ regimes_use = ['chaotic']
 
 """ plot normalised spectra on single axis """
 
-# fig, ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
-#                                  include_regimes=regimes_use, save=True,
-#                                  data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked_dim',
-#                                  fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True, show_beta_guide=True,
-#                                  labelsize=16, ticksize=12, marker='.', lw=0.5, alpha=0.8,
-#                                  xlim=(1e-3, 3e-2),
-#                                  xlabel=None, ylabel='Normalised power spectral density',
-#                                  x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, eff}$)',
-#                                  norm='intercept', dim=True, d=d, dT=dT, alpha_m=alpha, R_p=d,
-#                                  # add_files=[benchmark_path + 'lees_topo_grids/psd_hoggard.csv'], add_label=['Hoggard+ (2016)']
-#                                  )
+fig, ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
+                                 include_regimes=regimes_use, save=False,
+                                 data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked_slides',
+                                 fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True, show_beta_guide=False,
+                                 labelsize=16, ticksize=12, marker='.', lw=0.5, alpha=0.8, labelpad=20,
+                                 xlim=(1e-3, 3e-2), max_dscale=1, bl_fudge=5, c_guide='xkcd:off white',
+                                 xlabel=None, ylabel='Normalised power spectral density',
+                                 x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, eff}$)',
+                                 norm='intercept', dim=True, d=d, dT=dT, alpha_m=alpha, R_p=d,
+                                 # add_files=[benchmark_path + 'lees_topo_grids/psd_hoggard.csv'], add_label=['Hoggard+ (2016)']
+                                 )
+
+fig, ax = dark_background(fig, ax)
+fig.savefig('psd_example.png', bbox_inches='tight', transparent=True)
 
 """ what does a cartesian projection look like? """
 
-base_case = 'Ra1e8-eta1e7-wide'
-l, S = sh.make_baseline_spectrum(base_case, R=1, data_path=data_path, fig_path=fig_path, newfname='base_spectrum')
-power = S * d**3 * alpha**2 * dT**2
-sh.spectrum_to_grid(power=S, units='km', psd=True, l=l, plot=True, cmap='nipy_spectral',
-                    labelsize=16, save=True, figname='grid', fig_path=fig_path)
+# base_case = 'Ra1e8-eta1e7-wide'
+# l, S = sh.make_baseline_spectrum(base_case, R=1, data_path=data_path, fig_path=fig_path, newfname='base_spectrum',
+#                                  max_dscale=1, bl_fudge=5,)
+
 
 """ get all time-averaged spectra and store """
 
