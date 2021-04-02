@@ -147,6 +147,8 @@ def solve(pl, run_kwargs={}, t0=0, t_eval=None, verbose=False, **kwargs):
 def LHS(t, y, pl=None, **kwargs):
     """ ODE equation to solve, LHS = 0 """
 
+    print('t', t, 'T_m', y[0])
+
     pl.T_m = y[0]
     pl.T_c = y[1]
     pl.D_l = y[2]

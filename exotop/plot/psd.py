@@ -28,7 +28,7 @@ fig, *ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_gr
                                  # add_files=[benchmark_path + 'lees_topo_grids/psd_hoggard.csv'], add_label=['Hoggard+ (2016)']
                                  )
 
-fig, _ = dark_background(fig, ax)
+fig, *axes = dark_background(fig, ax)
 fig.savefig(fig_path + 'psd_stacked_slides.png', bbox_inches='tight', transparent=True)
 
 """ what does a cartesian projection look like? """
