@@ -53,19 +53,30 @@ for regime in regimes:
                    mlines.Line2D([], [], color=c_rms[3], marker='o', ls='--',
                                  markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
 
-    fig, ax, ax2 = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
-                     fig_path=fig_path, averagescheme='timefirst', which_x='Ra_i_eff', ticksize=ticksize,
-                     sigma=1,
-                     include_regimes=include_regimes, save=False,  labelsize=axissize,
-                           legend=False, figsize=(16,9), showpeak=False, lw=lw, ms=ms, elw=elw, ecapsize=ecapsize,
-                     xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography $\Delta h_{rms}^\prime$', ylabelpad=20, xlabelpad=13,
-                     title='', fiterror=False, c_fit=c_fit,
-                     c_peak='k', c_rms=c_rms,
-                           fit=True, logx=True, logy=True, hscale=1,
-                     show_isoviscous=False, ylim=ylim, xlim=xlim, postprocess_kwargs=postprocess_kwargs,
-                     regime_grid=regime_grid_td, p_dimensionals=p_Venus,
-                                  y2label='             Venus\n'+r'             $\Delta h_{rms}$ (m)',)
+    # fig, ax, ax2 = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
+    #                  fig_path=fig_path, averagescheme='timefirst', which_x='Ra_i_eff', ticksize=ticksize,
+    #                  sigma=1,
+    #                  include_regimes=include_regimes, save=False,  labelsize=axissize,
+    #                        legend=False, figsize=(16,9), showpeak=False, lw=lw, ms=ms, elw=elw, ecapsize=ecapsize,
+    #                  xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography $\Delta h_{rms}^\prime$', ylabelpad=20, xlabelpad=13,
+    #                  title='', fiterror=False, c_fit=c_fit,
+    #                  c_peak='k', c_rms=c_rms,
+    #                        fit=True, logx=True, logy=True, hscale=1,
+    #                  show_isoviscous=False, ylim=ylim, xlim=xlim, postprocess_kwargs=postprocess_kwargs,
+    #                  regime_grid=regime_grid_td,
+    #                               # p_dimensionals=p_Venus, y2label='             Venus\n'+r'             $\Delta h_{rms}$ (m)',
+    #                               )
 
+    fig, ax = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
+                   fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff', ticksize=ticksize,
+                   beta0=[0.1, -0.15], sigma=1, fiterror=False, legend=False,
+                   include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=axissize,
+                   xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography', #legsize=legsize, cleglabels=cleglabels,
+                   title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False,
+                   cmap=None, c_rms=c_rms,
+                   fit=True, logx=True, logy=True, ms=ms, elw=elw,
+                   show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                   regime_grid=regime_grid_td, figsize=(16, 9), errortype='standard', cbar=False)
 
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
@@ -94,7 +105,8 @@ for regime in regimes:
     """ model vs data, rms """
     c_contours = 'xkcd:off white'
     fc = 'k'
-    fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
+    fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, errortype='standard',
+                                             regime_grid=regime_grid_td, t1_grid=t1_grid, load_grid=True,
                                       end_grid=end_grid, literature_file=None, legend=False, cmap=None, ms=ms,
                                       postprocess_kwargs=postprocess_kwargs, c_contours=c_contours, fc=fc, averagescheme='timefirst',
                                       ylim=ylim, which_x='Ra_i_eff', which_h='rms', data_path=data_path,
