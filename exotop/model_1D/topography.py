@@ -4,10 +4,11 @@ import numpy as np
 
 def dimensionalise(h_prime, pl, end=True, **kwargs):
     if end:
-        h = h_prime*(np.maximum(pl.T_c[-1], pl.T_m[-1]) - pl.T_s)*pl.alpha_m*(pl.R_p - pl.R_c)
+        # h = h_prime*(np.maximum(pl.T_c[-1], pl.T_m[-1]) - pl.T_s)*pl.alpha_m*(pl.R_p - pl.R_c)
         h = h_prime * (pl.T_c - pl.T_s) * pl.alpha_m * (pl.R_p - pl.R_c)
         # h = pl.eta_m[-1] * pl.kappa_m / (pl.d_m[-1]**2 * pl.rho_m * pl.g_sfc)  # alternate scaling K&H
     return h
+
 
 def topography(pl, **kwargs):
     # get all topography parameters for a planet (given its thermal history)
@@ -26,7 +27,7 @@ def dyn_topo_heuristic(pl, **kwargs):
 
 
 def dyn_topo_prime_aspect(pl, **kwargs):
-    h_prime = 0.094 * pl.Ra_i_eff**-0.151  # fit to chaotic regime
+    h_prime = 0.12 * pl.Ra_i_eff**-0.17  # fit to chaotic regime
 
     return h_prime
 
@@ -73,9 +74,9 @@ def dyn_topo_Lees(pl=None, F=None, rho_m=None, rho_w=0, alpha_m=None, eta_m=None
 def convective_stress(pl=None, where='lid', rho_m=None, alpha_m=None, g_sfc=None, T_m=None, Ea=None, k_m=None, q_ubl=None,
                       d_bl=None, **kwargs): 
     # scaling law from Reese+ (2005) - warning: this is for shear stress, don't think you can apply to dyn topo which wants normal stress at the surface minus average normal stress at the surface
-    if where is 'lid':
+    if where == 'lid':
         C = 2.2
-    elif (where is 'mantle') or (where is 'interior'):
+    elif (where =='mantle') or (where == 'interior'):
         C = 0.1
     if pl is not None:
         rho_m = pl.rho_m

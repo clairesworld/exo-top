@@ -152,6 +152,7 @@ def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='
               rot=None, discrete=False, cmap='rainbow', tickformatter=None, c='k', pad=0.05, log=False):
     from mpl_toolkits.axes_grid1 import make_axes_locatable
     import matplotlib.colors as colors
+    from matplotlib.pyplot import clim
     # from https://joseph-long.com/writing/colorbars/
 
     if ax is None:
@@ -171,13 +172,14 @@ def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='
             print(e)
             raise Exception('colourbar: if mappable is None, must provide vector')
         dum = np.linspace(vmin, vmax, n)
-        mappable = ax.scatter(dum, dum, c=dum, vmin=vmin, vmax=vmax, cmap=cmap, s=0, norm=norm)
+        mappable = ax.scatter(dum, dum, c=dum, cmap=cmap, s=0, norm=norm)
 
     fig = ax.figure
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=pad)
     cbar = fig.colorbar(mappable, cax=cax)
     cbar.set_label(label, rotation=270, labelpad=labelpad, fontsize=labelsize, c=c)
+
     if ticks is not None:
         cbar.set_ticks(ticks)
     elif ticks is None and discrete:

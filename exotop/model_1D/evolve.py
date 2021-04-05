@@ -8,6 +8,7 @@ from . import topography
 from . import oceans
 from scipy import integrate
 import random as rand
+from scipy.stats import loguniform
 from pprint import pprint
 
 
@@ -18,8 +19,8 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, random=False,
     initial_kwargs can include T_m0, T_c0, D_l0, t0, tf"""
 
     if like is not None:
-        pl_kwargs = eval('inputs.' + like + '_in')
-        model_kwargs = eval('inputs.' + like + '_run')
+        pl_kwargs = eval('inputs.' + like + '_in').copy()
+        model_kwargs = eval('inputs.' + like + '_run').copy()
     else:
         pl_kwargs = {}  # use defaults given in terrestrialplanet.py
         model_kwargs = {}  # initial conditions defaults given in thermal.py
@@ -47,10 +48,11 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, random=False,
     return planets
 
 
-def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model_kwargs={}, **kwargs):
+def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model_kwargs={}, t_eval=None, log=False, **kwargs):
     """varying multiple parameters in 'names' between mini and maxi, use default values otherwise.
     update_kwargs can include any TerrestrialPlanet attribute
     initial_kwargs can include T_m0, T_c0, D_l0, t0, tf. names, mini, and maxi are in order and must have same lenghts"""
+    # pl_kwargs and model_kwargs should already be taken from inputs file
 
     planets = []
     ii = 0
@@ -58,15 +60,16 @@ def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model
         new_kwargs_pl = pl_kwargs.copy()
         new_kwargs_model = model_kwargs.copy()
         for iii, name in enumerate(names):
-            val = rand.uniform(mini[iii], maxi[iii])
+            if log:
+                val = loguniform.rvs(mini[iii], maxi[iii], size=1)
+            else:
+                val = rand.uniform(mini[iii], maxi[iii])
             if name in ['T_m0', 'T_c0', 'D_l0']:
                 new_kwargs_model.update({name: val})
             else:
                 new_kwargs_pl.update({name: val})
 
-        if ii == 0:
-            t_eval = None
-        else:
+        if t_eval is None and ii > 0:
             t_eval = planets[0].t
         pl = build_planet(new_kwargs_pl, new_kwargs_model, t_eval=t_eval, **kwargs)
         planets.append(pl)
@@ -75,8 +78,8 @@ def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model
 
 
 def build_planet_from_id(ident='Earthbaseline', run_kwargs=None, update_kwargs=None, **kwargs):
-    planet_kwargs = eval('inputs.' + ident + '_in')
-    model_kwargs = eval('inputs.' + ident + '_run')
+    planet_kwargs = eval('inputs.' + ident + '_in').copy()
+    model_kwargs = eval('inputs.' + ident + '_run').copy()
     if run_kwargs is not None:
         model_kwargs.update(run_kwargs)
     if update_kwargs is not None:
@@ -147,7 +150,7 @@ def solve(pl, run_kwargs={}, t0=0, t_eval=None, verbose=False, **kwargs):
 def LHS(t, y, pl=None, **kwargs):
     """ ODE equation to solve, LHS = 0 """
 
-    print('t', t, 'T_m', y[0])
+    # print('t', t*p.sec2Gyr, 'Gyr, T_m', y[0])
 
     pl.T_m = y[0]
     pl.T_c = y[1]
@@ -204,7 +207,7 @@ def recalculate(t, pl, verbose=False, **kwargs):
     except TypeError:
         bad_T = pl.dT_m < 0
     if bad_T:
-        raise ('{:.2f} M_E: WARNING: -ve T_m at {:.2f} Gyr'.format(pl.M_p / p.M_E, t * p.sec2Gyr))
+        print('{:.2f} M_E: SERIOUS WARNING: -ve T_m at {:.2f} Gyr'.format(pl.M_p / p.M_E, t * p.sec2Gyr))
 
     # viscosity update
     pl.eta_s = rh.dynamic_viscosity(T=pl.T_s, pl=pl, **kwargs)  # viscosity at surface temperature

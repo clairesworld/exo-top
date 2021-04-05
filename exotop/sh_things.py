@@ -112,6 +112,8 @@ def vol_from_spectrum(phi0=None, fname='', fpath='', r0=1, n_stats=10, **kwargs)
 
 def powerspectrum_RMS(path=None, power_lm=None, degree=None, amplitude=False,
                       lmax=None):  # try to calcuate RMS from digitized power spectrum
+    # accepts power in m^2 or km^2
+
     if path is not None:
         df = pd.read_csv(path, header=None, names=['degree', 'value'], index_col=False)
         degree = np.array(df['degree'])
@@ -423,16 +425,17 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
 
 
 def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=True,
-               min_type='delta_rh', max_dscale=2, bl_fudge=1, plot=True, **kwargs):
-
-    max_scale = max_dscale  # max wavelength as multiple of layer depth, e.g. 2*d
+               min_type='delta_rh', lid=False, max_dscale=2, bl_fudge=1, plot=True, **kwargs):
+    if not dim:
+        d = 1
     df = ap.pickleio(case, suffix='_T', t1=t1, load=True, data_path=data_path, **kwargs)
+    T_av, y = ap.time_averaged_profile_from_df(df, 'T_av')
+    uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')
+    dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, alpha_m=alpha,
+                                    data_path=data_path, **kwargs)
+
     if min_type == 'delta_rh':
         try:
-            T_av, y = ap.time_averaged_profile_from_df(df, 'T_av')
-            uv_mag_av, y = ap.time_averaged_profile_from_df(df, 'uv_mag_av')
-            dic_av = ap.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y, alpha_m=alpha,
-                                            data_path=data_path, **kwargs)
             min_scale = dic_av['delta_rh'] * bl_fudge
         except KeyError:
             min_scale = np.mean(df.delta_rh.to_numpy()) * bl_fudge
@@ -440,9 +443,17 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
         # https://www.essoar.org/pdfjs/10.1002/essoar.10504581.1 for elastic thickness based on heat flow (Borrelli)
         min_scale = 0.12  # 330 km, Lees
 
-    if dim:
-        min_scale = min_scale * d
-        max_scale = max_scale * d
+    if lid:
+        try:
+            D_l = dic_av['delta_L']
+        except KeyError:
+            D_l = np.mean(df.delta_L.to_numpy())
+        max_scale = max_dscale * (1 - D_l)  # include lid in layer depth consideration, e.g. 2* (d - d_L)
+    else:
+        max_scale = max_dscale  # max wavelength as multiple of layer depth, e.g. 2*d
+
+    min_scale = min_scale * d
+    max_scale = max_scale * d
 
     if plot:
         ax.axvline(x=2*np.pi/min_scale, lw=lw, c=c)
@@ -527,14 +538,44 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
     return l, Sl
 
 
-def coeffs_to_grid(clm, R=2, lmax_plot=120, plot_grid=True, plot_spectrum=True, cbar=False, clabel='Dynamic topography (km)',
+def integrate_to_peak(grid, R=2, fudge_to_rms=None, verbose=False):
+
+    if fudge_to_rms is not None:
+        rms_grid = np.sqrt(np.mean(grid**2))
+        grid = grid * fudge_to_rms/rms_grid
+
+    h_peak = np.max(grid)
+    h_peak_abs = np.max(abs(grid))
+
+    # calculate basin capacity
+    annulus_vol = 4 / 3 * np.pi * ((R + h_peak_abs) ** 3 - R ** 3)
+
+    vol_rock = 0
+    vol_ocn = 0
+    nx = np.shape(grid)[1]
+    ny = np.shape(grid)[0]
+    dx = 2 * np.pi * R / nx  # circumference
+    dy = np.pi * R / ny  # pole-to-pole distance
+    for ii in range(nx):
+        for jj in range(ny):
+            vol_rock = vol_rock + abs(grid[jj, ii]) * dx * dy
+            vol_ocn = vol_ocn + (h_peak - grid[jj, ii]) * dx * dy  # posi h
+    #             net_vol = net_vol + data[jj, ii] * dx * dy
+    if verbose:
+        print('spherical annulus vol:', annulus_vol)
+        print('integrated vol:', vol_ocn)
+        print('mean h', np.mean(grid), 'min h', np.min(grid), 'max h', np.max(grid))
+
+    return vol_ocn
+
+
+def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, plot_spectrum=True, cbar=False, clabel='Dynamic topography (km)',
                    cmap='terrain', labelsize=14, d=1, alpha_m=1, dT=1, verbose=False, fig_path='', cline='k', lw=3,
                    save=False, figsize=(5,3), ticksize=16):
 
     spectrum = clm.spectrum(unit='per_lm')  # 2D power spectral density
     l = clm.degrees()
-    wl = 2 * np.pi * R / (l + 0.5)
-    k = 2 * np.pi / wl
+    k = l_to_k(l, R)
     if verbose:
         print('RMS of 2D psd', parseval_rms_2D(4.0 * np.pi * R * R * spectrum, k), 'km')
 
@@ -555,6 +596,8 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, plot_grid=True, plot_spectrum=True, 
     lats = topo.lats()
     lons = topo.lons()
 
+    if scale_to_1D:
+        data = data / np.pi ** 2
     data = data * d * dT * alpha_m
 
     # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
@@ -579,23 +622,7 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, plot_grid=True, plot_spectrum=True, 
         if save:
             plt.savefig(fig_path + 'topo_grid.png', bbox_inches='tight')
 
-    h_peak = np.max(abs(data))
-    if verbose:
-        # calculate basin capacity
-        vol = 0
-        nx = len(lons)
-        ny = len(lats)
-        dx = 2 * np.pi * R / nx
-        dy = 2 * np.pi * R / (2 * ny)
-        for ii in range(nx):
-            for jj in range(ny):
-                vol = vol + abs(data[jj, ii]) * dx * dy
-        print('total vol:', vol)
-
-        annulus_vol = 4 / 3 * np.pi * ((R + h_peak) ** 3 - R ** 3)
-        print('spherical annulus vol:', annulus_vol)
-
-    return h_rms, h_peak
+    return data
 
 
 def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
@@ -614,10 +641,18 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
         plt.loglog(l, psd, c='k', ls='--', label='Interpolated')
 
     if verbose:
-        print('\nRMS of model 1D psd', parseval_rms(psd, k))
+        print('\nRMS of orig model 1D psd', parseval_rms(psd, k))
 
-    S = psd * (2 * l + 1)
-    S = S * h_ratio ** 2
+    # convert 1D psd (km^2 km) to pseudo-2D (km^2 km^2) assuming radial symmetry
+    phi_1D = psd
+    phi_2D_iso = np.pi / k * phi_1D  # Jacobs eqn 5
+
+    if verbose:
+        print('\nRMS of orig model 2D iso psd', parseval_rms(phi_2D_iso, k))  # works!
+
+    # use this pseudo-2D psd to find power in km^2
+    S = np.array(phi_2D_iso) * (2 * l + 1)
+    S = S * h_ratio ** 2  # scale by rms ratio if necessary
     lmax = np.max(l)
 
     if plot:
@@ -625,27 +660,28 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
 
     # generate new model spectra from random
     if verbose:
-        print('\n///// new randomised spectra')
+        print('\n///// new randomised spectra, scaled to rms', parseval_rms(phi_2D_iso, k)*h_ratio)
 
     coeffs_global = pyshtools.SHCoeffs.from_random(S, normalization='ortho', lmax=lmax)
 
-    if verbose:
+    if verbose or plot:
         degrees = coeffs_global.degrees()
-        power_per_lm = coeffs_global.spectrum(unit='per_lm')
-        psd_2D = 4 * np.pi * R ** 2 * power_per_lm
         k = (degrees + 0.5) / R
-        print('k', k[:9])
-        print('RMS of random 2D psd if it were 1D', parseval_rms(psd_2D * k, k))
-        # print('RMS of 2D psd if it were 1D', parseval_rms(4.0*np.pi*R*R*power_per_lm*k, k), 'km')
-
-    if plot:
-        degrees = coeffs_global.degrees()
         power_per_l = coeffs_global.spectrum(unit='per_l')
         power_per_lm = coeffs_global.spectrum(unit='per_lm')
-        plt.loglog(degrees, power_per_l, label='Power per l randomised')
-        plt.loglog(degrees, power_per_lm, label='2D PSD randomised')
+        psd_pseudo = power_per_lm * k / np.pi
+        psd_2D = 4 * np.pi * R ** 2 * power_per_lm
 
-        plt.legend()
+        if verbose:
+            print('RMS of random 2D psd', parseval_rms_2D(psd_2D, k))
+            print('RMS of random pseudo-1D psd', parseval_rms(psd_pseudo, k))
+            # print('RMS of 2D psd if it were 1D', parseval_rms(4.0*np.pi*R*R*power_per_lm*k, k), 'km')
+
+        if plot:
+            plt.loglog(degrees, power_per_l, label='Power per l randomised')
+            plt.loglog(degrees, power_per_lm, label='2D PSD randomised')
+
+            plt.legend()
     #     plt.ylim((1e-1, 1e6))
 
     return coeffs_global

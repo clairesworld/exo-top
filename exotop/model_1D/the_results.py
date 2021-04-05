@@ -27,7 +27,7 @@ import matplotlib.lines as mlines
 
 def plot_save(fig, fname, fig_path='plat/', fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
     path = fig_path + fname + fig_fmt
-    if fig_path is not '':
+    if fig_path != '':
         directory = os.path.dirname(path)
         os.makedirs(directory, exist_ok=True)
     if tight_layout:
@@ -444,16 +444,69 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
     return fig, axes
 
 
-def ensemble_distribution(yvar, default='baseline',
-                          num=100, update_kwargs=None, run_kwargs=None, yscale=1,
-                          names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
-                          mini=[240e3, 1.5e10, 1000, 2000, 100e3],
-                          maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
-                          n_sigma=1, log=False, **kwargs):
+def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100, update_kwargs=None, run_kwargs=None,
+                                   yscale=1, age=4.5, x_res=8, minx=None, maxx=None,
+                                   names=None, mini=None, maxi=None, t_eval=None,
+                                   n_sigma=1, log=False, **kwargs):
+    """generate ensemble of planets depending on x independent variable over some random variations of other
+     parameters -- do this for """
+    if maxi is None:
+        maxi = [300e3, 2.5e12, 2000, 2500, 300e3]
+    if mini is None:
+        mini = [240e3, 1.5e10, 1000, 2000, 100e3]
+    if names is None:
+        names = ['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0']
+
+    if default is not None:
+        pl_kwargs_base = eval('inputs.' + default + '_in').copy()
+        model_kwargs_base = eval('inputs.' + default + '_run').copy()
+    else:
+        pl_kwargs_base = {}  # use defaults given in terrestrialplanet.py
+        model_kwargs_base = {}  # initial conditions defaults given in thermal.py
+    if update_kwargs is not None:
+        pl_kwargs_base.update(update_kwargs)
+    if run_kwargs is not None:
+        model_kwargs_base.update(run_kwargs)
+
+    grid = np.zeros((x_res, dist_res))
+    if log:
+        x_vec = np.logspace(np.log10(minx), np.log10(maxx), x_res)
+    else:
+        x_vec = np.linspace(minx, maxx, x_res)
+    for ii, x in enumerate(x_vec):
+        # reset
+        pl_kwargs = pl_kwargs_base.copy()
+        pl_kwargs.update({xvar: x})
+        model_kwargs = model_kwargs_base.copy()
+        if ii == 1 and t_eval is None:
+            t_eval = pl_ensemble[0].t
+
+        pl_ensemble = evol.bulk_planets_mc(n=dist_res, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
+                                           model_kwargs=model_kwargs, t_eval=t_eval, log=False, **kwargs)
+
+        it = age_index(pl_ensemble[0].t, age, age_scale=parameters.sec2Gyr)  # should all be evaluated at same time
+        col = np.array([vars(pl)[yvar][it] for pl in pl_ensemble]) * yscale
+        grid[ii, :] = col
+
+    # mean, std
+    y_av = np.mean(grid, axis=1)
+    y_std = np.std(grid, axis=1)
+    y_upper = y_av + y_std * n_sigma  # todo for log scape
+    y_lower = y_av - y_std * n_sigma
+
+    return x_vec, y_av, y_upper, y_lower
+
+
+def ensemble_time_distribution(yvar, default='baseline',
+                               dist_res=100, update_kwargs=None, run_kwargs=None, yscale=1,
+                               names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
+                               mini=[240e3, 1.5e10, 1000, 2000, 100e3],
+                               maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
+                               n_sigma=1, log=False, **kwargs):
     # generate ensemble of planets depending on x independent variable over some random variations of other parameters and plot evol
     if default is not None:
-        pl_kwargs = eval('inputs.' + default + '_in')
-        model_kwargs = eval('inputs.' + default + '_run')
+        pl_kwargs = eval('inputs.' + default + '_in').copy()
+        model_kwargs = eval('inputs.' + default + '_run').copy()
     else:
         pl_kwargs = {}  # use defaults given in terrestrialplanet.py
         model_kwargs = {}  # initial conditions defaults given in thermal.py
@@ -462,13 +515,13 @@ def ensemble_distribution(yvar, default='baseline',
     if run_kwargs is not None:
         model_kwargs.update(run_kwargs)
 
-    pl_ensemble = evol.bulk_planets_mc(n=num, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
+    pl_ensemble = evol.bulk_planets_mc(n=dist_res, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
                                        model_kwargs=model_kwargs, **kwargs)
 
     # mean, std
     y_all = []
     for pl in pl_ensemble:
-        t = pl.t * parameters.sec2Gyr
+        t = pl.t
         y = eval('pl.' + yvar) * yscale
         y_all.append(y)
 
@@ -570,8 +623,8 @@ def plot_distribution(yvars, default='baseline',
     plt.tight_layout()
     if save:
         plot_save(fig, fname, fig_path=fig_path)
-    else:
-        plt.show()
+    # else:
+    #     plt.show()
     return fig, axes
 
 
@@ -947,6 +1000,92 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
 #     return fig, axes
 
 
+def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1, tickwidth=1, textc='k',
+                                           age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ', fig_height=4,
+                                           dist_res=10,
+                                           xlabels=None, log=None, x_range=None, xscales=None, units=None, x_res=8,
+                                           fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
+                                           yscale=1,
+                                           linec='k', labelsize=16, lw=3, ticksize=12,
+                                           update_kwargs={}, initial_kwargs={}, verbose=False, **kwargs):
+    if x_vars is None:
+        x_vars = ['t', 'M_p', 'CMF', 'H_0']
+    if units is None:
+        units = ['Gyr', '$M_E$', 'CMF', 'pW kg$^{-1}$']
+    if xlabels is None:
+        xlabels = x_vars
+    if x_range is None:
+        x_range = [(1.5, age), (0.1 * parameters.M_E, 6 * parameters.M_E), (0.1, 0.7), (10e-12, 40e-12)]
+    if xscales is None:
+        xscales = [parameters.sec2Gyr, parameters.M_E ** -1, 1, 1e12]
+    if axes is None:
+        fig, axes = plt.subplots(1, len(x_vars), figsize=(6 * len(x_vars), fig_height), sharey=True)
+    if not_iterable(axes):
+        axes = [axes]
+    if log is None:
+        log = [False] * len(x_vars)
+
+    # pl_baseline = evol.build_planet_from_id(ident=defaults,
+    #                                         initial_kwargs=initial_kwargs, update_kwargs=update_kwargs,
+    #                                         postprocessors=['topography'], t_eval=None)
+
+    for i_ax, x_var in enumerate(x_vars):
+        xmin, xmax = x_range[i_ax]
+        if x_var == 't':
+            # time/age variation - plot single planet evol
+            x_vec, y_av, y_upper, y_lower = ensemble_time_distribution(yvar=model_param, xvar=x_var,
+                                                                       default=defaults, dist_res=dist_res,
+                                                                       update_kwargs=update_kwargs,
+                                                                       run_kwargs=initial_kwargs,
+                                                                       yscale=yscale,
+                                                                       x_res=x_res, minx=xmin, maxx=xmax,
+                                                                       **kwargs)
+        else:
+            if verbose:
+                print('generating planets across', x_var, '...')
+            x_vec, y_av, y_upper, y_lower = ensemble_marginal_distribution(yvar=model_param, xvar=x_var,
+                                                                           default=defaults, dist_res=dist_res,
+                                                                           update_kwargs=update_kwargs,
+                                                                           run_kwargs=initial_kwargs,
+                                                                           yscale=yscale, age=age,
+                                                                           x_res=x_res, minx=xmin, maxx=xmax,
+                                                                           log=log[i_ax],
+                                                                           **kwargs)
+        x_vec = x_vec * xscales[i_ax]
+        axes[i_ax].plot(x_vec, y_av, c=linec, lw=lw)
+        print(x_var, ': x', x_vec, 'y', y_av)
+        axes[i_ax].fill_between(x_vec, y_lower, y_upper, color=linec, alpha=0.3)
+        axes[i_ax].set_xlabel(xlabels[i_ax], fontsize=labelsize)
+        axes[i_ax].tick_params(axis='both', labelsize=ticksize)
+        if log[i_ax]:
+            axes[i_ax].set_xscale('log')
+        if legend:
+            string = ''
+            if 't' not in x_vars:
+                string = string + '{:.3g} '.format(age) + 'Gyr' + '\n'
+            for jj, u in enumerate(units):
+                if jj != i_ax:
+                    if x_vars[jj] == 't':
+                        string = string + '{:.3g} '.format(age) + u + '\n'
+                    else:
+                        string = string + '{:.3g} '.format(
+                            eval('inputs.' + defaults + '_in')[x_vars[jj]] * xscales[jj]) + u + '\n'
+            string = string[:-1]  # remove last \n
+            axes[i_ax].text(0.06, 0.96, string,
+                            fontsize=legsize, c=textc,
+                            horizontalalignment='left',
+                            verticalalignment='top',
+                            transform=axes[i_ax].transAxes)
+
+    axes[0].set_ylabel(ylabel, fontsize=labelsize)
+
+    for ax in axes:
+        ax.xaxis.set_tick_params(width=tickwidth)
+        ax.yaxis.set_tick_params(width=tickwidth)
+    # plt.subplots_adjust(wspace=wspace)
+    return fig, axes
+
+
 def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidth=1, relative=True, textc='k',
                                   age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ', fig_height=4,
                                   xlabels=None, nplanets=20, log=False, x_range=None, xscales=None, units=None,
@@ -968,7 +1107,11 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
         axes = [axes]
 
     it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
-    model_baseline = eval('pl_baseline.' + model_param)[it]
+    try:
+        model_baseline = eval('pl_baseline.' + model_param)[it]
+    except IndexError:
+        # scalar
+        model_baseline = eval('pl_baseline.' + model_param)
     if relative:
         yscale = model_baseline ** -1
     set_ylabel = True
@@ -988,13 +1131,18 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
                                         like=defaults,
                                         t_eval=pl_baseline.t, random=False, verbose=verbose,
                                         initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
+
+            # for pl in planets:
+            #     print('mass:', pl.M_p/parameters.M_E, '| rel. vol:', pl.max_ocean*yscale, '| mass ocn:',
+            #           pl.max_ocean*1000/parameters.M_E, 'M_E | mass frac:',
+            #           pl.max_ocean*1000/pl.M_p)
             fig, ax = plot_vs_x(lplanets=planets, xname={x_var: (xlabels[i_ax], xscales[i_ax])},
                                 ynames={model_param: ('', yscale)}, fig=fig, axes=axes[i_ax], legsize=legsize,
                                 legend=legendd, snap=age, plots_save=False, set_ylabel=ylabel, set_xlim=True, log=log,
                                 relative=relative, **kwargs)
 
         if relative:
-            ax.axhline(y=1, lw=1, alpha=0.7, zorder=0)
+            ax.axhline(y=1, lw=1, alpha=0.5, zorder=0)
         if legend:
             string = ''
             for jj, u in enumerate(units):
@@ -1018,6 +1166,36 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
         ax.xaxis.set_tick_params(width=tickwidth)
         ax.yaxis.set_tick_params(width=tickwidth)
     plt.subplots_adjust(wspace=wspace)
+    return fig, axes
+
+
+def plot_h_ensemble(x_vars=None, x_range=None, defaults='Earthbaseline', save=False, fname='relative_h',
+                    models=None, labels=None, c=None, fig=None, axes=None, age=4.5,
+                    initial_kwargs={}, update_kwargs={}, legend=True,
+                    ylabel='$\Delta h$ / $\Delta h_0$  ', **kwargs):
+    if x_vars is None:
+        x_vars = ['t', 'M_p', 'H_0', 'CMF']
+    if x_range is None:
+        x_range = [(1.5, 4.5), (0.1 * parameters.M_E, 6 * parameters.M_E), (10e-12, 40e-12), (0.1, 0.7)]
+
+    initial_kwargs.update({'tf': age})
+    pl_baseline = evol.build_planet_from_id(ident=defaults,
+                                            initial_kwargs=initial_kwargs, update_kwargs=update_kwargs,
+                                            postprocessors=['topography'], t_eval=None)  # not used
+    legendd = False
+    for ii, h_param in enumerate(models):
+        if ii == len(models) - 1:
+            legendd = True
+
+        fig, axes = plot_change_with_observeables(defaults=defaults, relative=False, fig=fig, axes=axes,
+                                                  model_param=h_param,
+                                                  legend=legendd, pl_baseline=pl_baseline, label_l=labels[ii], c=c[ii],
+                                                  age=age, ylabel=ylabel, initial_kwargs=initial_kwargs,
+                                                  update_kwargs=update_kwargs, **kwargs)
+
+    if save:
+        plot_save(fig, fname, **kwargs)
+
     return fig, axes
 
 
@@ -1049,20 +1227,23 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                                  ticksize=14, labelsize=16, clabel='Surface water mass fraction', clabelpad=20,
                                  relative=False,
                                  mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10, 10), ytitle=1.1,
-                                 cmap='terrain_r',
+                                 cmap='terrain_r', vmin=None, vmax=None,
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
     # phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
     # h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
     degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
 
     pl0 = evol.bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults,
-                            t_eval=None, random=False, phi0=phi0, postprocessors=['topography', 'ocean_capacity'],
+                            # verbose=True,
+                            t_eval=None, random=False, phi0=phi0, postprocessors=['topography'],
                             **kwargs)[0]
+    pl0 = oceans.max_ocean(pl0, at_age=age, name_rms='dyn_top_rms', phi0=phi0, **kwargs)
+    vol_0 = pl0.max_ocean
+    print('vol_0', vol_0)
 
-    print('pl0 max ocean', pl0.max_ocean[-1])
     fig, axes = plt.subplots(figsize=figsize)
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0,
-                                              textc=textc,
+                                              textc=textc, at_age=age,
                                               label_l=None, c=c, ylabel=ylabel, age=age, legsize=legsize,
                                               postprocessors=['topography', 'ocean_capacity'], phi0=phi0, log=log,
                                               fig=fig,
@@ -1073,20 +1254,25 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
         # how does actual vol scale assuming constant mass fraction of surface water (bad assumption)?
         ax = axes[mass_iax]
         rho_w = 1000
-        vol_0 = pl0.max_ocean[-1]
-        print('vol_0', vol_0)
+
         masses = np.logspace(np.log10(0.1), np.log10(6))  # mass in M_E
         colours = colorize([np.log10(m) for m in mass_frac_sfcwater], cmap=cmap)[0]
 
         for ii, X in enumerate(mass_frac_sfcwater):
             M_w = masses * parameters.M_E * X  # mass of sfc water in kg
-            vol_w = M_w / rho_w  # volume of surface water if same mass fraction
+            vol_w = M_w / rho_w  # corresponding volume
             if relative:
                 vol_w = vol_w / vol_0
-            ax.plot(masses, vol_w, alpha=0.4, lw=0, zorder=0, c=colours[ii], marker='o', markersize=15,
+            # print('relative water budget change', vol_w)
+            ax.plot(masses, vol_w, alpha=0.5, lw=0, zorder=0, c=colours[ii], marker='o', markersize=15,
                     label='Maximum water budget')
 
-        colourbar(mappable=None, ax=ax, vmin=np.min(mass_frac_sfcwater), vmax=np.max(mass_frac_sfcwater), label=clabel,
+        if vmin is None:
+            vmin = np.min(mass_frac_sfcwater)
+        if vmax is None:
+            vmax = np.max(mass_frac_sfcwater)
+        colourbar(mappable=None, vector=mass_frac_sfcwater, ax=ax, vmin=vmin,
+                  vmax=vmax, label=clabel,
                   labelsize=labelsize * 0.8, ticksize=ticksize, labelpad=clabelpad, ticks=mass_frac_sfcwater,
                   cmap=cmap, c=textc, log=True, pad=0.2)
         #

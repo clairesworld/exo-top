@@ -1,5 +1,5 @@
 baseline_in = dict(
-    ident='Earthbaseline',  # must match dict name ****_in
+    ident='baseline',  # must match dict name ****_in
     M_p=5.972e24,
     sma=1,
     Alb=0,
