@@ -91,12 +91,13 @@ for regime in regimes:
     # ax.ticklabel_format(style='plain', axis='y', useOffset=False)
     ax.legend(handles=handles, frameon=False, fontsize=25, ncol=1, bbox_to_anchor=(1.01, 1), loc='upper left')
 
-    ax2.tick_params(axis='y', labelsize=ticksize, pad=15)
-    ax2.set_yticks([1000, 1600, 2280])
-    ax2.yaxis.set_major_formatter(ticker.ScalarFormatter())
-    ax2.yaxis.set_minor_formatter(ticker.ScalarFormatter())
+    # ax2.tick_params(axis='y', labelsize=ticksize, pad=15)
+    # ax2.set_yticks([1000, 1600, 2280])
+    # ax2.yaxis.set_major_formatter(ticker.ScalarFormatter())
+    # ax2.yaxis.set_minor_formatter(ticker.ScalarFormatter())
 
-    fig, _, _ = dark_background(fig, (ax, ax2))
+    # fig, _, _ = dark_background(fig, (ax, ax2))
+    fig, _ = dark_background(fig, ax)
     plat.plot_save(fig, fname='h_Ra_dim_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
 
 
