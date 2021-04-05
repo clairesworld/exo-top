@@ -42,7 +42,7 @@ for regime in regimes:
         ylim = [6e-3, 1.4e-2]
         xlim = [1e6, 3e7]
         yticks = [6e-3, 8e-3, 1e-2, 1.2e-2, 1.4e-2]
-        xticks = [1e6, 1e7, 3e7]
+        xticks = None # [1e6, 1e7, 3e7]
         fitlabel = r'$\Delta h = 0.12$ Ra$_{i, eff}^{-0.17}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
@@ -71,7 +71,7 @@ for regime in regimes:
                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff', ticksize=ticksize,
                    beta0=[0.1, -0.15], sigma=1, fiterror=False, legend=False,
                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=axissize,
-                   xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography', #legsize=legsize, cleglabels=cleglabels,
+                   xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography, $\Delta h^\prime_{rms}$', #legsize=legsize, cleglabels=cleglabels,
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False,
                    cmap=None, c_rms=c_rms, c_fit=c_fit,
                    fit=True, logx=True, logy=True, ms=ms, elw=elw,

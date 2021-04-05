@@ -359,14 +359,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     if ax is None:
         fig = plt.figure(figsize=figsize)
         ax = plt.gca()
-    if logx:
-        ax.set_xscale('log')
-    if logy:
-        ax.set_yscale('log')
-    if ylim is not None:
-        ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
-    if xlim is not None:
-        ax.set_xlim(xlim)
+
     if z_name == 'eta':
         z_vec = [float(eee) for eee in eta]  # the colourised vector, must be numeric
     else:
@@ -528,8 +521,17 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             xerr = 1
             yerr = 1
         ax = fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
-                               xerr=xerr, yerr=yerr, legend=legend, lw=lw,
+                               xerr=xerr, yerr=yerr, legend=legend, lw=lw, xlim=xlim,
                                sigma=sigma, **kwargs)
+
+    if logx:
+        ax.set_xscale('log')
+    if logy:
+        ax.set_yscale('log')
+    if ylim is not None:
+        ax.set_ylim(ylim[0], ylim[1])  # for fair comparison
+    if xlim is not None:
+        ax.set_xlim(xlim)
 
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
@@ -1610,7 +1612,7 @@ def plot_topo_profile(case, ts, save=True, fig_path=fig_path_bullard, data_path=
 
 
 def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=False, n_fitted=2, c_list=None,
-                      c='xkcd:periwinkle', legsize=12, lw=1, legloc='lower left', showchisq=False,
+                      c='xkcd:periwinkle', legsize=12, lw=1, legloc='lower left', showchisq=False, xlim=None,
                       **kwargs):
     x = [a[1] for a in yx_all]
     y = [a[0] for a in yx_all]
@@ -1658,7 +1660,7 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
 
         yn_upper = hprime + SE_y
         yn_lower = hprime - SE_y
-        ax.fill_between(xprime, yn_lower, yn_upper, fc='k', alpha=0.3)
+        ax.fill_between(xprime, yn_lower, yn_upper, fc=c, alpha=0.3)
 
     if legend:
         if showchisq:
@@ -1675,6 +1677,10 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
         # leg = ax.legend(fontsize=legsize, handles=handles, labels=labels, loc=legloc)
         # ax.add_artist(leg)
 
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    else:
+        ax.set_xlim(np.min(xprime), np.max(xprime))
     if showallscatter:
         ax.scatter(flatx, flaty, c=c, alpha=0.05, s=10)
     return ax
