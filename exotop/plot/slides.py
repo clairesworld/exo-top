@@ -76,7 +76,7 @@ for regime in regimes:
                    cmap=None, c_rms=c_rms, c_fit=c_fit,
                    fit=True, logx=True, logy=True, ms=ms, elw=elw,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td, figsize=(15, 9), errortype='standard', cbar=False)
+                   regime_grid=regime_grid_td, figsize=(12, 9), errortype='standard', cbar=False)
 
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
