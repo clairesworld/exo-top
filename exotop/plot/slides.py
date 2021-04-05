@@ -43,7 +43,7 @@ for regime in regimes:
         xlim = [1e6, 3e7]
         yticks = [6e-3, 8e-3, 1e-2, 1.2e-2, 1.4e-2]
         xticks = [1e6, 1e7, 3e7]
-        fitlabel = r'$\Delta h = 0.094$ Ra$_{i, eff}^{-0.151}$'
+        fitlabel = r'$\Delta h = 0.12$ Ra$_{i, eff}^{-0.17}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
                    mlines.Line2D([], [], color=c_rms[1], marker='o', ls='--',
@@ -73,10 +73,10 @@ for regime in regimes:
                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=axissize,
                    xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography', #legsize=legsize, cleglabels=cleglabels,
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False,
-                   cmap=None, c_rms=c_rms,
+                   cmap=None, c_rms=c_rms, c_fit=c_fit,
                    fit=True, logx=True, logy=True, ms=ms, elw=elw,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td, figsize=(16, 9), errortype='standard', cbar=False)
+                   regime_grid=regime_grid_td, figsize=(15, 9), errortype='standard', cbar=False)
 
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
@@ -98,7 +98,7 @@ for regime in regimes:
 
     # fig, _, _ = dark_background(fig, (ax, ax2))
     fig, _ = dark_background(fig, ax)
-    plat.plot_save(fig, fname='h_Ra_dim_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
+    plat.plot_save(fig, fname='h_Ra_'+regime, fig_path=fig_path+'slides/', fig_fmt=fig_fmt, facecolor=fig.get_facecolor())
 
 
 

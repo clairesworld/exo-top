@@ -36,7 +36,7 @@ xlabels = [#'Age\n(Gyr)',
            'Planet mass\n($M_E$)', 'Rad. heating, $t_f$\n(pW kg$^{-1}$)',  'Core mass fraction']
 
 
-fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=500, x_res=8,
+fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=1000, x_res=7,
                                                            defaults='baseline',
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
                                                            legend=True, lw=4, ylabel='$\Delta h_{rms}$ (m)',
@@ -53,12 +53,12 @@ for i, ax in enumerate(axes):
     ax.set_xlim([x*xscales[i] for x in x_range[i]])  # mass
     ax.set_xticks(xticks[i])
     ax.set_yscale('log')
-    ax.set_ylim((400, 1200))
+    ax.set_ylim((300, 1100))
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
 axes[0].yaxis.set_minor_formatter(ticker.NullFormatter())
-axes[0].set_yticks([500, 600, 700, 800, 900, 1000])
+axes[0].set_yticks([400, 500, 600, 700, 800, 900, 1000])
 
 # VENUS: 850 m
 h_Venus = 865.4906656355711
