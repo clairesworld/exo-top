@@ -38,7 +38,7 @@ for regime in regimes:
                                  markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
     elif regime == 'chaotic':
         include_regimes = ['chaotic']
-        c_rms = c_rms[1:]
+        # c_rms = c_rms[1:]
         ylim = [6e-3, 1.4e-2]
         xlim = [1e6, 3e7]
         yticks = [6e-3, 8e-3, 1e-2, 1.2e-2, 1.4e-2]
@@ -46,11 +46,11 @@ for regime in regimes:
         fitlabel = r'$\Delta h = 0.094$ Ra$_{i, eff}^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
-                   mlines.Line2D([], [], color=c_rms[0], marker='o', ls='--',
-                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{6}$'),
                    mlines.Line2D([], [], color=c_rms[1], marker='o', ls='--',
-                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{7}$'),
+                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{6}$'),
                    mlines.Line2D([], [], color=c_rms[2], marker='o', ls='--',
+                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{7}$'),
+                   mlines.Line2D([], [], color=c_rms[3], marker='o', ls='--',
                                  markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
 
     fig, ax, ax2 = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
