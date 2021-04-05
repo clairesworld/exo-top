@@ -40,9 +40,9 @@ for regime in regimes:
         include_regimes = ['chaotic']
         # c_rms = c_rms[1:]
         ylim = [6e-3, 1.4e-2]
-        xlim = [1e6, 3e7]
+        # xlim = [1e6, 3e7]
         yticks = [6e-3, 8e-3, 1e-2, 1.2e-2, 1.4e-2]
-        xticks = None # [1e6, 1e7, 3e7]
+        xticks = [3e6, 1e7]
         fitlabel = r'$\Delta h = 0.12$ Ra$_{i, eff}^{-0.17}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
@@ -69,14 +69,14 @@ for regime in regimes:
 
     fig, ax = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra_i_eff', ticksize=ticksize,
-                   beta0=[0.1, -0.15], sigma=1, fiterror=False, legend=False,
+                   beta0=[0.1, -0.15], sigma=1, fiterror=False, legend=False, ylabelpad=20,
                    include_regimes=['chaotic'], save=True, fname='h_Raieff_chaotic_timeavg', labelsize=axissize,
-                   xlabel=r'Ra$_{i,eff}$', ylabel=r'dynamic topography, $\Delta h^\prime_{rms}$', #legsize=legsize, cleglabels=cleglabels,
+                   xlabel=r'Ra$_{i,eff}$', ylabel=r'topography, $\Delta h^\prime_{rms}$', #legsize=legsize, cleglabels=cleglabels,
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False,
                    cmap=None, c_rms=c_rms, c_fit=c_fit,
                    fit=True, logx=True, logy=True, ms=ms, elw=elw,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td, figsize=(12, 9), errortype='standard', cbar=False)
+                   regime_grid=regime_grid_td, figsize=(13, 9), errortype='standard', cbar=False)
 
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
     ax.tick_params(axis='y', labelsize=ticksize, pad=15)
