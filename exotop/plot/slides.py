@@ -46,11 +46,11 @@ for regime in regimes:
         fitlabel = r'$\Delta h = 0.094$ Ra$_{i, eff}^{-0.151}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
-                   mlines.Line2D([], [], color=c_rms[1], marker='o', ls='--',
+                   mlines.Line2D([], [], color=c_rms[0], marker='o', ls='--',
                                  markersize=20, lw=0, label=r'$\Delta \eta = 10^{6}$'),
-                   mlines.Line2D([], [], color=c_rms[2], marker='o', ls='--',
+                   mlines.Line2D([], [], color=c_rms[1], marker='o', ls='--',
                                  markersize=20, lw=0, label=r'$\Delta \eta = 10^{7}$'),
-                   mlines.Line2D([], [], color=c_rms[3], marker='o', ls='--',
+                   mlines.Line2D([], [], color=c_rms[2], marker='o', ls='--',
                                  markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
 
     fig, ax, ax2 = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
