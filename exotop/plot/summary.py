@@ -12,9 +12,9 @@ from postaspect import aspect_post as ap
 #                         include_regimes=['chaotic'],
 #                         data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 
-# ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
-#                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
-#                         load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
+ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
+                        t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
+                        load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
 """plot summaries across delta eta and/or Ra """
 

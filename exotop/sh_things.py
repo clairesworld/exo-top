@@ -424,8 +424,8 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
     return ax
 
 
-def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=True,
-               min_type='delta_rh', lid=False, max_dscale=2, bl_fudge=1, plot=True, **kwargs):
+def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=False,
+               min_type='delta_rh', lid=False, max_dscale=2, bl_fudge=1, plot=True, show_orig_scales=False, **kwargs):
     if not dim:
         d = 1
     df = ap.pickleio(case, suffix='_T', t1=t1, load=True, data_path=data_path, **kwargs)
@@ -436,9 +436,10 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
 
     if min_type == 'delta_rh':
         try:
-            min_scale = dic_av['delta_rh'] * bl_fudge
+            delta_rh = dic_av['delta_rh']
         except KeyError:
-            min_scale = np.mean(df.delta_rh.to_numpy()) * bl_fudge
+            delta_rh = np.mean(df.delta_rh.to_numpy())
+        min_scale = delta_rh * bl_fudge
     elif min_type == 'elastic':
         # https://www.essoar.org/pdfjs/10.1002/essoar.10504581.1 for elastic thickness based on heat flow (Borrelli)
         min_scale = 0.12  # 330 km, Lees
@@ -456,8 +457,11 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
     max_scale = max_scale * d
 
     if plot:
-        ax.axvline(x=2*np.pi/min_scale, lw=lw, c=c)
-        ax.axvline(x=2*np.pi/max_scale, lw=lw, c=c)
+        ax.axvline(x=2*np.pi/min_scale, lw=lw, c=c, label=r'$\delta_{rh}$')
+        ax.axvline(x=2*np.pi/max_scale, lw=lw, ls=':', c=c, label=r'$2d$')
+        # if show_orig_scales:
+        #     ax.axvline(x=2 * np.pi / min_scale, lw=lw, c=c, label='min k')
+        #     ax.axvline(x=2 * np.pi / max_scale, lw=lw, ls='--', c=c, label='max k')
         # ylim = ax.get_ylim()
         # y_percent = 0.1
         # yt = 10**(y_percent*(np.log10(ylim[1]) - np.log10(ylim[0])) + np.log10(ylim[0]))
@@ -504,6 +508,8 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
     fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
     S, k = pkl.load(open(fname, "rb"))
+    print('k', k[:5])
+
     if k[0] == 0:  # only wavenumbers greater than 0
         k = k[1:]
         S = S[1:]
@@ -515,11 +521,17 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
 
     if plot:
         fig = plt.figure()
-        plt.loglog(l_orig, S, label='1D PSD')
-        plt.xlabel("Degree, $l$")
-        plt.ylabel("Power")
+        # plt.loglog(l_orig[1:], S[1:], 'k-', lw=3, label='original PSD', alpha=0.2)
+        # plt.xlabel("Degree, $l$")
+        plt.loglog(k, S, 'k-', lw=3, label='original PSD', alpha=0.2)
+        plt.xlabel("Wavenumber, $k$ (nondimensional)")
+        plt.ylabel("PSD")
 
-    # wavenumber range where spectrum makes sense
+        ax = plt.gca()
+        # wavenumber range where spectrum makes sense
+        ax, _, _ = nat_scales(case, dim=False, data_path=data_path, plot=True, bl_fudge=1,
+                                max_dscale=2, ax=ax, c='xkcd:sea blue')
+
     wl_min, wl_max = nat_scales(case, dim=False, data_path=data_path, plot=False, bl_fudge=bl_fudge, max_dscale=max_dscale)
     k_min, k_max = 2 * np.pi / wl_max, 2 * np.pi / wl_min
 
@@ -527,8 +539,14 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
     l, Sl = interpolate_degrees(S, k, R=R, lmin=2, kmin_fit=k_min, kmax_fit=k_max)
 
     if plot:
-        plt.loglog(l, Sl, c='k', ls='--', label='Interpolated')
-        plt.legend()
+        ax2 = ax.twiny()
+        ax2.loglog(l[2:], Sl[2:], c='g', ls='--', label='Fit')
+        # plt.scatter(l_to_k(l, R=R), S, marker='o', c='g', alpha=0.3, label='fit points')
+        ax2.set_xlabel("Degree, $l$")
+        ax2.legend()
+        ax.legend()
+        xlim = ax.get_xlim()
+        ax2.set_xlim([k_to_l(kk, R) for kk in xlim])
         plt.savefig(fig_path + 'Sl_test.png', bbox_inches='tight')
 
     if verbose:
@@ -569,7 +587,8 @@ def integrate_to_peak(grid, R=2, fudge_to_rms=None, verbose=False):
     return vol_ocn
 
 
-def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, plot_spectrum=True, cbar=False, clabel='Dynamic topography (km)',
+def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, plot_spectrum=True, cbar=False,
+                   clabel='Dynamic topography (km)',
                    cmap='terrain', labelsize=14, d=1, alpha_m=1, dT=1, verbose=False, fig_path='', cline='k', lw=3,
                    save=False, figsize=(5,3), ticksize=16):
 
@@ -586,6 +605,7 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, pl
         #         plt.ylim(1e1,1e6)
         plt.xlabel("Spherical harmonic degree", fontsize=labelsize)
         plt.ylabel("Power (km$^2$ km$^2$)", fontsize=labelsize)
+        plt.title('random 2D spectrum', fontsize=labelsize)
         plt.gca().tick_params(axis='both', which='major', labelsize=ticksize)
         if save:
             plt.savefig(fig_path + 'random_psd_2D.png', bbox_inches='tight')
@@ -596,19 +616,23 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, pl
     lats = topo.lats()
     lons = topo.lons()
 
+    h_rms = np.sqrt(np.mean(data**2))
+    if verbose:
+        print('RMS of map', h_rms)
+
     if scale_to_1D:
-        data = data / np.pi ** 2
+        data = data / np.pi ** 2  # where does this come from lol
     data = data * d * dT * alpha_m
+
+    h_rms = np.sqrt(np.mean(data**2))
+    if verbose:
+        print('RMS of map scaled', h_rms)
 
     # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
     lons = np.hstack([lons, np.array([360.0])])
     v = data[:, 0]
     v = v.reshape((v.shape[0], 1))
     data = np.hstack([data, v])
-
-    h_rms = np.sqrt(np.mean(data**2))
-    if verbose:
-        print('RMS of map', h_rms, 'km')
 
     if plot_grid:
         fig, ax = plt.subplots(1, 1)
@@ -638,7 +662,7 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
         fig = plt.figure()
         plt.xlabel("Degree, $l$")
         plt.ylabel("Power")
-        plt.loglog(l, psd, c='k', ls='--', label='Interpolated')
+        plt.loglog(l[2:], psd[2:], c='k', ls='--', label=r'$\phi_0^{1D}$ fit')
 
     if verbose:
         print('\nRMS of orig model 1D psd', parseval_rms(psd, k))
@@ -647,6 +671,8 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
     phi_1D = psd
     phi_2D_iso = np.pi / k * phi_1D  # Jacobs eqn 5
 
+    if plot:
+        plt.loglog(l[2:], phi_2D_iso[2:], ls='--', c='xkcd:magenta', label=r'$\phi_{iso}^{2D}$')
     if verbose:
         print('\nRMS of orig model 2D iso psd', parseval_rms(phi_2D_iso, k))  # works!
 
@@ -656,7 +682,7 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
     lmax = np.max(l)
 
     if plot:
-        plt.loglog(l, S, label='Power per l')
+        plt.loglog(l[2:], S[2:], ls='--', label=r'$S_l$')
 
     # generate new model spectra from random
     if verbose:
@@ -678,8 +704,8 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
             # print('RMS of 2D psd if it were 1D', parseval_rms(4.0*np.pi*R*R*power_per_lm*k, k), 'km')
 
         if plot:
-            plt.loglog(degrees, power_per_l, label='Power per l randomised')
-            plt.loglog(degrees, power_per_lm, label='2D PSD randomised')
+            plt.loglog(degrees[2:], power_per_l[2:], label=r'$S_{l}^{\rm rand}$')
+            plt.loglog(degrees[2:], power_per_lm[2:], label=r'$S_{lm}^{\rm rand}$')
 
             plt.legend()
     #     plt.ylim((1e-1, 1e6))
