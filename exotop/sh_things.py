@@ -529,7 +529,7 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
 
         ax = plt.gca()
         # wavenumber range where spectrum makes sense
-        ax, _, _ = nat_scales(case, dim=False, data_path=data_path, plot=True, bl_fudge=1,
+        ax, _, _ = nat_scales(case, dim=False, data_path=data_path, plot=True, bl_fudge=1, lid=True,
                                 max_dscale=2, ax=ax, c='xkcd:sea blue')
 
     wl_min, wl_max = nat_scales(case, dim=False, data_path=data_path, plot=False, bl_fudge=bl_fudge, max_dscale=max_dscale)
@@ -669,15 +669,16 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
 
     # convert 1D psd (km^2 km) to pseudo-2D (km^2 km^2) assuming radial symmetry
     phi_1D = psd
-    phi_2D_iso = np.pi / k * phi_1D  # Jacobs eqn 5
+    phi_2D_iso = 1 / k * phi_1D  # Jacobs eqn 5 but pi changed to 1 in numerator says JFR
 
     if plot:
         plt.loglog(l[2:], phi_2D_iso[2:], ls='--', c='xkcd:magenta', label=r'$\phi_{iso}^{2D}$')
     if verbose:
-        print('\nRMS of orig model 2D iso psd', parseval_rms(phi_2D_iso, k))  # works!
+        print('\nRMS of orig model 2D iso psd in 2D', parseval_rms_2D(phi_2D_iso, k))
+        # print('\nRMS of orig model 2D iso psd', parseval_rms(phi_2D_iso, k))  # works!
 
     # use this pseudo-2D psd to find power in km^2
-    S = np.array(phi_2D_iso) * (2 * l + 1)
+    S = np.array(phi_2D_iso) * (2 * l + 1) / (4*np.pi*R**2)  # factor of 4piR^2 from Lees eq A7
     S = S * h_ratio ** 2  # scale by rms ratio if necessary
     lmax = np.max(l)
 
@@ -686,7 +687,7 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
 
     # generate new model spectra from random
     if verbose:
-        print('\n///// new randomised spectra, scaled to rms', parseval_rms(phi_2D_iso, k)*h_ratio)
+        print('\n///// new randomised spectra, scaled to rms', parseval_rms_2D(phi_2D_iso, k)*h_ratio)
 
     coeffs_global = pyshtools.SHCoeffs.from_random(S, normalization='ortho', lmax=lmax)
 
@@ -695,7 +696,7 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
         k = (degrees + 0.5) / R
         power_per_l = coeffs_global.spectrum(unit='per_l')
         power_per_lm = coeffs_global.spectrum(unit='per_lm')
-        psd_pseudo = power_per_lm * k / np.pi
+        psd_pseudo = power_per_lm * k
         psd_2D = 4 * np.pi * R ** 2 * power_per_lm
 
         if verbose:
@@ -704,8 +705,8 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
             # print('RMS of 2D psd if it were 1D', parseval_rms(4.0*np.pi*R*R*power_per_lm*k, k), 'km')
 
         if plot:
-            plt.loglog(degrees[2:], power_per_l[2:], label=r'$S_{l}^{\rm rand}$')
-            plt.loglog(degrees[2:], power_per_lm[2:], label=r'$S_{lm}^{\rm rand}$')
+            plt.loglog(degrees[2:], psd_pseudo[2:], label=r'$S_{l}^{\rm rand}$')
+            plt.loglog(degrees[2:], psd_2D[2:], label=r'$S_{lm}^{\rm rand}$')
 
             plt.legend()
     #     plt.ylim((1e-1, 1e6))

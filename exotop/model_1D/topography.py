@@ -2,8 +2,10 @@
 from . import parameters as p
 import numpy as np
 
-def dimensionalise(h_prime, pl, end=True, **kwargs):
-    if end:
+def dimensionalise(h_prime, pl, i=None, **kwargs):
+    if i is not None:
+        h = h_prime * (pl.T_c[i] - pl.T_s) * pl.alpha_m * (pl.R_p - pl.R_c)
+    else:
         # h = h_prime*(np.maximum(pl.T_c[-1], pl.T_m[-1]) - pl.T_s)*pl.alpha_m*(pl.R_p - pl.R_c)
         h = h_prime * (pl.T_c - pl.T_s) * pl.alpha_m * (pl.R_p - pl.R_c)
         # h = pl.eta_m[-1] * pl.kappa_m / (pl.d_m[-1]**2 * pl.rho_m * pl.g_sfc)  # alternate scaling K&H

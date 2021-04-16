@@ -2,13 +2,17 @@ from . import parameters
 import numpy as np
 from useful_and_bespoke import age_index
 import sh_things as sh
+from model_1D.topography import dimensionalise
 
 
 def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0=None, plot=False, verbose=False, **kwargs):
 
     h_rms1 = eval('pl.' + name_rms)
-    h_rms1_dim = eval('pl.' + 'dyn_top_rms')
-    print('dimensional h rms', h_rms1_dim)
+    if verbose:
+        h_rms1_dim = eval('pl.' + 'dyn_top_rms')
+        print('nondimensional h rms',  h_rms1[-1])
+        print('dimensional h rms', h_rms1_dim[-1])
+
     l = np.arange(len(phi0))
     k = sh.l_to_k(l, R=2)  # original model spectrum uses R = 2d = 2
     # phi0_dim = phi0 * pl.d_m[-1] ** 3 * pl.dT_m[-1] ** 2 * pl.alpha_m ** 2  # dimensionalise power of model spec
@@ -34,7 +38,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
             clm = sh.random_harms_from_psd(phi0, l, R=2, h_ratio=h_ratio, plot=plot, verbose=verbose)
             grid = sh.coeffs_to_grid(clm, R=2, plot_grid=False, plot_spectrum=False, verbose=verbose,
                                      d=1, alpha_m=1, dT=1, scale_to_1D=False)
-            grid_dim = grid * pl.d_m[ii] * pl.alpha_m * pl.dT_m[ii]
+            grid_dim = dimensionalise(grid, pl, i=ii)
             if verbose:
                 print('RMS of map dimensionalised', np.sqrt(np.mean(grid_dim**2)), 'm')
 
