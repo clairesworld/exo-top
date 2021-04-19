@@ -2,7 +2,7 @@
 
 import numpy as np
 from matplotlib import use as matplotlibuse
-matplotlibuse('Agg')  # comment for running remotely
+matplotlibuse('Agg')  # turn on for running over ssh
 
 default_load_value = True
 check_new = True  # always check for new timesteps with ongoing runs

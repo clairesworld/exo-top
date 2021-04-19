@@ -7,6 +7,7 @@ from postaspect import aspectdata as post
 from postaspect.plt_aspect import plot_save
 import matplotlib.pyplot as plt
 
+
 def hpeak_from_spectrum(power, norm='4pi', lmax=40, n=10, **kwargs):
     ii = 0
     h_peak = []
@@ -36,7 +37,6 @@ def load_spectrum(fpath='', fname='', **kwargs):
     return power, degrees
 
 
-
 def load_spectrum_wavenumber(fpath='', fname='', has_header=True, wl=False, two_d=False, **kwargs):
     names = ['k', 'S']
     if has_header:
@@ -56,18 +56,18 @@ def norm_spectrum(k, S, norm='min_l', k_min=None):
         S_norm = S / S[0] * k ** 2  # trying to emphasise k**-2 slope but doesn't rlly work
     elif norm == 'intercept':
         beta, intercept = fit_slope(S, k, k_min=None, k_max=None, plot=False)
-        Shat = intercept * k_min**-beta  # intercept at natural min wavenumber - constant for given d
+        Shat = intercept * k_min ** -beta  # intercept at natural min wavenumber - constant for given d
         S_norm = S / Shat
     return k, S_norm
 
 
 def mod_loaded_spectrum(k, S, is_wl=False, is_2D=False, is_amplitude=False, normalise=False, **kwargs):
     if is_wl:
-        k = 2*np.pi/k
+        k = 2 * np.pi / k
     if is_2D:
-        S = S*k
+        S = S * k
     if is_amplitude:
-        S = S**2
+        S = S ** 2
     if normalise:
         k, S = norm_spectrum(k, S, **kwargs)
     return k, S
@@ -77,15 +77,16 @@ def scale_spectrum(h_rms, h_rms0=None, phi0=None, degree=None, pl=None, pl0=None
     # scale power spectrum phi0 such that it has new rms equal to h_rms
 
     # if h_func is None:
-        # here you are trying to scale dynamic topography spectrum by ratio of h_rms derived from known 1D params
-        # get time index nearest to desired snap given in Gyr
-        # it = min(enumerate(pl_baseline.t), key=lambda x: abs(age - x[1] * parameters.sec2Gyr))[0]
-        # ratio = (pl.d_m * pl.T_m ** 2 * pl.Ra_i_eff ** (-1 / 3)) / (
-        #         pl0.d_m * pl0.T_m ** 2 * pl0.Ra_i_eff ** (-1 / 3))  # = phi / phi0
-        # ratio = ratio[it]
+    # here you are trying to scale dynamic topography spectrum by ratio of h_rms derived from known 1D params
+    # get time index nearest to desired snap given in Gyr
+    # it = min(enumerate(pl_baseline.t), key=lambda x: abs(age - x[1] * parameters.sec2Gyr))[0]
+    # ratio = (pl.d_m * pl.T_m ** 2 * pl.Ra_i_eff ** (-1 / 3)) / (
+    #         pl0.d_m * pl0.T_m ** 2 * pl0.Ra_i_eff ** (-1 / 3))  # = phi / phi0
+    # ratio = ratio[it]
     if h_rms0 is None:
-        h_rms0 = powerspectrum_RMS(power_lm=phi0,degree=degree)  # I hope this is a power spectrum, but this probably needs to be multipled by R or something
-    ratio = h_rms/h_rms0
+        h_rms0 = powerspectrum_RMS(power_lm=phi0,
+                                   degree=degree)  # I hope this is a power spectrum, but this probably needs to be multipled by R or something
+    ratio = h_rms / h_rms0
     sqrtphi = np.sqrt(phi0) * ratio
     return sqrtphi ** 2
 
@@ -94,7 +95,7 @@ def vol_from_peak(r0, h_peak, vol_ref=1, **kwargs):
     # getting volume in between trough and peak maxima - as troughs fill in peaks, net volume is 0 and total volume is
     # the spherical annulus between r0 and h_peak
     # R_p = 6051.88e3
-    EO = 1.35e9 * 1000**3  # e.g. reference volume based on R_E
+    EO = 1.35e9 * 1000 ** 3  # e.g. reference volume based on R_E
     vol = 4 / 3 * np.pi * ((r0 + h_peak) ** 3 - r0 ** 3)
     # print('R_p:', r0*1e-3, 'km, h_peak', h_peak*1e-3, 'km, vol:', vol/EO, 'TO')
     return vol / vol_ref
@@ -148,15 +149,15 @@ def parseval_rms(psd, k):
     # RMS from power spectral density using parseval's theorem
     f = psd
     I = np.trapz(f, k)
-    rms = np.sqrt(I/(2*np.pi))
+    rms = np.sqrt(I / (2 * np.pi))
     return rms
 
 
 def parseval_rms_2D(psd, k):
     # RMS from power spectral density using parseval's theorem
-    f = psd*2*np.pi*k
+    f = psd * 2 * np.pi * k
     I = np.trapz(f, k)
-    rms = np.sqrt(I/(2*np.pi)**2)
+    rms = np.sqrt(I / (2 * np.pi) ** 2)
     return rms
 
 
@@ -202,7 +203,7 @@ def dct_spectrum_jfr(case=None, test=False, plot_test=False, L_x=8, x_res=1, dat
             L = d * L_x
         else:
             L = L_x
-        delta_x = L/N
+        delta_x = L / N
 
     t = dct(y, type=2, norm='ortho')
     k = (np.pi / L) * np.arange(N)
@@ -279,7 +280,7 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, data
     import os
     import pickle as pkl
 
-    file = data_path+'output-'+case+'/pickle/'+case+'_sph'+fend
+    file = data_path + 'output-' + case + '/pickle/' + case + '_sph' + fend
     if load and os.path.exists(file):
         psd_mean, k = pkl.load(open(file, "rb"))
     else:
@@ -289,8 +290,8 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, data
             tsf = ap.find_ts(case, 1e9, data_path=data_path, verbose=False)  # use last
 
         psd_grid = []
-        print('Averaging', len(np.arange(ts0, tsf+1, t_res)), 'timesteps')
-        for ts in np.arange(ts0, tsf+1, t_res):
+        print('Averaging', len(np.arange(ts0, tsf + 1, t_res)), 'timesteps')
+        for ts in np.arange(ts0, tsf + 1, t_res):
             if np.mod(ts, 1000) == 0:
                 print('    ts =', ts, '/', tsf)
             psd_i, k = dct_spectrum_jfr(case, ts0=ts, x_res=x_res, data_path=data_path, plot_test=False,
@@ -366,15 +367,15 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
         k_min = to_wn(l_min)
         k_max = to_wn(l_max)
     else:
-        k_min = 2*np.pi/wl_max
-        k_max = 2*np.pi/wl_min
+        k_min = 2 * np.pi / wl_max
+        k_max = 2 * np.pi / wl_min
     beta, intercept = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
     ax = show_beta_guide(ax, x0=x0_guide, y0=y0_guide, x1=x1_guide, m=-2, c='k', lw=3, log=True, **kwargs)
 
     fig = plt.gcf()
     plt.tight_layout()
     if save:
-        plot_save(fig, fname='DCT_'+case, fig_path=fig_path, **kwargs)
+        plot_save(fig, fname='DCT_' + case, fig_path=fig_path, **kwargs)
     elif show:
         plt.show()
     return fig, ax
@@ -400,7 +401,7 @@ def fit_slope(S, k, k_min=None, k_max=None, ax=None, fmt='g-', plot=True, **kwar
         print('  min, max', k_min, k_max)
         raise e
 
-    intercept = 10**intercept
+    intercept = 10 ** intercept
     print('         slope, 10^intercept:', slope, intercept)
     beta = -slope
 
@@ -414,13 +415,13 @@ def fit_slope(S, k, k_min=None, k_max=None, ax=None, fmt='g-', plot=True, **kwar
 
 def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=True, **kwargs):
     if log:
-        b = np.log10(y0) - m*np.log10(x0)
-        y1 = 10**b * x1**m
+        b = np.log10(y0) - m * np.log10(x0)
+        y1 = 10 ** b * x1 ** m
     else:
-        b = y0 - m*x0
-        y1 = m*x1 + b
+        b = y0 - m * x0
+        y1 = m * x1 + b
     ax.plot((x0, x1), (y0, y1), c=c, lw=lw)
-    ax.text((x0+x1)/2, y0, r'$k^{-2}$', fontsize=legsize, c=c)  # (y0+y1)/2
+    ax.text((x0 + x1) / 2, y0, r'$k^{-2}$', fontsize=legsize, c=c)  # (y0+y1)/2
     return ax
 
 
@@ -457,8 +458,8 @@ def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, d
     max_scale = max_scale * d
 
     if plot:
-        ax.axvline(x=2*np.pi/min_scale, lw=lw, c=c, label=r'$\delta_{rh}$')
-        ax.axvline(x=2*np.pi/max_scale, lw=lw, ls=':', c=c, label=r'$2d$')
+        ax.axvline(x=2 * np.pi / min_scale, lw=lw, c=c, label=r'$\delta_{rh}$')
+        ax.axvline(x=2 * np.pi / max_scale, lw=lw, ls=':', c=c, label=r'$2d$')
         # if show_orig_scales:
         #     ax.axvline(x=2 * np.pi / min_scale, lw=lw, c=c, label='min k')
         #     ax.axvline(x=2 * np.pi / max_scale, lw=lw, ls='--', c=c, label='max k')
@@ -483,7 +484,6 @@ def l_to_k(l, R):
 
 
 def interpolate_degrees(phi, kv, R, lmin=2, kmin_fit=None, kmax_fit=None):
-
     beta, intercept = fit_slope(phi, kv, k_min=kmin_fit, k_max=kmax_fit, plot=False)
 
     lmin_fit = int(np.ceil(-0.5 + kmin_fit * R))
@@ -491,76 +491,88 @@ def interpolate_degrees(phi, kv, R, lmin=2, kmin_fit=None, kmax_fit=None):
     l = np.arange(lmin_fit, lmax_fit + 1)
 
     kl = (l + 0.5) / R
-    Sl = intercept * kl ** -beta  # psd at wavenumber corresponding to range of l
+    Sl = intercept * kl ** -beta  # psd at wavenumber corresponding to appropriate range of l
 
     # insert lower degrees - flat
     p0 = Sl[0]
     Sl = np.insert(np.array(Sl), 0, [p0] * (lmin_fit - lmin))
-    Sl = np.insert(np.array(Sl), 0, [0.0] * lmin)  # no power at l=0,1
+    Sl = np.insert(np.array(Sl), 0, [0.0] * lmin)  # no power below lmin
     l = np.insert(np.array(l), 0, np.arange(lmin_fit))
-
     return l, Sl
 
 
 def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spectrum', pend='_sph', fend='.pkl',
-                        bl_fudge=1, max_dscale=2, plot=True, verbose=False):
+                        bl_fudge=1, max_dscale=2, plot=True, verbose=False, lmin=1):
     import pickle as pkl
     fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
     S, k = pkl.load(open(fname, "rb"))
-    print('k', k[:5])
 
-    if k[0] == 0:  # only wavenumbers greater than 0
-        k = k[1:]
-        S = S[1:]
+    # if k[0] == 0:  # only wavenumbers greater than 0
+    #     k = k[1:]
+    #     S = S[1:]
 
     l_orig = -0.5 + k * R
 
     if verbose:
-        print('RMS of 1D psd', parseval_rms(S, k))
+        print('k', k[:5])
+        print('l orig', l_orig[:5])
+        print('RMS of 1D psd', parseval_rms(S[1:], k[1:]), 'for k:', np.min(k[1:]), np.max(k[1:]))
 
     if plot:
         fig = plt.figure()
+        ax = plt.gca()
         # plt.loglog(l_orig[1:], S[1:], 'k-', lw=3, label='original PSD', alpha=0.2)
         # plt.xlabel("Degree, $l$")
-        plt.loglog(k, S, 'k-', lw=3, label='original PSD', alpha=0.2)
-        plt.xlabel("Wavenumber, $k$ (nondimensional)")
-        plt.ylabel("PSD")
+        ax.loglog(k[1:], S[1:], 'k-', lw=3, label='original PSD', alpha=0.2)  # original k includes 0, fucks up l
+        ax.set_xlabel("Wavenumber, $k$ (nondimensional)")
+        ax.set_ylabel("PSD")
 
-        ax = plt.gca()
         # wavenumber range where spectrum makes sense
         ax, _, _ = nat_scales(case, dim=False, data_path=data_path, plot=True, bl_fudge=1, lid=True,
-                                max_dscale=2, ax=ax, c='xkcd:sea blue')
+                              max_dscale=2, ax=ax, c='xkcd:sea blue')
 
-    wl_min, wl_max = nat_scales(case, dim=False, data_path=data_path, plot=False, bl_fudge=bl_fudge, max_dscale=max_dscale)
+    wl_min, wl_max = nat_scales(case, dim=False, data_path=data_path, plot=False, bl_fudge=bl_fudge,
+                                max_dscale=max_dscale)
     k_min, k_max = 2 * np.pi / wl_max, 2 * np.pi / wl_min
 
+    if verbose:
+        print('\nRMS of model 1D psd l=2', parseval_rms(S[k > k_max], k[k > k_max]), 'for k >', k_max)
+
     # somehow get exact degrees? must do fit...
-    l, Sl = interpolate_degrees(S, k, R=R, lmin=2, kmin_fit=k_min, kmax_fit=k_max)
+    l, Sl = interpolate_degrees(S, k, R=R, lmin=lmin, kmin_fit=k_min, kmax_fit=k_max)
+    # l_1, Sl_1 = interpolate_degrees(S, k, R=R, lmin=1, kmin_fit=k_min, kmax_fit=k_max)
 
     if plot:
         ax2 = ax.twiny()
-        ax2.loglog(l[2:], Sl[2:], c='g', ls='--', label='Fit')
+        # ax2.loglog(l_1, Sl_1, 'go', lw=0, ls='--', label='l=1 Fit')
+        ax2.loglog(l, Sl, 'b.', lw=0, ls='--', label='l=2 Fit')
+        ax2.loglog(k_to_l(k[1:], R), S[1:], 'b--', lw=3, label='original PSD', alpha=0.2)  # original k includes 0, fucks up l
         # plt.scatter(l_to_k(l, R=R), S, marker='o', c='g', alpha=0.3, label='fit points')
         ax2.set_xlabel("Degree, $l$")
         ax2.legend()
         ax.legend()
-        xlim = ax.get_xlim()
-        ax2.set_xlim([k_to_l(kk, R) for kk in xlim])
+        x2lim = (1e-1, 3e2)
+        xlim = [l_to_k(ll, R) for ll in x2lim]
+
+        ax2.set_xlim(x2lim)
+        ax.set_xlim(xlim)
         plt.savefig(fig_path + 'Sl_test.png', bbox_inches='tight')
 
     if verbose:
-        print('\nRMS of model 1D psd', parseval_rms(Sl, l_to_k(l, R)))
+        print('x1lim, k=', xlim)
+        print('\nRMS of model 1D psd l=', lmin, ':', parseval_rms(Sl, l_to_k(l, R)), 'for k:', np.min(l_to_k(l, R)), np.max(l_to_k(l, R)))
+        # print('\nRMS of model 1D psd l=1', parseval_rms(Sl_1, l_to_k(l_1, R)), 'for k:', np.min(l_to_k(l_1, R)), np.max(l_to_k(l_1, R)))
+        print('l = 1 corresponds to k=', l_to_k(1, R))
 
     pkl.dump((l, Sl), open(fig_path + newfname + fend, "wb"))
     return l, Sl
 
 
 def integrate_to_peak(grid, R=2, fudge_to_rms=None, verbose=False):
-
     if fudge_to_rms is not None:
-        rms_grid = np.sqrt(np.mean(grid**2))
-        grid = grid * fudge_to_rms/rms_grid
+        rms_grid = np.sqrt(np.mean(grid ** 2))
+        grid = grid * fudge_to_rms / rms_grid
 
     h_peak = np.max(grid)
     h_peak_abs = np.max(abs(grid))
@@ -590,8 +602,7 @@ def integrate_to_peak(grid, R=2, fudge_to_rms=None, verbose=False):
 def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, plot_spectrum=True, cbar=False,
                    clabel='Dynamic topography (km)',
                    cmap='terrain', labelsize=14, d=1, alpha_m=1, dT=1, verbose=False, fig_path='', cline='k', lw=3,
-                   save=False, figsize=(5,3), ticksize=16):
-
+                   save=False, figsize=(5, 3), ticksize=16):
     spectrum = clm.spectrum(unit='per_lm')  # 2D power spectral density
     l = clm.degrees()
     k = l_to_k(l, R)
@@ -616,7 +627,7 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, pl
     lats = topo.lats()
     lons = topo.lons()
 
-    h_rms = np.sqrt(np.mean(data**2))
+    h_rms = np.sqrt(np.mean(data ** 2))
     if verbose:
         print('RMS of map', h_rms)
 
@@ -624,7 +635,7 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, pl
         data = data / np.pi ** 2  # where does this come from lol
     data = data * d * dT * alpha_m
 
-    h_rms = np.sqrt(np.mean(data**2))
+    h_rms = np.sqrt(np.mean(data ** 2))
     if verbose:
         print('RMS of map scaled', h_rms)
 
@@ -642,7 +653,7 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, pl
         ax.set_ylabel('Longitude', fontsize=labelsize)
         if cbar:
             plt.colorbar(mappable, orientation='horizontal', label=clabel,
-                            fraction=0.07)
+                         fraction=0.07)
         if save:
             plt.savefig(fig_path + 'topo_grid.png', bbox_inches='tight')
 
@@ -678,7 +689,7 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
         # print('\nRMS of orig model 2D iso psd', parseval_rms(phi_2D_iso, k))  # works!
 
     # use this pseudo-2D psd to find power in km^2
-    S = np.array(phi_2D_iso) * (2 * l + 1) / (4*np.pi*R**2)  # factor of 4piR^2 from Lees eq A7
+    S = np.array(phi_2D_iso) * (2 * l + 1) / (4 * np.pi * R ** 2)  # factor of 4piR^2 from Lees eq A7
     S = S * h_ratio ** 2  # scale by rms ratio if necessary
     lmax = np.max(l)
 
@@ -687,7 +698,7 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
 
     # generate new model spectra from random
     if verbose:
-        print('\n///// new randomised spectra, scaled to rms', parseval_rms_2D(phi_2D_iso, k)*h_ratio)
+        print('\n///// new randomised spectra, scaled to rms', parseval_rms_2D(phi_2D_iso, k) * h_ratio)
 
     coeffs_global = pyshtools.SHCoeffs.from_random(S, normalization='ortho', lmax=lmax)
 

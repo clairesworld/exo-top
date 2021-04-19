@@ -46,6 +46,15 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
             postprocess_kwargs=postprocess_kwargs,
         )
 
+""" 2D isoviscous benchmark """
+plat.subplots_cases(
+    'Lees-Ra1e6-2D', labels='2D isoviscous benchmark', t1=0, save=True, load=False,
+    fname='Lees-benchmark', suptitle='Ra = 1e6', c_rms=c_rms, c_peak=c_peak,
+    includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
+    includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
+    postprocess_kwargs=postprocess_kwargs,
+)
+
 # compare 64 and 129 resolution for Ra=3e7
 # fig, ax = plat.case_subplots(
 #     ['Ra3e7-eta1e5-wide', 'Ra3e7-eta1e5-wide-128'],
