@@ -913,7 +913,10 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                     show_sols = False  # automatically override processing
 
             # rms velocity plot
-            ax = axes[ii, icol]
+            try:
+                ax = axes[ii, icol]
+            except IndexError:
+                ax = axes[icol]
             fig, ax = plot_evol(case, 'rms_velocity', fig=fig, ax=ax, save=False, mark_used=True, t1=t1_ii, dat=dat,
                                 show_sols=show_sols, ylabel='rms velocity', c='k', settitle=False, setxlabel=setxlabel,
                                 setylabel=setylabel, legend=False, labelsize=labelsize, labelpad=labelpad,
@@ -924,7 +927,10 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
             # heat flux plot
             icol = icol + 1
-            ax = axes[ii, icol]
+            try:
+                ax = axes[ii, icol]
+            except IndexError:
+                ax = axes[icol]
             fig, ax = plot_evol(case, 'heatflux_top', fig=fig, ax=ax, save=False, mark_used=False, dat=dat,
                                 show_sols=False, ylabel='heat flux', c='xkcd:light red', settitle=False,
                                 setxlabel=setxlabel, setylabel=setylabel, labelsize=labelsize, labelpad=labelpad,
@@ -936,7 +942,10 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
             if includeTz:
                 icol = icol + 1
-                ax = axes[ii, icol]
+                try:
+                    ax = axes[ii, icol]
+                except IndexError:
+                    ax = axes[icol]
                 if t1_ii < 1:
                     if not show_sols:
                         sol_df = pro.pickleio(case, suffix='_T', t1=t1_ii,
@@ -957,7 +966,10 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
             if includepdf:
                 icol = icol + 1
-                ax = axes[ii, icol]
+                try:
+                    ax = axes[ii, icol]
+                except IndexError:
+                    ax = axes[icol]
                 if t1_ii < 1:
                     ts_df = pro.pickleio(case, suffix='_h_all', t1=t1_ii,
                                          dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
@@ -974,7 +986,10 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
 
             if includegraphic:
                 icol = icol + 1
-                ax = axes[ii, icol]
+                try:
+                    ax = axes[ii, icol]
+                except IndexError:
+                    ax = axes[icol]
                 fgraph = fig_path + 'graphical/' + case + '.png'
                 try:
                     img = mpimg.imread(fgraph)
