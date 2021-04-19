@@ -716,7 +716,8 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
             # print('RMS of 2D psd if it were 1D', parseval_rms(4.0*np.pi*R*R*power_per_lm*k, k), 'km')
 
         if plot:
-            plt.loglog(degrees[2:], psd_pseudo[2:], label=r'$S_{l}^{\rm rand}$')
+            # plt.loglog(degrees[2:], psd_pseudo[2:], label=r'$S_{l}^{\rm rand}$')
+            plt.loglog(degrees[2:], power_per_l[2:], label=r'$S_{l}^{\rm rand}$')
             plt.loglog(degrees[2:], psd_2D[2:], label=r'$S_{lm}^{\rm rand}$')
 
             plt.legend()

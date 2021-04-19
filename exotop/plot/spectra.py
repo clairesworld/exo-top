@@ -1,6 +1,7 @@
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path, fig_path, fig_fmt, \
     regime_grid_td, regime_names_td, load_grid, p_Earth, postprocess_kwargs
 import fractals as fract
+import sh_things as sh
 
 ticksize = 22
 axissize = 40
@@ -19,10 +20,15 @@ ecapsize = 8
 # cases = ['Ra1e8-eta1e8-wide-ascii', 'Ra3e8-eta1e8-wide-ascii']
 # ts = [[133000, 133900],[137000, 137900]]
 
-include_regimes = ['chaotic']
-for ii, eta in enumerate(eta_ls):  # across eta_ls
-        cases = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
-        for jj, case in enumerate(cases):
-            if regime_grid_td[ii][jj] in include_regimes:
-                fract.dct_spectrum_avg(case, t0=t1_grid[ii][jj], t_res=1000, x_res=1, norm='ortho', data_path=data_path,
-                                       fig_path=fig_path, plot=True, dim=True, test=True)
+""" all chaotic cases get DCT-II and psd """
+# include_regimes = ['chaotic']
+# for ii, eta in enumerate(eta_ls):  # across eta_ls
+#         cases = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
+#         for jj, case in enumerate(cases):
+#             if regime_grid_td[ii][jj] in include_regimes:
+#                 sh.dct_spectrum_avg(case, t0=t1_grid[ii][jj], t_res=1000, x_res=1, norm='ortho', data_path=data_path,
+#                                        fig_path=fig_path, plot=True, dim=True, test=True)
+
+""" just Lees 2D benchmark """
+sh.dct_spectrum_avg(['Lees-Ra1e6-2D'], t0=[0.5], t_res=100, x_res=1, norm='ortho', data_path=data_path,
+                    fig_path=fig_path, plot=True, dim=True, test=True)
