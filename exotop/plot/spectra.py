@@ -2,6 +2,7 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
     regime_grid_td, regime_names_td, load_grid, p_Earth, postprocess_kwargs
 import fractals as fract
 import sh_things as sh
+from matplotlib import use as matplotlibuse
 matplotlibuse('Agg')
 ticksize = 22
 axissize = 40
