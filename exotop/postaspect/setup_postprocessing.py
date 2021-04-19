@@ -28,7 +28,7 @@ regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 
                            ['steady', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic'],  # eta 1e6
                            ['no convection', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic'],  # eta 1e7
                            ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'chaotic'],  # eta 1e8
-                           ['no convection', 'no convection', 'no convection', 'no convection', 'not ready', 'not ready']  # eta 1e9???
+                           ['not ran', 'not ran', 'not ran', 'not ran', 'not ready', 'not ready']  # eta 1e9???
                            ])
 regime_names_td = ['steady', 'trans.', 'chaotic']
 c_regimes_td = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure']
