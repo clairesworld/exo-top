@@ -50,7 +50,7 @@ from postaspect import aspect_post as ap
 plat.subplots_cases(
     ['Lees-Ra1e6-2D'], labels=['2D isoviscous benchmark'], t1=[0.001], save=True, load=False,
     fname='Lees-benchmark', suptitle='Ra = 1e6', c_rms=c_rms, c_peak=c_peak,
-    includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
+    includepdf=True, includeTz=False, show_sols=False,  # set False for faster summary with stats only
     includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
     postprocess_kwargs=postprocess_kwargs,
 )
