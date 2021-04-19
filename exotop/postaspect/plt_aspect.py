@@ -1569,7 +1569,12 @@ def plot_evol(case, col, fig=None, ax=None, save=True, fname='_f', mark_used=Tru
         ax = plt.gca()
 
     time, y = pro.read_evol(case, col, dat=dat)
-    ax.plot(time, y * yscale, c=c, lw=0.5, label=label)
+    try:
+        ax.plot(time, y * yscale, c=c, lw=0.5, label=label)
+    except ValueError as e:
+        print(case)
+        print(dat)
+        raise e
     ax.set_xlim(0, ax.get_xlim()[1])
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=labelpad)
