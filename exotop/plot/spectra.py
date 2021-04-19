@@ -30,5 +30,5 @@ ecapsize = 8
 #                                        fig_path=fig_path, plot=True, dim=True, test=True)
 
 """ just Lees 2D benchmark """
-sh.dct_spectrum_avg(['Lees-Ra1e6-2D'], t0=[0.5], t_res=100, x_res=1, norm='ortho', data_path=data_path,
+sh.dct_spectrum_avg('Lees-Ra1e6-2D', t0=0.5, t_res=100, x_res=1, norm='ortho', data_path=data_path,
                     fig_path=fig_path, plot=True, dim=True, test=True)
