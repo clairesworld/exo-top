@@ -31,5 +31,10 @@ ecapsize = 8
 #                                        fig_path=fig_path, plot=True, dim=True, test=True)
 
 """ just Lees 2D benchmark """
-sh.dct_spectrum_avg('Lees-Ra1e6-2D', t0=0.5, t_res=100, x_res=1, norm='ortho', data_path=data_path,
-                    fig_path=fig_path, plot=False, dim=True, test=True)
+sh.dct_spectrum_avg('Lees-Ra1e6-2D', t0=0.6, t_res=100, x_res=1, norm='ortho', data_path=data_path,
+                    fig_path=fig_path, plot=True, load=False, dim=False, fit=False,
+                    show_nat_scales=False, show_guide=False)
+
+# sh.dct_spectrum_jfr('Lees-Ra1e6-2D', ts0=ts, x_res=1, data_path=data_path, plot_test=True, check_norm=True, dim=False)
+
+""" compare 2D and 3D benchmark """

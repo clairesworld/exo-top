@@ -170,6 +170,7 @@ def total_power_parseval(psd=None, delta_k=None):
 
 
 def get_dct_test():
+    print('generating fake dct data for testing')
     def f(x):
         # function used for testing routine
         return np.cos(np.pi * x)
@@ -310,7 +311,8 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, data
     #     k = k * d**-1
 
     if plot:
-        fig, ax = plot_fit_psd(psd_mean, k, dim=dim, case=case, alpha=alpha, d=d, data_path=data_path, **kwargs)
+        fig, ax = plot_fit_psd(psd_mean, k, dim=dim, case=case, alpha=alpha, d=d, data_path=data_path,
+                               **kwargs)
         return fig, ax
     else:
         return None, None
@@ -318,7 +320,8 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, data
 
 def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig_path='', xlim=None, ylim=None,
                  d=2700, dT=3000, alpha=2e-5, l_max=None, l_min=None, labelsize=18, R_p=6050, c_spec='xkcd:slate',
-                 x0_guide=7e-4, y0_guide=1e5, x1_guide=2e-3, show_deg=False, show=True, **kwargs):
+                 x0_guide=7e-4, y0_guide=1e5, x1_guide=2e-3, show_deg=False, show=True, Ra=1e6, show_guide=True,
+                 fit=True, **kwargs):
     import matplotlib.ticker as ticker
     global R
 
@@ -361,7 +364,10 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     if show_nat_scales:
         ax, wl_min, wl_max = nat_scales(case, ax=ax, alpha=alpha, d=d, dim=dim, **kwargs)
     else:
-        wl_min, wl_max = nat_scales(case, ax=None, alpha=alpha, d=d, dim=dim, **kwargs)
+        try:
+            wl_min, wl_max = nat_scales(case, ax=None, alpha=alpha, d=d, dim=dim, **kwargs)
+        except KeyError:
+            wl_min, wl_max = Ra**(-1/3), 2
 
     if l_min is not None and l_max is not None:
         k_min = to_wn(l_min)
@@ -369,8 +375,12 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     else:
         k_min = 2 * np.pi / wl_max
         k_max = 2 * np.pi / wl_min
-    beta, intercept = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
-    ax = show_beta_guide(ax, x0=x0_guide, y0=y0_guide, x1=x1_guide, m=-2, c='k', lw=3, log=True, **kwargs)
+
+    if fit:
+        beta, intercept = fit_slope(psd, k, k_min=k_min, k_max=k_max, ax=ax, fmt='g--', **kwargs)
+
+    if show_guide:
+        ax = show_beta_guide(ax, x0=x0_guide, y0=y0_guide, x1=x1_guide, m=-2, c='k', lw=3, log=True, **kwargs)
 
     fig = plt.gcf()
     plt.tight_layout()
@@ -724,3 +734,15 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
     #     plt.ylim((1e-1, 1e6))
 
     return coeffs_global
+
+
+def get_psd_Venus(lmax=719):
+    hlm = pyshtools.datasets.Venus.VenusTopo719()  #  	719 degree and order spherical harmonic model of the shape of the planet Venus (Wieczorek 2015).
+    power_per_lm = hlm.spectrum(unit='per_lm', lmax=lmax)  # 2D psd
+    l = np.arange(lmax+1)
+    return l, power_per_lm
+
+
+def get_pysh_constants(body, name):
+    # wrapper
+    return eval('pyshtools.constants.' + body + '.' + name + '.value')

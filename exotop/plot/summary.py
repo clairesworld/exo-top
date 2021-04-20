@@ -48,8 +48,8 @@ from postaspect import aspect_post as ap
 
 """ 2D isoviscous benchmark """
 plat.subplots_cases(
-    ['Lees-Ra1e6-2D'], labels=['2D isoviscous benchmark'], t1=[0.6], save=True, load=False,
-    fname='Lees-benchmark', suptitle='Ra = 1e6', c_rms=c_rms, c_peak=c_peak, dt_xlim=(0.0, 0.9),
+    ['Lees-Ra1e6-2D'], labels=['2D isoviscous benchmark'], t1=[0.6], save=True, load='auto',
+    fname='Lees-benchmark', suptitle='Ra = 1e6', c_rms=c_rms, c_peak=c_peak, dt_xlim=(0.0, 0.1),
     includepdf=True, includeTz=False, show_sols=False,  # set False for faster summary with stats only
     includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
     postprocess_kwargs=postprocess_kwargs,

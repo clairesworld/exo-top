@@ -135,7 +135,7 @@ def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
     ani.save(fig_path+case + '-h.gif', writer='imagemagick', fps=fps, savefig_kwargs={'facecolor': fig.get_facecolor()})
 
 
-def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, dark=False,
+def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, dark=False, ylim=(-5e-2, 5e-2),
              xlabel='', ylabel='', return_artists=False, c='k', save=True, i_ts=0, avg=False, fig=None, ax=None, **kwargs):
     if dark:
         foreground = 'xkcd:off white'
@@ -149,8 +149,8 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
     ax.set_xticks([])
     # ax.set_yticks([])
-    ax.set_xlim([0, 8])
-    ax.set_ylim([-5e-2, 5e-2])
+    ax.set_xlim((0, 8))
+    ax.set_ylim((ylim))
 
     # preload data
     df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
@@ -264,7 +264,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
 
 def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
                    shading='nearest', return_artists=False, save=True, i_n=0, avg=False, c='k', cbar=True, dark=False,
-                   title='Nondimensional temperature', fig=None, ax=None):
+                   title='Nondimensional temperature', fig=None, ax=None, col_vis=20):
     if dark:
         foreground = 'xkcd:off white'
     else:
@@ -273,7 +273,11 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     # preload data
     dat = ap.Aspect_Data(directory=data_path + 'output-' + case + '/')
     df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
-    n = df.sol.to_numpy()
+    try:
+        n = df.sol.to_numpy()
+    except AttributeError:
+        dat.read_stats_sol_files(col_vis=col_vis)
+        n = np.array(dat.sol_files)
 
     if len(n) > 100:
         n = n[::2]
@@ -283,6 +287,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         iter = n
     else:
         iter = [i_n]
+
     for nn in iter:
         x, y, _, T = dat.read_temperature(nn, verbose=False)
         T_n.append(T)

@@ -13,7 +13,8 @@ import os
 #                                xlim=(0, 3000), xlabel='RMS Velocity')
 
 fig, axes = anims.static_h(case='Lees-Ra1e6-2D', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, dark=False,
-             xlabel='x', ylabel='h', return_artists=False, c='k', save=True, i_ts=43281, avg=False)
+             xlabel='x', ylabel='h', return_artists=False, c='k', save=True, i_ts=43650, avg=False, #ylim=(-9e-2, 9e-2)
+ )
 
 # fig, axes = anims.T_h_gridspec(case='Lees-Ra1e6-2D', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
 #                                cmap='gist_heat', save=True, c='k')
