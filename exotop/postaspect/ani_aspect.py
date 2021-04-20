@@ -142,21 +142,6 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
     else:
         foreground = c
 
-    # preload data
-    df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
-    n = df.sol.to_numpy()
-    ts = df.index.to_numpy()
-
-    h_n, h_peak, h_rms = [], [], []
-    for i in range(len(n)):
-        x, h = pro.read_topo_stats(case, ts[i], data_path=data_path)
-        h_norm = pro.trapznorm(h)  # normalize to 0 mean
-        peak, rms = pro.peak_and_rms(h_norm)
-        h_n.append(h_norm)
-        h_peak.append(peak)
-        h_rms.append(rms)
-    print('loaded', len(n), 'h profiles')
-
     if fig is None and ax is None:
         fig, ax = plt.subplots(figsize=(20, 1))
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=20)
@@ -164,11 +149,36 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
     ax.set_xticks([])
     # ax.set_yticks([])
-
-    hprof, = ax.plot(x, h_n[i_ts], c=foreground, lw=3)
-    hmean, = ax.plot(x, [h_rms[i_ts]] * len(x), c=foreground, lw=2, ls='--')
     ax.set_xlim([0, 8])
     ax.set_ylim([-5e-2, 5e-2])
+
+    # preload data
+    df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    if i_ts is None:
+        n = df.sol.to_numpy()
+        ts = df.index.to_numpy()
+
+        h_n, h_peak, h_rms = [], [], []
+        for i in range(len(n)):
+            x, h = pro.read_topo_stats(case, ts[i], data_path=data_path)
+            h_norm = pro.trapznorm(h)  # normalize to 0 mean
+            peak, rms = pro.peak_and_rms(h_norm)
+            h_n.append(h_norm)
+            h_peak.append(peak)
+            h_rms.append(rms)
+        print('loaded', len(n), 'h profiles')
+        h_plot = h_n[i_ts]
+        rms_plot = [h_rms[i_ts]] * len(x)
+    else:
+        x, h = pro.read_topo_stats(case, i_ts, data_path=data_path)
+        h_norm = pro.trapznorm(h)  # normalize to 0 mean
+        peak, rms = pro.peak_and_rms(h_norm)
+        h_plot = h
+        rms_plot = [rms] * len(x)
+
+    hprof, = ax.plot(x, h_plot, c=foreground, lw=3)
+    hmean, = ax.plot(x, rms_plot, c=foreground, lw=2, ls='--')
+
     if dark:
         fig, ax = dark_background(fig, ax)
     if save:
