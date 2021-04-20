@@ -4,16 +4,16 @@ from postaspect.aspect_post import T_parameters_at_sol, get_cases_list, pickleio
 from postaspect import ani_aspect as anims
 import os
 
-fig, ax = anims.static_uv_prof('Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30,
-                         ticksize=16, c='k', save=True, avg=True, fig=None, ax=None,
-                               xlim=(0, 3000), xlabel='RMS Velocity')
+# fig, ax = anims.static_uv_prof('Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30,
+#                          ticksize=16, c='k', save=True, avg=True, fig=None, ax=None,
+#                                xlim=(0, 3000), xlabel='RMS Velocity')
+#
+# fig, ax = anims.animate_uv_prof('Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30,
+#                          ticksize=16, c='k', fig=None, ax=None,
+#                                xlim=(0, 3000), xlabel='RMS Velocity')
 
-fig, ax = anims.animate_uv_prof('Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30,
-                         ticksize=16, c='k', fig=None, ax=None,
-                               xlim=(0, 3000), xlabel='RMS Velocity')
-
-# fig, axes = anims.T_h_gridspec(case='Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
-#                                cmap='gist_heat', save=True, c='k')
+fig, axes = anims.T_h_gridspec(case='Lees-Ra1e6-2D', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
+                               cmap='gist_heat', save=True, c='k')
 # fig, axes = anims.T_h_gridspec(case='Ra1e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
 #                                cmap='gist_heat', save=True, c='k')
 
