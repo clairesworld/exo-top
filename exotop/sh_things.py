@@ -736,11 +736,34 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
     return coeffs_global
 
 
-def get_psd_Venus(lmax=719):
-    hlm = pyshtools.datasets.Venus.VenusTopo719()  #  	719 degree and order spherical harmonic model of the shape of the planet Venus (Wieczorek 2015).
-    power_per_lm = hlm.spectrum(unit='per_lm', lmax=lmax)  # 2D psd
-    l = np.arange(lmax+1)
-    return l, power_per_lm
+def get_psd_Venus(lmax=719, unit='per_lm', to_km=True, to_1D=False, verbose=False, norm='ortho'):
+    hlm = pyshtools.datasets.Venus.VenusTopo719(lmax=lmax)  #  	719 degree and order spherical harmonic model of the shape of the planet Venus (Wieczorek 2015).
+    hlm_norm = hlm.convert(normalization=norm)
+    if verbose:
+        print(hlm_norm.__dict__)
+    power = hlm_norm.spectrum(unit=unit)  # 2D psd
+    l = hlm_norm.degrees()
+    R = pyshtools.constants.Venus.r.value
+    k = l_to_k(l, R)
+
+    if unit == 'per_lm':
+        print('rms original Venus', parseval_rms_2D(power, k), 'm')
+
+    if to_1D:
+        if unit != 'per_lm':
+            raise Exception('to get 1D PSD must give unit = per_lm')
+        power = k * power  # assume isosymmetric
+
+    if to_km:
+        if unit == 'per_lm':
+            if to_1D:
+                power = power * (1000 ** -3)
+            else:
+                power = power * (1000 ** -4)
+        elif unit == 'per_l':
+            power = power * (1000 ** -2)
+
+    return l, power  # in m2 m2 if per lm or km2 km2 if to_km=True etc
 
 
 def get_pysh_constants(body, name):

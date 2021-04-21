@@ -5,6 +5,13 @@ import sh_things as sh
 from model_1D.topography import dimensionalise
 
 
+def simple_vol_scaling(pl, verbose=False, **kwargs):
+    # use ASPECT fit to h_peak and scale volume to entire surface area
+    try:
+        L = pl.L*8
+
+
+
 def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0=None, plot=False, verbose=False, **kwargs):
 
     h_rms1 = eval('pl.' + name_rms)

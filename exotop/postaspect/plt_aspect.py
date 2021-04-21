@@ -336,7 +336,7 @@ def plot_h_vs_2component(Ra=None, eta=None, t1_grid=None, end_grid=None, load_gr
 
 def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', data_path=data_path_bullard,
               fig_path=fig_path_bullard, averagescheme=None, p_dimensionals=None, fiterror=False,
-              fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None,
+              fig_fmt='.png', which_x=None, include_regimes=None, regime_grid=None, which_h='rms',
               save=True, fname='h', legend=False, sigma=1, showpeak=False, cleglabels=None,
               labelsize=16, legsize=16, xlabel='', ylabel='dynamic topography', y2label='', title='', alpha=1,
               c_peak='xkcd:forest green', c_rms='xkcd:periwinkle', cmap=None, c_fit='k', ms=10, lw=1, z_name='eta',
@@ -451,12 +451,16 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
     try:
         for key in quants.keys():
             err[key] = np.asarray([quants[key][:, 1] - quants[key][:, 0], quants[key][:, 2] - quants[key][:, 1]])
-        if showpeak:
+        if showpeak and (which_h == 'rms'):
             ax.errorbar(means[which_x], means['h_peak'], yerr=sdy_all,  # err['h_peak'],
                         xerr=sdx_all,  # err[which_x],
                         elinewidth=0.5, ms=ms,
                         fmt='d', c=c_peak, alpha=alpha, capsize=5, markeredgecolor=highlight_colour)
         mark = 'o'
+        if which_h == 'rms':
+            h_key = 'h_rms'
+        elif which_h == 'peak':
+            h_key = 'h_peak'
         if colourful:
             if vmin is None:
                 vmin = np.min(zz_all)
@@ -469,11 +473,11 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     cmap = cmap_from_ascii(cmap, path=cmap_path, end='.txt', ncol=4)
                     c_rms = colorize(zz_all, cmap=cmap, vmin=vmin, vmax=vmax)[0]
             for pp in range(len(means[which_x])):
-                ax.errorbar(means[which_x][pp], means['h_rms'][pp], yerr=np.asarray([err['h_rms'][:, pp]]).T,
+                ax.errorbar(means[which_x][pp], means[h_key][pp], yerr=np.asarray([err[h_key][:, pp]]).T,
                             xerr=np.asarray([err[which_x][:, pp]]).T, elinewidth=elw, alpha=alpha,
                             fmt=mark, c=c_rms[zz_all[pp]], capsize=ecapsize, ms=ms)
         else:
-            ax.errorbar(means[which_x], means['h_rms'], yerr=err['h_rms'], xerr=err[which_x], elinewidth=elw,
+            ax.errorbar(means[which_x], means[h_key], yerr=err[h_key], xerr=err[which_x], elinewidth=elw,
                         fmt=mark, c=c_rms, capsize=ecapsize, ms=ms)
     except TypeError as e:
         if quants['h_rms'] is None:  # no cases in given regimes as quants is dict of None
@@ -514,7 +518,11 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         else:
             xerr = 1
             yerr = 1
-        ax = fit_cases_on_plot(yx_rms_all, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
+        if which_h == 'rms':
+            yx_fit = yx_rms_all
+        elif which_h == 'peak':
+            yx_fit = yx_peak_all
+        ax = fit_cases_on_plot(yx_fit, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
                                xerr=xerr, yerr=yerr, legend=legend, lw=lw, xlim=xlim,
                                sigma=sigma, **kwargs)
 

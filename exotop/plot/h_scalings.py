@@ -17,7 +17,7 @@ c_rms = ['k', 'xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']  # 
 cleglabels = [r'$\Delta \eta = 10^{5}$', r'$\Delta \eta = 10^{6}$', r'$\Delta \eta = 10^{7}$',
               r'$\Delta \eta = 10^{8}$',  r'$\Delta \eta = 10^{9}$']  # these correspond to entire z range as well
 figsize = (7, 5)  # (5, 5)
-include_regimes = ['chaotic', 'not ready']
+include_regimes = ['chaotic']  # , 'not ready'
 averagescheme = 'timefirst'
 which_x = 'Ra_i_eff'
 
@@ -39,17 +39,28 @@ fig, ax = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid_
 
 """all eta on one axis"""
 
-
 _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
                    fig_path=fig_path, averagescheme=averagescheme, p_dimensionals=None, which_x=which_x,
                    beta0=[0.1, -0.15], sigma=1, fiterror=False, legend=True,
                    include_regimes=include_regimes, save=True, fname='h_Raieff_chaotic_timeavg', labelsize=labelsize,
-                   xlabel=r'Ra$_{i,eff}$', ylabel='dynamic topography', legsize=legsize, cleglabels=cleglabels,
+                   xlabel=r'Ra$_{i,eff}$', ylabel='rms dynamic topography', legsize=legsize, cleglabels=cleglabels,
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False, vmin=vmin, vmax=vmax,
                    cmap=None, c_rms=c_rms,
                    fit=True, logx=True, logy=True, ms=ms,
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
                    regime_grid=regime_grid_td, figsize=figsize, errortype='standard', cbar=False)
+
+_ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+                   fig_path=fig_path, averagescheme=averagescheme, p_dimensionals=None, which_x=which_x,
+                   beta0=[0.1, -0.15], sigma=1, fiterror=False, legend=True,
+                   include_regimes=include_regimes, save=True, fname='h_Raieff_chaotic_timeavg', labelsize=labelsize,
+                   xlabel=r'Ra$_{i,eff}$', ylabel='peak dynamic topography', legsize=legsize, cleglabels=cleglabels,
+                   title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False, vmin=vmin, vmax=vmax,
+                   cmap=None, c_rms=c_rms,
+                   fit=True, logx=True, logy=True, ms=ms,
+                   show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                   regime_grid=regime_grid_td, figsize=figsize, errortype='standard', cbar=False,
+                   which_h='peak')
 
 # _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
 #                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra',

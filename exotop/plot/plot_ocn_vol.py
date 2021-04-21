@@ -6,9 +6,10 @@ from useful_and_bespoke import dark_background
 import model_1D.the_results as results
 import model_1D.parameters as p
 import matplotlib.ticker as ticker
+import matplotlib.lines as mlines
 import numpy as np
 
-fig_path = ''
+fig_path = '/home/claire/Works/exo-top/exotop/figs_scratch/'
 data_path = '/home/claire/Works/aspect/runs/model-output/'
 case = 'Ra1e8-eta1e7-wide'
 # d, dT, alpha = 1, 1, 1
@@ -62,15 +63,15 @@ labelsize = 20
 """ money plot """
 
 labelsize = 40
-fig, axes = results.plot_ocean_capacity_relative(n_stats=100, relative=True, nplanets=8,
+fig, axes = results.plot_ocean_capacity_relative(n_stats=10, relative=True, nplanets=8,
                                                  legsize=20, ticksize=25, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False,
                                                  showwaterscale=True, log=True,
                                                  defaults='Venusbaseline', textc='xkcd:off white',
-                                                 title='Water volume to submerge land',
+                                                 # title='Water volume to submerge land',
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  # benchmark_path+'wei_Venus/',
-                                                 spectrum_fname='base_spectrum.pkl',  # 'model_power_m2_b.csv',
+                                                 spectrum_fname='base_spectrum_l1.pkl',
                                                  #                                                  c='#81f79f',
                                                  c='xkcd:light red',
                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
@@ -80,6 +81,25 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=100, relative=True, npl
                                                  leg_bbox=(0, 1.01), clabelpad=70,
                                                  fname='ocean-vol', ytitle=1.05, vmax=3e-3,
                                                  mass_frac_sfcwater=[1e-5, 3e-5, 1e-4, 3e-4, 1e-3])
+
+fig, axes = results.plot_ocean_capacity_relative(n_stats=10, relative=True, nplanets=8,
+                                                 fig=fig, axes=axes, vol_0=8.468613612559923e+17,
+                                                 legsize=20, ticksize=25, labelsize=labelsize, wspace=0.15,
+                                                 titlesize=32, fig_path=fig_path, save=False,
+                                                 showwaterscale=True, log=True,
+                                                 defaults='Venusbaseline', textc='xkcd:off white',
+                                                 # title='Water volume to submerge land',
+                                                 spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
+                                                 spectrum_fname='Venus_spectrum_l1.pkl',
+                                                 #                                                  c='#81f79f',
+                                                 c='xkcd:ochre',
+                                                 alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
+                                                 set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
+                                                 x_range=[(0.1 * p.M_E, 6 * p.M_E)], xscales=[p.M_E ** -1],
+                                                 xlabels=['Planet mass\n($M_E$)'],
+                                                 leg_bbox=(0, 1.01), clabelpad=70, ytitle=1.05, vmax=3e-3,
+                                                 mass_frac_sfcwater=None)
+
 ax = axes[0]
 ax.axhline(y=1, c='xkcd:off white', alpha=0.5, zorder=0)
 # for ax in axes:
@@ -105,5 +125,12 @@ ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 ax.set_xticks([0.1, 1, 2, 3, 4, 5, 6])
 ax.set_yticks([0.3, 1, 3])
 
+handles = [mlines.Line2D([], [], color='xkcd:light red', ls='-', lw=3,
+                                 label='ASPECT 2D'),
+           mlines.Line2D([], [], color='xkcd:ochre', ls='-', lw=3,
+                                 label='Venus')]
+ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=20)
+
+
 fig, *axes = dark_background(fig, axes)
-fig.savefig(fig_path + 'ocn_vol-new.png', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_Venus.png', bbox_inches='tight')

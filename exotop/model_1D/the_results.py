@@ -1225,7 +1225,7 @@ def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_
 def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwater=None, textc='k', M0=0.815,
                                  titlesize=24, save=False, spectrum_fname='', spectrum_fpath='', c='#81f79f', title='',
                                  ticksize=14, labelsize=16, clabel='Surface water mass fraction', clabelpad=20,
-                                 relative=False,
+                                 relative=False, fig=None, axes=None, vol_0=None,
                                  mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10, 10), ytitle=1.1,
                                  cmap='terrain_r', vmin=None, vmax=None,
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
@@ -1237,11 +1237,16 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                             # verbose=True,
                             t_eval=None, random=False, phi0=phi0, postprocessors=['topography'],
                             **kwargs)[0]
-    pl0 = oceans.max_ocean(pl0, at_age=age, name_rms='dyn_top_rms', phi0=phi0, **kwargs)
-    vol_0 = pl0.max_ocean
-    print('vol_0', vol_0)
+    pl0 = oceans.max_ocean(pl0, at_age=age, #name_rms='dyn_top_rms',
+                           phi0=phi0, **kwargs)
 
-    fig, axes = plt.subplots(figsize=figsize)
+    if vol_0 is None:
+        vol_0 = pl0.max_ocean
+    else:
+        print('given vol_0', vol_0)
+
+    if axes is None:
+        fig, axes = plt.subplots(figsize=figsize)
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0,
                                               textc=textc, at_age=age,
                                               label_l=None, c=c, ylabel=ylabel, age=age, legsize=legsize,
@@ -1265,7 +1270,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                 vol_w = vol_w / vol_0
             # print('relative water budget change', vol_w)
             ax.plot(masses, vol_w, alpha=0.5, lw=0, zorder=0, c=colours[ii], marker='o', markersize=15,
-                    label='Maximum water budget')
+                    )
 
         if vmin is None:
             vmin = np.min(mass_frac_sfcwater)
