@@ -347,6 +347,20 @@ def peak_and_rms(h):
     return np.max(h), np.sqrt(trapzmean(h ** 2))
 
 
+def test_h_avg(case, data_path=data_path_bullard):
+    dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=True)
+    ts =  dat.stats_timestep[-1] # final
+    x, h = read_topo_stats(case, ts)
+    h_mean = np.mean(h)
+    h_peak = np.max(h)
+    print('h mean raw', h_mean)
+    print('h max raw', h_peak)
+
+    # processed verj
+    dic = h_at_ts(case, ts=ts)
+    print('h max saved', dic['h_peak'])
+
+
 def time_averaged_profile(case, n0, nf, which='temperature', dat=None, data_path=data_path_bullard,
                           **kwargs):
     " get time-averaged profile for T, u, v etc. "
