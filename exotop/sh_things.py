@@ -91,8 +91,8 @@ def scale_psd_to_rms(phi0=None, k=None, rms1=1, R=2, **kwargs):
     phi_iso1 = S1 / (2 * l + 1) * (4 * np.pi * R ** 2)
     phi1 = phi_iso1 * k
 
-    print('old rms', rms0)
-    print('new rms', parseval_rms(phi1, k))
+    # print('old rms', rms0)
+    # print('new rms', parseval_rms(phi1, k))
     return phi1
 
 
