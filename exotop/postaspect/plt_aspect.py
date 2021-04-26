@@ -2059,7 +2059,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       fig=None, ax=None, figsize=(5, 5), z_name='Ra', vmin=None, vmax=None, clabel=None,
                       norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True,
                       add_files=None, add_label=None, legsize=12, xlim=None, ylim=None, show_beta_guide=False,
-                      max_dscale=2, bl_fudge=1, c_guide='xkcd:slate', labelpad=20, whole=False,
+                      max_dscale=2, bl_fudge=1, c_guide='xkcd:slate', labelpad=20, whole=False, show_natscales=False,
                       **kwargs):
     import pickle as pkl
     import sh_things as sh
@@ -2118,7 +2118,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
 
         # wavenumber range where spectrum makes sense
         ax, wl_min, wl_max = sh.nat_scales(case, ax=ax, alpha=alpha_m, d=d, dim=dim, data_path=data_path,
-                                           plot=False, bl_fudge=bl_fudge, max_dscale=max_dscale,
+                                           plot=show_natscales, bl_fudge=bl_fudge, max_dscale=max_dscale,
                                            c=clist[zz], **kwargs)
         # wl_min, wl_max = sh.nat_scales(case, dim=False, alpha=alpha_m, data_path=data_path, ax=None, **kwargs)
         k_min, k_max = 2*np.pi / wl_max, 2*np.pi / wl_min
