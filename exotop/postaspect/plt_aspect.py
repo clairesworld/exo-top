@@ -2060,7 +2060,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True,
                       add_files=None, add_label=None, legsize=12, xlim=None, ylim=None, show_beta_guide=False,
                       max_dscale=2, bl_fudge=1, c_guide='xkcd:slate', labelpad=20, whole=False, show_natscales=False,
-                      **kwargs):
+                      relative_power=False, **kwargs):
     import pickle as pkl
     import sh_things as sh
     global R
@@ -2120,27 +2120,35 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         ax, wl_min, wl_max = sh.nat_scales(case, ax=ax, alpha=alpha_m, d=d, dim=dim, data_path=data_path,
                                            plot=show_natscales, bl_fudge=bl_fudge, max_dscale=max_dscale,
                                            c=clist[zz], **kwargs)
-        # wl_min, wl_max = sh.nat_scales(case, dim=False, alpha=alpha_m, data_path=data_path, ax=None, **kwargs)
-        k_min, k_max = 2*np.pi / wl_max, 2*np.pi / wl_min
-        if k_min is not None and (k_min > np.min(k)):
-            i_min = np.argmax(k >= k_min)
-        if k_max is not None and (k_max < np.max(k)):
-            i_max = np.argmax(k >= k_max)  # -2 (testing)
-        try:
-            kv = k[i_min:i_max + 1]
-            Sv = S[i_min:i_max + 1]
-        except UnboundLocalError:
-            raise Exception('kmin, kmax out of bounds')
-
         if whole:
-            kv, Sv_norm = sh.norm_spectrum(k, S, k_min=k_min, norm=norm, R=R_p, **kwargs)
+            kv = k
+            Sv = S
         else:
-            kv, Sv_norm = sh.norm_spectrum(kv, Sv, k_min=k_min, norm=norm, R=R_p, **kwargs)
-        ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
+            k_min, k_max = 2*np.pi / wl_max, 2*np.pi / wl_min
+            if k_min is not None and (k_min > np.min(k)):
+                i_min = np.argmax(k >= k_min)
+            if k_max is not None and (k_max < np.max(k)):
+                i_max = np.argmax(k >= k_max)  # -2 (testing)
+            try:
+                kv = k[i_min:i_max + 1]
+                Sv = S[i_min:i_max + 1]
+            except UnboundLocalError:
+                raise Exception('kmin, kmax out of bounds')
 
+        kv, Sv_norm = sh.norm_spectrum(kv, Sv, k_min=k_min, norm=norm, R=R_p, **kwargs)
+
+        if relative_power:
+            kv = kv / np.pi
+            Sv_norm = 100 * Sv_norm / np.sum(Sv_norm)
+            xlabel = "$k/\pi$"
+            ylabel = "Power (% relative to total)"
+
+        ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
         zz = zz + 1
 
     ax.loglog()
+    print('kv', kv)
+    print('Sv_norm', Sv_norm)
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=labelpad)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
