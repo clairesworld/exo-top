@@ -2148,6 +2148,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             Sv_norm = 100 * Sv_norm / np.sum(Sv_norm)
             # xlabel = "$k/\pi$"
             ylabel = "Power (% relative to total)"
+            print(case, 'max power @', kv[Sv_norm == np.max(Sv_norm)])
 
         ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
         zz = zz + 1
