@@ -2218,11 +2218,17 @@ def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, pl
     return ax
 
 
-def test_rms_ratio(phi0, k, n_stats=10, h_ratio=1, R=2):
+def test_rms_ratio(phi_test, k, n_stats=10, R=2, spectrum_fname='base_spectrum_l1.pkl', fig_path=fig_path_bullard):
     import sh_things as sh
-    h_rms = sh.parseval_rms(phi0, k)
+
+    spectrum_fpath = fig_path
+    degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
+
+    h_rms = sh.parseval_rms(phi_test, k)
     l = sh.k_to_l(k, R)
     print('original h_rms', h_rms)
+    h_rms0 = sh.parseval_rms(phi0, sh.l_to_k(degree, R))
+    h_ratio = h_rms / h_rms0
 
     nn = 0
     peaks = []
