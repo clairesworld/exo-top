@@ -2218,7 +2218,7 @@ def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, pl
     return ax
 
 
-def test_rms_ratio(phi_test, k, n_stats=10, R=2, spectrum_fname='base_spectrum_l1.pkl', fig_path=fig_path_bullard):
+def test_rms_ratio(phi_test, k, n_stats=100, R=2, spectrum_fname='base_spectrum_l1.pkl', fig_path=fig_path_bullard):
     import sh_things as sh
 
     h_rms = sh.parseval_rms(phi_test, k)
