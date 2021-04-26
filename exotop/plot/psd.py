@@ -24,7 +24,7 @@ fig, *ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_gr
                                   show_beta_guide=False,
                                   labelsize=16, ticksize=12, marker='.', lw=0.5, alpha=0.8, labelpad=16,
                                   # xlim=(1e-3, 3e-2),
-                                  max_dscale=1, bl_fudge=5,  # c_guide='xkcd:off white',
+                                  max_dscale=2, bl_fudge=5,  # c_guide='xkcd:off white',
                                   xlabel=None, ylabel='Normalised power spectral density',
                                   x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, eff}$)',
                                   norm=None, whole=True, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
@@ -35,19 +35,19 @@ fig.savefig(fig_path + 'psd_relative_stacked.png', bbox_inches='tight')
 
 """ plot normalised spectra on single axis - full spectrum norm rms"""
 
-# fig, *ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
-#                                   include_regimes=regimes_use, save=False, show_natscales=True,
-#                                   data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
-#                                   fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True,
-#                                   show_beta_guide=False,
-#                                   labelsize=16, ticksize=12, marker='.', lw=0.5, alpha=0.8, labelpad=16,
-#                                   # xlim=(1e-3, 3e-2),
-#                                   max_dscale=1, bl_fudge=5,  # c_guide='xkcd:off white',
-#                                   xlabel=None, ylabel='Normalised power spectral density',
-#                                   x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, eff}$)',
-#                                   norm='rms', whole=True, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
-#                                   )
-# fig.savefig(fig_path + 'psd_stacked.png', bbox_inches='tight')
+fig, *ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
+                                  include_regimes=regimes_use, save=False, show_natscales=True,
+                                  data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
+                                  fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True,
+                                  show_beta_guide=False,
+                                  labelsize=16, ticksize=12, marker='.', lw=0.5, alpha=0.8, labelpad=16,
+                                  # xlim=(1e-3, 3e-2),
+                                  max_dscale=2, bl_fudge=5,  # c_guide='xkcd:off white',
+                                  xlabel=None, ylabel='Normalised power spectral density',
+                                  x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, eff}$)',
+                                  norm='rms', whole=True, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
+                                  )
+fig.savefig(fig_path + 'psd_stacked.png', bbox_inches='tight')
 
 """ plot normalised spectra on single axis - slides, norm intercept """
 
