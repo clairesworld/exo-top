@@ -2101,7 +2101,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
 
                 h_rms, h_peak = plot_geth(case=case, averagescheme='timelast', data_path=data_path, return_all=False,
                                           t1=0)
-                print(case, 'rms/peak', h_rms/h_peak)
+                print(case, 'rms/peak', h_rms/h_peak, '| rms', h_rms)
 
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
