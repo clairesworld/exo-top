@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from postaspect.plt_aspect import plot_save
 from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard
+from useful_and_bespoke import dark_background
 
 data_path = '/home/claire/Works/aspect/runs/model-output/'
 fig_path = '/home/claire/Works/exo-top/exotop/figs_scratch/'
@@ -32,8 +33,8 @@ def cmp_dimensions(benchmark_path='/home/cmg76/Works/exo-top/benchmarks/lees_top
 
     """ plot """
     fig, ax = plt.subplots()
-    ax.loglog(k2, psd2_iso, '.-', lw=0.5, alpha=0.5, c='xkcd:slate', label='2D')
-    ax.loglog(k3, psd3, '^-', lw=0.5, alpha=0.5, c='xkcd:forest green', label='3D')
+    ax.loglog(k2, psd2_iso, 'o-', lw=1, alpha=0.5, c='xkcd:slate', label='2D')
+    ax.loglog(k3, psd3, '^-', lw=1, alpha=0.5, c='xkcd:forest green', label='3D')
     ax.set_xlabel(r'Wavenumber (km$^{-1}$)')
     ax.set_ylabel(r'PSD (km$^{2}$ km$^{2}$)')
     ax.legend()
@@ -43,7 +44,7 @@ def cmp_dimensions(benchmark_path='/home/cmg76/Works/exo-top/benchmarks/lees_top
 
 
 def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path=fig_path_bullard, R_base=2, lmin=1,
-                     save=True, plot=True, units='km4', scale_to='Venus', **kwargs):
+                     save=True, plot=True, units='km4', scale_to='Venus', labelsize=16, alpha=0.5, **kwargs):
     R_Venus = sh.get_pysh_constants('Venus', 'r') * 1e-3  # in km
 
     # get 2D PSDs
@@ -88,21 +89,24 @@ def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path=fig_path_bulla
 
     if plot:
         fig, ax = plt.subplots()
-        ax.loglog(lV, phiV_sc, '.-', lw=0.5, alpha=0.5, c='xkcd:slate', label='Venus (Wieczorek 2015)')
-        ax.loglog(l, phi_sc, '^-', lw=0.5, alpha=0.5, c='xkcd:forest green', label='2D ASPECT @ Venus rms')
-        ax.set_xlabel(r'Degree')
+        ax.loglog(lV, phiV_sc, 'o-', lw=1, alpha=alpha, c='xkcd:slate', label='Venus (Wieczorek 2015)')
+        ax.loglog(l, phi_sc, '^-', lw=1, alpha=alpha, c='xkcd:lime green', label='2D ASPECT @ Venus rms')
+        ax.set_xlabel(r'Degree', fontsize=labelsize)
         if units == 'km4':
             ylabel = r'2D PSD (km$^{2}$ km$^{2}$)'
         elif units == 'km3':
             ylabel = r'1D PSD (km$^{2}$ km)'
-        ax.set_ylabel(ylabel)
-        ax.legend()
+        ax.set_ylabel(ylabel, fontsize=labelsize)
+        ax.legend(frameon=False, fontsize=labelsize-2)
         if save:
             plot_save(fig, fname='Venus_correction', fig_path=fig_path)
 
     if lmin > 0:
         lV = np.arange(0, lmax + 1)
         phiV_sc = np.insert(np.array(phiV_sc), 0, [0.0] * lmin)  # no power below lmin
+
+    if plot:
+        return lV, phiV_sc, fig, ax
     return lV, phiV_sc
 
 
@@ -119,6 +123,10 @@ def make_Venus_reference(newfname='Venus_spectrum.pkl', baseline_fname='base_spe
     return l, Sl
 
 
-make_Venus_reference(newfname='Venus_spectrum_l1.pkl', baseline_fname='base_spectrum_l1.pkl',
-                     fig_path=fig_path)
+lV, phiV_sc, fig, ax = Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, R_base=2, lmin=1,
+                     save=True, plot=True, units='km4', scale_to='Venus', alpha=0.9, labelsize=16)
+
+fig, ax = dark_background(fig, ax)
+# make_Venus_reference(newfname='Venus_spectrum_l1.pkl', baseline_fname='base_spectrum_l1.pkl',
+#                      fig_path=fig_path)
 plt.show()

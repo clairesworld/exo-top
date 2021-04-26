@@ -781,6 +781,7 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
             y = []
             xscale = xlabels[1]
             yscale = ylabels[ii][1]
+            # print('1/yscale', 1/yscale)
             try:
                 for ip, pl in enumerate(lplanets):  # planets to plot as line
                     t = pl.t
@@ -1086,11 +1087,11 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
     return fig, axes
 
 
-def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidth=1, relative=True, textc='k',
+def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidth=1, relative=True, textc='k', c='k',
                                   age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ', fig_height=4,
                                   xlabels=None, nplanets=20, log=False, x_range=None, xscales=None, units=None,
                                   fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12, yscale=1,
-                                  pl_baseline=None, update_kwargs={}, initial_kwargs={}, verbose=False, **kwargs):
+                                  pl_baseline=None, update_kwargs={}, initial_kwargs={}, relval=None, verbose=False, **kwargs):
     if x_vars is None:
         x_vars = ['t', 'M_p', 'CMF', 'H_0', 'Ea']
     if units is None:
@@ -1107,23 +1108,33 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
         axes = [axes]
 
     it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
-    try:
-        model_baseline = eval('pl_baseline.' + model_param)[it]
-    except IndexError:
-        # scalar
-        model_baseline = eval('pl_baseline.' + model_param)
-    if relative:
+
+    if type(model_param) == str:
+        model_param = [model_param]
+        c = [c]
+
+    if relative and (relval is None):
+        try:
+            model_baseline = eval('pl_baseline.' + model_param[0])[it]
+        except IndexError:
+            # scalar
+            model_baseline = eval('pl_baseline.' + model_param[0])
         yscale = model_baseline ** -1
+    elif relative:
+        yscale = relval ** -1
+
     set_ylabel = True
     legendd = legend
     for i_ax, x_var in enumerate(x_vars):
         xmin, xmax = x_range[i_ax]
         if x_var == 't':
             # time/age variation - plot single planet evol
-            fig, ax = plot_vs_x(lplanets=pl_baseline, xname={'t': (xlabels[i_ax], xscales[i_ax])},
-                                ynames={model_param: (ylabel, yscale)}, fig=fig, axes=axes[i_ax], legsize=legsize,
-                                legend=legendd, plots_save=False, set_ylabel=set_ylabel, set_xlim=True, xmin=xmin,
-                                xmax=xmax, log=log, relative=relative, **kwargs)
+            for ip, param in enumerate(model_param):
+                print('yscale', yscale)
+                fig, ax = plot_vs_x(lplanets=pl_baseline, xname={'t': (xlabels[i_ax], xscales[i_ax])},
+                                    ynames={param: (ylabel, yscale)}, fig=fig, axes=axes[i_ax], legsize=legsize,
+                                    legend=legendd, plots_save=False, set_ylabel=set_ylabel, set_xlim=True, xmin=xmin,
+                                    xmax=xmax, log=log, relative=relative, c=c[ip], **kwargs)
         else:
             if verbose:
                 print('generating planets across', x_var, '...')
@@ -1136,10 +1147,13 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
             #     print('mass:', pl.M_p/parameters.M_E, '| rel. vol:', pl.max_ocean*yscale, '| mass ocn:',
             #           pl.max_ocean*1000/parameters.M_E, 'M_E | mass frac:',
             #           pl.max_ocean*1000/pl.M_p)
-            fig, ax = plot_vs_x(lplanets=planets, xname={x_var: (xlabels[i_ax], xscales[i_ax])},
-                                ynames={model_param: ('', yscale)}, fig=fig, axes=axes[i_ax], legsize=legsize,
-                                legend=legendd, snap=age, plots_save=False, set_ylabel=ylabel, set_xlim=True, log=log,
-                                relative=relative, **kwargs)
+
+            for ip, param in enumerate(model_param):
+                print(param, 'pl[-1]', eval('planets[-1].' + param))
+                fig, ax = plot_vs_x(lplanets=planets, xname={x_var: (xlabels[i_ax], xscales[i_ax])},
+                                    ynames={param: ('', yscale)}, fig=fig, axes=axes[i_ax], legsize=legsize,
+                                    legend=legendd, snap=age, plots_save=False, set_ylabel=ylabel, set_xlim=True, log=log,
+                                    relative=relative, c=c[ip], **kwargs)
 
         if relative:
             ax.axhline(y=1, lw=1, alpha=0.5, zorder=0)
@@ -1225,9 +1239,9 @@ def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_
 def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwater=None, textc='k', M0=0.815,
                                  titlesize=24, save=False, spectrum_fname='', spectrum_fpath='', c='#81f79f', title='',
                                  ticksize=14, labelsize=16, clabel='Surface water mass fraction', clabelpad=20,
-                                 relative=False, fig=None, axes=None, vol_0=None,
+                                 relative=False, fig=None, axes=None, vol_0=None, simple_scaling=False, c2='g',
                                  mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10, 10), ytitle=1.1,
-                                 cmap='terrain_r', vmin=None, vmax=None,
+                                 cmap='terrain_r', vmin=None, vmax=None, mass_EO=1.4e21, rho_w=1000,
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
     # phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
     # h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
@@ -1239,26 +1253,37 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                             **kwargs)[0]
     pl0 = oceans.max_ocean(pl0, at_age=age, #name_rms='dyn_top_rms',
                            phi0=phi0, **kwargs)
+    pl0 = oceans.simple_vol_scaling(pl0, at_age=age, #name_rms='dyn_top_rms',
+                              **kwargs)
+    # print('max ocean', pl0.max_ocean, 'm3')
+    # print('peak scaling ocean', pl0.simple_ocean, 'm3')
 
     if vol_0 is None:
         vol_0 = pl0.max_ocean
-    else:
-        print('given vol_0', vol_0)
+    elif vol_0 == 'Earth':
+        vol_0 = mass_EO / rho_w
+    print('vol_0', vol_0)
 
     if axes is None:
         fig, axes = plt.subplots(figsize=figsize)
-    fig, axes = plot_change_with_observeables(defaults=defaults, model_param='max_ocean', legend=True, pl_baseline=pl0,
+    if simple_scaling:
+        model_param = ['max_ocean', 'simple_ocean']
+        c = [c, c2]
+    else:
+        model_param = 'max_ocean'
+
+    fig, axes = plot_change_with_observeables(defaults=defaults, model_param=model_param, legend=True, pl_baseline=pl0,
                                               textc=textc, at_age=age,
                                               label_l=None, c=c, ylabel=ylabel, age=age, legsize=legsize,
                                               postprocessors=['topography', 'ocean_capacity'], phi0=phi0, log=log,
                                               fig=fig,
                                               axes=axes, ticksize=ticksize, labelsize=labelsize, relative=relative,
-                                              **kwargs)
+                                              relval=vol_0, **kwargs)
+
 
     if mass_frac_sfcwater is not None:
         # how does actual vol scale assuming constant mass fraction of surface water (bad assumption)?
         ax = axes[mass_iax]
-        rho_w = 1000
 
         masses = np.logspace(np.log10(0.1), np.log10(6))  # mass in M_E
         colours = colorize([np.log10(m) for m in mass_frac_sfcwater], cmap=cmap)[0]

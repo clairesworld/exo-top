@@ -2,14 +2,53 @@ from . import parameters
 import numpy as np
 from useful_and_bespoke import age_index
 import sh_things as sh
-from model_1D.topography import dimensionalise
+from model_1D.topography import dimensionalise, dyn_topo_peak_prime_aspect
 
 
-def simple_vol_scaling(pl, verbose=False, **kwargs):
+# def eval_age(pl, verbose=False, at_age=None, **kwargs):
+#
+#     # get time index nearest to desired snap given in Gyr
+#     if at_age is not None:
+#         it = age_index(pl.t, at_age, parameters.sec2Gyr)
+#         it = range(it, it + 1)
+#     else:
+#         it = range(len(pl.t))
+#         pl.max_ocean = np.zeros_like(it, dtype=np.float64)
+#     for ii in it:
+#
+#         if at_age is None:
+#             pl.max_ocean[ii] = basin_capacity
+#             pl.simple_ocean[ii] = simple_vol_scaling(pl, it=ii)
+#         else:
+#             pl.max_ocean = basin_capacity
+#             pl.simple_ocean = simple_vol_scaling(pl, it=ii)
+#
+#     return pl
+
+
+def simple_vol_scaling(pl, verbose=False, at_age=None, it=None, **kwargs):
     # use ASPECT fit to h_peak and scale volume to entire surface area
-    try:
-        L = pl.L*8
+    h_peak_prime = dyn_topo_peak_prime_aspect(pl)
+    R = pl.R_p
 
+    # get time index nearest to desired snap given in Gyr
+    if at_age is not None:
+        i = age_index(pl.t, at_age, parameters.sec2Gyr)
+        it = range(i, i + 1)
+    else:
+        it = range(len(pl.t))
+        pl.simple_ocean = np.zeros_like(it, dtype=np.float64)
+
+    for ii in it:
+        h_peak = dimensionalise(h_peak_prime[ii], pl=pl, i=ii)
+        if at_age is None:
+            pl.simple_ocean[ii] = h_peak * (4 * np.pi * R**2)
+        else:
+            print('h peak from scaling', h_peak, 'm')
+            print('h rms', pl.dyn_top_rms[ii], 'm')
+            pl.simple_ocean = h_peak * (4 * np.pi * R**2)
+
+    return pl
 
 
 def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0=None, plot=False, verbose=False, **kwargs):

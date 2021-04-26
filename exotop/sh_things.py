@@ -48,7 +48,7 @@ def load_spectrum_wavenumber(fpath='', fname='', has_header=True, wl=False, two_
     return power, k
 
 
-def norm_spectrum(k, S, norm='min_l', k_min=None):
+def norm_spectrum(k, S, norm='min_l', k_min=None, **kwargs):
     if norm == 'min_l':
         S_norm = S / S[0]  # actually normalise to first point inside k range
         S_norm = S / S[0]
@@ -58,6 +58,9 @@ def norm_spectrum(k, S, norm='min_l', k_min=None):
         beta, intercept = fit_slope(S, k, k_min=None, k_max=None, plot=False)
         Shat = intercept * k_min ** -beta  # intercept at natural min wavenumber - constant for given d
         S_norm = S / Shat
+    elif norm == 'rms':
+        # assume S is psd
+        S_norm = scale_psd_to_rms(phi0=S, k=k, **kwargs)
     return k, S_norm
 
 
@@ -71,6 +74,23 @@ def mod_loaded_spectrum(k, S, is_wl=False, is_2D=False, is_amplitude=False, norm
     if normalise:
         k, S = norm_spectrum(k, S, **kwargs)
     return k, S
+
+
+def scale_psd_to_rms(phi0=None, k=None, rms1=1, R=2, **kwargs):
+    # given psd in 1D (units m2 m), scale to new rms1
+    phi_iso0 = 1 / k * phi0  # Jacobs eqn 5 but pi changed to 1 in numerator says JFR
+    l = k_to_l(k, R)
+    rms0 = parseval_rms(phi0, k)
+    rms_ratio = rms1/rms0
+
+    # use this pseudo-2D psd to find power in m^2
+    S0 = np.array(phi_iso0) * (2 * l + 1) / (4 * np.pi * R ** 2)  # factor of 4piR^2 from Lees eq A7
+    S1 = S0 * rms_ratio ** 2
+
+    # convert back to 1D psd
+    phi_iso1 = S1 / (2 * l + 1) * (4 * np.pi * R ** 2)
+    phi1 = phi_iso1 * k
+    return phi1
 
 
 def scale_spectrum(h_rms, h_rms0=None, phi0=None, degree=None, pl=None, pl0=None, h_func=None, age=4.5, **kwargs):
@@ -601,6 +621,7 @@ def integrate_to_peak(grid, R=2, fudge_to_rms=None, verbose=False):
             vol_rock = vol_rock + abs(grid[jj, ii]) * dx * dy
             vol_ocn = vol_ocn + (h_peak - grid[jj, ii]) * dx * dy  # posi h
     #             net_vol = net_vol + data[jj, ii] * dx * dy
+    print('h peak from grid', h_peak, 'm')
     if verbose:
         print('spherical annulus vol:', annulus_vol)
         print('integrated vol:', vol_ocn)

@@ -422,12 +422,12 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                     zz_all.append(jj)  # the colourised vector
 
                 for key in quants.keys():
-                    if errortype is 'time':
+                    if errortype == 'time':
                         try:
                             quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
                         except ValueError:  # haven't added anything yet
                             quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
-                    elif errortype is 'standard':
+                    elif errortype == 'standard':
                         try:
                             SE_mean = np.std(d_times[key]) / np.sqrt(len(d_times[key]))  # todo: log!
                         except TypeError:  # key is a scalar
@@ -509,10 +509,10 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
             n_fitted = 1
         else:
             n_fitted = 2
-        if fiterror and errortype is 'time':
+        if fiterror and errortype == 'time':
             xerr = sdx_all
             yerr = sdy_all
-        elif fiterror and errortype is 'standard':
+        elif fiterror and errortype == 'standard':
             xerr = d_times[which_x + '_SE']
             yerr = d_times['h_rms_SE']
         else:
@@ -1786,12 +1786,12 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
                                                   keys=quants.keys(), plot=False, sigma=sigma)
 
                 for key in quants.keys():
-                    if errortype is 'time':
+                    if errortype == 'time':
                         try:
                             quants[key] = np.vstack((quants[key], qdict[key]))  # add to array of errors
                         except ValueError:  # haven't added anything yet
                             quants[key] = qdict[key].reshape((1, 3))  # reshape so it works if you just have one row
-                    elif errortype is 'standard':
+                    elif errortype == 'standard':
                         SE_mean = np.std(d_times[key]) / np.sqrt(len(d_times[key]))  # todo: log!
                         avg = np.mean(d_times[key])
                         SE_vec = np.array([avg - SE_mean, avg, avg + SE_mean])
@@ -2055,17 +2055,17 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
 def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=None, include_regimes=None,
                       data_path=data_path_bullard, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
                       marker='.', lw=0.5, xlabel=None, ylabel='Normalised power spectral density',
-                      x2label='spherical harmonic degree', save=True, alpha=1, labelsize=16, ticksize=12,
+                      x2label='Spherical harmonic degree', save=True, alpha=1, labelsize=16, ticksize=12,
                       fig=None, ax=None, figsize=(5, 5), z_name='Ra', vmin=None, vmax=None, clabel=None,
                       norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True,
                       add_files=None, add_label=None, legsize=12, xlim=None, ylim=None, show_beta_guide=False,
-                      max_dscale=2, bl_fudge=1, c_guide='xkcd:slate', labelpad=20,
+                      max_dscale=2, bl_fudge=1, c_guide='xkcd:slate', labelpad=20, whole=False,
                       **kwargs):
     import pickle as pkl
     import sh_things as sh
     global R
     if R_p is None:
-        R_p = d
+        R_p = 2*d
 
     if fig is None and ax is None:
         fig, ax = plt.subplots(1, 1, figsize=figsize)
@@ -2131,10 +2131,12 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             Sv = S[i_min:i_max + 1]
         except UnboundLocalError:
             raise Exception('kmin, kmax out of bounds')
-        kv, Sv_norm = sh.norm_spectrum(kv, Sv, k_min=k_min, norm=norm)
 
+        if whole:
+            kv, Sv_norm = sh.norm_spectrum(k, S, k_min=k_min, norm=norm, R=R_p, **kwargs)
+        else:
+            kv, Sv_norm = sh.norm_spectrum(kv, Sv, k_min=k_min, norm=norm, R=R_p, **kwargs)
         ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
-        # ax.plot(k, S_norm, c=clist[zz], alpha=0.1, lw=lw, marker=marker)  # not in range
 
         zz = zz + 1
 
@@ -2161,10 +2163,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.1, log=False)
         axes.append(cb.ax)
     if show_degrees:
-        if dim:
-            R = R_p
-        else:
-            R = 1
+        R = R_p
 
         def to_deg(k):
             return k * 2 * np.pi * R - 0.5

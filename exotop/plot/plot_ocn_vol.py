@@ -59,14 +59,14 @@ labelsize = 20
 # print('basin capacity in M_E', vol_0*1000/parameters.M_E)
 
 
-
 """ money plot """
-
+print('first call')
 labelsize = 40
 fig, axes = results.plot_ocean_capacity_relative(n_stats=10, relative=True, nplanets=8,
                                                  legsize=20, ticksize=25, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False,
                                                  showwaterscale=True, log=True,
+                                                 vol_0='Earth', simple_scaling=False,
                                                  defaults='Venusbaseline', textc='xkcd:off white',
                                                  # title='Water volume to submerge land',
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
@@ -81,18 +81,19 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=10, relative=True, npla
                                                  leg_bbox=(0, 1.01), clabelpad=70,
                                                  fname='ocean-vol', ytitle=1.05, vmax=3e-3,
                                                  mass_frac_sfcwater=[1e-5, 3e-5, 1e-4, 3e-4, 1e-3])
-
+print('second call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=10, relative=True, nplanets=8,
-                                                 fig=fig, axes=axes, vol_0=8.468613612559923e+17,
+                                                 fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
                                                  legsize=20, ticksize=25, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False,
+                                                 simple_scaling=True,
                                                  showwaterscale=True, log=True,
                                                  defaults='Venusbaseline', textc='xkcd:off white',
                                                  # title='Water volume to submerge land',
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  spectrum_fname='Venus_spectrum_l1.pkl',
                                                  #                                                  c='#81f79f',
-                                                 c='xkcd:ochre',
+                                                 c='xkcd:hot pink', ls='--',
                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
                                                  x_range=[(0.1 * p.M_E, 6 * p.M_E)], xscales=[p.M_E ** -1],
@@ -112,9 +113,10 @@ ax.set_xlabel('Planet mass ($M_E$)', fontsize=labelsize,  # c='xkcd:off white',
 
 ax.set_xlim((0.1, 6))
 ax.set_ylim((2e-1, 4e0))
+# ax.set_ylim((1e-2, 4e0))
 
 ax.text(0.05, 0.95, '4.5 Ga\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=20,
-        horizontalalignment='left',  c='xkcd:off white',
+        horizontalalignment='left', c='xkcd:off white',
         verticalalignment='top',
         transform=ax.transAxes)
 
@@ -126,11 +128,13 @@ ax.set_xticks([0.1, 1, 2, 3, 4, 5, 6])
 ax.set_yticks([0.3, 1, 3])
 
 handles = [mlines.Line2D([], [], color='xkcd:light red', ls='-', lw=3,
-                                 label='ASPECT 2D'),
-           mlines.Line2D([], [], color='xkcd:ochre', ls='-', lw=3,
-                                 label='Venus')]
-ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=20)
-
+                         label='Pure dynamic topography'),
+           mlines.Line2D([], [], color='xkcd:hot pink', ls='--', lw=3,
+                         label='Venus-like topography'),
+           # mlines.Line2D([], [], color='g', ls='--', lw=3,
+           #               label='Simple scaling')
+           ]
+ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=20, ncol=2)
 
 fig, *axes = dark_background(fig, axes)
-fig.savefig(fig_path + 'ocn_vol_Venus.png', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_test.png', bbox_inches='tight')

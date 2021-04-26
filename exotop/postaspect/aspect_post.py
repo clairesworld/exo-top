@@ -12,10 +12,10 @@ from sklearn import linear_model
 from scipy.interpolate import interp1d
 from scipy.spatial import distance
 # import statsmodels.api as sm
-from postaspect import aspectdata as ad  # noqa: E402
-from postaspect.setup_postprocessing import data_path_bullard  # noqa: E402
+from postaspect import aspectdata as ad
+from postaspect.setup_postprocessing import data_path_bullard
 from useful_and_bespoke import colorize, iterable_not_string, not_iterable, find_nearest_idx, \
-    not_string, minmaxnorm, reduced_chisq, mahalanobis  # noqa: E402
+    not_string, minmaxnorm, reduced_chisq, mahalanobis
 
 
 def find_ts(case, t, dat=None, data_path=data_path_bullard, **kwargs):
@@ -359,6 +359,7 @@ def test_h_avg(case, data_path=data_path_bullard):
     # processed verj
     dic = h_at_ts(case, ts=ts)
     print('h max saved', dic['h_peak'])
+    # --> h_avg = 0 --> h_peak - h_avg = h_peak
 
 
 def time_averaged_profile(case, n0, nf, which='temperature', dat=None, data_path=data_path_bullard,

@@ -107,6 +107,7 @@ def postprocess_planet(pl, postprocessors=None, nondimensional=True, **kwargs):
         pl = topography.topography(pl, **kwargs)
     if 'ocean_capacity' in postprocessors:
         pl = oceans.max_ocean(pl, **kwargs)
+        pl = oceans.simple_vol_scaling(pl, **kwargs)
     if nondimensional:
         pl.nondimensionalise()
     return pl
