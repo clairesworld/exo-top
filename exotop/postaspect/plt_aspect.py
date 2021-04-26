@@ -2101,7 +2101,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
 
                 h_rms, h_peak = plot_geth(case=case, averagescheme='timelast', data_path=data_path, return_all=False,
                                           t1=0)
-                print(case, 'rms/peak', h_rms/h_peak, '| rms', h_rms)
+                print(case, 'rms/peak', h_rms/h_peak, '| peak', h_peak)
 
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
@@ -2116,6 +2116,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         if k[0] == 0:  # only wavenumbers greater than 0
             k = k[1:]
             S = S[1:]
+
+        test_rms_ratio(S, k, n_stats=10, h_ratio=1, R=R_p)
 
         if dim:
             k = k * d**-1
@@ -2215,3 +2217,26 @@ def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, pl
         x, y = additional_mod_fn(x, y, **kwargs)
     ax.plot(x, y, label=label, **plot_kwargs)
     return ax
+
+
+def test_rms_ratio(phi0, k, n_stats=10, h_ratio=1, R=2):
+    import sh_things as sh
+    h_rms = sh.parseval_rms(phi0, k)
+    l = sh.k_to_l(k, R)
+    print('original h_rms', h_rms)
+
+    nn = 0
+    peaks = []
+    # print('forcing h_ratio = 1')
+    while nn < n_stats:
+        clm = sh.random_harms_from_psd(phi0, l, R=2, h_ratio=h_ratio, verbose=True)
+        grid = sh.coeffs_to_grid(clm, R=R, plot_grid=False, plot_spectrum=False, verbose=True,
+                                 d=1, alpha_m=1, dT=1)
+        peak = np.max(grid)
+        peaks.append(peak)
+        nn = nn + 1
+
+    peaka = np.mean(peaks)
+    print('peak from grid', peaka)
+    print('rms/peak_grid', h_rms/peaka)
+    return None
