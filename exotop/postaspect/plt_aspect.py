@@ -2113,7 +2113,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
         S, k = pkl.load(open(fname, "rb"))
-        test_rms_ratio(S, k, n_stats=10, h_ratio=1, R=R_p)
+        test_rms_ratio(S, k, n_stats=10, R=R_p)
         if k[0] == 0:  # only wavenumbers greater than 0
             k = k[1:]
             S = S[1:]
