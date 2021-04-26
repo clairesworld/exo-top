@@ -2144,9 +2144,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         kv, Sv_norm = sh.norm_spectrum(kv, Sv, k_min=k_min, norm=norm, R=R_p, **kwargs)
 
         if relative_power:
-            kv = kv / np.pi
+            # kv = kv / np.pi
             Sv_norm = 100 * Sv_norm / np.sum(Sv_norm)
-            xlabel = "$k/\pi$"
+            # xlabel = "$k/\pi$"
             ylabel = "Power (% relative to total)"
 
         ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
