@@ -2154,6 +2154,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
 
     if not relative_power:
         ax.loglog()
+    else:
+        ax.set_xscale('log')
     # print('kv', kv)
     # print('Sv_norm', Sv_norm)
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
