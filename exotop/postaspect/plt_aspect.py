@@ -2123,6 +2123,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         if whole:
             kv = k
             Sv = S
+            k_min = np.min(k)
         else:
             k_min, k_max = 2*np.pi / wl_max, 2*np.pi / wl_min
             if k_min is not None and (k_min > np.min(k)):
