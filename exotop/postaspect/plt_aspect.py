@@ -2098,6 +2098,11 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                                       alpha_m=alpha_m, **kwargs)))
                 else:
                     print(fname, 'not found')
+
+                h_rms, h_peak = plot_geth(case=case, averagescheme='timelast', data_path=data_path, return_all=False,
+                                          t1=0)
+                print(case, 'rms/peak', h_rms/h_peak)
+
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
 
     # load spectra
@@ -2148,8 +2153,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         zz = zz + 1
 
     ax.loglog()
-    print('kv', kv)
-    print('Sv_norm', Sv_norm)
+    # print('kv', kv)
+    # print('Sv_norm', Sv_norm)
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=labelpad)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)

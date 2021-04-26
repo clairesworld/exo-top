@@ -61,6 +61,9 @@ def norm_spectrum(k, S, norm='min_l', k_min=None, **kwargs):
     elif norm == 'rms':
         # assume S is psd
         S_norm = scale_psd_to_rms(phi0=S, k=k, **kwargs)
+    else:
+        print('no PSD normalisation scheme recognised')
+        S_norm = S
     return k, S_norm
 
 

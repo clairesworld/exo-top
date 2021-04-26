@@ -14,6 +14,7 @@ R_p = 6371  # Earth
 d, dT, alpha = 1, 1, 1
 regimes_use = ['chaotic']
 
+
 """ plot normalised spectra relative power on single axis - full spectrum norm rms"""
 
 fig, *ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
@@ -26,10 +27,11 @@ fig, *ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_gr
                                   max_dscale=1, bl_fudge=5,  # c_guide='xkcd:off white',
                                   xlabel=None, ylabel='Normalised power spectral density',
                                   x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, eff}$)',
-                                  norm='rms', whole=True, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
+                                  norm=None, whole=True, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
                                   relative_power=True,
                                   )
 fig.savefig(fig_path + 'psd_relative_stacked.png', bbox_inches='tight')
+
 
 """ plot normalised spectra on single axis - full spectrum norm rms"""
 
