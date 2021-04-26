@@ -669,6 +669,7 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, pl
         print('RMS of map', h_rms)
 
     if scale_to_1D:
+        print('for no reason scaling by 1/pi^2 lol')
         data = data / np.pi ** 2  # where does this come from lol
     data = data * d * dT * alpha_m
 

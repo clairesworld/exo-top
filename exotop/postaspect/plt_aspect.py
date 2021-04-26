@@ -2239,7 +2239,7 @@ def test_rms_ratio(phi_test, k, n_stats=10, R=2, spectrum_fname='base_spectrum_l
             verbose = False
         clm = sh.random_harms_from_psd(phi0, degree, R=R, h_ratio=h_ratio, verbose=verbose)
         grid = sh.coeffs_to_grid(clm, R=R, plot_grid=False, plot_spectrum=False, verbose=verbose,
-                                 d=1, alpha_m=1, dT=1)
+                                 d=1, alpha_m=1, dT=1, scale_to_1D=False)
         peak = np.max(grid)
         peaks.append(peak)
         nn = nn + 1
