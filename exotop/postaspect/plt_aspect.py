@@ -2109,7 +2109,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
     zz = 0
     for (jj, ii) in ji_use:
         case = 'Ra' + Ra_ls[ii] + '-eta' + eta_ls[jj] + end_grid[jj, ii]
-        print('case', case)
+        print('\n\n\n', case)
         fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
         S, k = pkl.load(open(fname, "rb"))
@@ -2232,10 +2232,13 @@ def test_rms_ratio(phi_test, k, n_stats=10, R=2, spectrum_fname='base_spectrum_l
 
     nn = 0
     peaks = []
+    verbose = True
     # print('forcing h_ratio = 1')
     while nn < n_stats:
-        clm = sh.random_harms_from_psd(phi0, degree, R=R, h_ratio=h_ratio, verbose=True)
-        grid = sh.coeffs_to_grid(clm, R=R, plot_grid=False, plot_spectrum=False, verbose=True,
+        if nn > 0:
+            verbose = False
+        clm = sh.random_harms_from_psd(phi0, degree, R=R, h_ratio=h_ratio, verbose=verbose)
+        grid = sh.coeffs_to_grid(clm, R=R, plot_grid=False, plot_spectrum=False, verbose=verbose,
                                  d=1, alpha_m=1, dT=1)
         peak = np.max(grid)
         peaks.append(peak)
