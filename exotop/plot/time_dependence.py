@@ -50,12 +50,12 @@ cmap = 'cool'
 #
 # # # plot evolutions for debugging T components
 
-
-fig, axes = plat.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td, save=False,
-                                      t1_grid=t1_grid, load_grid=True, psuffixes=['_T', '_h_all'], fig_path=fig_path,
-                                      fig_fmt=fig_fmt, end_grid=end_grid, normtime=False, alpha=0.4,
-                                      labelsize=14, xlabel=r'Time', percent_change=True,
-                                      keys=['T_l', 'delta_rh', 'h_rms'], title='',
+zoom = False
+fig, axes = plat.subplots_evol_at_sol(Ra_ls[-2:], eta_ls, regime_grid=regime_grid_td[:,-2:], save=False,
+                                      t1_grid=t1_grid[:,-2:], load_grid=True, psuffixes=['_T', '_h_all'], fig_path=fig_path,
+                                      fig_fmt=fig_fmt, end_grid=end_grid[:,-2:], normtime=False, alpha=0.4,
+                                      labelsize=14, xlabel=r'Time', percent_change=True, zoom=zoom,
+                                      keys=['T_l', 'delta_rh', 'h_rms'], title='', legend=False,
                                       xlabelpad=8, ylabelpad=8, markers=None, markersize=24, colour_by=None,
                                       data_path=data_path, regime_names=regime_names_td,
                                       postprocess_kwargs=postprocess_kwargs)
@@ -63,8 +63,8 @@ fig, axes = plat.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td,
 fig, axes = plat.subplots_evol_at_sol(Ra_ls[4], eta_ls[1], regime_grid=regime_grid_td[1, 4], save=False,
                                       t1_grid=t1_grid[1, 4], load_grid=True, psuffixes=['_T', '_h_all'], fig_path=fig_path,
                                       fname='evol_bi', fig_fmt=fig_fmt, end_grid=end_grid[1, 4], normtime=False,
-                                      labelsize=14, xlabel=r'Time', percent_change=True, alpha=1,
-                                      keys=['T_l', 'delta_rh', 'h_rms'], title='',
+                                      labelsize=14, xlabel=r'Time', percent_change=True, alpha=1, zoom=zoom,
+                                      keys=['T_l', 'delta_rh', 'h_rms'], title='', legend=False,
                                       xlabelpad=8, ylabelpad=8, markers=None, markersize=24, c_const='r', colour_by=None,
                                       data_path=data_path, regime_names=regime_names_td, fig=fig, axes=axes,
                                       postprocess_kwargs=postprocess_kwargs)
@@ -72,8 +72,8 @@ fig, axes = plat.subplots_evol_at_sol(Ra_ls[4], eta_ls[1], regime_grid=regime_gr
 fig, axes = plat.subplots_evol_at_sol(Ra_ls[5], eta_ls[3], regime_grid=regime_grid_td[3, 5], save=True,
                                       t1_grid=t1_grid[3, 5], load_grid=True, psuffixes=['_T', '_h_all'], fig_path=fig_path,
                                       fname='evol_bi', fig_fmt=fig_fmt, end_grid=end_grid[3, 5], normtime=False,
-                                      labelsize=14, xlabel=r'Time', percent_change=True, alpha=1,
-                                      keys=['T_l', 'delta_rh', 'h_rms'], title='',
+                                      labelsize=14, xlabel=r'Time', percent_change=True, alpha=1, zoom=zoom,
+                                      keys=['T_l', 'delta_rh', 'h_rms'], title='', legend=False,
                                       xlabelpad=8, ylabelpad=8, markers=None, markersize=24, c_const='r', colour_by=None,
                                       data_path=data_path, regime_names=regime_names_td, fig=fig, axes=axes,
                                       postprocess_kwargs=postprocess_kwargs)

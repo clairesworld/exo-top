@@ -1316,7 +1316,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=10,
                          xlabelpad=8, ylabelpad=-2, markers=None, markersize=20, alpha=0.5,
                          fig=None, axes=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
-                         regime_names=None, colour_by='Ra', zoom=True, c_const='k',
+                         regime_names=None, colour_by='Ra', zoom=True, c_const='k', legend=True,
                          data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
 
@@ -1397,7 +1397,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                     ax.set_ylabel(ylabels[k], fontsize=labelsize, labelpad=ylabelpad)
                     if percent_change:
                         y_data = y_data / np.nanmean(y_data)
-                        ax.set_ylabel(ylabels[k] + ' (rel to mean)', fontsize=labelsize, labelpad=ylabelpad)
+                        ax.set_ylabel(ylabels[k] + '\n(rel to mean)', fontsize=labelsize, labelpad=ylabelpad)
 
                     if k == len(keys) - 1:
                         ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
@@ -1408,40 +1408,41 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                     if np.max(y_data) > maxes[k]:
                         maxes[k] = np.max(y_data)
 
-    # legend proxy artist
-    ax = axes[0]
-    lines = []
-    for jj, leta in enumerate(logeta_fl):
-        if colour_by == 'eta':
-            c = c_list[jj]
-            marker = 'o'
-        elif colour_by == 'Ra':
-            c = 'k'
-            marker = markers[jj]
-        elif colour_by is None:
-            c = c_const
-            marker = '.'
-        p = mlines.Line2D([], [], lw=0, color=c, marker=marker, markersize=markersize / 4, label=leta,
-                          alpha=alpha)
-        lines.append(p)
-    legend1 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="upper left",
-                        title=r"log $\Delta \eta$", )
-    ax.add_artist(legend1)
+    if legend:
+        # legend proxy artist
+        ax = axes[0]
+        lines = []
+        for jj, leta in enumerate(logeta_fl):
+            if colour_by == 'eta':
+                c = c_list[jj]
+                marker = 'o'
+            elif colour_by == 'Ra':
+                c = 'k'
+                marker = markers[jj]
+            elif colour_by is None:
+                c = c_const
+                marker = '.'
+            p = mlines.Line2D([], [], lw=0, color=c, marker=marker, markersize=markersize / 4, label=leta,
+                              alpha=alpha)
+            lines.append(p)
+        legend1 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="upper left",
+                            title=r"log $\Delta \eta$", )
+        ax.add_artist(legend1)
 
-    ax = axes[-1]
-    lines = []
-    for ii, Ra in enumerate(Ra_ls):
-        if colour_by == 'eta':
-            c = 'k'
-            marker = markers[ii]
-        elif colour_by == 'Ra':
-            c = c_list[ii]
-            marker = 'o'
-        p = mlines.Line2D([], [], lw=0, color=c, marker=marker, markersize=markersize / 4, label=Ra, alpha=alpha)
-        lines.append(p)
-    legend2 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="lower right",
-                        title="Ra", )
-    ax.add_artist(legend2)
+        ax = axes[-1]
+        lines = []
+        for ii, Ra in enumerate(Ra_ls):
+            if colour_by == 'eta':
+                c = 'k'
+                marker = markers[ii]
+            elif colour_by == 'Ra':
+                c = c_list[ii]
+                marker = 'o'
+            p = mlines.Line2D([], [], lw=0, color=c, marker=marker, markersize=markersize / 4, label=Ra, alpha=alpha)
+            lines.append(p)
+        legend2 = ax.legend(lines, [l.get_label() for l in lines], fontsize=legsize, frameon=True, loc="lower right",
+                            title="Ra", )
+        ax.add_artist(legend2)
 
     if zoom:
         # zoom to data limits
