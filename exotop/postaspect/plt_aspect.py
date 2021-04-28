@@ -1311,7 +1311,7 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
 
 
 def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=None,
-                         load_grid='auto', psuffixes=None,
+                         load_grid='auto', psuffixes=None, percent_change=False,
                          fig_path=fig_path_bullard, fname='evol', fig_fmt='.png', end_grid=None, normtime=True,
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=10,
                          xlabelpad=8, ylabelpad=-2, markers=None, markersize=20, alpha=0.5,
@@ -1351,8 +1351,6 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
     maxes = np.zeros(len(keys))
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = pro.get_cases_list(Ra_ls, eta_str, end_grid[jj])
-        if colour_by == 'eta':
-            c = c_list[jj]
 
         for ii, case in enumerate(cases):
             t1_ii = t1_grid[jj][ii]
@@ -1360,6 +1358,8 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
             marker_ii = markers[ii]
             if colour_by == 'Ra':
                 c = c_list[ii]
+            elif colour_by == 'eta':
+                c = c_list[jj]
             elif colour_by is None:
                 c = c_const
 
@@ -1395,10 +1395,14 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                     ax = axes[k]
                     y_data = df[key]
                     ax.set_ylabel(ylabels[k], fontsize=labelsize, labelpad=ylabelpad)
+                    if percent_change:
+                        y_data = y_data / np.nanmean(y_data)
+                        ax.set_ylabel(ylabels[k] + ' (rel to mean)', fontsize=labelsize, labelpad=ylabelpad)
+
                     if k == len(keys) - 1:
                         ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
                     ax.scatter(x_data, y_data, color=c, s=markersize, marker=marker_ii, alpha=alpha)
-                    ax.plot(x_data, y_data, color=c, lw=0.8, alpha=alpha)
+                    ax.plot(x_data, y_data, color=c, lw=1, ls='-', alpha=alpha)
                     if np.min(y_data) < mins[k]:
                         mins[k] = np.min(y_data)
                     if np.max(y_data) > maxes[k]:
