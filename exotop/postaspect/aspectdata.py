@@ -870,12 +870,13 @@ class Aspect_Data():
                          'delta_L':delta_L, 'delta_0':delta_0, 'T_av':T_av, 'uv_mag_av':uv_mag_av, 'y':y}
         return self.T_params
     
-    def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, uv_mag=None, **kwargs):
+    def surface_mobility(self, n=None, delta_0=None, delta_rh=None, delta_l=None, uv_mag_av=None, uv_mag=None, **kwargs):
         # stagnant lid criterion S << 1 from Moresi & Solomatov 2000
-        if uv_mag is None:
-            x, _, _, u, v, _, uv_mag = self.read_velocity(n, **kwargs)
-        mag_av = horizontal_mean(uv_mag, x)
-        u_0 = mag_av[-1]
+        if uv_mag_av is None:
+            if uv_mag is None:
+                x, _, _, u, v, _, uv_mag = self.read_velocity(n, **kwargs)
+            uv_mag_av = horizontal_mean(uv_mag, x)
+        u_0 = uv_mag_av[-1]
         # u_0 = horizontal_mean(u, x)[-1]  # surface velocity
         if delta_0 is None:
             if delta_rh is None:

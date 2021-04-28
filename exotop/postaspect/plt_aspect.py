@@ -1107,6 +1107,7 @@ def plot_parameter_grid(Ra, eta, function, data_path=data_path_bullard, fig_path
             # calculate value at this parameter-space coordinate
             if os.path.exists(data_path + 'output-' + cases[ii] + '/'):
                 plot_grid[jj, ii] = function(Ra=Ra_str, eta=eta_str, ii=ii, jj=jj, load=load[jj][ii],
+                                             case=cases[ii],
                                              t1=t1[jj][ii], end=end[jj][ii], data_path=data_path, **kwargs)
             else:
                 plot_grid[jj, ii] = np.nan

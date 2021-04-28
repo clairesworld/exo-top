@@ -987,15 +987,18 @@ def surf_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullar
     if dat is None:
         dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/',
                              read_statistics=False, read_parameters=False, **kwargs)
-    if n is None:
-        n = dat.final_step()
-
     df_T = pickleio(case, '_T', dat_new=dat,
                     data_path=data_path, **kwargs)
+
     if not df_T.empty:
         df_sol = df_T.set_index('sol')
-        S = dat.surface_mobility(n=n, delta_0=df_sol.loc[n, 'delta_0'], delta_rh=df_sol.loc[n, 'delta_rh'],
-                                 delta_l=df_sol.loc[n, 'delta_L'])
+        if n is None:
+            delta_0 = np.mean(df_sol['delta_0'].to_numpy())
+            uv_mag_av = np.mean(df_sol['uv_mag_av'].to_numpy())
+        else:
+            delta_0 = df_sol.loc[n, 'delta_0']
+            uv_mag_av = df_sol.loc[n, 'uv_mag_av']
+        S = dat.surface_mobility(n=n, delta_0=delta_0, uv_mag_av=uv_mag_av)
         return S
     else:
         return np.nan
