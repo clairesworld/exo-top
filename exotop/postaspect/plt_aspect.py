@@ -1315,7 +1315,7 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                          labelsize=14, xlabel=r'Time', ylabels=None, keys=None, title='', legsize=10,
                          xlabelpad=8, ylabelpad=-2, markers=None, markersize=20, alpha=0.5,
                          fig=None, axes=None, cmap='magma', vmin=None, vmax=None, include_regimes=None,
-                         regime_names=None, colour_by='Ra', zoom=True,
+                         regime_names=None, colour_by='Ra', zoom=True, c_const='k',
                          data_path=data_path_bullard, **kwargs):
     # plot time-evolution of list of keys for all cases in given regime
 
@@ -1411,6 +1411,9 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
         elif colour_by == 'Ra':
             c = 'k'
             marker = markers[jj]
+        elif colour_by is None:
+            c = c_const
+            marker = '.'
         p = mlines.Line2D([], [], lw=0, color=c, marker=marker, markersize=markersize / 4, label=leta,
                           alpha=alpha)
         lines.append(p)
