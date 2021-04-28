@@ -1398,11 +1398,12 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                     if percent_change:
                         y_data = y_data / np.nanmean(y_data)
                         ax.set_ylabel(ylabels[k] + '\n(rel to mean)', fontsize=labelsize, labelpad=ylabelpad)
-
                     if k == len(keys) - 1:
                         ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=xlabelpad)
+
                     ax.scatter(x_data, y_data, color=c, s=markersize, marker=marker_ii, alpha=alpha)
                     ax.plot(x_data, y_data, color=c, lw=1, ls='-', alpha=alpha)
+
                     if np.min(y_data) < mins[k]:
                         mins[k] = np.min(y_data)
                     if np.max(y_data) > maxes[k]:
