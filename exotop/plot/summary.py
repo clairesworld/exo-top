@@ -12,9 +12,9 @@ from postaspect import aspect_post as ap
 #                         include_regimes=['chaotic'],
 #                         data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 
-# ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
-#                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
-#                         load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
+ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
+                        t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
+                        load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
 """plot summaries across delta eta and/or Ra """
 
@@ -46,14 +46,14 @@ from postaspect import aspect_post as ap
 #             postprocess_kwargs=postprocess_kwargs,
 #         )
 
-""" 2D isoviscous benchmark """
-plat.subplots_cases(
-    ['Lees-Ra1e6-2D'], labels=['2D isoviscous benchmark'], t1=[0.6], save=True, load='auto',
-    fname='Lees-benchmark', suptitle='Ra = 1e6', c_rms=c_rms, c_peak=c_peak, dt_xlim=(0.0, 0.1),
-    includepdf=True, includeTz=False, show_sols=False,  # set False for faster summary with stats only
-    includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
-    postprocess_kwargs=postprocess_kwargs,
-)
+# """ 2D isoviscous benchmark """
+# plat.subplots_cases(
+#     ['Lees-Ra1e6-2D'], labels=['2D isoviscous benchmark'], t1=[0.6], save=True, load='auto',
+#     fname='Lees-benchmark', suptitle='Ra = 1e6', c_rms=c_rms, c_peak=c_peak, dt_xlim=(0.0, 0.1),
+#     includepdf=True, includeTz=False, show_sols=False,  # set False for faster summary with stats only
+#     includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
+#     postprocess_kwargs=postprocess_kwargs,
+# )
 
 # compare 64 and 129 resolution for Ra=3e7
 # fig, ax = plat.case_subplots(

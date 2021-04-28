@@ -60,14 +60,22 @@ labelsize = 20
 
 
 """ money plot """
+slides = False
+nplanets = 8
+n_stats = 100
+
+if slides:
+    textc = 'xkcd:off white'
+else:
+    textc = 'k'
 print('first call')
 labelsize = 40
-fig, axes = results.plot_ocean_capacity_relative(n_stats=10, relative=True, nplanets=8,
+fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
                                                  legsize=20, ticksize=25, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False,
                                                  showwaterscale=True, log=True,
                                                  vol_0='Earth', simple_scaling=False,
-                                                 defaults='Venusbaseline', textc='xkcd:off white',
+                                                 defaults='Venusbaseline', textc=textc,
                                                  # title='Water volume to submerge land',
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  # benchmark_path+'wei_Venus/',
@@ -82,13 +90,13 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=10, relative=True, npla
                                                  fname='ocean-vol', ytitle=1.05, vmax=3e-3,
                                                  mass_frac_sfcwater=[1e-5, 3e-5, 1e-4, 3e-4, 1e-3])
 print('second call')
-fig, axes = results.plot_ocean_capacity_relative(n_stats=10, relative=True, nplanets=8,
+fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
                                                  fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
                                                  legsize=20, ticksize=25, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False,
                                                  simple_scaling=True,
                                                  showwaterscale=True, log=True,
-                                                 defaults='Venusbaseline', textc='xkcd:off white',
+                                                 defaults='Venusbaseline', textc=textc,
                                                  # title='Water volume to submerge land',
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  spectrum_fname='Venus_spectrum_l1.pkl',
@@ -106,9 +114,9 @@ ax.axhline(y=1, c='xkcd:off white', alpha=0.5, zorder=0)
 # for ax in axes:
 #     ax.set_xscale('log')
 #     ax.set_yscale('log')
-ax.set_ylabel('Relative basin capacity', fontsize=labelsize,  # c='xkcd:off white',
+ax.set_ylabel('Basin capacity (Earth oceans)', fontsize=labelsize,  c=textc,
               labelpad=20)
-ax.set_xlabel('Planet mass ($M_E$)', fontsize=labelsize,  # c='xkcd:off white',
+ax.set_xlabel('Planet mass ($M_E$)', fontsize=labelsize,  c=textc,
               labelpad=20)
 
 ax.set_xlim((0.1, 6))
@@ -116,7 +124,7 @@ ax.set_ylim((2e-1, 4e0))
 # ax.set_ylim((1e-2, 4e0))
 
 ax.text(0.05, 0.95, '4.5 Ga\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=20,
-        horizontalalignment='left', c='xkcd:off white',
+        horizontalalignment='left', c=textc,
         verticalalignment='top',
         transform=ax.transAxes)
 
@@ -136,5 +144,6 @@ handles = [mlines.Line2D([], [], color='xkcd:light red', ls='-', lw=3,
            ]
 ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=20, ncol=2)
 
-fig, *axes = dark_background(fig, axes)
+if slides:
+    fig, *axes = dark_background(fig, axes)
 fig.savefig(fig_path + 'ocn_vol_test.png', bbox_inches='tight')

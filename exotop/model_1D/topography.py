@@ -5,7 +5,7 @@ import numpy as np
 def dimensionalise(h_prime, pl, i=None, **kwargs):
     if i is not None:
         dim_factor = (pl.T_c[i] - pl.T_s) * pl.alpha_m * (pl.R_p - pl.R_c)
-        print('dim factor', dim_factor)
+        # print('dim factor', dim_factor)
     else:
         dim_factor = (pl.T_c - pl.T_s) * pl.alpha_m * (pl.R_p - pl.R_c)
         # h = h_prime*(np.maximum(pl.T_c[-1], pl.T_m[-1]) - pl.T_s)*pl.alpha_m*(pl.R_p - pl.R_c)
@@ -26,11 +26,11 @@ def topography(pl, **kwargs):
 
     pl.dyn_top_peak_prime = dyn_topo_peak_prime_aspect(pl)
     pl.dyn_top_peak = dimensionalise(pl.dyn_top_peak_prime, pl)
-    print('\nRa_i_eff', pl.Ra_i_eff[-1])
-    print('h rms prime', pl.dyn_top_aspect_prime[-1])
-    print('h peak prime', pl.dyn_top_peak_prime[-1])
-    print('h rms', pl.dyn_top_rms[-1])
-    print('h peak', pl.dyn_top_peak[-1], '\n')
+    # print('\nRa_i_eff', pl.Ra_i_eff[-1])
+    # print('h rms prime', pl.dyn_top_aspect_prime[-1])
+    # print('h peak prime', pl.dyn_top_peak_prime[-1])
+    # print('h rms', pl.dyn_top_rms[-1])
+    # print('h peak', pl.dyn_top_peak[-1], '\n')
     return pl
 
 

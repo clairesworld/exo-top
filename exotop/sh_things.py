@@ -1,5 +1,5 @@
 import pyshtools
-# import cartopy.crs as ccrs
+import cartopy.crs as ccrs
 import numpy as np
 import pandas as pd
 from postaspect import aspect_post as ap
@@ -519,11 +519,13 @@ def l_to_k(l, R):
     return (l + 0.5) / R
 
 
-def interpolate_degrees(phi, kv, R, lmin=2, kmin_fit=None, kmax_fit=None):
+def interpolate_degrees(phi, kv, R, lmin=2, kmin_fit=None, kmax_fit=None, kmax_interp=None):
     beta, intercept = fit_slope(phi, kv, k_min=kmin_fit, k_max=kmax_fit, plot=False)
 
+    if kmax_interp is None:
+        kmax_interp = kmax_fit
     lmin_fit = int(np.ceil(-0.5 + kmin_fit * R))
-    lmax_fit = int(np.floor(-0.5 + kmax_fit * R))
+    lmax_fit = int(np.floor(-0.5 + kmax_interp * R))
     l = np.arange(lmin_fit, lmax_fit + 1)
 
     kl = (l + 0.5) / R
@@ -538,7 +540,7 @@ def interpolate_degrees(phi, kv, R, lmin=2, kmin_fit=None, kmax_fit=None):
 
 
 def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spectrum', pend='_sph', fend='.pkl',
-                        bl_fudge=1, max_dscale=2, plot=True, verbose=False, lmin=1):
+                        bl_fudge=1, max_dscale=2, plot=True, verbose=False, lmin=1, kmax_interp=None):
     import pickle as pkl
     fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
@@ -553,7 +555,7 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
     if verbose:
         print('k', k[:5])
         print('l orig', l_orig[:5])
-        print('RMS of 1D psd', parseval_rms(S[1:], k[1:]), 'for k:', np.min(k[1:]), np.max(k[1:]))
+        print('RMS of 1D psd', parseval_rms(S[1:], k[1:]), 'for k:', np.min(k[1:]), 'to', np.max(k[1:]))
 
     if plot:
         fig = plt.figure()
@@ -572,11 +574,11 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
                                 max_dscale=max_dscale)
     k_min, k_max = 2 * np.pi / wl_max, 2 * np.pi / wl_min
 
-    if verbose:
-        print('\nRMS of model 1D psd l=2', parseval_rms(S[k > k_max], k[k > k_max]), 'for k >', k_max)
+    # if verbose:
+    #     print('\nRMS of model 1D psd l=2', parseval_rms(S[k > k_max], k[k > k_max]), 'for k >', k_max)
 
     # somehow get exact degrees? must do fit...
-    l, Sl = interpolate_degrees(S, k, R=R, lmin=lmin, kmin_fit=k_min, kmax_fit=k_max)
+    l, Sl = interpolate_degrees(S, k, R=R, lmin=lmin, kmin_fit=k_min, kmax_fit=k_max, kmax_interp=kmax_interp)
     # l_1, Sl_1 = interpolate_degrees(S, k, R=R, lmin=1, kmin_fit=k_min, kmax_fit=k_max)
 
     if plot:
@@ -596,8 +598,8 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
         plt.savefig(fig_path + 'Sl_test.png', bbox_inches='tight')
 
     if verbose:
-        print('x1lim, k=', xlim)
-        print('\nRMS of model 1D psd l=', lmin, ':', parseval_rms(Sl, l_to_k(l, R)), 'for k:', np.min(l_to_k(l, R)), np.max(l_to_k(l, R)))
+        # print('x1lim, k=', xlim)
+        print('\nRMS of model 1D psd l =', lmin, ':', parseval_rms(Sl, l_to_k(l, R)), 'for k:', np.min(l_to_k(l, R)), np.max(l_to_k(l, R)))
         # print('\nRMS of model 1D psd l=1', parseval_rms(Sl_1, l_to_k(l_1, R)), 'for k:', np.min(l_to_k(l_1, R)), np.max(l_to_k(l_1, R)))
         print('l = 1 corresponds to k=', l_to_k(1, R))
 
@@ -605,7 +607,8 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
     return l, Sl
 
 
-def integrate_to_peak(grid, R=2, fudge_to_rms=None, verbose=False):
+def integrate_to_peak(grid, lats, lons, R=2, lmax=120, fudge_to_rms=None, verbose=False, type='GLQ'):
+
     if fudge_to_rms is not None:
         rms_grid = np.sqrt(np.mean(grid ** 2))
         grid = grid * fudge_to_rms / rms_grid
@@ -613,38 +616,87 @@ def integrate_to_peak(grid, R=2, fudge_to_rms=None, verbose=False):
     h_peak = np.max(grid)
     h_peak_abs = np.max(abs(grid))
 
-    # calculate basin capacity
+    # calculate basin capacity if perfectly symmetric
     annulus_vol = 4 / 3 * np.pi * ((R + h_peak_abs) ** 3 - R ** 3)
+
+    # integrate cellwise
+    if type == 'GLQ':
+        # calculate Gauss-Legendre weights for quadrature rule
+        nodes, lat_weights = pyshtools.expand.SHGLQ(lmax)  # gives weights for latitude
+        lon_weights = 2.0 * np.pi / (2 * lmax + 1)  # weights for longitude are uniform
+        w = lon_weights * np.tile(lat_weights, (2 * lmax + 1, 1)).T  # 2d grid of lat-lon weights for quadrature
 
     vol_rock = 0
     vol_ocn = 0
-    nx = np.shape(grid)[1]
-    ny = np.shape(grid)[0]
-    dx = 2 * np.pi * R / nx  # circumference
-    dy = np.pi * R / ny  # pole-to-pole distance
-    for ii in range(nx):
-        for jj in range(ny):
-            vol_rock = vol_rock + abs(grid[jj, ii]) * dx * dy
-            vol_ocn = vol_ocn + (h_peak - grid[jj, ii]) * dx * dy  # posi h
-    #             net_vol = net_vol + data[jj, ii] * dx * dy
-    print('h peak from grid', h_peak, 'm')
+    area = 0
+    nlon = len(lons)
+    nlat = len(lats)
+    for jj in range(1, nlat - 1):  # don't count poles (??)
+        for ii in range(nlon - 1):  # shgrid contains redundant column for 360 E
+            if type == 'GLQ':
+                # quadrature integration
+                dA = w[jj, ii]
+            else:
+                # regular lat lon grid?
+                dlon = lons[1] - lons[0]  # width of one cell in degrees, constant
+                dy = np.pi * R / nlat  # height of cell in m, constant for a sphere (pole-to-pole distance over n cells)
+                lat = lats[jj]  # latitude at cell edge
+                d_1lon = np.pi / 180 * R * np.cos(np.pi / 180 * lat)  # width of 1 deg lon depends on radius at jj
+                dx = dlon * d_1lon
+                dA = dx * dy
+            vol_rock = vol_rock + abs(grid[jj, ii]) * dA
+            vol_ocn = vol_ocn + (h_peak - grid[jj, ii]) * dA
+            area = area + dA
+
     if verbose:
-        print('spherical annulus vol:', annulus_vol)
-        print('integrated vol:', vol_ocn)
+        vol_EO = 1.4e21 / 1000
+        print('h peak from grid', h_peak, 'm')
+        print('spherical annulus vol:', annulus_vol, 'm^3 -->', annulus_vol/vol_EO, 'EO')
+        print('integrated vol:', vol_ocn, 'm^3 -->', vol_ocn/vol_EO, 'EO')
         print('mean h', np.mean(grid), 'min h', np.min(grid), 'max h', np.max(grid))
+        print('area/4piR^2', area/(4*np.pi*R**2))
 
     return vol_ocn
 
 
-def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, plot_spectrum=True, cbar=False,
+def integrate_to_peak_GLQ(grid, R=2, lmax=120, verbose=False):
+
+    h_peak = np.max(grid)
+    h_peak_abs = np.max(abs(grid))
+
+    # calculate basin capacity if perfectly symmetric
+    annulus_vol = 4 / 3 * np.pi * ((R + h_peak_abs) ** 3 - R ** 3)
+
+    # calculate Gauss-Legendre weights for quadrature rule
+    nodes, lat_weights = pyshtools.expand.SHGLQ(lmax)  # gives weights for latitude
+    lon_weights = 2.0 * np.pi / (2 * lmax + 1)  # weights for longitude are uniform
+    w = lon_weights * np.tile(lat_weights, (2 * lmax + 1, 1)).T * R**2  # 2d grid of lat-lon weights for quadrature
+    f = (h_peak - grid)  # function to integrate
+    # vol_ocn = np.trapz(np.trapz(w*f))  # 2D integral
+    area = np.sum(w)  # np.trapz(np.trapz(w))
+    vol_ocn = np.sum(w*f)
+
+    if verbose:
+        vol_EO = 1.4e21 / 1000
+        print('h peak from grid', h_peak, 'm')
+        print('spherical annulus vol:', annulus_vol, 'm^3 -->', annulus_vol/vol_EO, 'EO')
+        print('integrated vol:', vol_ocn, 'm^3 -->', vol_ocn/vol_EO, 'EO')
+        print('mean h', np.mean(grid), 'min h', np.min(grid), 'max h', np.max(grid))
+        print('area/4piR^2', area/(4*np.pi*R**2))
+
+    return vol_ocn
+
+
+def coeffs_to_grid(clm, R=2, lmax=None, scale_to_1D=False, plot_grid=True, plot_spectrum=True, cbar=False,
                    clabel='Dynamic topography (km)',
-                   cmap='terrain', labelsize=14, d=1, alpha_m=1, dT=1, verbose=False, fig_path='', cline='k', lw=3,
+                   cmap='terrain', labelsize=14, verbose=False, fig_path='', cline='k', lw=3,
                    save=False, figsize=(5, 3), ticksize=16):
+    if lmax is None:
+        lmax = clm.lmax
     spectrum = clm.spectrum(unit='per_lm')  # 2D power spectral density
     l = clm.degrees()
-    k = l_to_k(l, R)
     if verbose:
-        print('RMS of 2D psd', parseval_rms_2D(4.0 * np.pi * R * R * spectrum, k), 'km')
+        print('RMS of 2D psd', parseval_rms_2D(4.0 * np.pi * R * R * spectrum, l_to_k(l, R)), 'km')
 
     if plot_spectrum:
         plt.figure(figsize=figsize)
@@ -658,8 +710,10 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, pl
         if save:
             plt.savefig(fig_path + 'random_psd_2D.png', bbox_inches='tight')
 
-    # Expand onto a regular lat/lon grid for plotting
-    topo = clm.expand(lmax=lmax_plot)
+    # Expand onto a regular lat/lon grid
+    # topo = clm.expand(lmax=lmax_plot)
+    # Expand function on to grid points. Grid has l+1 points in latitude, 2l + 1 points in longitude
+    topo = clm.expand(grid='GLQ', lmax=lmax)
     data = topo.data
     lats = topo.lats()
     lons = topo.lons()
@@ -668,22 +722,21 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, pl
     if verbose:
         print('RMS of map', h_rms)
 
-    if scale_to_1D:
-        print('for no reason scaling by 1/pi^2 lol')
-        data = data / np.pi ** 2  # where does this come from lol
-    data = data * d * dT * alpha_m
-
-    h_rms = np.sqrt(np.mean(data ** 2))
-    if verbose:
-        print('RMS of map scaled', h_rms)
-
-    # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
-    lons = np.hstack([lons, np.array([360.0])])
-    v = data[:, 0]
-    v = v.reshape((v.shape[0], 1))
-    data = np.hstack([data, v])
+    # if scale_to_1D:
+    #     print('for no reason scaling by 1/pi^2 lol')
+    #     data = data / np.pi ** 2  # where does this come from lol
+    #     h_rms = np.sqrt(np.mean(data ** 2))
+    # if verbose:
+    #     print('RMS of map scaled', h_rms)
 
     if plot_grid:
+        # Aid plotting by repeating the 0 degree longitude as 360 degree longitude
+        # Think this is done if topo.extend=True
+        # lons = np.hstack([lons, np.array([360.0])])
+        # v = data[:, 0]
+        # v = v.reshape((v.shape[0], 1))
+        # data = np.hstack([data, v])
+
         fig, ax = plt.subplots(1, 1)
         mappable = ax.imshow(data, extent=(0, 360, -90, 90), cmap=cmap)
         ax.set(yticks=np.arange(-90, 120, 30), xticks=np.arange(0, 390, 30))
@@ -695,7 +748,7 @@ def coeffs_to_grid(clm, R=2, lmax_plot=120, scale_to_1D=True, plot_grid=True, pl
         if save:
             plt.savefig(fig_path + 'topo_grid.png', bbox_inches='tight')
 
-    return data
+    return topo
 
 
 def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):

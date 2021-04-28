@@ -61,11 +61,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
 
     l = np.arange(len(phi0))
     k = sh.l_to_k(l, R=2)  # original model spectrum uses R = 2d = 2
-    # phi0_dim = phi0 * pl.d_m[-1] ** 3 * pl.dT_m[-1] ** 2 * pl.alpha_m ** 2  # dimensionalise power of model spec
-    # k_dim = k * pl.d_m[-1] ** -1  # dimensionalise wavenumber of model spec
     h_rms0 = sh.parseval_rms(phi0, k)
-    # h_rms0_dim = sh.parseval_rms(phi0_dim, k_dim)
-    # print('mass', pl.M_p/parameters.M_E, 'M_E, dimensional rms of phi0', h_rms0_dim)
 
     # get time index nearest to desired snap given in Gyr
     if at_age is not None:
@@ -79,18 +75,24 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         h_ratio = h_rms / h_rms0
         nn = 0
         vols = []
-        # print('forcing h_ratio = 1')
         while nn < n_stats:
             clm = sh.random_harms_from_psd(phi0, l, R=2, h_ratio=h_ratio, plot=plot, verbose=verbose)
-            grid = sh.coeffs_to_grid(clm, R=2, plot_grid=False, plot_spectrum=False, verbose=verbose,
-                                     d=1, alpha_m=1, dT=1, scale_to_1D=False)
-            grid_dim = dimensionalise(grid, pl, i=ii)
-            if verbose:
-                print('RMS of map dimensionalised', np.sqrt(np.mean(grid_dim**2)), 'm')
-
-            vol = sh.integrate_to_peak(grid_dim, R=pl.R_p, fudge_to_rms=pl.dyn_top_rms[ii], verbose=verbose)
+            # shgrid = sh.coeffs_to_grid(clm, R=2, plot_grid=False, plot_spectrum=False, verbose=verbose,)
+            # lmax = shgrid.lmax
+            # data = shgrid.data
+            # lats = shgrid.lats()
+            # lons = shgrid.lons()
+            # vol = sh.integrate_to_peak(grid_dim, lats, lons, R=pl.R_p, lmax=shgrid.lmax, verbose=verbose)
+            data = clm.expand(grid='GLQ', extend=False).to_array()
+            lmax = clm.lmax
+            grid_dim = dimensionalise(data, pl, i=ii)
+            vol = sh.integrate_to_peak_GLQ(grid_dim, R=pl.R_p, lmax=lmax, verbose=verbose)
             vols.append(vol)
             nn = nn + 1
+            if verbose:
+                print('RMS of map dimensionalised', np.sqrt(np.mean(grid_dim**2)), 'm')
+                if nn > 0:
+                    verbose = False  # don't repeat output
         basin_capacity = np.mean(vols)
 
         # phi = sh.scale_spectrum(h_rms=h_rms1[ii], **kwargs)  # old verj
