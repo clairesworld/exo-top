@@ -61,7 +61,7 @@ fig, axes = plat.subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=regime_grid_td,
                                       postprocess_kwargs=postprocess_kwargs)
 
 fig, axes = plat.subplots_evol_at_sol(Ra_ls[4], eta_ls[1], regime_grid=regime_grid_td[1, 4], save=False,
-                                      t1_grid=t1_grid[1, 4], load_grid=True, psuffixes=['_T'], fig_path=fig_path,
+                                      t1_grid=t1_grid[1, 4], load_grid=True, psuffixes=['_T', '_h_all'], fig_path=fig_path,
                                       fname='evol_bi', fig_fmt=fig_fmt, end_grid=end_grid[1, 4], normtime=True,
                                       labelsize=14, xlabel=r'Time',
                                       keys=['T_l', 'delta_rh', 'h_rms'], title='',
@@ -70,7 +70,7 @@ fig, axes = plat.subplots_evol_at_sol(Ra_ls[4], eta_ls[1], regime_grid=regime_gr
                                       postprocess_kwargs=postprocess_kwargs)
 
 fig, axes = plat.subplots_evol_at_sol(Ra_ls[5], eta_ls[3], regime_grid=regime_grid_td[3, 5], save=True,
-                                      t1_grid=t1_grid[3, 5], load_grid=True, psuffixes=['_T'], fig_path=fig_path,
+                                      t1_grid=t1_grid[3, 5], load_grid=True, psuffixes=['_T', '_h_all'], fig_path=fig_path,
                                       fname='evol_bi', fig_fmt=fig_fmt, end_grid=end_grid[3, 5], normtime=True,
                                       labelsize=14, xlabel=r'Time',
                                       keys=['T_l', 'delta_rh', 'h_rms'], title='',
