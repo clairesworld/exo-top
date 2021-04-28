@@ -1390,7 +1390,9 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
                 x_data = df['time']
                 if normtime:
                     # Normalised [0,1]
+                    print('ptp', np.ptp(x_data))
                     x_data = (x_data - np.min(x_data)) / np.ptp(x_data)
+                    print('x_data', x_data)
                 for k, key in enumerate(keys):
                     ax = axes[k]
                     y_data = df[key]
