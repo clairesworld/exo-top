@@ -1360,6 +1360,8 @@ def subplots_evol_at_sol(Ra_ls, eta_ls, regime_grid=None, save=True, t1_grid=Non
             marker_ii = markers[ii]
             if colour_by == 'Ra':
                 c = c_list[ii]
+            elif colour_by is None:
+                c = c_const
 
             if (t1_ii != 1) and (os.path.exists(data_path + 'output-' + case)) and (
                     regime_grid[jj][ii] in include_regimes):
