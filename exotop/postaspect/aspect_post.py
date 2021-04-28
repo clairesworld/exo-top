@@ -998,7 +998,7 @@ def surf_mobility_at_sol(case=None, dat=None, n=None, data_path=data_path_bullar
             if np.isnan(delta_0):
                 print(case, df_sol['delta_0'])
                 delta_0 = np.nanmean(df_sol['delta_0'].to_numpy())
-            if np.isnan(uv_mag_av):
+            if np.isnan(uv_mag_av).any():
                 print(case, df_sol['uv_mag_av'])
                 uv_mag_av = np.nanmean(df_sol['uv_mag_av'].to_numpy())
         else:
