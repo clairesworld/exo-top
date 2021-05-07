@@ -385,7 +385,10 @@ def time_averaged_profile(case, n0, nf, which='temperature', dat=None, data_path
 
 def time_averaged_profile_from_df(df, col):
     nsols = len(df)
-    srs = df[col].to_numpy()
+    try:
+        srs = df[col].to_numpy()
+    except KeyError:
+        print(df.head(5))
     y = df.y.to_numpy()[0]
     profs = np.zeros((nsols, len(srs[0])))
     for ii in range(nsols):
