@@ -18,47 +18,50 @@ labelsize = 28
 legsize = 20
 xlabelpad = 20
 ticksize = 20
+linec = 'xkcd:ocean green'  # 'xkcd:british racing green'  # '#d88868'
 
 # how h varies across key input parameters
-x_vars = [#'t',
-          'M_p', 'H_f', 'CMF']
-units = [#'Gyr',
-         '$M_E$', 'pW kg$^{-1}$', 'CMF']
-log = [#False,
+x_vars = ['t',
+          'M_p', 'CMF', 'H_f']
+units = ['Gyr',
+         '$M_E$', 'CMF', 'pW kg$^{-1}$']
+log = [False,
        True, False, False]
-x_range = [#(2, 4.5),
-           (0.1 * p.M_E, 5 * p.M_E), (2e-12, 10e-12), (0.1, 0.7)]
-xticks = [#[2, 4.5],
-          [0.1, 1, 5], [2, 5, 10], [0.1, 0.3, 0.7]]
-xscales = [#p.sec2Gyr,
-           p.M_E ** -1, 1e12, 1]
-xlabels = [#'Age\n(Gyr)',
-           'Planet mass\n($M_E$)', 'Rad. heating, $t_f$\n(pW kg$^{-1}$)',  'Core mass fraction']
-
+x_range = [(2, 5),
+           (0.1 * p.M_E, 5 * p.M_E),  (0.1, 0.4), (2e-12, 10e-12)]
+xticks = [[2, 3, 4, 5],
+          [0.1, 1, 5], [0.1, 0.2, 0.3, 0.4], [2, 5, 10]]
+xscales = [p.sec2Gyr,
+           p.M_E ** -1, 1, 1e12]
+xlabels = ['Age\n(Gyr)',
+           'Planet mass\n($M_E$)', 'Core mass fraction', 'Present rad. heating\n(pW kg$^{-1}$)']
 
 fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=1000, x_res=7,
                                                            defaults='baseline',
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
-                                                           legend=True, lw=4, ylabel='$\Delta h_{rms}$ (m)',
+                                                           legend=True, lw=4, ylabel='$h_{rms}$ (m)',
                                                            labelpad=20, legendtop=True, tickwidth=2,
                                                            save=False, fname='relative_h_slides', fig_path=fig_path,
                                                            update_kwargs={'visc_type': 'KW'},
                                                            models=['dyn_top_rms'], labels=[''],
                                                            x_vars=x_vars, units=units, log=log, x_range=x_range,
                                                            xscales=xscales, xlabels=xlabels,
-                                                           linec='#d88868', textc='k', #'xkcd:off white',
-                                                           alpha=1, legsize=legsize)
+                                                           linec=linec,
+                                                           textc='k', #'xkcd:off white',
+                                                           alpha=0.3, legsize=legsize)
 
 for i, ax in enumerate(axes):
-    ax.set_xlim([x*xscales[i] for x in x_range[i]])  # mass
+    ax.set_xlim([x*xscales[i] for x in x_range[i]])
     ax.set_xticks(xticks[i])
     ax.set_yscale('log')
-    ax.set_ylim((300, 1100))
+    ax.set_ylim((350, 1100))
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
 axes[0].yaxis.set_minor_formatter(ticker.NullFormatter())
 axes[0].set_yticks([400, 500, 600, 700, 800, 900, 1000])
+
+axes[0].set_xlim(2, 5)  # ensure time axis lims
 
 # VENUS: 850 m
 h_Venus = 865.4906656355711
@@ -77,7 +80,7 @@ ax = axes[0]
 #     ax.scatter(M_Venus, h, marker='^', s=70, alpha=0.5, c='xkcd:orchid', label=r'Huang+ (2013)', zorder=1)
 
 
-handles = [mlines.Line2D([], [], color='#d88868', ls='-',
+handles = [mlines.Line2D([], [], color=linec, ls='-',
                          markersize=0, lw=4, label='$\Delta h^\prime = 0.14$ Ra$_{i, eff}^{-0.18}$'),
            #          mlines.Line2D([], [], color='#749af3', ls='-',
            #                                  markersize=0, lw=4, label='h = f($\delta_{rh}, \Delta T_{rh}$)'),
@@ -87,9 +90,10 @@ handles = [mlines.Line2D([], [], color='#d88868', ls='-',
            #                                  markersize=15, lw=0, label=r'Huang+ (2013) 3D model'),
            ]
 
-legend = axes[0].legend(handles=handles, frameon=False, fontsize=legsize,
-                        borderaxespad=0,
-                        loc='lower left', bbox_to_anchor=(0.0, 1.01), ncol=3, )
+# legend?
+# legend = axes[0].legend(handles=handles, frameon=False, fontsize=legsize,
+#                         borderaxespad=0,
+#                         loc='lower left', bbox_to_anchor=(0.0, 1.01), ncol=3, )
 
 # fig, *axes = dark_background(fig, axes)
 plt.subplots_adjust(wspace=0.2)

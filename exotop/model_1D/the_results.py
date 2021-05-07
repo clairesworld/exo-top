@@ -445,17 +445,17 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
 
 
 def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100, update_kwargs=None, run_kwargs=None,
-                                   yscale=1, age=4.5, x_res=8, minx=None, maxx=None,
+                                   yscale=1, age=4.5, x_res=8, minx=None, maxx=None, verbose=False,
                                    names=None, mini=None, maxi=None, t_eval=None,
                                    n_sigma=1, log=False, **kwargs):
     """generate ensemble of planets depending on x independent variable over some random variations of other
      parameters -- do this for """
     if maxi is None:
-        maxi = [300e3, 2.5e12, 2000, 2500, 300e3]
+        maxi = [300e3, 2.5e12, 2000, 200e3]
     if mini is None:
-        mini = [240e3, 1.5e10, 1000, 2000, 100e3]
+        mini = [240e3, 1.5e10, 1000, 50e3]
     if names is None:
-        names = ['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0']
+        names = ['Ea', 'eta_pre', 'T_m0', 'D_l0']
 
     if default is not None:
         pl_kwargs_base = eval('inputs.' + default + '_in').copy()
@@ -487,6 +487,8 @@ def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100,
         it = age_index(pl_ensemble[0].t, age, age_scale=parameters.sec2Gyr)  # should all be evaluated at same time
         col = np.array([vars(pl)[yvar][it] for pl in pl_ensemble]) * yscale
         grid[ii, :] = col
+        if verbose:
+            print('    generated ensemble for', x)
 
     # mean, std
     y_av = np.mean(grid, axis=1)
@@ -499,9 +501,9 @@ def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100,
 
 def ensemble_time_distribution(yvar, default='baseline',
                                dist_res=100, update_kwargs=None, run_kwargs=None, yscale=1,
-                               names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
-                               mini=[240e3, 1.5e10, 1000, 2000, 100e3],
-                               maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
+                               names=['Ea', 'eta_pre', 'T_m0', 'D_l0'],
+                               mini=[240e3, 1.5e10, 1000, 100e3],
+                               maxi=[300e3, 2.5e12, 2000, 300e3], min_t=0, max_t=4.5,
                                n_sigma=1, log=False, **kwargs):
     # generate ensemble of planets depending on x independent variable over some random variations of other parameters and plot evol
     if default is not None:
@@ -514,6 +516,7 @@ def ensemble_time_distribution(yvar, default='baseline',
         pl_kwargs.update(update_kwargs)
     if run_kwargs is not None:
         model_kwargs.update(run_kwargs)
+    model_kwargs.update({'tf': max_t})
 
     pl_ensemble = evol.bulk_planets_mc(n=dist_res, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
                                        model_kwargs=model_kwargs, **kwargs)
@@ -551,6 +554,8 @@ def plot_distribution(yvars, default='baseline',
         ylabels = [''] * len(yvars)
     if log is None:
         log = [False] * len(yvars)
+    if ylims is None:
+        ylims = [None] * len(yvars)
     if default is not None:
         pl_kwargs = eval('inputs.' + default + '_in')
         model_kwargs = eval('inputs.' + default + '_run')
@@ -610,11 +615,12 @@ def plot_distribution(yvars, default='baseline',
         ax.set_ylabel(ylabels[ii], fontsize=labelsize, labelpad=ylabelpad)
         if log[ii]:
             ax.set_yscale('log')
+            ax.tick_params(axis='both', which='minor', labelsize=0)
         if yticks is not None:
             ax.set_yticks(yticks[ii])
         ax.tick_params(axis='y', labelsize=ticksize, pad=tickpad)
         ax.set_xlim(t[0], t[-1])
-        if ylims is not None:
+        if ylims[ii] is not None:
             ax.set_ylim(ylims[ii])
 
         if legtext is not None and ii == 0:
@@ -1003,10 +1009,10 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
 
 def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1, tickwidth=1, textc='k',
                                            age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ', fig_height=4,
-                                           dist_res=10,
+                                           dist_res=10, ylim=None,
                                            xlabels=None, log=None, x_range=None, xscales=None, units=None, x_res=8,
                                            fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
-                                           yscale=1,
+                                           yscale=1, alpha=0.2,
                                            linec='k', labelsize=16, lw=3, ticksize=12,
                                            update_kwargs={}, initial_kwargs={}, verbose=False, **kwargs):
     if x_vars is None:
@@ -1031,6 +1037,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
     #                                         postprocessors=['topography'], t_eval=None)
 
     for i_ax, x_var in enumerate(x_vars):
+        print('axis', i_ax + 1, '/', len(axes))
         xmin, xmax = x_range[i_ax]
         if x_var == 't':
             # time/age variation - plot single planet evol
@@ -1039,7 +1046,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                                                        update_kwargs=update_kwargs,
                                                                        run_kwargs=initial_kwargs,
                                                                        yscale=yscale,
-                                                                       x_res=x_res, minx=xmin, maxx=xmax,
+                                                                       min_t=xmin, max_t=xmax,
                                                                        **kwargs)
         else:
             if verbose:
@@ -1052,14 +1059,18 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                                                            x_res=x_res, minx=xmin, maxx=xmax,
                                                                            log=log[i_ax],
                                                                            **kwargs)
+
+        print('      range:', y_av[0], '-', y_av[-1], '| % diff:',  abs(y_av[-1] - y_av[0])/y_av[0])
         x_vec = x_vec * xscales[i_ax]
         axes[i_ax].plot(x_vec, y_av, c=linec, lw=lw)
-        print(x_var, ': x', x_vec, 'y', y_av)
-        axes[i_ax].fill_between(x_vec, y_lower, y_upper, color=linec, alpha=0.3)
+        # print(x_var, ': x', x_vec, 'y', y_av)
+        axes[i_ax].fill_between(x_vec, y_lower, y_upper, color=linec, alpha=alpha)
         axes[i_ax].set_xlabel(xlabels[i_ax], fontsize=labelsize)
         axes[i_ax].tick_params(axis='both', labelsize=ticksize)
         if log[i_ax]:
             axes[i_ax].set_xscale('log')
+        if ylim is not None:
+            axes[i_ax].set_ylim(ylim)
         if legend:
             string = ''
             if 't' not in x_vars:
@@ -1239,9 +1250,9 @@ def plot_h_relative_multi(defaults='Earthbaseline', save=False, fname='relative_
 def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwater=None, textc='k', M0=0.815,
                                  titlesize=24, save=False, spectrum_fname='', spectrum_fpath='', c='#81f79f', title='',
                                  ticksize=14, labelsize=16, clabel='Surface water mass fraction', clabelpad=20,
-                                 relative=False, fig=None, axes=None, vol_0=None, simple_scaling=False, c2='g',
-                                 mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10, 10), ytitle=1.1,
-                                 cmap='terrain_r', vmin=None, vmax=None, mass_EO=1.4e21, rho_w=1000,
+                                 relative=True, fig=None, axes=None, vol_0=None, simple_scaling=False, c2='g',
+                                 mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10, 10), ytitle=1.1, x_range=None,
+                                 cmap='terrain_r', vmin=None, vmax=None, mass_EO=1.4e21, rho_w=1000, version=0, alpha_w=0.5,
                                  defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
     # phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
     # h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
@@ -1273,29 +1284,44 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
         model_param = 'max_ocean'
 
     fig, axes = plot_change_with_observeables(defaults=defaults, model_param=model_param, legend=True, pl_baseline=pl0,
-                                              textc=textc, at_age=age,
+                                              textc=textc, at_age=age, x_range=x_range,
                                               label_l=None, c=c, ylabel=ylabel, age=age, legsize=legsize,
                                               postprocessors=['topography', 'ocean_capacity'], phi0=phi0, log=log,
-                                              fig=fig,
+                                              fig=fig, relval=vol_0,
                                               axes=axes, ticksize=ticksize, labelsize=labelsize, relative=relative,
-                                              relval=vol_0, **kwargs)
+                                               **kwargs)
 
 
     if mass_frac_sfcwater is not None:
         # how does actual vol scale assuming constant mass fraction of surface water (bad assumption)?
         ax = axes[mass_iax]
+        masses = np.logspace(np.log10(0.1), np.log10(6), num=60)  # mass in M_E
 
-        masses = np.logspace(np.log10(0.1), np.log10(6))  # mass in M_E
-        colours = colorize([np.log10(m) for m in mass_frac_sfcwater], cmap=cmap)[0]
-
-        for ii, X in enumerate(mass_frac_sfcwater):
-            M_w = masses * parameters.M_E * X  # mass of sfc water in kg
-            vol_w = M_w / rho_w  # corresponding volume
-            if relative:
-                vol_w = vol_w / vol_0
-            # print('relative water budget change', vol_w)
-            ax.plot(masses, vol_w, alpha=0.5, lw=0, zorder=0, c=colours[ii], marker='o', markersize=15,
-                    )
+        if version == 0:
+            f_water = np.logspace(np.log10(mass_frac_sfcwater[0]), np.log10(mass_frac_sfcwater[-1]), num=25)
+            colours = colorize([np.log10(m) for m in f_water], cmap=cmap)[0]
+            for ii, X in enumerate(f_water):
+                M_w = masses * parameters.M_E * X  # mass of sfc water in kg
+                vol_w = M_w / rho_w  # corresponding volume
+                if relative:
+                    vol_w = vol_w / vol_0
+                # print('relative water budget change', vol_w)
+                ax.plot(masses, vol_w, alpha=alpha_w, lw=0, zorder=0, c=colours[ii], marker='o', markersize=15)
+        elif version == 1:
+            # contourfill with some individual lines
+            f_water = np.logspace(np.log10(mass_frac_sfcwater[0]), np.log10(mass_frac_sfcwater[-1]), num=100)
+            vol_ws = np.zeros((len(masses), len(f_water)))
+            colours = colorize([np.log10(m) for m in f_water], cmap=cmap)[0]
+            for ii, X in enumerate(f_water):
+                M_w = masses * parameters.M_E * X  # mass of sfc water in kg
+                vol_w = M_w / rho_w  # corresponding volume
+                if relative:
+                    vol_w = vol_w / vol_0
+                vol_ws[:, ii] = vol_w
+                if np.mod(ii, 14) == 0:
+                    ax.plot(masses, vol_w, alpha=1, lw=0.5, zorder=1, c=colours[ii])
+                ax.plot(masses[::14], vol_w[::14], alpha=alpha_w, lw=0, markersize=10, zorder=0, c=colours[ii])
+            # ax.pcolormesh(masses, vol_ws, vol_ws, alpha=0.2, zorder=0, cmap=cmap)
 
         if vmin is None:
             vmin = np.min(mass_frac_sfcwater)
@@ -1303,7 +1329,8 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
             vmax = np.max(mass_frac_sfcwater)
         colourbar(mappable=None, vector=mass_frac_sfcwater, ax=ax, vmin=vmin,
                   vmax=vmax, label=clabel,
-                  labelsize=labelsize * 0.8, ticksize=ticksize, labelpad=clabelpad, ticks=mass_frac_sfcwater,
+                  labelsize=labelsize * 0.8, ticksize=ticksize, labelpad=clabelpad,
+                  #ticks=mass_frac_sfcwater,
                   cmap=cmap, c=textc, log=True, pad=0.2)
         #
         # # title and legend

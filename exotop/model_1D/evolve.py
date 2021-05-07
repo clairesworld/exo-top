@@ -48,7 +48,8 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, random=False,
     return planets
 
 
-def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model_kwargs={}, t_eval=None, log=False, **kwargs):
+def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model_kwargs={}, t_eval=None, log=False,
+                    T_m0_options=[1273, 1523, 1773, 2023, 2273], **kwargs):
     """varying multiple parameters in 'names' between mini and maxi, use default values otherwise.
     update_kwargs can include any TerrestrialPlanet attribute
     initial_kwargs can include T_m0, T_c0, D_l0, t0, tf. names, mini, and maxi are in order and must have same lenghts"""
@@ -60,7 +61,10 @@ def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model
         new_kwargs_pl = pl_kwargs.copy()
         new_kwargs_model = model_kwargs.copy()
         for iii, name in enumerate(names):
-            if log:
+            if name == 'T_m0':
+                # for initial temps do discrete values after johnny seales
+                val = np.random.choice(T_m0_options, size=1)[0]
+            elif log:
                 val = loguniform.rvs(mini[iii], maxi[iii], size=1)
             else:
                 val = rand.uniform(mini[iii], maxi[iii])
@@ -251,3 +255,42 @@ def recalculate(t, pl, verbose=False, **kwargs):
                          a0=pl.a0, **kwargs)
 
     return pl
+
+
+def steady_state(t, pl, tol=1e-1, T_m0=1700, D_l0=100e3, **kwargs):
+    """ steady state temps for Urey ratio 1 planet """
+    difference = 1
+    q_rad = th.h_rad(t, H_0=pl.H_0, H_f=pl.H_f, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, **kwargs)
+    a0 = q_rad * pl.rho_m  # volumetric heating in W m^-3
+    D_l = D_l0
+    T_m = T_m0
+    while difference > tol:
+        T_c = T_m
+        R_l = pl.R_p - D_l
+        d_m = pl.R_l - pl.R_c
+
+        # heating
+        V_lid = 4 / 3 * np.pi * (pl.R_p ** 3 - pl.R_l ** 3)
+        M_lid = V_lid * pl.rho_m  # not considering density change in lid due to melting/differentiation
+        M_conv = pl.M_m - pl.M_lid  # mass of convecting region
+        H_rad = th.H_rad(q_rad, M_conv)  # mantle rad heating in W (equal to surface flux here)
+        H_rad_lid = th.H_rad(q_rad, M_lid)  # lid radiogenic heating in W
+
+        # temperature update
+        T_l = th.T_lid(T_m=T_m, a_rh=pl.a_rh, Ea=pl.Ea)
+        dT_rh = pl.a_rh * (p.R_b * T_m ** 2 / pl.Ea)
+        dT_m = T_c - T_l
+
+        eta_m = rh.dynamic_viscosity(T=T_m, pl=pl, **kwargs)  # viscosity at interior mantle temperature
+        Ra_i_eff = th.Ra(eta=eta_m, rho=pl.rho_m, g=pl.g_sfc, deltaT=dT_m, l=d_m, kappa=pl.kappa_m,
+                         alpha=pl.alpha_m)
+
+        delta_rh = th.bdy_thickness(d_m=d_m, Ra_crit=pl.Ra_crit_u, beta=1/3, Ra_rh=Ra_i_eff, **kwargs)
+        q_ubl = th.q_bl(deltaT=dT_m, k=pl.k_m, d_bl=delta_rh, beta=1/3, **kwargs)
+        Q_ubl = th.Q_bl(q=q_ubl, R=R_l)
+        q_sfc = th.sph_flux(pl.R_p, a0=pl.a0, T_l=T_l, R_l=R_l, k_m=pl.k_m, T_s=pl.T_s, R_p=pl.R_p, **kwargs)
+
+        Q_sfc = th.Q_bl(q=q_sfc, R=pl.R_p)  # W
+
+    # TODO: sympy?
+

@@ -4,7 +4,6 @@ from useful_and_bespoke import age_index
 import sh_things as sh
 from model_1D.topography import dimensionalise, dyn_topo_peak_prime_aspect
 
-
 # def eval_age(pl, verbose=False, at_age=None, **kwargs):
 #
 #     # get time index nearest to desired snap given in Gyr
@@ -44,8 +43,9 @@ def simple_vol_scaling(pl, verbose=False, at_age=None, it=None, **kwargs):
         if at_age is None:
             pl.simple_ocean[ii] = h_peak * (4 * np.pi * R**2)
         else:
-            print('h peak from scaling', h_peak, 'm')
-            print('h rms', pl.dyn_top_rms[ii], 'm')
+            if verbose:
+                print('h peak from scaling', h_peak, 'm')
+                print('h rms', pl.dyn_top_rms[ii], 'm')
             pl.simple_ocean = h_peak * (4 * np.pi * R**2)
 
     return pl
@@ -75,6 +75,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         h_ratio = h_rms / h_rms0
         nn = 0
         vols = []
+        peaks = []
         while nn < n_stats:
             clm = sh.random_harms_from_psd(phi0, l, R=2, h_ratio=h_ratio, plot=plot, verbose=verbose)
             # shgrid = sh.coeffs_to_grid(clm, R=2, plot_grid=False, plot_spectrum=False, verbose=verbose,)
@@ -88,6 +89,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
             grid_dim = dimensionalise(data, pl, i=ii)
             vol = sh.integrate_to_peak_GLQ(grid_dim, R=pl.R_p, lmax=lmax, verbose=verbose)
             vols.append(vol)
+            peaks.append(np.max(grid_dim))
             nn = nn + 1
             if verbose:
                 print('RMS of map dimensionalised', np.sqrt(np.mean(grid_dim**2)), 'm')
@@ -103,6 +105,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
             pl.max_ocean[ii] = basin_capacity
         else:
             pl.max_ocean = basin_capacity
+            print(pl.M_p/parameters.M_E, 'M_E |', basin_capacity/1.4e18, 'EO | V_shell =', 4/3*np.pi*((pl.R_p + np.mean(peaks))**3 - pl.R_p**3)/1.4e18, 'EO | h_peak =', np.mean(peaks)*1e-3, 'km')
 
         # print('t', ii, 'R_p:', pl.R_p * 1e-3, 'km, h_rms', h_rms1[ii]*1e-3, 'km, h_peak', h_spectrum_max * 1e-3, 'km, ocn vol:', basin_capacity / parameters.TO, 'TO')
     # print('final h_ratio', h_ratio)

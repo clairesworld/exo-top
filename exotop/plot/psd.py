@@ -5,6 +5,10 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
     fig_fmt, regime_grid_td, load_grid, p_Earth, postprocess_kwargs, benchmark_path
 from useful_and_bespoke import dark_background
 
+
+
+
+
 """ set dimensionalisation factors """
 R_p = 6371  # Earth
 # d, dT, alpha = 600, 442, 4e-5 # Lees table 1-2: Ra=1e6
@@ -14,6 +18,25 @@ R_p = 6371  # Earth
 d, dT, alpha = 1, 1, 1
 regimes_use = ['chaotic']
 
+""" manu - all norm spectra with fit and Venus (and Hoggard?) """
+fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
+                                  include_regimes=regimes_use, save=False, show_natscales=False,
+                                  data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
+                                  fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True,
+                                  show_beta_guide=True, test=False,
+                                  labelsize=16, ticksize=12, marker='.', lw=0.5, alpha=0.5, labelpad=16,
+                                  # xlim=(1e-3, 3e-2),
+                                  max_dscale=2, bl_fudge=5,  # c_guide='xkcd:off white',
+                                  xlabel=None, ylabel='Normalised power spectral density',
+                                  x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, eff}$)',
+                                  norm='rms', whole=False, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
+                                 xlim_l=(0.3, 130), x1_name='degrees', show_degrees=False)
+print(np.shape(axs))
+_, _, fig, ax = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
+                                    R_base=2, lmin=1, set_axlabels=False,
+                                    save=False, plot=True, units='m3', scale_to=1.0, alpha=0.9, labelsize=16,
+                                    fig=fig, ax=axs[0])  # axs[0] if no secondary ax; this plots degrees
+fig.savefig(fig_path + 'psd_stacked_manu.png', bbox_inches='tight')
 
 """ plot normalised spectra relative power on single axis - full spectrum norm rms"""
 
@@ -51,18 +74,18 @@ regimes_use = ['chaotic']
 
 """ plot normalised spectra on single axis"""
 
-fig, *ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
-                                  include_regimes=regimes_use, save=True, show_natscales=True,
-                                  data_path=data_path, pend='_sph', fend='.pkl', figname='psd_stacked_sub',
-                                  fig=None, ax=None, figsize=(8, 5), z_name='Ra', cbar=True,
-                                  show_beta_guide=False,
-                                  labelsize=16, ticksize=12, marker='.', lw=0.5, alpha=0.4, labelpad=16,
-                                  # xlim=(1e-3, 3e-2),
-                                  max_dscale=1, bl_fudge=5,  # c_guide='xkcd:off white',
-                                  xlabel=None, ylabel='Normalised power spectral density',
-                                  x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, eff}$)',
-                                  norm='intercept', whole=False, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
-                                  )
+# fig, *ax = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
+#                                   include_regimes=regimes_use, save=True, show_natscales=True,
+#                                   data_path=data_path, pend='_sph', fend='.pkl', figname='psd_stacked_sub',
+#                                   fig=None, ax=None, figsize=(8, 5), z_name='Ra', cbar=True,
+#                                   show_beta_guide=False,
+#                                   labelsize=16, ticksize=12, marker='.', lw=0.5, alpha=0.4, labelpad=16,
+#                                   # xlim=(1e-3, 3e-2),
+#                                   max_dscale=1, bl_fudge=5,  # c_guide='xkcd:off white',
+#                                   xlabel=None, ylabel='Normalised power spectral density',
+#                                   x2label='Spherical harmonic degree', clabel=r'log(Ra$_{i, eff}$)',
+#                                   norm='intercept', whole=False, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
+#                                   )
 
 
 """ plot normalised spectra on single axis - slides, norm intercept """

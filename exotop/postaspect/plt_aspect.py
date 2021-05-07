@@ -54,6 +54,7 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
                 T_av, y = pro.time_averaged_profile_from_df(df, 'T_av')
                 uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
                 dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y,
+                                                 data_path=data_path,
                                                  **postprocess_kwargs, **kwargs)  # actually a dict
                 # really hacky bit
                 for k in ['T_av', 'uv_mag_av', 'y']:
@@ -70,12 +71,12 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
             # use each xy point (y=h) for fitting
             df1 = df
     x = getx_fromdf(Ra, eta, df=df1, case=case, which_x=which_x, averagescheme=averagescheme,
-                    data_path=data_path_bullard,
+                    data_path=data_path,
                     t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
     if return_all:
         x_all = getx_fromdf(Ra, eta, df=df, case=case, which_x=which_x, averagescheme=None,
-                            data_path=data_path_bullard,
+                            data_path=data_path,
                             t1=t1, load=load, postprocess_kwargs=postprocess_kwargs, **kwargs)
         return x, x_all
     else:
@@ -2072,7 +2073,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                       norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True,
                       add_files=None, add_label=None, legsize=12, xlim=None, ylim=None, show_beta_guide=False,
                       max_dscale=2, bl_fudge=1, c_guide='xkcd:slate', labelpad=20, whole=False, show_natscales=False,
-                      relative_power=False, **kwargs):
+                      relative_power=False, test=True, xlim_l=None, x1_name='wavenumber', **kwargs):
     import pickle as pkl
     import sh_things as sh
     global R
@@ -2084,7 +2085,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
     if clabel is None:
         xlabel = z_name
     if xlabel is None:
-        if dim:
+        if x1_name == 'degrees':
+            xlabel = r'Spherical harmonic degree'
+        elif dim:
             xlabel = r'Wavenumber (km$^{-1}$)'
         else:
             xlabel = r'Wavenumber'
@@ -2104,6 +2107,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                     elif z_name == 'eta':
                         z_vec.append(np.log10(float(eta_str)))
                     elif z_name == 'Ra_i_eff':
+                        print('data path', data_path)
                         z_vec.append(np.log10(
                             plot_getx(Ra_ls[ii], eta_str, case=case, which_x='Ra_i_eff', averagescheme='timefirst',
                                       data_path=data_path, load=True, postprocess_kwargs=None, return_all=False, t1=0,
@@ -2125,7 +2129,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
         S, k = pkl.load(open(fname, "rb"))
-        test_rms_ratio(S, k, n_stats=10, R=R_p)
+        if test:
+            test_rms_ratio(S, k, n_stats=10, R=R_p)
         if k[0] == 0:  # only wavenumbers greater than 0
             k = k[1:]
             S = S[1:]
@@ -2163,7 +2168,11 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             ylabel = "Power (% relative to total)"
             print(case, 'max power @', kv[Sv_norm == np.max(Sv_norm)])
 
-        ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
+        if x1_name == 'degrees':
+            lv = sh.k_to_l(kv, R_p)
+            ax.plot(lv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
+        else:
+            ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
         zz = zz + 1
 
     if not relative_power:
@@ -2185,14 +2194,14 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                                 legsize=legsize)
 
     axes = [ax,]
-    if cbar:
-        if cmap is None:
-            print('cbar not implemented without cmap')
-        else:
-            cb = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=clabel, labelsize=labelsize,
-                            ticksize=ticksize, ticks=None, ticklabels=None, labelpad=25,
-                            rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.1, log=False)
-        axes.append(cb.ax)
+
+    if add_files is not None:
+        for ii, f in enumerate(add_files):
+            ax = plot_from_txt(f, ax, label=add_label[ii], header=0,
+                               additional_mod_fn=sh.mod_loaded_spectrum,
+                               plot_kwargs={'c': 'k'}, is_2D=True, is_wl=True, normalise=True, norm=norm)
+        ax.legend(frameon=False, fontsize=legsize)
+
     if show_degrees:
         R = R_p
 
@@ -2202,17 +2211,29 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         def to_wn(l):
             return (l + 0.5) / (2 * np.pi * R)
 
-        secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
+        # secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
+        secax = ax.twiny()
+        if xlim_l is None:
+            xlim_k = ax.get_xlim()
+        else:
+            xlim_k = sh.l_to_k(np.array(xlim_l), R)
+        xlim_l = sh.k_to_l(np.array(xlim_k), R)
+        secax.set_xlim(xlim_l)
         secax.set_xlabel(x2label, fontsize=labelsize, labelpad=labelpad)
         secax.tick_params(axis='both', which='major', labelsize=ticksize)
         axes.append(secax)
 
-    if add_files is not None:
-        for ii, f in enumerate(add_files):
-            ax = plot_from_txt(f, ax, label=add_label[ii], header=0,
-                               additional_mod_fn=sh.mod_loaded_spectrum,
-                               plot_kwargs={'c': 'k'}, is_2D=True, is_wl=True, normalise=True, norm=norm)
-        ax.legend(frameon=False, fontsize=legsize)
+    if cbar:
+        if cmap is None:
+            print('cbar not implemented without cmap')
+        else:
+            cb = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=clabel, labelsize=labelsize,
+                            ticksize=ticksize, ticks=None, ticklabels=None, labelpad=25,
+                            rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.1, log=False)
+        axes.append(cb.ax)
+
+
+
 
     if save:
         plot_save(fig, fname=figname, **kwargs)

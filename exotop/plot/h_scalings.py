@@ -50,17 +50,17 @@ _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, loa
                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
                    regime_grid=regime_grid_td, figsize=figsize, errortype='standard', cbar=False)
 
-_ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
-                   fig_path=fig_path, averagescheme=averagescheme, p_dimensionals=None, which_x=which_x,
-                   beta0=[0.1, -0.15], sigma=1, fiterror=False, legend=True,
-                   include_regimes=include_regimes, save=True, fname='hpeak_Raieff_chaotic_timeavg', labelsize=labelsize,
-                   xlabel=r'Ra$_{i,eff}$', ylabel='peak dynamic topography', legsize=legsize, cleglabels=cleglabels,
-                   title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False, vmin=vmin, vmax=vmax,
-                   cmap=None, c_rms=c_rms,
-                   fit=True, logx=True, logy=True, ms=ms,
-                   show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
-                   regime_grid=regime_grid_td, figsize=figsize, errortype='standard', cbar=False,
-                   which_h='peak')
+# _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
+#                    fig_path=fig_path, averagescheme=averagescheme, p_dimensionals=None, which_x=which_x,
+#                    beta0=[0.1, -0.15], sigma=1, fiterror=False, legend=True,
+#                    include_regimes=include_regimes, save=True, fname='hpeak_Raieff_chaotic_timeavg', labelsize=labelsize,
+#                    xlabel=r'Ra$_{i,eff}$', ylabel='peak dynamic topography', legsize=legsize, cleglabels=cleglabels,
+#                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False, vmin=vmin, vmax=vmax,
+#                    cmap=None, c_rms=c_rms,
+#                    fit=True, logx=True, logy=True, ms=ms,
+#                    show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+#                    regime_grid=regime_grid_td, figsize=figsize, errortype='standard', cbar=False,
+#                    which_h='peak')
 
 # _ = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load, data_path=data_path,
 #                    fig_path=fig_path, averagescheme='timefirst', p_dimensionals=None, which_x='Ra',

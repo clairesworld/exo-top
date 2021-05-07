@@ -23,6 +23,7 @@ def topography(pl, **kwargs):
     pl.dyn_top_KH = dyn_topo_KH(pl)
     pl.dyn_top_rms_isoviscous = dyn_topo_Lees(pl)
     pl.dyn_top_rms = dimensionalise(pl.dyn_top_aspect_prime, pl)
+    pl.h_dim_factor = (pl.T_c - pl.T_s) * pl.alpha_m * (pl.R_p - pl.R_c)
 
     pl.dyn_top_peak_prime = dyn_topo_peak_prime_aspect(pl)
     pl.dyn_top_peak = dimensionalise(pl.dyn_top_peak_prime, pl)

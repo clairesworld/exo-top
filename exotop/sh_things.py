@@ -48,7 +48,7 @@ def load_spectrum_wavenumber(fpath='', fname='', has_header=True, wl=False, two_
     return power, k
 
 
-def norm_spectrum(k, S, norm='min_l', k_min=None, **kwargs):
+def norm_spectrum(k, S, norm='min_l', k_min=None, verbose=False, **kwargs):
     if norm == 'min_l':
         S_norm = S / S[0]  # actually normalise to first point inside k range
         S_norm = S / S[0]
@@ -64,6 +64,9 @@ def norm_spectrum(k, S, norm='min_l', k_min=None, **kwargs):
     else:
         print('no PSD normalisation scheme recognised')
         S_norm = S
+
+    if verbose:
+        print('after norm_spectrum, rms', parseval_rms(S_norm, k))
     return k, S_norm
 
 
@@ -84,7 +87,7 @@ def scale_psd_to_rms(phi0=None, k=None, rms1=1, R=2, **kwargs):
     phi_iso0 = 1 / k * phi0  # Jacobs eqn 5 but pi changed to 1 in numerator says JFR
     l = k_to_l(k, R)
     rms0 = parseval_rms(phi0, k)
-    rms_ratio = rms1/rms0
+    rms_ratio = rms1 / rms0
 
     # use this pseudo-2D psd to find power in m^2
     S0 = np.array(phi_iso0) * (2 * l + 1) / (4 * np.pi * R ** 2)  # factor of 4piR^2 from Lees eq A7
@@ -197,6 +200,7 @@ def total_power_parseval(psd=None, delta_k=None):
 
 def get_dct_test():
     print('generating fake dct data for testing')
+
     def f(x):
         # function used for testing routine
         return np.cos(np.pi * x)
@@ -393,7 +397,7 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
         try:
             wl_min, wl_max = nat_scales(case, ax=None, alpha=alpha, d=d, dim=dim, **kwargs)
         except KeyError:
-            wl_min, wl_max = Ra**(-1/3), 2
+            wl_min, wl_max = Ra ** (-1 / 3), 2
 
     if l_min is not None and l_max is not None:
         k_min = to_wn(l_min)
@@ -585,7 +589,8 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
         ax2 = ax.twiny()
         # ax2.loglog(l_1, Sl_1, 'go', lw=0, ls='--', label='l=1 Fit')
         ax2.loglog(l, Sl, 'b.', lw=0, ls='--', label='l=2 Fit')
-        ax2.loglog(k_to_l(k[1:], R), S[1:], 'b--', lw=3, label='original PSD', alpha=0.2)  # original k includes 0, fucks up l
+        ax2.loglog(k_to_l(k[1:], R), S[1:], 'b--', lw=3, label='original PSD',
+                   alpha=0.2)  # original k includes 0, fucks up l
         # plt.scatter(l_to_k(l, R=R), S, marker='o', c='g', alpha=0.3, label='fit points')
         ax2.set_xlabel("Degree, $l$")
         ax2.legend()
@@ -599,7 +604,8 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
 
     if verbose:
         # print('x1lim, k=', xlim)
-        print('\nRMS of model 1D psd l =', lmin, ':', parseval_rms(Sl, l_to_k(l, R)), 'for k:', np.min(l_to_k(l, R)), np.max(l_to_k(l, R)))
+        print('\nRMS of model 1D psd l =', lmin, ':', parseval_rms(Sl, l_to_k(l, R)), 'for k:', np.min(l_to_k(l, R)),
+              np.max(l_to_k(l, R)))
         # print('\nRMS of model 1D psd l=1', parseval_rms(Sl_1, l_to_k(l_1, R)), 'for k:', np.min(l_to_k(l_1, R)), np.max(l_to_k(l_1, R)))
         print('l = 1 corresponds to k=', l_to_k(1, R))
 
@@ -608,7 +614,6 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
 
 
 def integrate_to_peak(grid, lats, lons, R=2, lmax=120, fudge_to_rms=None, verbose=False, type='GLQ'):
-
     if fudge_to_rms is not None:
         rms_grid = np.sqrt(np.mean(grid ** 2))
         grid = grid * fudge_to_rms / rms_grid
@@ -651,16 +656,15 @@ def integrate_to_peak(grid, lats, lons, R=2, lmax=120, fudge_to_rms=None, verbos
     if verbose:
         vol_EO = 1.4e21 / 1000
         print('h peak from grid', h_peak, 'm')
-        print('spherical annulus vol:', annulus_vol, 'm^3 -->', annulus_vol/vol_EO, 'EO')
-        print('integrated vol:', vol_ocn, 'm^3 -->', vol_ocn/vol_EO, 'EO')
+        print('spherical annulus vol:', annulus_vol, 'm^3 -->', annulus_vol / vol_EO, 'EO')
+        print('integrated vol:', vol_ocn, 'm^3 -->', vol_ocn / vol_EO, 'EO')
         print('mean h', np.mean(grid), 'min h', np.min(grid), 'max h', np.max(grid))
-        print('area/4piR^2', area/(4*np.pi*R**2))
+        print('area/4piR^2', area / (4 * np.pi * R ** 2))
 
     return vol_ocn
 
 
 def integrate_to_peak_GLQ(grid, R=2, lmax=120, verbose=False):
-
     h_peak = np.max(grid)
     h_peak_abs = np.max(abs(grid))
 
@@ -670,19 +674,19 @@ def integrate_to_peak_GLQ(grid, R=2, lmax=120, verbose=False):
     # calculate Gauss-Legendre weights for quadrature rule
     nodes, lat_weights = pyshtools.expand.SHGLQ(lmax)  # gives weights for latitude
     lon_weights = 2.0 * np.pi / (2 * lmax + 1)  # weights for longitude are uniform
-    w = lon_weights * np.tile(lat_weights, (2 * lmax + 1, 1)).T * R**2  # 2d grid of lat-lon weights for quadrature
+    w = lon_weights * np.tile(lat_weights, (2 * lmax + 1, 1)).T * R ** 2  # 2d grid of lat-lon weights for quadrature
     f = (h_peak - grid)  # function to integrate
     # vol_ocn = np.trapz(np.trapz(w*f))  # 2D integral
     area = np.sum(w)  # np.trapz(np.trapz(w))
-    vol_ocn = np.sum(w*f)
+    vol_ocn = np.sum(w * f)
 
     if verbose:
         vol_EO = 1.4e21 / 1000
         print('h peak from grid', h_peak, 'm')
-        print('spherical annulus vol:', annulus_vol, 'm^3 -->', annulus_vol/vol_EO, 'EO')
-        print('integrated vol:', vol_ocn, 'm^3 -->', vol_ocn/vol_EO, 'EO')
+        print('spherical annulus vol:', annulus_vol, 'm^3 -->', annulus_vol / vol_EO, 'EO')
+        print('integrated vol:', vol_ocn, 'm^3 -->', vol_ocn / vol_EO, 'EO')
         print('mean h', np.mean(grid), 'min h', np.min(grid), 'max h', np.max(grid))
-        print('area/4piR^2', area/(4*np.pi*R**2))
+        print('area/4piR^2', area / (4 * np.pi * R ** 2))
 
     return vol_ocn
 
@@ -818,7 +822,8 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
 
 
 def get_psd_Venus(lmax=719, unit='per_lm', to_km=True, to_1D=False, verbose=False, norm='ortho'):
-    hlm = pyshtools.datasets.Venus.VenusTopo719(lmax=lmax)  #  	719 degree and order spherical harmonic model of the shape of the planet Venus (Wieczorek 2015).
+    hlm = pyshtools.datasets.Venus.VenusTopo719(
+        lmax=lmax)  # 719 degree and order spherical harmonic model of the shape of the planet Venus (Wieczorek 2015).
     hlm_norm = hlm.convert(normalization=norm)
     if verbose:
         print(hlm_norm.__dict__)
@@ -834,8 +839,10 @@ def get_psd_Venus(lmax=719, unit='per_lm', to_km=True, to_1D=False, verbose=Fals
         if unit != 'per_lm':
             raise Exception('to get 1D PSD must give unit = per_lm')
         power = k * power  # assume isosymmetric
+        print('rms 1D Venus', parseval_rms(power, k), 'm')
 
     if to_km:
+        print('converting to km')
         if unit == 'per_lm':
             if to_1D:
                 power = power * (1000 ** -3)
@@ -850,3 +857,110 @@ def get_psd_Venus(lmax=719, unit='per_lm', to_km=True, to_1D=False, verbose=Fals
 def get_pysh_constants(body, name):
     # wrapper
     return eval('pyshtools.constants.' + body + '.' + name + '.value')
+
+
+def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, lmin=1, set_axlabels=True,
+                     save=True, plot=True, units='km4', scale_to='Venus', labelsize=16, legsize=12, alpha=0.5,
+                     fig=None, ax=None, **kwargs):
+    R_Venus = get_pysh_constants('Venus', 'r')
+    if 'km' in units:
+        R_Venus = R_Venus * 1e-3  # in km
+        to_km = True
+    else:
+        to_km = False
+    if '4' in units:
+        to_1D = False
+    elif '3' in units:
+        to_1D = True
+    if scale_to != 'Venus':
+        R_Venus = R_base
+
+    # get PSDs - model is 1D
+    l, phi = load_model_spectrum_pkl(fname=baseline_fname, path=fig_path, **kwargs)
+    k = l_to_k(l, R_Venus)
+    phi_iso = 1 / k * phi
+
+    lmax = np.max(l)
+
+    lV, phiV = get_psd_Venus(unit='per_lm', to_1D=False, lmax=lmax, to_km=to_km,
+                             verbose=False)  # power per lm in km^2 km^2, 2D because need to scale S anyways
+    kV = l_to_k(lV, R_Venus)
+
+    # remove 0 degree
+    l, phi_iso, phi, k = l[lmin:], phi_iso[lmin:], phi[lmin:], k[lmin:]
+    lV, phiV, kV = lV[lmin:], phiV[lmin:], kV[lmin:]
+
+    # scale to Venus RMS at power
+    # if to_1D:
+    #     rms_V = parseval_rms(phiV, kV)
+    #     rms_base = parseval_rms(phi_mdl, k)
+    # else:
+    rms_V = parseval_rms_2D(phiV, kV)
+    rms_base = parseval_rms_2D(phi_iso, k)
+    print('rms Venus', rms_V, 'km')
+    print('rms base', rms_base, 'nondim')
+
+    S = np.array(phi_iso) * (2 * l + 1) / (4 * np.pi * R_Venus ** 2)  # factor of 4piR^2 from Lees eq A7
+    SV = np.array(phiV) * (2 * lV + 1) / (4 * np.pi * R_Venus ** 2)
+
+    if scale_to == 'base':
+        rms0 = rms_base
+    elif scale_to == 'Venus':
+        rms0 = rms_V
+    elif isinstance(scale_to, float):
+        # scale_to is float -> desired rms
+        rms0 = scale_to
+
+    S_sc = S * (rms0 / rms_base) ** 2  # scale
+    phi_sc = S_sc / (2 * l + 1)  # conver to per lm
+    SV_sc = SV * (rms0 / rms_V) ** 2  # scale
+    phiV_sc = SV_sc / (2 * lV + 1)  # convert to per lm
+    print('rms base new', parseval_rms_2D(4 * np.pi * R_Venus ** 2 * phi_sc, k))
+    print('rms Venus new', parseval_rms_2D(4 * np.pi * R_Venus ** 2 * phiV_sc, kV))
+
+    if to_1D:
+        # convert back to 1D
+        phiV_sc = phiV_sc * kV
+        phi_sc = phi_sc * k
+        print('rms base new 1D', parseval_rms(4 * np.pi * R_Venus ** 2 * phi_sc, k))
+        print('rms Venus new 1D', parseval_rms(4 * np.pi * R_Venus ** 2 * phiV_sc, kV))
+
+    if plot:
+        if fig is None:
+            fig, ax = plt.subplots()
+        mdl_label = 'Numerical dynamic topography'
+        if scale_to == 'Venus':
+            mdl_label = mdl_label + ' @ Venus RMS'
+        ax.loglog(lV, 4 * np.pi * R_Venus ** 2 * phiV_sc, 'o-', lw=1, alpha=alpha, c='xkcd:slate', label='Venus (Wieczorek 2015)')
+        ax.loglog(l, 4 * np.pi * R_Venus ** 2 * phi_sc, '^-', lw=1, alpha=alpha, c='xkcd:lime green', label=mdl_label)
+        if set_axlabels:
+            ax.set_xlabel(r'Degree', fontsize=labelsize)
+            if units == 'km4':
+                ylabel = r'2D PSD (km$^{2}$ km$^{2}$)'
+            elif units == 'km3':
+                ylabel = r'1D PSD (km$^{2}$ km)'
+            ax.set_ylabel(ylabel, fontsize=labelsize)
+        ax.legend(frameon=False, fontsize=legsize)
+        if save:
+            plot_save(fig, fname='Venus_correction', fig_path=fig_path)
+
+    if lmin > 0:
+        lV = np.arange(0, lmax + 1)
+        phiV_sc = np.insert(np.array(phiV_sc), 0, [0.0] * lmin)  # no power below lmin
+
+    if plot:
+        return lV, phiV_sc, fig, ax
+    return lV, phiV_sc
+
+
+def make_Venus_reference(newfname='Venus_spectrum.pkl', baseline_fname='base_spectrum.pkl', fig_path='',
+                         lmin=1, plot=True):
+    import pickle as pkl
+
+    # want to 'nondimensionalise' observed Venus spectrum by scaling it such that it has same rms as baseline and
+    # corresponds to R=2
+    l, Sl = Venus_correction(baseline_fname=baseline_fname, fig_path=fig_path, R_base=2,
+                             save=False, plot=plot, lmin=lmin, units='km3', scale_to='base')
+
+    pkl.dump((l, Sl), open(fig_path + newfname, "wb"))
+    return l, Sl
