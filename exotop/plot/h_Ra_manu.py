@@ -41,7 +41,7 @@ fig, ax0 = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_gr
                    title='', showpeak=False, vmin=vmin, vmax=vmax,
                    cmap=cmap, c_rms=c_rms,
                    fit=True, logx=True, logy=True, ms=ms,
-                   show_isoviscous=False, ylim=hlim, xlim=(2.5e6, 2e7), postprocess_kwargs=postprocess_kwargs,
+                   show_isoviscous=False, ylim=hlim, xlim=None, postprocess_kwargs=postprocess_kwargs,
                    regime_grid=regime_grid_td, errortype='standard', cbar=False)
 
 """model versus data"""
@@ -61,6 +61,7 @@ fig, ax1 = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid
 for ax in axes:
     ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
     ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
+axes[1].xaxis.set_minor_formatter(ticker.ScalarFormatter())
 
 # show colours outside
 ax1 = colourised_legend(axes[1], clist=c_rms[1:-1], cleglabels=cleglabels[1:-1], lw=0, marker=mark, markersize=ms,

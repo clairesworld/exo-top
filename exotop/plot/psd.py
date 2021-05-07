@@ -21,10 +21,10 @@ regimes_use = ['chaotic']
 """ manu - all norm spectra with fit and Venus (and Hoggard?) """
 fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
                                   include_regimes=regimes_use, save=False, show_natscales=False,
-                                  data_path=data_path, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
+                                  data_path=data_path, pend='_sph', fend='.pkl',
                                   fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True,
                                   show_beta_guide=True, test=False,
-                                  labelsize=16, ticksize=12, marker='.', lw=0.5, alpha=0.5, labelpad=16,
+                                  labelsize=16, ticksize=12, marker=None, lw=0.5, alpha=0.5, labelpad=16,
                                   # xlim=(1e-3, 3e-2),
                                   max_dscale=2, bl_fudge=5,  # c_guide='xkcd:off white',
                                   xlabel=None, ylabel='Normalised power spectral density',
