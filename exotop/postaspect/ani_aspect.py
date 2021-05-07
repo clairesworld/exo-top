@@ -192,7 +192,7 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
 
 def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, legsize=20, dark=False,
                   return_artists=False, c='k', alpha=0.9, save=True, i_n=0, avg=False, fig=None, ax=None, leg=True,
-                  xlabel='', ylabel='', **kwargs):
+                  xlabel='', ylabel='', showminmax=False, **kwargs):
 
     if dark:
         foreground = 'xkcd:off white'
@@ -232,8 +232,9 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
             ax.plot(T_ii, y_ii, c=foreground, lw=0.5, alpha=0.5)
             delta_all.append(np.array(df_n['delta_rh']))
             D_all.append(np.array(df_n['y_L']))
-        ax.plot(T_ii, [np.max(D_all)] * len(T_ii), c='xkcd:tangerine', lw=0.5, alpha=0.5)
-        ax.plot(T_ii, [np.min(np.array(D_all) - np.array(delta_all))] * len(T_ii), c='xkcd:tangerine', lw=0.5, alpha=0.5)
+        if showminmax:
+            ax.plot(T_ii, [np.max(D_all)] * len(T_ii), c='xkcd:tangerine', lw=0.5, alpha=0.5)
+            ax.plot(T_ii, [np.min(np.array(D_all) - np.array(delta_all))] * len(T_ii), c='xkcd:tangerine', lw=0.5, alpha=0.5)
 
     else:
         df_n = df.iloc[i_n]
@@ -405,11 +406,11 @@ def static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
 
 def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
-                 save=True, c='k', **kwargs):
+                 save=True, c='k', wspace=0.1, hspace=0.1, **kwargs):
     # not animated
 
     fig = plt.figure(figsize=(24, 5))
-    gs = fig.add_gridspec(5, 24, wspace=0.1, hspace=0.1)
+    gs = fig.add_gridspec(5, 24, wspace=wspace, hspace=hspace)
 
     ax0 = fig.add_subplot(gs[1, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
