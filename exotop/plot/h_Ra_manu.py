@@ -23,7 +23,7 @@ cleglabels = [r'$\Delta \eta = 10^{5}$', r'$\Delta \eta = 10^{6}$', r'$\Delta \e
 include_regimes = ['chaotic']  # , 'not ready'
 averagescheme = 'timefirst'
 which_x = 'Ra_i_eff'
-hlim = (6e-3, 1.3e-3)
+hlim = (6e-3, 1.3e-2)
 
 fig, axes = plt.subplots(1, 2, figsize=(10, 5))
 
