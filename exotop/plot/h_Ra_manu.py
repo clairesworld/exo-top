@@ -29,7 +29,7 @@ averagescheme = 'timefirst'
 which_x = 'Ra_i_eff'
 hlim = (6e-3, 1.2e-2)
 
-fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+fig, axes = plt.subplots(1, 2, figsize=(11, 5))
 
 """all eta on one axis"""
 
