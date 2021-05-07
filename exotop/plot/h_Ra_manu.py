@@ -5,6 +5,10 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
     c_regimes_td, fig_fmt, regime_grid_td, regime_names_td, load_grid, p_Earth, postprocess_kwargs
 from postaspect import plt_aspect as plat
 from useful_and_bespoke import colourised_legend
+import matplotlib.ticker as ticker
+from matplotlib import rc
+
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
 
 """setup"""
 
@@ -23,9 +27,9 @@ cleglabels = [r'$\Delta \eta = 10^{5}$', r'$\Delta \eta = 10^{6}$', r'$\Delta \e
 include_regimes = ['chaotic']  # , 'not ready'
 averagescheme = 'timefirst'
 which_x = 'Ra_i_eff'
-hlim = (6e-3, 1.3e-2)
+hlim = (6e-3, 1.1e-2)
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 """all eta on one axis"""
 
@@ -33,11 +37,11 @@ fig, ax0 = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_gr
                    fig_path=fig_path, averagescheme=averagescheme, p_dimensionals=None, which_x=which_x,
                    beta0=[0.1, -0.1], sigma=1, fiterror=False, legend=False, fig=fig, ax=axes[0],
                    include_regimes=include_regimes, save=False, labelsize=labelsize,
-                   xlabel=r'Ra$_{i,eff}$', ylabel='RMS dynamic topography', legsize=legsize, cleglabels=cleglabels,
+                   xlabel=r'Ra$_{i,{\rm eff}}$', ylabel='RMS dynamic topography', legsize=legsize, cleglabels=cleglabels,
                    title='', showpeak=False, vmin=vmin, vmax=vmax,
                    cmap=cmap, c_rms=c_rms,
                    fit=True, logx=True, logy=True, ms=ms,
-                   show_isoviscous=False, ylim=hlim, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                   show_isoviscous=False, ylim=hlim, xlim=(2.5e6, 2e7), postprocess_kwargs=postprocess_kwargs,
                    regime_grid=regime_grid_td, errortype='standard', cbar=False)
 
 """model versus data"""
@@ -53,6 +57,10 @@ fig, ax1 = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid
                                          title='',
                                          ylabel=r'Model',
                                          xlabel=r'Data')
+
+for ax in axes:
+    ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
+    ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
 
 # show colours outside
 ax1 = colourised_legend(axes[1], clist=c_rms[1:-1], cleglabels=cleglabels[1:-1], lw=0, marker=mark, markersize=ms,
