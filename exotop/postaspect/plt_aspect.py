@@ -1723,13 +1723,13 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
 
 def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, load_grid=None, end_grid=None,
                               literature_file=None, ms=30, fig=None, ax=None, figsize=(7, 5), xlabelpad=10,
-                              ylabelpad=10, title=None,
+                              ylabelpad=10, title=None, cleglabels=None,
                               legend=True, postprocess_kwargs=None, regime_names=None, which_x='h_components',
                               c_contours='k', fc='w', averagescheme=None, ylim=None, which_h='rms',
                               data_path=data_path_bullard, alpha=1,
                               save=True, fname='model-data', labelsize=16, clist=None, vmin=None, vmax=None,
                               cmap='magma', z_name=None, include_regimes=None, show_cbar=True, clabel=None,
-                              cticklabels=None, errortype='time',
+                              cticklabels=None, errortype='time', legsize=14,
                               ylabel='Model', xlabel='Data', errs=None, elw=1, ecapsize=5, crot=0, discrete=True,
                               errorsize=9, sigma=2, **kwargs):
     print('errortype = standard to use errorbars are SE of the mean - TODO check log errorbars')
@@ -1874,6 +1874,17 @@ def plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=None, t1_grid=None, loa
             pass
         else:
             raise e
+
+    # if legend:
+    #     # show colours outside
+    #     c_rms = []
+    #     clabels = []
+    #     for zz, colour in enumerate(clist):  # only used z vec
+    #         if zz in np.unique(zz_all):
+    #             clist.append(colour)
+    #             clabels.append(cleglabels[zz])
+    #     ax = colourised_legend(ax, clist=clist, cleglabels=clabels, lw=0, ls='--', marker=mark, markersize=ms,
+    #                            legsize=legsize, ncol=1)
 
     ax.set_xscale('log')
     ax.set_yscale('log')
