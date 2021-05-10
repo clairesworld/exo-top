@@ -271,7 +271,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
                    legsize=12, legtext='',
                    shading='nearest', return_artists=False, save=True, i_n=0, avg=False, c='k', cbar=True, dark=False,
                    title='Nondimensional temperature', fig=None, ax=None, col_vis=20, ticklabels=True, ylabelpad=20):
-    from useful_and_bespoke import cornertext
+
     if dark:
         foreground = 'xkcd:off white'
     else:
@@ -316,9 +316,6 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         fig, ax = plt.subplots(figsize=(20, 10))
 
     im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
-
-    # e.g. case label
-    ax = cornertext(ax, legtext, pos='bottom left', size=legsize, x=0.14, ha='right')
 
     if cbar:
         divider = make_axes_locatable(ax)
@@ -418,7 +415,8 @@ def static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
 
 def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
-                 save=True, c='k', wspace=0.1, hspace=0.1, c_h='k', **kwargs):
+                 save=True, c='k', wspace=0.1, hspace=0.1, c_h='k', legtext='', legsize=12, **kwargs):
+    from useful_and_bespoke import cornertext
     # not animated
 
     fig = plt.figure(figsize=(24, 5))
@@ -432,6 +430,8 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
     fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
                               title='', labelsize=labelsize, ticksize=ticksize, i_n=-1, cbar=False, ticklabels=False,
                               ylabelpad=25, **kwargs)
+    # e.g. case label
+    ax1 = cornertext(ax1, legtext, pos='bottom left', size=legsize, x=0.1, ha='right')
 
     ax2 = fig.add_subplot(gs[2:,-1])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
