@@ -313,7 +313,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         fig, ax = plt.subplots(figsize=(20, 10))
 
     ax.set_title(title, fontsize=labelsize, pad=90, color=foreground)
-    if not ticklabels:
+    if ticklabels:
         ax.set_xlabel('x', fontsize=labelsize, labelpad=20)
         ax.set_ylabel('y', fontsize=labelsize, labelpad=ylabelpad)
         ax.set_xticks([])
