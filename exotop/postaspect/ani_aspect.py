@@ -318,7 +318,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
 
     # e.g. case label
-    ax = cornertext(ax, legtext, pos='bottom left', size=legsize, x=0.12, ha='right')
+    ax = cornertext(ax, legtext, pos='bottom left', size=legsize, x=0.14, ha='right')
 
     if cbar:
         divider = make_axes_locatable(ax)
@@ -435,7 +435,7 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
 
     ax2 = fig.add_subplot(gs[2:,-1])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
-                             ticksize=ticksize, leg=False, xlabel='$T^\prime$', xlabelpad=10, **kwargs)
+                             ticksize=ticksize, leg=False, xlabel='$T^\prime$', xlabelpad=7, **kwargs)
     ax2.set_xticks([0, 1])
 
     if save:
