@@ -150,9 +150,9 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
     ax.set_xticks([])
-    ax.set_yticks([ylim[0], 0, ylim[1]])
     ax.set_xlim((0, 8))
-    ax.set_ylim((ylim))
+    ax.set_ylim(ylim)
+    ax.set_yticks([ylim[0], 0, ylim[1]])
 
     # preload data
     df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
