@@ -23,7 +23,7 @@ legsize = 20
 wspace = 0.3
 hspace = 0.3
 c_h = 'xkcd:dark pastel green'  # 'xkcd:tealish green'
-hlim = (-4e-2, 4e-2)
+hlim = (-3e-2, 3e-2)
 
 # fig, axes = anims.T_h_gridspec(case='Lees-Ra1e6-2D', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
 #                                cmap='gist_heat', save=True, c='k')
