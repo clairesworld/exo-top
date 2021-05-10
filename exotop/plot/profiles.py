@@ -22,7 +22,7 @@ ticksize = 20
 legsize = 25
 wspace = 0.3
 hspace = 0.3
-c_h = 'xkcd:dark hot pink'
+c_h = 'xkcd:green again'
 
 # fig, axes = anims.T_h_gridspec(case='Lees-Ra1e6-2D', data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=20,
 #                                cmap='gist_heat', save=True, c='k')
