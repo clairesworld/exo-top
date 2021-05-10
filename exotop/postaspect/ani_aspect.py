@@ -312,10 +312,10 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     if ax is None and fig is None:
         fig, ax = plt.subplots(figsize=(20, 10))
 
-    ax.set_xlabel('x', fontsize=labelsize, labelpad=20)
-    ax.set_ylabel('y', fontsize=labelsize, labelpad=ylabelpad)
     ax.set_title(title, fontsize=labelsize, pad=90, color=foreground)
     if not ticklabels:
+        ax.set_xlabel('x', fontsize=labelsize, labelpad=20)
+        ax.set_ylabel('y', fontsize=labelsize, labelpad=ylabelpad)
         ax.set_xticks([])
         ax.set_yticks([])
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
@@ -419,7 +419,7 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
 
     ax0 = fig.add_subplot(gs[1, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
-                        ticksize=ticksize, i_ts=-1, ylabel='$h^\prime$', ylabelpad=15, **kwargs)
+                        ticksize=ticksize, i_ts=-1, ylabel='$h^\prime$', ylabelpad=7, **kwargs)
 
     ax1 = fig.add_subplot(gs[2:,:-1])
     fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
@@ -428,7 +428,7 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
 
     ax2 = fig.add_subplot(gs[2:,-1])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
-                             ticksize=ticksize, leg=False, xlabel='$T^\prime$', xlabelpad=15, **kwargs)
+                             ticksize=ticksize, leg=False, xlabel='$T^\prime$', xlabelpad=10, **kwargs)
     ax2.set_xticks([0, 1])
 
     if save:
