@@ -325,7 +325,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
     im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
 
-    ax = cornertext(ax, legtext, pos='bottom left', size=legsize)
+    ax = cornertext(ax, legtext, pos='bottom left', size=legsize, x=0.15, ha='right')
 
     if cbar:
         divider = make_axes_locatable(ax)

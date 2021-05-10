@@ -314,7 +314,7 @@ def dark_background(fig, ax, fgc='xkcd:off white', bgc='xkcd:black'):
     return (fig, *ax)
 
 
-def cornertext(ax, text, pos='top right', size=12):
+def cornertext(ax, text, pos='top right', size=12, **kwargs):
     if 'top' in pos:
         y = 0.95
         va = 'top'
@@ -328,5 +328,11 @@ def cornertext(ax, text, pos='top right', size=12):
         x = 0.95
         ha = 'right'
 
-    ax.text(x, y, text, ha=ha, va=va, transform=ax.transAxes, fontsize=size)
+    # update?
+    pass_args = {'x':x, 'y':y, 'va':va, 'ha':ha}
+    pass_args.update(kwargs)
+    x = pass_args['x']
+    y = pass_args['y']
+
+    ax.text(x, y, text, transform=ax.transAxes, fontsize=size, **pass_args)
     return ax
