@@ -5,7 +5,7 @@ from matplotlib import use as matplotlibuse
 from matplotlib import rc
 
 matplotlibuse('Agg')  # turn on for running over ssh
-# rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
 # rc('text', usetex=True)
 
 default_load_value = True

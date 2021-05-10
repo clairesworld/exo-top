@@ -136,7 +136,8 @@ def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
 
 
 def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, dark=False, ylim=(-5e-2, 5e-2),
-             xlabel='', ylabel='', return_artists=False, c='k', save=True, i_ts=0, avg=False, fig=None, ax=None, **kwargs):
+             xlabel='', ylabel='', return_artists=False, c='k', save=True, i_ts=0, avg=False, fig=None, ax=None,
+             ylabelpad=20, **kwargs):
     if dark:
         foreground = 'xkcd:off white'
     else:
@@ -145,7 +146,7 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
     if fig is None and ax is None:
         fig, ax = plt.subplots(figsize=(20, 1))
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=20)
-    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=20)
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
     ax.set_xticks([])
     # ax.set_yticks([])
@@ -265,7 +266,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
 
 def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
                    shading='nearest', return_artists=False, save=True, i_n=0, avg=False, c='k', cbar=True, dark=False,
-                   title='Nondimensional temperature', fig=None, ax=None, col_vis=20):
+                   title='Nondimensional temperature', fig=None, ax=None, col_vis=20, ylabelpad=20):
     if dark:
         foreground = 'xkcd:off white'
     else:
@@ -309,7 +310,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         fig, ax = plt.subplots(figsize=(20, 10))
 
     ax.set_xlabel('x', fontsize=labelsize, labelpad=20)
-    ax.set_ylabel('y', fontsize=labelsize, labelpad=20)
+    ax.set_ylabel('y', fontsize=labelsize, labelpad=ylabelpad)
     ax.set_title(title, fontsize=labelsize, pad=90, color=foreground)
     # ax.set_xticks([])
     # ax.set_yticks([])
@@ -414,15 +415,18 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
 
     ax0 = fig.add_subplot(gs[1, :-1])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
-                        ticksize=ticksize, i_ts=-1, ylabel='$h^\prime$', **kwargs)
+                        ticksize=ticksize, i_ts=-1, ylabel='$h^\prime$', ylabelpad=15, **kwargs)
 
     ax1 = fig.add_subplot(gs[2:,:-1])
     fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
-                              title='', labelsize=labelsize, ticksize=ticksize, i_n=-1, cbar=False, **kwargs)
+                              title='', labelsize=labelsize, ticksize=ticksize, i_n=-1, cbar=False,
+                              ylabelpad=25, **kwargs)
+    ax1.
 
     ax2 = fig.add_subplot(gs[2:,-1])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
                              ticksize=ticksize, leg=False, xlabel='$T^\prime$', **kwargs)
+    ax2.set_xticks([0, 1])
 
     if save:
         sc.plot_save(fig, case + '_T_h_gridspec', fig_path=fig_path)

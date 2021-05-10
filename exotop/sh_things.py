@@ -861,7 +861,7 @@ def get_pysh_constants(body, name):
 
 def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, lmin=1, set_axlabels=True,
                      save=True, plot=True, units='km4', scale_to='Venus', labelsize=16, legsize=12, alpha=0.5,
-                     fig=None, ax=None, c_Ve='xkcd:sea', c_fit='xkcd:slate',  **kwargs):
+                     fig=None, ax=None, c_Ve='xkcd:sea', c_fit='xkcd:slate', x_name='degrees', **kwargs):
     R_Venus = get_pysh_constants('Venus', 'r')
     if 'km' in units:
         R_Venus = R_Venus * 1e-3  # in km
@@ -931,8 +931,14 @@ def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, 
         mdl_label = 'Numerical dynamic topography'
         if scale_to == 'Venus':
             mdl_label = mdl_label + ' @ Venus RMS'
-        ax.loglog(lV, 4 * np.pi * R_Venus ** 2 * phiV_sc, 'o-', lw=1, alpha=alpha, c=c_Ve, label='Venus (Wieczorek 2015)')
-        ax.loglog(l, 4 * np.pi * R_Venus ** 2 * phi_sc, '^-', lw=1, alpha=alpha, c=c_fit, label=mdl_label)
+        if x_name == 'degrees':
+            ax.loglog(lV, 4 * np.pi * R_Venus ** 2 * phiV_sc, 'o-', lw=1, alpha=alpha, c=c_Ve, label='Venus (Wieczorek 2015)')
+            ax.loglog(l, 4 * np.pi * R_Venus ** 2 * phi_sc, '^-', lw=1, alpha=alpha, c=c_fit, label=mdl_label)
+        elif x_name == 'wavenumber':
+            kV = l_to_k(lV, R_Venus)
+            k = l_to_k(l, R_Venus)
+            ax.loglog(kV, 4 * np.pi * R_Venus ** 2 * phiV_sc, 'o-', lw=1, alpha=alpha, c=c_Ve, label='Venus (Wieczorek 2015)')
+            ax.loglog(k, 4 * np.pi * R_Venus ** 2 * phi_sc, '^-', lw=1, alpha=alpha, c=c_fit, label=mdl_label)
         if set_axlabels:
             ax.set_xlabel(r'Degree', fontsize=labelsize)
             if units == 'km4':
