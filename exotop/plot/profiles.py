@@ -19,7 +19,7 @@ import os
 """ manuscript gridspec """
 labelsize = 25
 ticksize = 20
-legsize = 25
+legsize = 20
 wspace = 0.3
 hspace = 0.3
 c_h = 'xkcd:green again'
