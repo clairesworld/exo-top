@@ -317,7 +317,8 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
     im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
 
-    ax = cornertext(ax, legtext, pos='bottom left', size=legsize, x=0.15, ha='right')
+    # e.g. case label
+    ax = cornertext(ax, legtext, pos='bottom left', size=legsize, x=0.12, ha='right')
 
     if cbar:
         divider = make_axes_locatable(ax)
@@ -334,6 +335,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     if ticklabels:
         ax.set_xlabel('x', fontsize=labelsize, labelpad=20)
         ax.set_ylabel('y', fontsize=labelsize, labelpad=ylabelpad)
+    else:
         ax.set_xticks([])
         ax.set_yticks([])
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
