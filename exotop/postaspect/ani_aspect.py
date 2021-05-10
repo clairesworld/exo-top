@@ -136,10 +136,11 @@ def animate_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksi
 
 
 def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, dark=False, ylim=(-5e-2, 5e-2),
-             xlabel='', ylabel='', return_artists=False, c='k', save=True, i_ts=0, avg=False, fig=None, ax=None,
+             xlabel='', ylabel='', return_artists=False, c='k', c_line='k', save=True, i_ts=0, avg=False, fig=None, ax=None,
              ylabelpad=20, **kwargs):
     if dark:
         foreground = 'xkcd:off white'
+        c_line = foreground
     else:
         foreground = c
 
@@ -179,7 +180,7 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
         h_plot = h
         rms_plot = [rms] * len(x)
 
-    hprof, = ax.plot(x, h_plot, c=foreground, lw=3)
+    hprof, = ax.plot(x, h_plot, c=c_line, lw=3)
     hmean, = ax.plot(x, rms_plot, c=foreground, lw=2, ls='--')
 
     if dark:
@@ -314,15 +315,6 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     if ax is None and fig is None:
         fig, ax = plt.subplots(figsize=(20, 10))
 
-    ax.set_title(title, fontsize=labelsize, pad=90, color=foreground)
-    if ticklabels:
-        ax.set_xlabel('x', fontsize=labelsize, labelpad=20)
-        ax.set_ylabel('y', fontsize=labelsize, labelpad=ylabelpad)
-        ax.set_xticks([])
-        ax.set_yticks([])
-    ax.tick_params(axis='both', which='major', labelsize=ticksize)
-    ax.axis('equal')
-
     im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
 
     ax = cornertext(ax, legtext, pos='bottom left', size=legsize, x=0.15, ha='right')
@@ -337,6 +329,15 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         cax.xaxis.tick_top()
         cax.xaxis.set_label_position('top')
         cax.xaxis.set_ticks_position('top')
+
+    ax.set_title(title, fontsize=labelsize, pad=90, color=foreground)
+    if ticklabels:
+        ax.set_xlabel('x', fontsize=labelsize, labelpad=20)
+        ax.set_ylabel('y', fontsize=labelsize, labelpad=ylabelpad)
+        ax.set_xticks([])
+        ax.set_yticks([])
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
+    ax.axis('equal')
 
     if dark:
         fig, ax, cax = dark_background(fig, [ax, cax])
@@ -415,14 +416,14 @@ def static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
 
 def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
-                 save=True, c='k', wspace=0.1, hspace=0.1, **kwargs):
+                 save=True, c='k', wspace=0.1, hspace=0.1, c_h='k', **kwargs):
     # not animated
 
     fig = plt.figure(figsize=(24, 5))
     gs = fig.add_gridspec(5, 24, wspace=wspace, hspace=hspace)
 
     ax0 = fig.add_subplot(gs[1, :-1])
-    fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c=c, labelsize=labelsize,
+    fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c_line=c_h, labelsize=labelsize,
                         ticksize=ticksize, i_ts=-1, ylabel='$h^\prime$', ylabelpad=7, **kwargs)
 
     ax1 = fig.add_subplot(gs[2:,:-1])
