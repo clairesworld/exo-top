@@ -170,8 +170,10 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
         print('loaded', len(n), 'h profiles')
         h_plot = h_n[i_ts]
         rms_plot = [h_rms[i_ts]] * len(x)
+
     else:
-        x, h = pro.read_topo_stats(case, i_ts, data_path=data_path)
+        ts = df.index.to_numpy()[i_ts]
+        x, h = pro.read_topo_stats(case, ts, data_path=data_path)
         h_norm = pro.trapznorm(h)  # normalize to 0 mean
         peak, rms = pro.peak_and_rms(h_norm)
         h_plot = h
@@ -289,6 +291,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         iter = n
     else:
         iter = [i_n]
+        print('reading sol n =', i_n)
 
     for nn in iter:
         x, y, _, T = dat.read_temperature(nn, verbose=False)
