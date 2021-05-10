@@ -421,7 +421,6 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
     fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
                               title='', labelsize=labelsize, ticksize=ticksize, i_n=-1, cbar=False,
                               ylabelpad=25, **kwargs)
-    ax1.
 
     ax2 = fig.add_subplot(gs[2:,-1])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
