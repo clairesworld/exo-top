@@ -17,7 +17,7 @@ import os
 #  )
 
 """ manuscript gridspec """
-labelsize = 30
+labelsize = 25
 ticksize = 20
 wspace = 0.2
 hspace = 0.2
