@@ -29,11 +29,11 @@ c_h = 'xkcd:dark hot pink'
 fig, axes = anims.T_h_gridspec(case='Ra1e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path,
                                labelsize=labelsize, ticksize=ticksize, legsize=legsize, wspace=wspace, hspace=hspace,
                                legtext=r'Ra = $1 \times 10^8$' + '\n' + r'$\Delta \eta = 1 \times 10^8$',
-                               cmap='gist_heat', save=True, c='k')
+                               cmap='gist_heat', save=True, c='k', c_h=c_h)
 fig, axes = anims.T_h_gridspec(case='Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path,
                                labelsize=labelsize, ticksize=ticksize, legsize=legsize, wspace=wspace, hspace=hspace,
                                legtext=r'Ra = $1 \times 10^8$' + '\n' + r'$\Delta \eta = 1 \times 10^8$',
-                               cmap='gist_heat', save=True, c='k')
+                               cmap='gist_heat', save=True, c='k', c_h=c_h)
 
 # cases = ['Ra1e7-eta1e5-wide', 'Ra3e7-eta1e5-wide', 'Ra1e8-eta1e5-wide', 'Ra3e8-eta1e5-wide', 'Ra3e8-eta1e6-wide']
 # for case in cases:
