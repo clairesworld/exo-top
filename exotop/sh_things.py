@@ -523,7 +523,7 @@ def l_to_k(l, R):
     return (l + 0.5) / R
 
 
-def interpolate_degrees(phi, kv, R, lmin=2, kmin_fit=None, kmax_fit=None, kmax_interp=None):
+def interpolate_degrees(phi, kv, R, lmin=1, kmin_fit=None, kmax_fit=None, kmax_interp=None):
     beta, intercept = fit_slope(phi, kv, k_min=kmin_fit, k_max=kmax_fit, plot=False)
 
     if kmax_interp is None:
@@ -970,3 +970,41 @@ def make_Venus_reference(newfname='Venus_spectrum.pkl', baseline_fname='base_spe
 
     pkl.dump((l, Sl), open(fig_path + newfname, "wb"))
     return l, Sl
+
+
+def make_any_reference(slope=-2, l_rolloff=None, newfname='spectrum', fig_path='', lmin=1, lmax=100,
+                       plot=False, R=2, S0=1, max_dscale=2, d=1):
+    import pickle as pkl
+    # make a new spectrum with given slope, rms doesn't matter here
+
+    l = np.arange(0, lmax+1)
+    Sl = np.ones_like(l, dtype=np.float64)
+    if l_rolloff is None:
+        # use same as ASPECT
+        wl_min = d*max_dscale
+        k_min = 2*np.pi/wl_min
+        l_rolloff = int(np.floor(k_to_l(k_min, R)))
+
+    print('l rolloff', l_rolloff)
+
+    logl = np.log10(l)
+    logl_rolloff = np.log10(l_rolloff)
+    logS0 = np.log10(S0)
+
+    b = logS0 - slope * logl_rolloff  # intercept of line based lin (x,y) = (l_rolloff, S0)
+    logSl = slope * np.array(logl) + b
+    Sl = 10**logSl
+    Sl[:lmin] = [0]*lmin  # e.g. 0 power at l=0
+    Sl[1:l_rolloff] = [S0]*(l_rolloff - lmin)  # flat slope from lmin to rolloff
+
+    if plot:
+        print('l', l)
+        print('S', Sl)
+        plt.plot(l, Sl, 'kx-')
+        plt.loglog()
+        plt.show()
+
+    fname = newfname + '_' + str(slope) + '.pkl'
+    pkl.dump((l, Sl), open(fig_path + fname, "wb"))
+    return l, Sl
+

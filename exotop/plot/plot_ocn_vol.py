@@ -11,7 +11,7 @@ import numpy as np
 
 cmap_path = '/home/claire/Works/exo-top/exotop/plot/cmaps/'
 cmap_name = 'c3t3'
-cmap = cmap_from_ascii(cmap_name, path=cmap_path, end='.txt', ncol=4).reversed()
+cmap = cmap_from_ascii(cmap_name, path=cmap_path, end='.txt').reversed()
 fig_path = '/home/claire/Works/exo-top/exotop/figs_scratch/'
 data_path = '/home/claire/Works/aspect/runs/model-output/'
 case = 'Ra1e8-eta1e7-wide'
@@ -64,18 +64,20 @@ labelsize = 20
 
 """ money plot """
 slides = False
-nplanets = 20
+nplanets = 7
 n_stats = 1000
 
 if slides:
     textc = 'xkcd:off white'
 else:
     textc = 'k'
-print('first call')
-labelsize = 30
-legsize = 20
-ticksize = 20
+
+xlabel = 'Planet mass ' + r'($M_{\oplus}$)'
+labelsize = 33.5  # 30
+legsize = 24  # 20
+ticksize = 22  # 20
 clabelpad = 35
+print('first call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets, version=0,
                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False, log=True, alpha_w=0.3,
@@ -90,10 +92,11 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
                                                  x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
-                                                 xlabels=['Planet mass\n($M_E$)'],
+                                                 xlabels=[xlabel],
                                                  leg_bbox=(0, 1.01), clabelpad=clabelpad,
-                                                 fname='ocean-vol', ytitle=1.05, #vmax=3e-3,
-                                                 mass_frac_sfcwater=np.logspace(-5, -3.4, num=30), # [1e-5, 3e-5, 1e-4, 3e-4, 1e-3]
+                                                 fname='ocean-vol', ytitle=1.05,  # vmax=3e-3,
+                                                 mass_frac_sfcwater=np.logspace(-5, -3.4, num=30),
+                                                 # [1e-5, 3e-5, 1e-4, 3e-4, 1e-3]
                                                  )
 print('second call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
@@ -110,7 +113,24 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
                                                  x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
-                                                 xlabels=['Planet mass\n($M_E$)'],
+                                                 xlabels=[xlabel],
+                                                 leg_bbox=(0, 1.01), clabelpad=clabelpad, ytitle=1.05, vmax=3e-3,
+                                                 mass_frac_sfcwater=None)
+
+print('third call')
+fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
+                                                 fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
+                                                 legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
+                                                 titlesize=32, fig_path=fig_path, save=False,
+                                                 simple_scaling=False, log=True,
+                                                 defaults='Venusbaseline',
+                                                 spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
+                                                 spectrum_fname='spectrum_-2.pkl',
+                                                 c='xkcd:squash', ls='-.',
+                                                 alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
+                                                 set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
+                                                 x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
+                                                 xlabels=[xlabel],
                                                  leg_bbox=(0, 1.01), clabelpad=clabelpad, ytitle=1.05, vmax=3e-3,
                                                  mass_frac_sfcwater=None)
 
@@ -119,16 +139,16 @@ ax.axhline(y=1, c='xkcd:off white', alpha=0.5, zorder=0)
 # for ax in axes:
 #     ax.set_xscale('log')
 #     ax.set_yscale('log')
-ax.set_ylabel('Basin capacity (Earth oceans)', fontsize=labelsize,  c=textc,
+ax.set_ylabel('Basin capacity (Earth oceans)', fontsize=labelsize, c=textc,
               labelpad=20)
-ax.set_xlabel('Planet mass ($M_E$)', fontsize=labelsize,  c=textc,
+ax.set_xlabel(xlabel, fontsize=labelsize, c=textc,
               labelpad=20)
 
 ax.set_xlim((0.1, 5))
 ax.set_ylim((1e-1, 1e0))
 # ax.set_ylim((1e-2, 4e0))
 
-ax.text(0.03, 0.97, '4.5 Ga\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize-2,
+ax.text(0.03, 0.97, '4.5 Ga\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
         horizontalalignment='left', c=textc,
         verticalalignment='top',
         transform=ax.transAxes)
@@ -145,6 +165,8 @@ handles = [mlines.Line2D([], [], color='xkcd:reddish orange', ls='-', lw=3,
                          label='Pure dynamic topography'),
            mlines.Line2D([], [], color='xkcd:bordeaux', ls='--', lw=3,
                          label='Venus-like topography'),
+           mlines.Line2D([], [], color='xkcd:squash', ls='-.', lw=3,
+                         label='Red noise topography'),
            # mlines.Line2D([], [], color='g', ls='--', lw=3,
            #               label='Simple scaling')
            ]
@@ -152,4 +174,5 @@ ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", f
 
 if slides:
     fig, *axes = dark_background(fig, axes)
-fig.savefig(fig_path + 'ocn_vol_test.png', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_test_v3.png', bbox_inches='tight')
+plt.show()

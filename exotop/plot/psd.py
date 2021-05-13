@@ -34,7 +34,8 @@ print(np.shape(axs))
 _, _, fig, ax = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
                                     R_base=2, lmin=1, set_axlabels=False, c_fit='xkcd:dark', x_name='wavenumber',
                                     save=False, plot=True, units='m3', scale_to=1.0, alpha=0.9, labelsize=16,
-                                    fig=fig, ax=axs[0])  # axs[0] if no secondary ax; this plots degrees
+                                    fig=fig, ax=axs[0])  # axs[0] if no secondary ax; this plots degrees 
+
 fig.savefig(fig_path + 'psd_stacked_k.png', bbox_inches='tight')
 
 

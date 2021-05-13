@@ -3,10 +3,12 @@
 import numpy as np
 from matplotlib import use as matplotlibuse
 from matplotlib import rc
+from matplotlib.pyplot import rcParams
 
 matplotlibuse('Agg')  # turn on for running over ssh
-rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
-# rc('text', usetex=True)
+rcParams['font.family'] = 'serif'
+rcParams['font.serif'] = 'CMU Serif'
+rc('text', usetex=True)
 
 default_load_value = True
 check_new = True  # always check for new timesteps with ongoing runs

@@ -62,6 +62,10 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
     l = np.arange(len(phi0))
     k = sh.l_to_k(l, R=2)  # original model spectrum uses R = 2d = 2
     h_rms0 = sh.parseval_rms(phi0, k)
+    if np.isnan(h_rms0):
+        print('phi0', phi0)
+        print('k', k)
+        raise Exception('rms of model spectrum is nan!')
 
     # get time index nearest to desired snap given in Gyr
     if at_age is not None:
@@ -88,6 +92,9 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
             lmax = clm.lmax
             grid_dim = dimensionalise(data, pl, i=ii)
             vol = sh.integrate_to_peak_GLQ(grid_dim, R=pl.R_p, lmax=lmax, verbose=verbose)
+            if np.isnan(vol):
+                print('phi0', phi0, 'h_ratio', h_ratio)
+                raise Exception('ocean vol nan!')
             vols.append(vol)
             peaks.append(np.max(grid_dim))
             nn = nn + 1
