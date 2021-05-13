@@ -44,7 +44,9 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                 df = df_T.mean(axis=0).to_frame().transpose()  # mean of other parameters
                 df.set_index(pd.Series([0]))
                 df.update(df_av)  # update with properly timefirst-averaged temperature params
-                print('df', df.head())
+                df['Ra_i_eff'] = pro.Ra_i_eff(Ra_1=float(Ra), d_eta=float(eta), T_i=df['T_i'].to_numpy(),
+                                 T_l=df['T_l'].to_numpy(), delta_L=df['delta_L'].to_numpy())
+                print('df\n', df.head())
 
                 df_h = pro.pickleio_multi(case, psuffixes=['_h_all'], t1=t1_ii, load=load_ii,
                                         data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
@@ -56,8 +58,9 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                     if row not in ['h_peak', 'h_rms']:
                         row.append(df[col])
                 row.extend([h_rms, h_peak])
-                print('row', row)
+                print('row\n', row)
                 df_print.loc[i] = row
+                i = i + 1
     df_print.to_csv(fig_path + fname)
     print(df_print.head())
     return df_print
