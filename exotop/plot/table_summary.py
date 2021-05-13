@@ -50,14 +50,12 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
 
                 df_h = pro.pickleio_multi(case, psuffixes=['_h_all'], t1=t1_ii, load=load_ii,
                                         data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
-                h_rms = df_h.h_rms.mean()
-                h_peak = df_h.h_peak.mean()
+                df['h_rms'] = df_h.h_rms.mean()
+                df['h_peak'] = df_h.h_peak.mean()
 
                 row = [Ra[ii], etastr]
                 for col in cols[2:]:
-                    if row not in ['h_peak', 'h_rms']:
-                        row.append(df[col])
-                row.extend([h_rms, h_peak])
+                    row.append(df[col])
                 print('row\n', row)
                 df_print.loc[i] = row
                 i = i + 1
