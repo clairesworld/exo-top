@@ -14,7 +14,7 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
     if include_regimes is None:
         include_regimes = regime_names
     if cols is None:
-        cols = ('Ra_1', 'delta_eta', 'Ra_i_eff', 'delta_L', 'delta_rh', 'T_l', 'dT_rh', 'h_rms', 'h_peak')
+        cols = ('Ra_1', 'delta_eta', 'Ra_i_eff', 'delta_L', 'delta_rh', 'T_i', 'T_l', 'dT_rh', 'Nu', 'h_rms', 'h_peak')
 
     Ra, eta, (t1_grid, load_grid, end_grid, regime_grid) = pro.reshape_inputs(Ra, eta,
                                                                               (t1_grid, load_grid, end_grid,
@@ -48,14 +48,16 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                                  T_l=df['T_l'].to_numpy(), delta_L=df['delta_L'].to_numpy())
                 print('df\n', df.head())
 
-                df_h = pro.pickleio_multi(case, psuffixes=['_h_all'], t1=t1_ii, load=load_ii,
+                df_h = pro.pickleio_multi(case, psuffixes=['_h_all', 'Nu'], t1=t1_ii, load=load_ii,
                                         data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
                 df['h_rms'] = df_h.h_rms.mean()
                 df['h_peak'] = df_h.h_peak.mean()
+                df['Nu'] = df_h.Nu.mean()
 
                 row = [Ra[ii], etastr]
                 for col in cols[2:]:
-                    row.append(df[col])
+                    print('df[', col, ']', float(df[col]))
+                    row.append(float(df[col]))
                 print('row\n', row)
                 df_print.loc[i] = row
                 i = i + 1
