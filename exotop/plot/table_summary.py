@@ -48,7 +48,7 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                                  T_l=df['T_l'].to_numpy(), delta_L=df['delta_L'].to_numpy())
                 print('df\n', df.head())
 
-                df_h = pro.pickleio_multi(case, psuffixes=['_h_all', 'Nu'], t1=t1_ii, load=load_ii,
+                df_h = pro.pickleio_multi(case, psuffixes=['_h_all', '_Nu'], t1=t1_ii, load=load_ii,
                                         data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
                 df['h_rms'] = df_h.h_rms.mean()
                 df['h_peak'] = df_h.h_peak.mean()
