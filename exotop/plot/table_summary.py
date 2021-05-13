@@ -44,6 +44,7 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                 df = df_T.mean(axis=0).to_frame().transpose()  # mean of other parameters
                 df.set_index(pd.Series([0]))
                 df.update(df_av)  # update with properly timefirst-averaged temperature params
+                print('df', df.head())
 
                 df_h = pro.pickleio_multi(case, psuffixes=['_h_all'], t1=t1_ii, load=load_ii,
                                         data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
@@ -55,6 +56,7 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                     if row not in ['h_peak', 'h_rms']:
                         row.append(df[col])
                 row.extend([h_rms, h_peak])
+                print('row', row)
                 df_print.loc[i] = row
     df_print.to_csv(fig_path + fname)
     print(df_print.head())
