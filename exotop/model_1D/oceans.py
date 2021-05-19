@@ -80,6 +80,8 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         nn = 0
         vols = []
         peaks = []
+        rms_dims = []
+        rms_nondims = []
         while nn < n_stats:
             clm = sh.random_harms_from_psd(phi0, l, R=2, h_ratio=h_ratio, plot=plot, verbose=verbose)
             # shgrid = sh.coeffs_to_grid(clm, R=2, plot_grid=False, plot_spectrum=False, verbose=verbose,)
@@ -90,16 +92,22 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
             # vol = sh.integrate_to_peak(grid_dim, lats, lons, R=pl.R_p, lmax=shgrid.lmax, verbose=verbose)
             data = clm.expand(grid='GLQ', extend=False).to_array()
             lmax = clm.lmax
+            rms_nondim = np.sqrt(np.mean(data**2))
+            # if verbose:
+            #     print('RMS of map nondimensional', rms_nondim)
             grid_dim = dimensionalise(data, pl, i=ii)
             vol = sh.integrate_to_peak_GLQ(grid_dim, R=pl.R_p, lmax=lmax, verbose=verbose)
             if np.isnan(vol):
                 print('phi0', phi0, 'h_ratio', h_ratio)
                 raise Exception('ocean vol nan!')
+            rms_dim = np.sqrt(np.mean(grid_dim ** 2))
             vols.append(vol)
             peaks.append(np.max(grid_dim))
+            rms_nondims.append(rms_nondim)
+            rms_dims.append(rms_dim)
             nn = nn + 1
             if verbose:
-                print('RMS of map dimensionalised', np.sqrt(np.mean(grid_dim**2)), 'm')
+                # print('RMS of map dimensionalised', rms_dim, 'm')
                 if nn > 0:
                     verbose = False  # don't repeat output
         basin_capacity = np.mean(vols)
@@ -112,7 +120,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
             pl.max_ocean[ii] = basin_capacity
         else:
             pl.max_ocean = basin_capacity
-            print(pl.M_p/parameters.M_E, 'M_E |', basin_capacity/1.4e18, 'EO | V_shell =', 4/3*np.pi*((pl.R_p + np.mean(peaks))**3 - pl.R_p**3)/1.4e18, 'EO | h_peak =', np.mean(peaks)*1e-3, 'km')
+            print(pl.M_p/parameters.M_E, 'M_E |', basin_capacity/1.4e18, 'EO | V_shell =', 4/3*np.pi*((pl.R_p + np.mean(peaks))**3 - pl.R_p**3)/1.4e18, 'EO | h_peak =', np.mean(peaks)*1e-3, 'km | h_rms =', np.mean(rms_dims)*1e-3, 'km =', np.mean(rms_nondims))
 
         # print('t', ii, 'R_p:', pl.R_p * 1e-3, 'km, h_rms', h_rms1[ii]*1e-3, 'km, h_peak', h_spectrum_max * 1e-3, 'km, ocn vol:', basin_capacity / parameters.TO, 'TO')
     # print('final h_ratio', h_ratio)

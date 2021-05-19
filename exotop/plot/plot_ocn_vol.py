@@ -64,7 +64,7 @@ labelsize = 20
 
 """ money plot """
 slides = False
-nplanets = 7
+nplanets = 2
 n_stats = 1000
 
 if slides:
@@ -77,7 +77,7 @@ labelsize = 33.5  # 30
 legsize = 24  # 20
 ticksize = 22  # 20
 clabelpad = 35
-print('first call')
+print('\nfirst call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets, version=0,
                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False, log=True, alpha_w=0.3,
@@ -98,7 +98,7 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  mass_frac_sfcwater=np.logspace(-5, -3.4, num=30),
                                                  # [1e-5, 3e-5, 1e-4, 3e-4, 1e-3]
                                                  )
-print('second call')
+print('\nsecond call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
                                                  fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
@@ -117,7 +117,7 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  leg_bbox=(0, 1.01), clabelpad=clabelpad, ytitle=1.05, vmax=3e-3,
                                                  mass_frac_sfcwater=None)
 
-print('third call')
+print('\nthird call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
                                                  fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
@@ -174,5 +174,5 @@ ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", f
 
 if slides:
     fig, *axes = dark_background(fig, axes)
-fig.savefig(fig_path + 'ocn_vol_test_v3.png', bbox_inches='tight')
+# fig.savefig(fig_path + 'ocn_vol_test_v3.png', bbox_inches='tight')
 plt.show()

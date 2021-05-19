@@ -1258,6 +1258,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
     # h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
     degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
 
+    print('\n...........\nfname', spectrum_fname, 'phi0', phi0[:5])
     pl0 = evol.bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults,
                             # verbose=True,
                             t_eval=None, random=False, phi0=phi0, postprocessors=['topography'],
@@ -1329,7 +1330,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
             vmax = np.max(mass_frac_sfcwater)
         colourbar(mappable=None, vector=mass_frac_sfcwater, ax=ax, vmin=vmin,
                   vmax=vmax, label=clabel,
-                  labelsize=labelsize * 0.8, ticksize=ticksize, labelpad=clabelpad,
+                  labelsize=labelsize, ticksize=ticksize, labelpad=clabelpad,
                   #ticks=mass_frac_sfcwater,
                   cmap=cmap, c=textc, log=True, pad=0.2)
         #

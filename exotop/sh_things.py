@@ -685,7 +685,7 @@ def integrate_to_peak_GLQ(grid, R=2, lmax=120, verbose=False):
         print('h peak from grid', h_peak, 'm')
         print('spherical annulus vol:', annulus_vol, 'm^3 -->', annulus_vol / vol_EO, 'EO')
         print('integrated vol:', vol_ocn, 'm^3 -->', vol_ocn / vol_EO, 'EO')
-        print('mean h', np.mean(grid), 'min h', np.min(grid), 'max h', np.max(grid))
+        # print('mean h', np.mean(grid), 'min h', np.min(grid), 'max h', np.max(grid))
         print('area/4piR^2', area / (4 * np.pi * R ** 2))
 
     return vol_ocn
@@ -770,8 +770,8 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
         plt.ylabel("Power")
         plt.loglog(l[2:], psd[2:], c='k', ls='--', label=r'$\phi_0^{1D}$ fit')
 
-    if verbose:
-        print('\nRMS of orig model 1D psd', parseval_rms(psd, k))
+    # if verbose:
+    #     print('RMS of orig model 1D psd', parseval_rms(psd, k))
 
     # convert 1D psd (km^2 km) to pseudo-2D (km^2 km^2) assuming radial symmetry
     phi_1D = psd
@@ -779,9 +779,9 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
 
     if plot:
         plt.loglog(l[2:], phi_2D_iso[2:], ls='--', c='xkcd:magenta', label=r'$\phi_{iso}^{2D}$')
-    if verbose:
-        print('\nRMS of orig model 2D iso psd in 2D', parseval_rms_2D(phi_2D_iso, k))
-        # print('\nRMS of orig model 2D iso psd', parseval_rms(phi_2D_iso, k))  # works!
+    # if verbose:
+    #     print('RMS of orig model 2D iso psd in 2D', parseval_rms_2D(phi_2D_iso, k))
+    #     # print('\nRMS of orig model 2D iso psd', parseval_rms(phi_2D_iso, k))  # works!
 
     # use this pseudo-2D psd to find power in km^2
     S = np.array(phi_2D_iso) * (2 * l + 1) / (4 * np.pi * R ** 2)  # factor of 4piR^2 from Lees eq A7
@@ -793,7 +793,7 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
 
     # generate new model spectra from random
     if verbose:
-        print('\n///// new randomised spectra, scaled to rms', parseval_rms_2D(phi_2D_iso, k) * h_ratio)
+        print('///// new randomised spectra, scaled to rms', parseval_rms_2D(phi_2D_iso, k) * h_ratio)
 
     coeffs_global = pyshtools.SHCoeffs.from_random(S, normalization='ortho', lmax=lmax)
 
@@ -861,7 +861,8 @@ def get_pysh_constants(body, name):
 
 def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, lmin=1, set_axlabels=True,
                      save=True, plot=True, units='km4', scale_to='Venus', labelsize=16, legsize=12, alpha=0.5,
-                     fig=None, ax=None, c_Ve='xkcd:sea', c_fit='xkcd:slate', x_name='degrees', **kwargs):
+                     fig=None, ax=None, c_Ve='xkcd:sea', c_fit='xkcd:slate', x_name='degrees', load_fname=None,
+                     **kwargs):
     R_Venus = get_pysh_constants('Venus', 'r')
     if 'km' in units:
         R_Venus = R_Venus * 1e-3  # in km
@@ -882,8 +883,12 @@ def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, 
 
     lmax = np.max(l)
 
-    lV, phiV = get_psd_Venus(unit='per_lm', to_1D=False, lmax=lmax, to_km=to_km,
-                             verbose=False)  # power per lm in km^2 km^2, 2D because need to scale S anyways
+    if load_fname is None:
+        # use Venus spectrum
+        lV, phiV = get_psd_Venus(unit='per_lm', to_1D=False, lmax=lmax, to_km=to_km,
+                                 verbose=False)  # power per lm in km^2 km^2, 2D because need to scale S anyways
+    else:
+        lV, phiV = load_model_spectrum_pkl(fname=load_fname, path=fig_path, **kwargs)
     kV = l_to_k(lV, R_Venus)
 
     # remove 0 degree
