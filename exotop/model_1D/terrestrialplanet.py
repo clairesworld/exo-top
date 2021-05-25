@@ -137,7 +137,10 @@ class TerrestrialPlanet():
         T = np.maximum(self.T_c, self.T_m) - self.T_s  # fucked for cases where T_c < T_m
         T = self.T_c - self.T_s
         L = self.R_p - self.R_c
-        T0 = T[0]
+        try:
+            T0 = T[0]
+        except IndexError:
+            T0 = T  # steady state?
 
         self.T_m_prime = self.T_m/T0
         self.T_c_prime = self.T_c/T0

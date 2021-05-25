@@ -13,7 +13,7 @@ import matplotlib.lines as mlines
 fig_path = ''  # laptop
 fig_format = '.png'
 benchmark_path = '../benchmarks/'
-labelsize = 16
+labelsize = 20 #16
 legsize = 16
 xlabelpad = 20
 ticksize = 12

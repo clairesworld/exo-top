@@ -2078,7 +2078,7 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
 
 def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=None, include_regimes=None,
                       data_path=data_path_bullard, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
-                      marker='.', lw=0.5, xlabel=None, ylabel='Normalised power spectral density',
+                      marker='.', lw=0.5, xlabel=None, ylabel='Normalised power spectral density', clabelpad=25,
                       x2label='Spherical harmonic degree', save=True, alpha=1, labelsize=16, ticksize=12,
                       fig=None, ax=None, figsize=(5, 5), z_name='Ra', vmin=None, vmax=None, clabel=None,
                       norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True,
@@ -2239,7 +2239,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             print('cbar not implemented without cmap')
         else:
             cb = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=clabel, labelsize=labelsize,
-                            ticksize=ticksize, ticks=None, ticklabels=None, labelpad=25,
+                            ticksize=ticksize, ticks=None, ticklabels=None, labelpad=clabelpad,
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.1, log=False)
         axes.append(cb.ax)
 

@@ -859,10 +859,10 @@ def get_pysh_constants(body, name):
     return eval('pyshtools.constants.' + body + '.' + name + '.value')
 
 
-def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, lmin=1, set_axlabels=True,
+def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, lmin=1, lmax=None, set_axlabels=True,
                      save=True, plot=True, units='km4', scale_to='Venus', labelsize=16, legsize=12, alpha=0.5,
                      fig=None, ax=None, c_Ve='xkcd:sea', c_fit='xkcd:slate', x_name='degrees', load_fname=None,
-                     **kwargs):
+                     show_orig=True, V_label='Venus (Wieczorek 2015)', is_1D=False, marker_Ve='o', **kwargs):
     R_Venus = get_pysh_constants('Venus', 'r')
     if 'km' in units:
         R_Venus = R_Venus * 1e-3  # in km
@@ -881,19 +881,26 @@ def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, 
     k = l_to_k(l, R_Venus)
     phi_iso = 1 / k * phi
 
-    lmax = np.max(l)
+    if lmax is None:
+        lmax = np.max(l)
 
     if load_fname is None:
         # use Venus spectrum
         lV, phiV = get_psd_Venus(unit='per_lm', to_1D=False, lmax=lmax, to_km=to_km,
                                  verbose=False)  # power per lm in km^2 km^2, 2D because need to scale S anyways
+        kV = l_to_k(lV, R_Venus)
     else:
         lV, phiV = load_model_spectrum_pkl(fname=load_fname, path=fig_path, **kwargs)
-    kV = l_to_k(lV, R_Venus)
+        # make sure same format (2D) as above
+        kV = l_to_k(lV, R_Venus)
+        phiV = phiV / kV
+
+    print('lmax', lmax)
+    print('lV', lV[0], '-', lV[-1])
 
     # remove 0 degree
-    l, phi_iso, phi, k = l[lmin:], phi_iso[lmin:], phi[lmin:], k[lmin:]
-    lV, phiV, kV = lV[lmin:], phiV[lmin:], kV[lmin:]
+    l, phi_iso, phi, k = l[lmin:lmax+1], phi_iso[lmin:lmax+1], phi[lmin:lmax+1], k[lmin:lmax+1]
+    lV, phiV, kV = lV[lmin:lmax+1], phiV[lmin:lmax+1], kV[lmin:lmax+1]
 
     # scale to Venus RMS at power
     # if to_1D:
@@ -937,13 +944,19 @@ def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, 
         if scale_to == 'Venus':
             mdl_label = mdl_label + ' @ Venus RMS'
         if x_name == 'degrees':
-            ax.loglog(lV, 4 * np.pi * R_Venus ** 2 * phiV_sc, 'o-', lw=1, alpha=alpha, c=c_Ve, label='Venus (Wieczorek 2015)')
-            ax.loglog(l, 4 * np.pi * R_Venus ** 2 * phi_sc, '^-', lw=1, alpha=alpha, c=c_fit, label=mdl_label)
+            if show_orig:
+                ax.loglog(l, 4 * np.pi * R_Venus ** 2 * phi_sc, marker='^', ls='-', lw=1, alpha=alpha, c=c_fit,
+                          label=mdl_label)
+            ax.loglog(lV, 4 * np.pi * R_Venus ** 2 * phiV_sc, marker=marker_Ve, ls='-', lw=1, alpha=alpha, c=c_Ve,
+                      label=V_label)
         elif x_name == 'wavenumber':
             kV = l_to_k(lV, R_Venus)
             k = l_to_k(l, R_Venus)
-            ax.loglog(kV, 4 * np.pi * R_Venus ** 2 * phiV_sc, 'o-', lw=1, alpha=alpha, c=c_Ve, label='Venus (Wieczorek 2015)')
-            ax.loglog(k, 4 * np.pi * R_Venus ** 2 * phi_sc, '^-', lw=1, alpha=alpha, c=c_fit, label=mdl_label)
+            if show_orig:
+                ax.loglog(k, 4 * np.pi * R_Venus ** 2 * phi_sc, marker='^', ls='-', lw=1, alpha=alpha, c=c_fit,
+                          label=mdl_label)
+            ax.loglog(kV, 4 * np.pi * R_Venus ** 2 * phiV_sc, marker=marker_Ve, ls='-', lw=1, alpha=alpha, c=c_Ve,
+                      label=V_label)
         if set_axlabels:
             ax.set_xlabel(r'Degree', fontsize=labelsize)
             if units == 'km4':

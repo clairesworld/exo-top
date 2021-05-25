@@ -790,10 +790,10 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
             # print('1/yscale', 1/yscale)
             try:
                 for ip, pl in enumerate(lplanets):  # planets to plot as line
-                    t = pl.t
-                    it = age_index(t, snap, parameters.sec2Gyr)
                     data_x = eval('pl.' + xparam) * xscale
                     if isinstance(data_x, Iterable):
+                        t = pl.t
+                        it = age_index(t, snap, parameters.sec2Gyr)
                         data_x = data_x[it]  # if an evolution model then take certain snap
                     x.append(data_x)
 
@@ -805,6 +805,8 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
                     else:
                         data_y = eval('pl.' + yparam[ii]) * yscale
                     if isinstance(data_y, Iterable):
+                        t = pl.t
+                        it = age_index(t, snap, parameters.sec2Gyr)
                         data_y = data_y[it]  # if an evolution model then take certain snap
                     y.append(data_y)
             except TypeError:  # if given a single planet (not iterable) - get values across evol
@@ -1009,7 +1011,7 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
 
 def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1, tickwidth=1, textc='k',
                                            age=4.5, x_vars=None, ylabel='$\Delta h$ / $\Delta h_0$  ', fig_height=4,
-                                           dist_res=10, ylim=None,
+                                           dist_res=10, ylim=None, leg_loc='upper left',
                                            xlabels=None, log=None, x_range=None, xscales=None, units=None, x_res=8,
                                            fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
                                            yscale=1, alpha=0.2,
@@ -1083,12 +1085,18 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                         string = string + '{:.3g} '.format(
                             eval('inputs.' + defaults + '_in')[x_vars[jj]] * xscales[jj]) + u + '\n'
             string = string[:-1]  # remove last \n
-            axes[i_ax].text(0.06, 0.96, string,
-                            fontsize=legsize, c=textc,
-                            horizontalalignment='left',
-                            verticalalignment='top',
-                            transform=axes[i_ax].transAxes)
-
+            if leg_loc == 'upper left':
+                axes[i_ax].text(0.06, 0.96, string,
+                                fontsize=legsize, c=textc,
+                                horizontalalignment='left',
+                                verticalalignment='top',
+                                transform=axes[i_ax].transAxes)
+            elif leg_loc == 'upper right':
+                axes[i_ax].text(0.96, 0.96, string,
+                                fontsize=legsize, c=textc,
+                                horizontalalignment='right',
+                                verticalalignment='top',
+                                transform=axes[i_ax].transAxes)
     axes[0].set_ylabel(ylabel, fontsize=labelsize)
 
     for ax in axes:
@@ -1118,17 +1126,19 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
     if not_iterable(axes):
         axes = [axes]
 
-    it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
-
     if type(model_param) == str:
         model_param = [model_param]
         c = [c]
 
     if relative and (relval is None):
         try:
+            it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
             model_baseline = eval('pl_baseline.' + model_param[0])[it]
         except IndexError:
             # scalar
+            model_baseline = eval('pl_baseline.' + model_param[0])
+        except AttributeError:
+            # steady state?
             model_baseline = eval('pl_baseline.' + model_param[0])
         yscale = model_baseline ** -1
     elif relative:
@@ -1149,9 +1159,13 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
         else:
             if verbose:
                 print('generating planets across', x_var, '...')
+            if hasattr(pl_baseline, 't'):
+                t_eval = pl_baseline.t
+            else:
+                t_eval = None
             planets = evol.bulk_planets(n=nplanets, name=x_var, mini=xmin, maxi=xmax,
                                         like=defaults,
-                                        t_eval=pl_baseline.t, random=False, verbose=verbose,
+                                        t_eval=t_eval, random=False, verbose=verbose,
                                         initial_kwargs=initial_kwargs, update_kwargs=update_kwargs, **kwargs)
 
             # for pl in planets:

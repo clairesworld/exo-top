@@ -10,7 +10,7 @@ import matplotlib.lines as mlines
 import numpy as np
 
 cmap_path = '/home/claire/Works/exo-top/exotop/plot/cmaps/'
-cmap_name = 'c3t3'
+cmap_name = 'c3t3a'
 cmap = cmap_from_ascii(cmap_name, path=cmap_path, end='.txt').reversed()
 fig_path = '/home/claire/Works/exo-top/exotop/figs_scratch/'
 data_path = '/home/claire/Works/aspect/runs/model-output/'
@@ -88,7 +88,7 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  # benchmark_path+'wei_Venus/',
                                                  spectrum_fname='base_spectrum_l1.pkl',
                                                  #                                                  c='#81f79f',
-                                                 c='xkcd:reddish orange', cmap=cmap,
+                                                 c='xkcd:bordeaux', cmap=cmap,
                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
                                                  x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
@@ -109,7 +109,7 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  spectrum_fname='Venus_spectrum_l1.pkl',
                                                  #                                                  c='#81f79f',
-                                                 c='xkcd:bordeaux', ls='--',
+                                                 c='xkcd:squash', ls='--',
                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
                                                  x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
@@ -126,7 +126,7 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  defaults='Venusbaseline',
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  spectrum_fname='spectrum_-2.pkl',
-                                                 c='xkcd:squash', ls='-.',
+                                                 c='xkcd:reddish orange', ls='-.',
                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
                                                  x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
@@ -161,11 +161,11 @@ ax.set_xticks([0.1, 1, 2, 3, 4, 5])
 ax.set_yticks([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1])
 # ax.set_yticks([0.2, 0.3, 1, 2])
 
-handles = [mlines.Line2D([], [], color='xkcd:reddish orange', ls='-', lw=3,
+handles = [mlines.Line2D([], [], color='xkcd:bordeaux', ls='-', lw=3,
                          label='Pure dynamic topography'),
-           mlines.Line2D([], [], color='xkcd:bordeaux', ls='--', lw=3,
+           mlines.Line2D([], [], color='xkcd:squash', ls='--', lw=3,
                          label='Venus-like topography'),
-           mlines.Line2D([], [], color='xkcd:squash', ls='-.', lw=3,
+           mlines.Line2D([], [], color='xkcd:reddish orange', ls='-.', lw=3,
                          label='Red noise topography'),
            # mlines.Line2D([], [], color='g', ls='--', lw=3,
            #               label='Simple scaling')
@@ -174,5 +174,5 @@ ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", f
 
 if slides:
     fig, *axes = dark_background(fig, axes)
-# fig.savefig(fig_path + 'ocn_vol_test_v3.png', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_v3.png', bbox_inches='tight')
 plt.show()

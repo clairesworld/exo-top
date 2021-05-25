@@ -3,6 +3,7 @@ from . import parameters as p
 
 
 ###### SOME TEMPERATURES AND FLUXES ######
+from .parameters import R_b
 
 
 def thermal_diffusivity(k, rho, C_p):
@@ -56,7 +57,7 @@ def rect_flux(r, a0=None, q0=None, r0=None, **kwargs):
 
 
 def T_mean(T_m=None, T_l=None, R_p=None, R_l=None, R_c=None, T_s=None, k_m=None, a0=None, **kwargs):
-    '''average temperature across convecting region and lid'''
+    """average temperature across convecting region and lid"""
     c1 = k_m * (T_l - T_s - a0 / (6 * k_m) * (R_p ** 2 - R_l ** 2)) / (R_l ** -1 - R_p ** -1)
     c2 = T_s + a0 / (6 * k_m) * R_p ** 2 - c1 / (k_m * R_p)
     return 3 / (R_p ** 3 - R_c ** 3) * (
@@ -180,6 +181,13 @@ def dTdt(Q=None, M=None, C=None, **kwargs):
         return 0
     else:
         return Q / (M * C)
+
+
+def d_lid_ss(Tm, a_rh=None, k=None, Ea=None, H0=None, Ra_crit=None, eta_0=None, T_ref=None,
+          kappa_m=None, alpha_m=None, g_sfc=None, rho_m=None, Ts=None, **kwargs):
+    """ from sympy solution for d in steady state """
+    return (-R_b * Tm ** 2 * a_rh * k + np.sqrt(k * (2.0 * Ea ** 2 * H0 * Tm * (Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** 0.666666666666667 - 2.0 * Ea ** 2 * H0 * Ts * (Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** 0.666666666666667 - 2.0 * Ea * H0 * R_b * Tm ** 2 * a_rh * (Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** 0.666666666666667 + R_b ** 2 * Tm ** 4 * a_rh ** 2 * k))) / (Ea * H0 * (Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** (1 / 3))
+
 
 
 
