@@ -524,7 +524,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
         elif which_h == 'peak':
             yx_fit = yx_peak_all
         ax = fit_cases_on_plot(yx_fit, ax, c=c_fit, labelsize=labelsize, n_fitted=n_fitted, dist=D_m2_all,
-                               xerr=xerr, yerr=yerr, legend=legend, lw=lw, xlim=xlim,
+                               xerr=xerr, yerr=yerr, legend=True, lw=lw, xlim=xlim,
                                sigma=sigma, **kwargs)
 
     if logx:

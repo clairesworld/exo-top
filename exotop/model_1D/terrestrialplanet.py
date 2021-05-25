@@ -87,22 +87,26 @@ class TerrestrialPlanet():
             self.R_p = ast.radius_zeng(self.M_p, self.CMF)*parameters.R_E # in m
         else:
             self.R_p = self.R_p0
-        if self.R_c0 is None:
-            self.M_m = self.M_p*(1 - self.CMF) # mass of mantle, updated immediately in thermal code including lid dynamics
 
-            self.CRF = self.CMF**0.5 # Zeng & Jacobsen 2017
-            self.M_c = self.M_p*self.CMF # M_p - M_m
-            self.R_c = self.R_p*self.CRF
-            #R_c = struct.radius_seager(M_p*CMF, CMF=0, m1=4.34*M_E, r1=2.23*R_E) # EoS for iron... is this consistent?
-
-#             print('d_m with 150-km lid', (self.R_p - 150e3 - self.R_c)*1e-3, 'km')
-        
-        else:
+        if self.CMF is not None:
+            self.CRF = self.CMF ** 2
+            self.R_c = self.R_p * self.CRF
+            self.M_m = self.M_p * (
+                    1 - self.CMF)  # mass of mantle, updated immediately in thermal code including lid dynamics
+            self.M_c = self.M_p * self.CMF  # M_p - M_m
+        elif self.R_c0 is not None:
             self.R_c = self.R_c0
-            self.CRF = self.R_c0/self.R_p0
-            self.M_c = 4/3*np.pi*self.R_c**3 * self.rho_c
-            self.CMF = self.M_c/self.M_p
-            self.M_m = 4/3*np.pi*(self.R_p**3 - self.R_c**3)*self.rho_m  #M_p - M_c
+            self.CRF = self.R_c0 / self.R_p0
+            self.M_c = 4 / 3 * np.pi * self.R_c ** 3 * self.rho_c
+            self.CMF = self.M_c / self.M_p
+            self.M_m = 4 / 3 * np.pi * (self.R_p ** 3 - self.R_c ** 3) * self.rho_m  # M_p - M_c
+        else:
+            self.M_m = self.M_p * (
+                        1 - self.CMF)  # mass of mantle, updated immediately in thermal code including lid dynamics
+            self.CRF = self.CMF ** 0.5  # Zeng & Jacobsen 2017
+            self.M_c = self.M_p * self.CMF  # M_p - M_m
+            self.R_c = self.R_p * self.CRF
+
         self.SA_p = geom.SA(R=self.R_p)
         self.SA_c = geom.SA(R=self.R_c) # core surface area 
         self.g_sfc = ast.grav(self.M_p, self.R_p)

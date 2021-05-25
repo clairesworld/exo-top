@@ -4,26 +4,6 @@ from useful_and_bespoke import age_index
 import sh_things as sh
 from model_1D.topography import dimensionalise, dyn_topo_peak_prime_aspect
 
-# def eval_age(pl, verbose=False, at_age=None, **kwargs):
-#
-#     # get time index nearest to desired snap given in Gyr
-#     if at_age is not None:
-#         it = age_index(pl.t, at_age, parameters.sec2Gyr)
-#         it = range(it, it + 1)
-#     else:
-#         it = range(len(pl.t))
-#         pl.max_ocean = np.zeros_like(it, dtype=np.float64)
-#     for ii in it:
-#
-#         if at_age is None:
-#             pl.max_ocean[ii] = basin_capacity
-#             pl.simple_ocean[ii] = simple_vol_scaling(pl, it=ii)
-#         else:
-#             pl.max_ocean = basin_capacity
-#             pl.simple_ocean = simple_vol_scaling(pl, it=ii)
-#
-#     return pl
-
 
 def simple_vol_scaling(pl, verbose=False, at_age=None, it=None, **kwargs):
     # use ASPECT fit to h_peak and scale volume to entire surface area
@@ -51,7 +31,11 @@ def simple_vol_scaling(pl, verbose=False, at_age=None, it=None, **kwargs):
     return pl
 
 
-def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0=None, plot=False, verbose=False, **kwargs):
+def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0=None, plot=False, verbose=False,
+              spectrum_fname='base_spectrum_l1.pkl', spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
+              **kwargs):
+    if phi0 is None:
+        degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
 
     h_rms1 = eval('pl.' + name_rms)
     if verbose:
@@ -129,3 +113,43 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         from matplotlib.pyplot import show as pltshow
         pltshow()
     return pl
+
+def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_w=1000, spectrum_fname='base_spectrum_l1.pkl',
+             spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/', verbose=False, **kwargs):
+    """ predict min rms topography for land given sfc water mass frac and radius"""
+    vol_EO = 1.4e21/rho_w
+
+    if phi0 is None:
+        degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
+
+    l = np.arange(len(phi0))
+    k = sh.l_to_k(l, R=2)  # original model spectrum uses R = 2d = 2
+    h_rms0 = sh.parseval_rms(phi0, k)
+    M_w = M_p * parameters.M_E * x_h2o  # mass of sfc water in kg
+    vol_w = M_w / rho_w  # corresponding volume
+
+    print('vol_w', vol_w/vol_EO, 'EO')
+
+    h_rms = rms_1
+    flag = True
+    while flag:
+        # get vol from rms
+        vols = []
+        n = 0
+        while n < n_stats:
+            h_ratio = h_rms / h_rms0
+            clm = sh.random_harms_from_psd(phi0, l, R=2, h_ratio=h_ratio, plot=False, verbose=verbose)
+            grid = clm.expand(grid='GLQ', extend=False).to_array()
+            lmax = clm.lmax
+            vol = sh.integrate_to_peak_GLQ(grid, R=R_p, lmax=lmax, verbose=verbose)
+            vols.append(vol)
+            n = n + 1
+        vol = np.mean(vols)
+        diff = vol_w - vol
+        if abs(diff) < tol*vol_EO:
+            flag = False
+            print('h_rms', h_rms, 'm | vol', vol / vol_EO, 'EO')
+        else:
+            h_rms = h_rms * (vol_w/vol)
+    print('ANS:', 'h_rms', h_rms, 'm | vol', vol / vol_EO, 'EO')
+    return h_rms

@@ -101,10 +101,9 @@ def build_planet(planet_kwargs, run_kwargs, solve_ODE=True, steady=False, **kwar
     if steady:
         age = run_kwargs['tf']/p.sec2Gyr
         pl = steadystate(pl, age=age, **run_kwargs, **planet_kwargs, **kwargs)
-        pl = postprocess_planet(pl, **kwargs)
     elif solve_ODE:
         pl = solve(pl, run_kwargs=run_kwargs, **kwargs)  # T_m, T_c, D_l
-        pl = postprocess_planet(pl, **kwargs)
+    pl = postprocess_planet(pl, **kwargs)
 
     return pl
 

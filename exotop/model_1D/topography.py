@@ -106,3 +106,10 @@ def convective_stress(pl=None, where='lid', rho_m=None, alpha_m=None, g_sfc=None
         Ea = pl.Ea
         d_bl = pl.delta_rh
     return C* rho_m*alpha_m*g_sfc*(p.R_b*T_m**2/Ea)**2 * k_m/q_ubl
+
+
+def strength_max(g=None, M=None, R=None, Y=100e6, rho=2700):
+    if g is None:
+        g = 6.674e-11*M/R**2
+
+    return Y*2/(rho*g)

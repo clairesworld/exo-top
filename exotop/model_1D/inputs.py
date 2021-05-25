@@ -1,3 +1,5 @@
+from model_1D import parameters as p
+
 baseline_in = dict(
     ident='baseline',  # must match dict name ****_in
     M_p=5.972e24,
@@ -447,3 +449,66 @@ Mars1_in = dict(
     # backwards_cooling=True,
 )
 Mars1_run = dict(T_m0=1750, T_c0=2250, D_l0=300e3, tf=4.5, visc_type='Thi', backwards_cooling=False)
+
+
+TRAPPIST1e_in = dict(
+    ident='TRAPPIST1e',  # must match dict name ****_in
+    M_p=0.692*p.M_E,
+    R_p0=0.788*p.R_E,
+    T_s=273,
+    CMF=0.246,
+    FeMg=0.48,
+    rho_m=3300,
+    k_m=3,
+    alpha_m=3e-5,
+    H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0  based on below
+    H_f=4.6e-12,  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
+)
+TRAPPIST1e_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=6, visc_type='KW', backwards_cooling=False)  # model params
+
+TRAPPIST1f_in = dict(
+    ident='TRAPPIST1f',  # must match dict name ****_in
+    M_p=1.039*p.M_E,
+    R_p0=1.045*p.R_E,
+    T_s=273,
+    CMF=0.201,
+    FeMg=0.45,
+    rho_m=3300,
+    k_m=3,
+    alpha_m=3e-5,
+    H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0  based on below
+    H_f=4.6e-12,  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
+)
+TRAPPIST1f_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=6, visc_type='KW', backwards_cooling=False)  # model params
+
+
+TRAPPIST1g_in = dict(
+    ident='TRAPPIST1g',  # must match dict name ****_in
+    M_p=1.321*p.M_E,
+    R_p0=1.129*p.R_E,
+    T_s=273,
+    CMF=0.161,
+    FeMg=0.34,
+    rho_m=3300,
+    k_m=3,
+    alpha_m=3e-5,
+    H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0  based on below
+    H_f=4.6e-12,  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
+)
+TRAPPIST1g_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=6, visc_type='KW', backwards_cooling=False)  # model params
+
+TRAPPIST1h_in = dict(
+    ident='TRAPPIST1h',  # must match dict name ****_in
+    M_p=0.326*p.M_E,
+    R_p0=0.755*p.R_E,
+    T_s=273,
+    CMF=0.165,
+    FeMg=0.35,
+    rho_m=3300,
+    k_m=3,
+    alpha_m=3e-5,
+    H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0  based on below
+    H_f=4.6e-12,  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
+)
+TRAPPIST1h_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=6, visc_type='KW', backwards_cooling=False)  # model params
+

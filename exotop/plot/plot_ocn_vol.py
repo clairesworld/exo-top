@@ -73,8 +73,8 @@ else:
     textc = 'k'
 
 xlabel = 'Planet mass ' + r'($M_{\oplus}$)'
-labelsize = 33.5  # 30
-legsize = 24  # 20
+labelsize = 36 #33.5  # 30
+legsize = 30 # 24  # 20
 ticksize = 22  # 20
 clabelpad = 35
 print('\nfirst call')
@@ -170,7 +170,7 @@ handles = [mlines.Line2D([], [], color='xkcd:bordeaux', ls='-', lw=3,
            # mlines.Line2D([], [], color='g', ls='--', lw=3,
            #               label='Simple scaling')
            ]
-ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize, ncol=1)
+ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=22, ncol=1)
 
 if slides:
     fig, *axes = dark_background(fig, axes)

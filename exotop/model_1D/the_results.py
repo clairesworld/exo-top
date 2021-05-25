@@ -3,13 +3,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from . import evolve as evol
-from . import inputs
-from . import terrestrialplanet as tp
-from . import parameters
-from . import thermal
-from . import topography
-from . import oceans
+from model_1D import evolve as evol
+from model_1D import inputs
+from model_1D import terrestrialplanet as tp
+from model_1D import parameters
+from model_1D import thermal
+from model_1D import topography
+from model_1D import oceans
 from collections.abc import Iterable
 import collections
 import six

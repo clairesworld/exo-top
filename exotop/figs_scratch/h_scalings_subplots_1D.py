@@ -14,10 +14,10 @@ fig_path = ''  # laptop
 fig_format = '.png'
 benchmark_path = '../benchmarks/'
 planet_icon_path = '/home/claire/Pictures/science-graphics/planet_png/'
-labelsize = 36
+labelsize = 30
 legsize = 30
-xlabelpad = 20
-ticksize = 20
+xlabelpad = 30
+ticksize = 25
 linec = 'xkcd:ocean green'  # 'xkcd:british racing green'  # '#d88868'
 
 # how h varies across key input parameters
