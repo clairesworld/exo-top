@@ -54,7 +54,7 @@ fig, ax1 = plat.plot_model_data_errorbars(Ra_ls, eta_ls, regime_grid=regime_grid
                                          ylim=hlim, which_x=which_x, which_h='rms', data_path=data_path,
                                          clist=c_rms, cmap=cmap, z_name='eta',
                                          save=False, include_regimes=include_regimes, errs=[0.2, 0.1, 0.05],
-                                         fig_fmt=fig_fmt, vmin=vmin, vmax=vmax, xlabelpad=xlabelpad, ylabelpad=5,
+                                         fig_fmt=fig_fmt, vmin=vmin, vmax=vmax, xlabelpad=xlabelpad, ylabelpad=3,
                                          show_cbar=False, errortype='standard',
                                          title='',
                                          ylabel=r'Model',
@@ -74,6 +74,6 @@ ax1 = colourised_legend(axes[1], clist=c_rms[1:-1], cleglabels=cleglabels[1:-1],
 
 fig.suptitle(r'Fit to $C$ Ra$_{i,eff}^p$', fontsize=labelsize)
 plt.tight_layout()
-plt.subplots_adjust(wspace=0.3)
+plt.subplots_adjust(wspace=0.35)
 fig.savefig(fig_path + 'h_Ra_scalings.png', bbox_inches='tight')
 
