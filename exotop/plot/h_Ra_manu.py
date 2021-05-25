@@ -37,7 +37,7 @@ fig, ax0 = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_gr
                    fig_path=fig_path, averagescheme=averagescheme, p_dimensionals=None, which_x=which_x,
                    beta0=[0.1, -0.1], sigma=1, fiterror=False, legend=False, fig=fig, ax=axes[0],
                    include_regimes=include_regimes, save=False, labelsize=labelsize,
-                   xlabel=r'Ra$_{i,{\rm eff}}$', ylabel='RMS dynamic topography $h^\prime$', legsize=legsize, cleglabels=cleglabels,
+                   xlabel=r'Ra$_{i,{\rm eff}}$', ylabel=r'Dynamic topography $h^\prime_{\rm rms}$', legsize=legsize, cleglabels=cleglabels,
                    title='', showpeak=False, vmin=vmin, vmax=vmax,
                    cmap=cmap, c_rms=c_rms,
                    fit=True, logx=True, logy=True, ms=ms,
@@ -72,6 +72,6 @@ ax1 = colourised_legend(axes[1], clist=c_rms[1:-1], cleglabels=cleglabels[1:-1],
 
 fig.suptitle(r'Fit to $C$ Ra$_{i,eff}^p$', fontsize=labelsize)
 plt.tight_layout()
-plt.subplots_adjust(wspace=0.1)
+plt.subplots_adjust(wspace=0.3)
 fig.savefig(fig_path + 'h_Ra_scalings.png', bbox_inches='tight')
 

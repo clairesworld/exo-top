@@ -14,8 +14,8 @@ fig_path = ''  # laptop
 fig_format = '.png'
 benchmark_path = '../benchmarks/'
 planet_icon_path = '/home/claire/Pictures/science-graphics/planet_png/'
-labelsize = 32
-legsize = 26
+labelsize = 35
+legsize = 30
 xlabelpad = 20
 ticksize = 20
 linec = 'xkcd:ocean green'  # 'xkcd:british racing green'  # '#d88868'
@@ -34,9 +34,9 @@ xticks = [[2, 3, 4, 5],
 xscales = [p.sec2Gyr,
            p.M_E ** -1, 1, 1e12]
 xlabels = ['Age\n(Gyr)',
-           'Planet mass\n($M_E$)', 'Core mass fraction', 'Present rad. heating\n(pW kg$^{-1}$)']
+           'Planet mass\n($M_E$)', 'Core mass fraction', 'Radiogenic heating\n(pW kg$^{-1}$)']
 
-fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=1000, x_res=7,
+fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=10, x_res=7,
                                                            defaults='baseline',
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
                                                            legend=True, lw=4, ylabel=r'$h_{\rm rms}$ (m)',
@@ -99,5 +99,6 @@ handles = [mlines.Line2D([], [], color=linec, ls='-',
 # fig, *axes = dark_background(fig, axes)
 plt.subplots_adjust(wspace=0.2)
 # plt.tight_layout()
-# plt.show()
+
 fig.savefig(fig_path+'h_parameters'+fig_format, bbox_inches='tight')
+plt.show()
