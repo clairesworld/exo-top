@@ -7,8 +7,8 @@ from matplotlib.pyplot import rcParams
 
 matplotlibuse('Agg')  # turn on for running over ssh
 # rc('text', usetex=True)  # turn off for running over ssh
-rcParams['font.family'] = 'serif'
-rcParams['font.serif'] = 'CMU Serif'
+# rcParams['font.family'] = 'serif'
+# rcParams['font.serif'] = 'CMU Serif'
 
 default_load_value = True
 check_new = True  # always check for new timesteps with ongoing runs

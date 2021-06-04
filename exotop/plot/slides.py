@@ -40,7 +40,7 @@ for regime in regimes:
         include_regimes = ['chaotic']
         # c_rms = c_rms[1:]
         ylim = [6e-3, 1.2e-2]
-        xlim = [2e6, 6e7]
+        xlim = [2e6, 8e7]
         yticks = [6e-3, 8e-3, 1e-2, 1.2e-2]
         xticks = [3e6, 1e7]
         fitlabel = r'$\Delta h = 0.11$ Ra$_{i, eff}^{-0.16}$'
@@ -87,6 +87,7 @@ for regime in regimes:
         ax.set_yticks(yticks)
     if xticks is not None:
         ax.set_xticks(xticks)
+    ax.set_xlim(xlim)
     ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
     ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
     # ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
