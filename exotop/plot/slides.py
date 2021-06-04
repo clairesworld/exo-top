@@ -39,9 +39,9 @@ for regime in regimes:
     elif regime == 'chaotic':
         include_regimes = ['chaotic']
         # c_rms = c_rms[1:]
-        ylim = [6e-3, 1.2e-2]
+        ylim = [6e-3, 1.1e-2]
         xlim = [2e6, 8e7]
-        yticks = [6e-3, 8e-3, 1e-2, 1.2e-2]
+        yticks = [6e-3, 8e-3, 1e-2]
         xticks = [3e6, 1e7]
         fitlabel = r'$\Delta h = 0.11$ Ra$_{i, eff}^{-0.16}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
