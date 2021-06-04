@@ -78,7 +78,7 @@ for regime in regimes:
                    title=r'Fit to $C$ Ra$_{i,eff}^p$', showpeak=False,
                    cmap=None, c_rms=c_rms, c_fit=c_fit,
                    fit=True, logx=True, logy=True, ms=ms, elw=elw,
-                   show_isoviscous=False, ylim=None, xlim=None, postprocess_kwargs=postprocess_kwargs,
+                   show_isoviscous=False, ylim=None, xlim=xlim, postprocess_kwargs=postprocess_kwargs,
                    regime_grid=regime_grid_td, figsize=(13, 9), errortype='standard', cbar=False)
 
     ax.tick_params(axis='x', labelsize=ticksize, pad=15)
@@ -87,7 +87,6 @@ for regime in regimes:
         ax.set_yticks(yticks)
     if xticks is not None:
         ax.set_xticks(xticks)
-    ax.set_xlim(xlim)
     ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
     ax.yaxis.set_minor_formatter(ticker.ScalarFormatter())
     # ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
