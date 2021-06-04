@@ -42,14 +42,14 @@ c_regimes_td = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure']
 load_grid = np.empty_like(t1_grid, dtype=object)
 load_grid[:] = default_load_value
 if check_new:
-    load_grid[1:, 5] = 'auto'   # ongoing runs: Ra3e8
+    load_grid[1:, 5:] = 'auto'   # ongoing runs: Ra3e8
     load_grid[3, 4] = 'auto'  # ongoing runs: Ra1e8 eta1e8
     load_grid[4, 4:] = 'auto'  # ongoing runs: new eta1e9 runs
 
 # string endings for case names
 end_grid = np.empty_like(t1_grid, dtype=object)
 end_grid[:] = "-wide"
-end_grid[2:, 5] = "-wide-ascii"  # which runs use ascii initialisation
+end_grid[2:, 5:] = "-wide-ascii"  # which runs use ascii initialisation
 end_grid[3, 4] = "-wide-ascii"  # which runs use ascii initialisation
 end_grid[4, 4:] = "-wide-ascii"  # ongoing runs: new eta1e9 runs
 
