@@ -41,7 +41,7 @@ def dyn_topo_heuristic(pl, **kwargs):
 
 
 def dyn_topo_prime_aspect(pl, **kwargs):
-    h_prime = 0.14 * pl.Ra_i_eff**-0.18  # fit to chaotic regime
+    h_prime = 0.11 * pl.Ra_i_eff**-0.16  # fit to chaotic regime
     return h_prime
 
 

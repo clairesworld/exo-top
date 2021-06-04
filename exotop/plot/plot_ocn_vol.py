@@ -77,14 +77,20 @@ n_stats = 1000
 
 if slides:
     textc = 'xkcd:off white'
+    c_dt = 'xkcd:orange red'
+    alpha_w = 0.9
 else:
     textc = 'k'
+    c_dt = 'xkcd:bordeaux'
+    alpha_w = 0.3
 
 xlabel = 'Planet mass ' + r'($M_{\oplus}$)'
 labelsize = 30 #33.5  # 30
 legsize = 30 # 24  # 20
 ticksize = 26  # 20
-clabelpad = 35
+clabelpad = 45
+
+
 print('\nfirst call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets, version=0,
                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
@@ -96,7 +102,7 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  # benchmark_path+'wei_Venus/',
                                                  spectrum_fname='base_spectrum_l1.pkl',
                                                  #                                                  c='#81f79f',
-                                                 c='xkcd:bordeaux', cmap=cmap,
+                                                 c=c_dt, cmap=cmap,
                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
                                                  x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
@@ -169,7 +175,7 @@ ax.set_xticks([0.1, 1, 2, 3, 4, 5])
 ax.set_yticks([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1, 1.4])
 # ax.set_yticks([0.2, 0.3, 1, 2])
 
-handles = [mlines.Line2D([], [], color='xkcd:bordeaux', ls='-', lw=3,
+handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,
                          label='Pure dynamic topography'),
            # mlines.Line2D([], [], color='xkcd:squash', ls='--', lw=3,
            #               label='Venus-like topography'),
@@ -182,5 +188,5 @@ ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", f
 
 if slides:
     fig, *axes = dark_background(fig, axes)
-fig.savefig(fig_path + 'ocn_vol_v3.png', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_slides.png', bbox_inches='tight')
 plt.show()
