@@ -46,8 +46,8 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
         df = pro.pickleio_multi(case, psuffixes=psuffixes, t1=t1, load=load,
                                 data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
-        print(df)
-        print(case, 't1', t1, 'load', load, '\n')
+        # print(df)
+        # print(case, 't1', t1, 'load', load, '\n')
         if averagescheme == 'timelast':
             df1 = df.mean(axis=0)
         elif averagescheme == 'timefirst':

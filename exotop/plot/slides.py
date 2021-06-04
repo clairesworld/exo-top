@@ -10,7 +10,7 @@ import matplotlib.lines as mlines
 ticksize = 22
 axissize = 40
 c_fit = 'xkcd:off white'
-c_rms = ['xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
+c_rms = ['r', 'xkcd:lime green', 'xkcd:lilac', 'xkcd:orange', 'xkcd:yellow']
 lw = 5
 ms = 25
 elw = 2
