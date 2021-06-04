@@ -226,6 +226,7 @@ def unique_rows_indices(a):
 
 def minmaxnorm(x, a=0, b=1):
     # linear normalisation to min, max
+    x = np.array(x)
     xmin = np.min(x)
     xmax = np.max(x)
     x = (x - xmin) / (xmax - xmin)  # norm to 0, 1
@@ -355,7 +356,7 @@ def rgb_to_dec(value):
     return [v/256 for v in value]
 
 
-def get_continuous_cmap(hex_list, float_list=None):
+def get_continuous_cmap(hex_list, float_list=None, N=256):
     ''' creates and returns a color map that can be used in heat map figures.
         If float_list is not provided, colour map graduates linearly between each color in hex_list.
         If float_list is provided, each color in hex_list is mapped to the respective location in float_list.
@@ -368,8 +369,9 @@ def get_continuous_cmap(hex_list, float_list=None):
         Returns
         ----------
         colour map'''
+    import matplotlib.colors as mcolors
     rgb_list = [rgb_to_dec(hex_to_rgb(i)) for i in hex_list]
-    if float_list:
+    if float_list is not None:
         pass
     else:
         float_list = list(np.linspace(0, 1, len(rgb_list)))
@@ -378,5 +380,5 @@ def get_continuous_cmap(hex_list, float_list=None):
     for num, col in enumerate(['red', 'green', 'blue']):
         col_list = [[float_list[i], rgb_list[i][num], rgb_list[i][num]] for i in range(len(float_list))]
         cdict[col] = col_list
-    cmp = mcolors.LinearSegmentedColormap('my_cmp', segmentdata=cdict, N=256)
+    cmp = mcolors.LinearSegmentedColormap('my_cmp', segmentdata=cdict, N=N)
     return cmp

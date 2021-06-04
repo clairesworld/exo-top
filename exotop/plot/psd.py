@@ -7,7 +7,7 @@ from useful_and_bespoke import dark_background
 
 data_path = data_path_home
 fig_path = fig_path_home
-labelsize = 20
+labelsize = 18
 ticksize = 14
 legsize = 14
 
@@ -21,7 +21,7 @@ d, dT, alpha = 1, 1, 1
 regimes_use = ['chaotic']
 
 """ manu - all norm spectra with fit and Venus (and Hoggard?) """
-fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='binary', end_grid=end_grid, regime_grid=regime_grid_td,
+fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='bone', end_grid=end_grid, regime_grid=regime_grid_td,
                                   include_regimes=regimes_use, save=False, show_natscales=False,
                                   data_path=data_path, pend='_sph', fend='.pkl', test=False,
                                   fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True,

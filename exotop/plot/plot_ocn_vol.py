@@ -1,7 +1,7 @@
 # GOOD COPY OF PLOT FOR SLIDES
 import sh_things as sh
 import matplotlib.pyplot as plt
-from useful_and_bespoke import dark_background, cmap_from_ascii
+from useful_and_bespoke import dark_background, cmap_from_ascii, get_continuous_cmap, minmaxnorm
 # import postaspect.plt_aspect as plat
 import model_1D.the_results as results
 import model_1D.parameters as p
@@ -9,15 +9,13 @@ import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
 import numpy as np
 
-cmap_path = '/home/claire/Works/exo-top/exotop/plot/cmaps/'
-cmap_name = 'c3t3a'
-cmap = cmap_from_ascii(cmap_name, path=cmap_path, end='.txt').reversed()
+
 fig_path = '/home/claire/Works/exo-top/exotop/figs_scratch/'
 data_path = '/home/claire/Works/aspect/runs/model-output/'
 case = 'Ra1e8-eta1e7-wide'
 # d, dT, alpha = 1, 1, 1
 d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph dim factors
-labelsize = 20
+
 
 # only do this once
 # sh.make_model_spectrum(case, R=2, data_path=data_path, fig_path='', newfname='base_spectrum',
@@ -63,6 +61,16 @@ labelsize = 20
 
 
 """ money plot """
+cmap_path = '/home/claire/Works/exo-top/exotop/plot/cmaps/'
+# cmap_name = 'c3t3a'
+# cmap = cmap_from_ascii(cmap_name, path=cmap_path, end='.txt').reversed()
+hex_list = ['#ffd8e2', '#dce5e9', '#d6fcdd', '#bbfde1', '#a4fde1', '#49fffc', '#4cd5e8', '#56c3e0', '#72b2d3', '#3b5e71']
+float_list = [1e-5, 5e-5, 6e-5, 8e-5, 1e-4, 1.1e-4, 1.3e-4, 2e-4, 2.3e-4, 3e-4]
+fln = None  # minmaxnorm(float_list, a=0, b=1)
+cmap = get_continuous_cmap(hex_list, N=12,
+                           float_list=fln)
+
+
 slides = False
 nplanets = 2
 n_stats = 1000
@@ -73,9 +81,9 @@ else:
     textc = 'k'
 
 xlabel = 'Planet mass ' + r'($M_{\oplus}$)'
-labelsize = 36 #33.5  # 30
+labelsize = 30 #33.5  # 30
 legsize = 30 # 24  # 20
-ticksize = 22  # 20
+ticksize = 26  # 20
 clabelpad = 35
 print('\nfirst call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets, version=0,
@@ -95,7 +103,7 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  xlabels=[xlabel],
                                                  leg_bbox=(0, 1.01), clabelpad=clabelpad,
                                                  fname='ocean-vol', ytitle=1.05,  # vmax=3e-3,
-                                                 mass_frac_sfcwater=np.logspace(-5, -3.4, num=30),
+                                                 mass_frac_sfcwater=np.logspace(-5, -3, num=30),
                                                  # [1e-5, 3e-5, 1e-4, 3e-4, 1e-3]
                                                  )
 print('\nsecond call')
@@ -145,10 +153,10 @@ ax.set_xlabel(xlabel, fontsize=labelsize, c=textc,
               labelpad=20)
 
 ax.set_xlim((0.1, 5))
-ax.set_ylim((1e-1, 1e0))
+ax.set_ylim((1e-1, 1.4))
 # ax.set_ylim((1e-2, 4e0))
 
-ax.text(0.03, 0.97, '4.5 Ga\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
+ax.text(0.03, 0.97, '4.5 Gyr\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
         horizontalalignment='left', c=textc,
         verticalalignment='top',
         transform=ax.transAxes)
@@ -158,7 +166,7 @@ ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
 ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 ax.set_xticks([0.1, 1, 2, 3, 4, 5])
-ax.set_yticks([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1])
+ax.set_yticks([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1, 1.4])
 # ax.set_yticks([0.2, 0.3, 1, 2])
 
 handles = [mlines.Line2D([], [], color='xkcd:bordeaux', ls='-', lw=3,

@@ -1180,8 +1180,8 @@ def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidt
                                     legend=legendd, snap=age, plots_save=False, set_ylabel=ylabel, set_xlim=True, log=log,
                                     relative=relative, c=c[ip], **kwargs)
 
-        if relative:
-            ax.axhline(y=1, lw=1, alpha=0.5, zorder=0)
+        # if relative:
+        #     ax.axhline(y=1, lw=1, alpha=0.5, zorder=0)
         if legend:
             string = ''
             for jj, u in enumerate(units):
