@@ -40,7 +40,7 @@ for regime in regimes:
         include_regimes = ['chaotic']
         # c_rms = c_rms[1:]
         ylim = [6e-3, 1.2e-2]
-        xlim = [2e6, 4e7]
+        xlim = [2e6, 6e7]
         yticks = [6e-3, 8e-3, 1e-2, 1.2e-2]
         xticks = [3e6, 1e7]
         fitlabel = r'$\Delta h = 0.11$ Ra$_{i, eff}^{-0.16}$'
