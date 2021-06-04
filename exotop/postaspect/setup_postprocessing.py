@@ -45,6 +45,7 @@ if check_new:
     load_grid[1:, 5:] = 'auto'   # ongoing runs: Ra3e8
     load_grid[3, 4] = 'auto'  # ongoing runs: Ra1e8 eta1e8
     load_grid[4, 4:] = 'auto'  # ongoing runs: new eta1e9 runs
+    load_grid[:, -1] = False  # 2e8 initialisation
 
 # string endings for case names
 end_grid = np.empty_like(t1_grid, dtype=object)
