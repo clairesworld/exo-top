@@ -46,12 +46,14 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
         df = pro.pickleio_multi(case, psuffixes=psuffixes, t1=t1, load=load,
                                 data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
 
+        print(df)
+        print(case, 't1', t1, 'load', load, '\n')
         if averagescheme == 'timelast':
             df1 = df.mean(axis=0)
         elif averagescheme == 'timefirst':
             if '_T' in psuffixes:
                 # load time-averages
-                T_av, y = pro.time_averaged_profile_from_df(df, 'T_av')
+                T_av, y = pro.time_ad_profile_fromverage_df(df, 'T_av')
                 uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
                 dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y,
                                                  data_path=data_path,
@@ -377,6 +379,7 @@ def plot_h_vs(Ra=None, eta=None, t1_grid=None, end_grid=None, load_grid='auto', 
                 load_ii = load_grid[jj][ii]
                 # dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/', verbose=False, read_statistics=True)
 
+                print('Ra', Ra[ii], 'eta', etastr)
                 # extract x values for plotting
                 x, x_times = plot_getx(Ra[ii], etastr, case=case, which_x=which_x, return_all=True, data_path=data_path,
                                        t1=t1_ii, load=load_ii, postprocess_kwargs=postprocess_kwargs,

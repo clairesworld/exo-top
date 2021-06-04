@@ -1,0 +1,189 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{color,soul}
+\usepackage{sectsty}% http://ctan.org/pkg/sectsty
+\usepackage{xcolor}% http://ctan.org/pkg/xcolor
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{wrapfig}
+\usepackage{pgfgantt}
+\usepackage{natbib}
+\bibliographystyle{bibstyle}
+\setcitestyle{authoryear, open={(},close={)}}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{nicefrac}
+\usepackage{makecell}
+\usepackage{lineno}
+\usepackage{fancyhdr}
+\usepackage[title]{appendix}
+\graphicspath{{figs/}}
+\renewcommand{\arraystretch}{1.2}
+\renewcommand{\d}{\mathrm{d}}
+\newcommand*\mean[1]{\bar{#1}}
+
+\definecolor{blue}{RGB}{0,0,204}
+\definecolor{red1}{RGB}{102,0,14}
+\definecolor{teal1}{RGB}{0,138,124}
+\definecolor{teal2}{RGB}{0,212,184}
+\definecolor{darkgrey}{RGB}{25,55,50}
+
+\definecolor{frugalGreyishPurple}{RGB}{136,113,145}
+\definecolor{polledElectricPurple}{RGB}{170,35,255}
+\definecolor{balkingMud}{RGB}{115,92,18}
+
+\captionsetup[figure]{font=footnotesize,labelfont={it,bf,footnotesize,color=teal1}}
+\captionsetup[table]{font=footnotesize,labelfont={it,bf,footnotesize,color=teal1}}
+
+\setulcolor{polledElectricPurple}
+
+\sectionfont{\color{darkgrey}\itshape}
+\subsectionfont{\color{frugalGreyishPurple}\itshape}
+\subsubsectionfont{\color{teal1}} %teal1
+
+
+\pagestyle{fancy}
+\thispagestyle{empty}
+
+% Define a new fontfamily for the subsubsection font
+% Don't use \fontspec directly to change the font
+%\newfontfamily\sectionfont[Color=MSLightBlue]{CMU Sans Serif Demi Condensed}
+%\newfontfamily\subsectionfont[Color=MSLightBlue]{CMU Typewriter Text}
+%\newfontfamily\subsubsectionfont[Color=MSLightBlue]{CMU Serif Extra BoldSlanted}
+%\titleformat*{\section}{\Large\bfseries}
+%\titleformat*{\subsection}{\large\bfseries\sffamily}
+%\titleformat*{\subsubsection}{\itshape}
+
+%\renewcommand{\cellalign/theadalign}{vh}
+%\titleformat{\section}
+%  {\normalfont\sffamily\Large\bfseries}
+%  {\thesection}{1em}{}
+
+\author{C. M. Guimond \\ \normalsize O. Shorttle \& J. F. Rudge, supervisors \\ \textit{Second-Year Report to the Department of Earth Sciences}}
+\title{Mountains on massive rocky exoplanets? \\ \large Theoretical limits to topography}
+
+\fancyhead[L]{Exoplanet topography}
+\fancyhead[R]{C. M. Guimond}
+
+\begin{document}
+
+\begin{figure}
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.25\textwidth]{cats} % first figure itself
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.25\textwidth]{cam} % second figure itself
+    \end{minipage}
+\end{figure}
+
+\maketitle
+
+%\linenumbers
+
+
+
+
+
+
+% gantt chart
+\begin{ganttchart}[
+    y unit title=0.4cm,
+    y unit chart=0.5cm,
+    vgrid,
+    time slot format=isodate-yearmonth,
+    time slot unit=month,
+    title/.append style={draw=none, fill=barblue},
+    title label font=\sffamily\footnotesize\bfseries\color{white},
+    title label node/.append style={below=-2.4ex},
+    title left shift=.05,
+    title right shift=-.05,
+    title height=1,
+    bar/.append style={draw=none, fill=groupblue},
+    bar height=.8,
+    bar label font=\normalsize\color{black!50},
+    group right shift=0,
+    group top shift=.6,
+    group height=.3,
+    group peaks height=.2,
+    bar incomplete/.append style={fill=coral}
+   ]{2021-05}{2023-03}
+   \gantttitlecalendar{year}\\
+   
+   
+\ganttset{progress label text={}, link/.style={black, -to}}
+\ganttgroup[group label font=\small\bfseries]{Controls on. }{2050-05}{2050-06} \\
+\ganttbar[
+    progress=0,
+    bar label font=\scriptsize,
+    name=pp, bar incomplete/.append style={fill=green}
+   ]{Paper manuscript}{2021-05}{2021-06} \\
+\ganttset{progress label text={}, link/.style={black, -to}}
+\ganttgroup[group label font=\small\bfseries]{Uniform cross-current}{2021-07}{2022-02} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize]{Experiments}{2021-07}{2021-10} \\
+\ganttlinkedbar[progress=0, bar label font=\scriptsize]{Write up}{2021-09}{2022-02} \\
+
+\ganttset{progress label text={}, link/.style={black, -to}}
+\ganttgroup[group label font=\small\bfseries]{Steady gravity currents}{2022-02}{2022-09} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=orange}]{Experiments}{2022-02}{2022-05} \\
+\ganttlinkedbar[progress=0, bar label font=\scriptsize, bar incomplete/.append style={fill=orange}]{Write up}{2022-04}{2022-09} \\
+
+\ganttset{progress label text={}, link/.style={black, -to}}
+\ganttgroup[group label font=\small\bfseries]{Geological data }{2050-10}{2050-03} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=red}]{Deposit data collection}{2021-05}{2022-09}
+\\
+
+\ganttset{progress label text={}, link/.style={black, -to}}
+\ganttgroup[group label font=\small\bfseries]{Thesis}{2022-10}{2023-03} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=purple}]{Intro. \& conc.}{2022-10}{2022-12} \\
+\ganttbar[progress=0, bar label font=\scriptsize, bar incomplete/.append style={fill=purple}]{Editing}{2023-01}{2023-03} 
+\\
+
+
+\end{ganttchart}
+
+
+
+
+
+
+
+
+
+%\input{tex/abstract}
+
+%\tableofcontents
+%\listoffigures
+
+%\input{tex/introduction}
+%\input{tex/results}
+%\input{tex/discussion}
+%\input{tex/future}
+\bibliography{../exogeodynamics}
+
+
+%\setcounter{equation}{0}
+%\renewcommand{\theequation}{A\arabic{equation}}
+%\setcounter{table}{0}
+%\renewcommand{\thetable}{A\arabic{table}}
+%\begin{appendices}
+%\input{tex/terminology}
+%\input{tex/methods}
+%\end{appendices}
+
+
+
+\end{document}
+
