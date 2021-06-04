@@ -74,7 +74,7 @@ from postaspect import aspect_post as ap
 """look at individual case data"""
 
 case = 'Ra2e8-eta1e6-wide'
-plat.print_solution_data(case, suffix='_T', keys=None, data_path=data_path)
-plat.print_solution_data(case, suffix='_h', keys=None, data_path=data_path)
+ap.print_solution_data(case, suffix='_T', keys=None, data_path=data_path)
+ap.print_solution_data(case, suffix='_h', keys=None, data_path=data_path)
 
 print('Summary plots complete')
