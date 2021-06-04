@@ -16,10 +16,10 @@ from postaspect import aspect_post as ap
 #                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
 #                         load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
-ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
-                        t1_grid=t1_grid[:, -2], end_grid=end_grid[:, -2], data_path=data_path, redo=False,
-                        load_grid=load_grid[:, -2], regime_grid=regime_grid_td[:, -2],
-                        postprocess_kwargs=postprocess_kwargs)
+# ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
+#                         t1_grid=t1_grid[:, -2], end_grid=end_grid[:, -2], data_path=data_path, redo=False,
+#                         load_grid=load_grid[:, -2], regime_grid=regime_grid_td[:, -2],
+#                         postprocess_kwargs=postprocess_kwargs)
 
 """plot summaries across delta eta and/or Ra """
 
@@ -37,19 +37,19 @@ ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu
 #             postprocess_kwargs=postprocess_kwargs,
 #         )
 #
-i_plot = list(range(len(Ra_ls)))  # range(4,5)
-for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
-    if ii in i_plot:
-        cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
-        labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
-        plat.subplots_cases(
-            cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
-            fname='all-Ra' + Ra, suptitle='Ra = ' + Ra, c_rms=c_rms, c_peak=c_peak,
-            includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
-            regime_grid=regime_grid_td.T[ii],
-            postprocess_kwargs=postprocess_kwargs,
-        )
+# i_plot = list(range(len(Ra_ls)))  # range(4,5)
+# for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
+#     if ii in i_plot:
+#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
+#         labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
+#         plat.subplots_cases(
+#             cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
+#             fname='all-Ra' + Ra, suptitle='Ra = ' + Ra, c_rms=c_rms, c_peak=c_peak,
+#             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
+#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
+#             regime_grid=regime_grid_td.T[ii],
+#             postprocess_kwargs=postprocess_kwargs,
+#         )
 
 # """ 2D isoviscous benchmark """
 # plat.subplots_cases(
@@ -78,8 +78,8 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
 
 """look at individual case data"""
 
-case = 'Ra2e8-eta1e6-wide'
+case = 'Ra2e8-eta1e7-wide-ascii'
 ap.print_solution_data(case, suffix='_T', keys=None, data_path=data_path)
-ap.print_solution_data(case, suffix='_h', keys=None, data_path=data_path)
+# ap.print_solution_data(case, suffix='_h', keys=None, data_path=data_path)
 
 print('Summary plots complete')
