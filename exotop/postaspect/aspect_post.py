@@ -1035,7 +1035,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
         t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
         include_regimes = regime_names
-
+    print('load_grid for reprocessing:', load_grid)
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = get_cases_list(Ra_ls, eta_str, end_grid[jj])
         for ii, case in enumerate(cases):

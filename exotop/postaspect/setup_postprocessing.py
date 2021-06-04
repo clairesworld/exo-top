@@ -47,8 +47,6 @@ if check_new:
     load_grid[4, 4:] = 'auto'  # ongoing runs: new eta1e9 runs
     load_grid[:, -2] = False  # 2e8 initialisation
 
-print('load_grid', load_grid)
-
 # string endings for case names
 end_grid = np.empty_like(t1_grid, dtype=object)
 end_grid[:] = "-wide"
