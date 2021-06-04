@@ -39,11 +39,11 @@ for regime in regimes:
     elif regime == 'chaotic':
         include_regimes = ['chaotic']
         # c_rms = c_rms[1:]
-        ylim = [6e-3, 1.5e-2]
-        # xlim = [1e6, 3e7]
+        ylim = [6e-3, 1.2e-2]
+        xlim = [2e6, 4e7]
         yticks = [6e-3, 8e-3, 1e-2, 1.2e-2]
         xticks = [3e6, 1e7]
-        fitlabel = r'$\Delta h = 0.12$ Ra$_{i, eff}^{-0.17}$'
+        fitlabel = r'$\Delta h = 0.97$ Ra$_{i, eff}^{-0.16}$'
         handles = [mlines.Line2D([], [], color=c_fit, marker='*', ls='--',
                                  markersize=0, lw=lw, label=fitlabel),
                    mlines.Line2D([], [], color=c_rms[1], marker='o', ls='--',
