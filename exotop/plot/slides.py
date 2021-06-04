@@ -39,7 +39,7 @@ for regime in regimes:
     elif regime == 'chaotic':
         include_regimes = ['chaotic']
         # c_rms = c_rms[1:]
-        ylim = [6e-3, 1.2e-2]
+        ylim = [6e-3, 1.3e-2]
         # xlim = [1e6, 3e7]
         yticks = [6e-3, 8e-3, 1e-2, 1.2e-2]
         xticks = [3e6, 1e7]
@@ -51,7 +51,10 @@ for regime in regimes:
                    mlines.Line2D([], [], color=c_rms[2], marker='o', ls='--',
                                  markersize=20, lw=0, label=r'$\Delta \eta = 10^{7}$'),
                    mlines.Line2D([], [], color=c_rms[3], marker='o', ls='--',
-                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$')]
+                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{8}$'),
+                   mlines.Line2D([], [], color=c_rms[4], marker='o', ls='--',
+                                 markersize=20, lw=0, label=r'$\Delta \eta = 10^{9}$')
+                   ]
 
     # fig, ax, ax2 = plat.plot_h_vs(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=True, data_path=data_path,
     #                  fig_path=fig_path, averagescheme='timefirst', which_x='Ra_i_eff', ticksize=ticksize,
