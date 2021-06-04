@@ -36,7 +36,7 @@ regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 
                            ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'not ready', 'chaotic'],  # eta 1e8
                            ['not ran', 'not ran', 'not ran', 'not ran', 'not ready', 'not ran', 'not ready']  # eta 1e9???
                            ])
-regime_names_td = ['steady', 'trans.', 'chaotic']
+regime_names_td = ['steady', 'trans.', 'chaotic', 'not ready']
 c_regimes_td = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure']
 
 load_grid = np.empty_like(t1_grid, dtype=object)
@@ -45,7 +45,9 @@ if check_new:
     load_grid[1:, 5:] = 'auto'   # ongoing runs: Ra3e8
     load_grid[3, 4] = 'auto'  # ongoing runs: Ra1e8 eta1e8
     load_grid[4, 4:] = 'auto'  # ongoing runs: new eta1e9 runs
-    load_grid[:, -1] = False  # 2e8 initialisation
+    load_grid[:, -2] = False  # 2e8 initialisation
+
+print('load_grid', load_grid)
 
 # string endings for case names
 end_grid = np.empty_like(t1_grid, dtype=object)
