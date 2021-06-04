@@ -53,7 +53,7 @@ def plot_getx(Ra, eta, case=None, which_x=None, averagescheme='timefirst', data_
         elif averagescheme == 'timefirst':
             if '_T' in psuffixes:
                 # load time-averages
-                T_av, y = pro.time_ad_profile_fromverage_df(df, 'T_av')
+                T_av, y = pro.time_averaged_profile_fromverage_df(df, 'T_av')
                 uv_mag_av, y = pro.time_averaged_profile_from_df(df, 'uv_mag_av')
                 dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y,
                                                  data_path=data_path,
