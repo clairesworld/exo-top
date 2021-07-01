@@ -73,7 +73,7 @@ from postaspect import aspect_post as ap
 fig, ax = plat.subplots_cases(
     ['Ra1e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
     labels=['Ra 1e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path, col_vis=23,  # not sure why 23 for eta 1e9 only
-    t1=[0.15, 0.1], load=True, fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
+    t1=[0.15, 0.1], load='auto', fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
     includepd=True, includeTz=True, includegraphic=True,  # turn on once you know where steady state starts
 )
 
@@ -81,7 +81,7 @@ fig, ax = plat.subplots_cases(
 fig, ax = plat.subplots_cases(
     ['Ra2e8-eta1e6-wide', 'Ra2e8-eta1e7-wide-ascii', 'Ra2e8-eta1e8-wide-ascii'],
     labels=['$\Delta \eta$=1e6', '$\Delta \eta$=1e7', '$\Delta \eta$=1e8'], data_path=data_path, fig_path=fig_path,
-    t1=[0.06, 0.065, 0.06], load=True, fname='all-Ra2e8', suptitle='Ra=2e8', postprocess_kwargs=postprocess_kwargs,
+    t1=[0.06, 0.065, 0.06], load='auto', fname='all-Ra2e8', suptitle='Ra=2e8', postprocess_kwargs=postprocess_kwargs,
     includepd=True, includeTz=True, includegraphic=True,  # turn on once you know where steady state starts
 )
 

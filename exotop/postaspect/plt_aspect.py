@@ -1007,6 +1007,9 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                     try:
                         fig, ax = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10, t1=t1_ii,
                                                  cmap='gist_heat', c='k', cbar=False, title='', fig=fig, ax=ax,
+                                                 shading='nearest', return_artists=False, save=False, i_n=-1, avg=False)
+                        fig, ax = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10, t1=t1_ii,
+                                                 cmap='gist_heat', c='k', cbar=False, title='', fig=None, ax=None,
                                                  shading='nearest', return_artists=False, save=True, i_n=-1, avg=False)
                         print('    Plotting graphical output from solution for', case)
                     except Exception as e:
@@ -1252,35 +1255,14 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
 
     if n == 'mean':  # avg of all steady state sols
         print('    plotting time-mean T profile')
-        # bug here where taking this mean returns a series with the array columns missing
-        # T_params_plot = T_params.mean(axis=0)  # T params df already only contains steady state values
-        # print('T_params_plot', type(T_params_plot), '\n', T_params_plot)
-        # print('     ', T_params_plot.keys())
-
         # get proper time-averages
         T_av_proper, _ = pro.time_averaged_profile_from_df(T_params, 'T_av')
         uv_mag_av_proper, y_proper = pro.time_averaged_profile_from_df(T_params, 'uv_mag_av')
 
         d_n = dat.T_components(n=None, T_av=T_av_proper, uv_mag_av=uv_mag_av_proper, y=y_proper, data_path=data_path,
                                **kwargs)
-        print('d_n\n', d_n.keys())
         T_params_plot = d_n.copy()
 
-        # dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y,
-        #                                  data_path=data_path, **kwargs)  # actually a dict
-        # print('dic_av\n', dic_av.keys())  # this has the stuff you want to plot
-        # really hacky bit
-        # for k in ['T_av', 'uv_mag_av', 'y']:
-        #     dic_av.pop(k, None)
-        #     T_params = T_params.drop(k, axis=1)  # drop lists you don't need
-
-        # df_av = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
-        # print('df_av\n', df_av.keys())
-        # T_params_plot = T_params.mean(axis=0).to_frame().transpose()  # mean of other parameters
-        # T_params_plot.set_index(pd.Series([0]))
-        # print('T_params_plot\n', T_params_plot.keys())
-        # T_params_plot.update(df_av)  # update with properly timefirst-averaged temperature params
-        # print('updated: T_params_plot\n', T_params_plot.keys())
     else:
         print('    plotting T profile at n =', n)
         try:
