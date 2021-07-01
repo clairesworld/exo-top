@@ -1,9 +1,9 @@
 \documentclass[10pt,a4paper]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage[utf8]{inputenc}
+\usepackage{xcolor}% http://ctan.org/pkg/xcolor
 \usepackage{color,soul}
 \usepackage{sectsty}% http://ctan.org/pkg/sectsty
-\usepackage{xcolor}% http://ctan.org/pkg/xcolor
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -27,7 +27,7 @@
 \usepackage{lineno}
 \usepackage{fancyhdr}
 \usepackage[title]{appendix}
-\graphicspath{{figs/}}
+\graphicspath{{../report-firstyr/figs/}}
 \renewcommand{\arraystretch}{1.2}
 \renewcommand{\d}{\mathrm{d}}
 \newcommand*\mean[1]{\bar{#1}}
@@ -41,6 +41,8 @@
 \definecolor{frugalGreyishPurple}{RGB}{136,113,145}
 \definecolor{polledElectricPurple}{RGB}{170,35,255}
 \definecolor{balkingMud}{RGB}{115,92,18}
+\definecolor{silver}{RGB}{197,201,199}
+%\definecolor{palelilac}{RGB}{228,203,}
 
 \captionsetup[figure]{font=footnotesize,labelfont={it,bf,footnotesize,color=teal1}}
 \captionsetup[table]{font=footnotesize,labelfont={it,bf,footnotesize,color=teal1}}
@@ -53,29 +55,16 @@
 
 
 \pagestyle{fancy}
-\thispagestyle{empty}
-
-% Define a new fontfamily for the subsubsection font
-% Don't use \fontspec directly to change the font
-%\newfontfamily\sectionfont[Color=MSLightBlue]{CMU Sans Serif Demi Condensed}
-%\newfontfamily\subsectionfont[Color=MSLightBlue]{CMU Typewriter Text}
-%\newfontfamily\subsubsectionfont[Color=MSLightBlue]{CMU Serif Extra BoldSlanted}
-%\titleformat*{\section}{\Large\bfseries}
-%\titleformat*{\subsection}{\large\bfseries\sffamily}
-%\titleformat*{\subsubsection}{\itshape}
-
-%\renewcommand{\cellalign/theadalign}{vh}
-%\titleformat{\section}
-%  {\normalfont\sffamily\Large\bfseries}
-%  {\thesection}{1em}{}
+%\thispagestyle{empty}
 
 \author{C. M. Guimond \\ \normalsize O. Shorttle \& J. F. Rudge, supervisors \\ \textit{Second-Year Report to the Department of Earth Sciences}}
-\title{Mountains on massive rocky exoplanets? \\ \large Theoretical limits to topography}
+\title{Rocky exoplanet surfaces: \\ \large Theoretical limits on land area}
 
 \fancyhead[L]{Exoplanet topography}
 \fancyhead[R]{C. M. Guimond}
 
 \begin{document}
+
 
 \begin{figure}
     \centering
@@ -84,71 +73,141 @@
         \includegraphics[width=0.25\textwidth]{cats} % first figure itself
     \end{minipage}\hfill
     \begin{minipage}{0.5\textwidth}
-        \centering
+       r \centering
         \includegraphics[width=0.25\textwidth]{cam} % second figure itself
     \end{minipage}
 \end{figure}
 
 \maketitle
-
+\tableofcontents
 %\linenumbers
 
 
+\section{Updates since the last report}
+
+\begin{itemize}
+
+\item Given virtual presentations on exoplanet topography work, both internal and external
+
+\begin{enumerate}
+\item Europlanet Science Congress, 21 September -- 9 October 2020 [poster]
+\item Bullard first-year talk, 12 February 2021 [talk]
+\item Grad talk (downtown), 5 March 2021 [talk]
+\item UK Exoplanet Meeting, 22 April 2021 [talk]
+\item Cambridge Exoplanets and Life Day, 8 June 2021 [talk]
+\end{enumerate}
+
+\item Decided to include a contemporaneous first-author manuscript in my thesis (Paper 1), which I've been leading with a group outside Cambridge.
+
+\item Nearly (this week?) ready to re-submit third review of Paper 1
+
+
+\item Completed draft of first work on exoplanet dynamic topography (Paper 2).
+
+\begin{itemize}
+
+\item No more new numerical convection simulations to perform (notwithstanding referee report), although some runs are still going
+
+\item Integrated dynamic topography scaling relationships into 1D thermal history model
+
+\item Arrived at estimates of a planetary "ocean basin capacity" (given only dynamic topography), the amount of liquid water that can be stored before flooding the surface
+
+\end{itemize}
+
+\end{itemize}
+
+
+\subsection{Abstract of Paper 1 (under review at PEPI)}
+
+Before the origin of life, Earth's atmosphere was built up by outgassing of the mantle. Here we model how C-O-H outgassing could have evolved through the late Hadean and early Archean, under the conditions that global plate tectonics had not yet initiated, all outgassing was subaerial, and graphite was the stable carbon phase in the melt source regions. The model couples numerical mantle convection, partitioning of volatiles into the melt, and chemical speciation in the gas phase. Of the parameters tested, the mantle oxidation state has the largest effect on individual species' gas fluxes because it controls both the volatile speciation and the carbon content of basaltic magmas. Hence virtually no CO$_2$ would be outgassed below the iron-w\"ustite mineral redox buffer: in conditions this reduced, (i) carbonate ions dissolve in magmas only in very limited amounts, and (ii) almost all degassed carbon takes the form of CO instead of CO$_2$. Even for oxidised scenarios near the quartz-fayalite-magnetite buffer, we predict CO$_2$ outgassing rates of less than 5 Tmol yr$^{-1}$. This result contrasts common assumptions in Archean climate studies. Relatively small fluxes are due in part to our model's strong dependence of CO$_2$ melt concentrations on the mantle oxidation state (which may not have reached late Archean values in the Hadean). Imposing a stagnant lid regime also seems to curb outgassing rates, which points to the importance of the presumed tectonic mode on this vital atmospheric input. Our results could suggest that certain chemical and geodynamic conditions may have been required if outgassing were to supply enough greenhouse gas for a clement climate under the Faint Young Sun.
 
 
 
+\subsection{Abstract of Paper 2 (submitting to PSJ)}
+
+
+Topography on a rocky exoplanet would raise land above its hypothetical sea level. Although land elevation is the product of many complex processes, the large-scale topographic features on any geodynamically-active planet are the expression of the convecting mantle beneath the surface. This so-called ``dynamic topography" exists regardless of a planet's tectonic regime or volcanism; its amplitude, with a few assumptions, can be estimated via numerical simulations of convection as a function of the mantle Rayleigh number. Here, we develop new scaling relationships for dynamic topography on stagnant lid planets using 2D convection models with temperature-dependent viscosity. These scalings are applied to 1D thermal history models to explore how topography varies with exoplanetary observables over a wide parameter space. Synthetic dynamic topography is converted to an ocean basin capacity, the minimum water volume required to flood the entire surface. A planet's basin capacity increases less steeply with its mass than does the amount of water itself, assuming a water inventory at a constant planetary mass fraction. These results suggest that dynamically-supported topography alone would be sufficient to maintain subaerial land on planets with surface water inventories of less than approximately $10^{-6}$ times their mass. Our work indicates that deterministic geophysical modelling might be used to inform land/ocean fractions, a key unknown in planetary climate studies.
+
+\section{Thesis plan}
+
+\subsection{Next steps}
+
+\begin{itemize}
+\item Paper 3 to focus on planetary limits to volcanic constructional topography
+\begin{itemize}
+\item Will implement pre-existing mantle melting model into 1D thermal history model
+\item Will develop relatively simple physical model of the maximum height of these landforms, depending on bulk planetary properties (e.g., surface gravity)
+\end{itemize}
+\end{itemize}
+
+
+\subsection{Calendar}
 
 % gantt chart
 \begin{ganttchart}[
+    x unit=0.3cm,    
     y unit title=0.4cm,
     y unit chart=0.5cm,
     vgrid,
     time slot format=isodate-yearmonth,
     time slot unit=month,
-    title/.append style={draw=none, fill=barblue},
-    title label font=\sffamily\footnotesize\bfseries\color{white},
-    title label node/.append style={below=-2.4ex},
-    title left shift=.05,
+    title/.append style={draw=none, fill=darkgrey},
+    title label font=\footnotesize\bfseries\color{white},
+    title label node/.append style={below=-1.7ex},
+    title left shift=0,
     title right shift=-.05,
     title height=1,
-    bar/.append style={draw=none, fill=groupblue},
+    bar/.append style={draw=none, fill=teal1},
     bar height=.8,
     bar label font=\normalsize\color{black!50},
     group right shift=0,
-    group top shift=.6,
-    group height=.3,
-    group peaks height=.2,
-    bar incomplete/.append style={fill=coral}
-   ]{2021-05}{2023-03}
+    group left shift=0,
+    group top shift=0.5,
+    group height=.03,
+    group peaks height=.05,
+    bar incomplete/.append style={fill=teal2}
+   ]{2021-01}{2023-10}
    \gantttitlecalendar{year}\\
    
    
 \ganttset{progress label text={}, link/.style={black, -to}}
-\ganttgroup[group label font=\small\bfseries]{Controls on. }{2050-05}{2050-06} \\
-\ganttbar[
-    progress=0,
-    bar label font=\scriptsize,
-    name=pp, bar incomplete/.append style={fill=green}
-   ]{Paper manuscript}{2021-05}{2021-06} \\
-\ganttset{progress label text={}, link/.style={black, -to}}
-\ganttgroup[group label font=\small\bfseries]{Uniform cross-current}{2021-07}{2022-02} \\
-\ganttbar[progress=0, name=T1A, bar label font=\scriptsize]{Experiments}{2021-07}{2021-10} \\
-\ganttlinkedbar[progress=0, bar label font=\scriptsize]{Write up}{2021-09}{2022-02} \\
+%\ganttgroup[group label font=\small\bfseries]{Controls on. }{2050-05}{2050-06} \\
+%\ganttbar[
+%    progress=0,
+%    bar label font=\scriptsize,
+%    name=pp, bar incomplete/.append style={fill=black}
+%   ]{Paper manuscript}{2021-05}{2021-06} \\
+%\ganttset{progress label text={}, link/.style={black, -to}}
+
+
+
+\ganttgroup[group label font=\small\bfseries]{\textit{Paper 1:} Archean outgassing}{2021-01}{2021-06} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=frugalGreyishPurple}]{Review}{2021-01}{2021-06} \\
+\\
+
 
 \ganttset{progress label text={}, link/.style={black, -to}}
-\ganttgroup[group label font=\small\bfseries]{Steady gravity currents}{2022-02}{2022-09} \\
-\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=orange}]{Experiments}{2022-02}{2022-05} \\
-\ganttlinkedbar[progress=0, bar label font=\scriptsize, bar incomplete/.append style={fill=orange}]{Write up}{2022-04}{2022-09} \\
-
-\ganttset{progress label text={}, link/.style={black, -to}}
-\ganttgroup[group label font=\small\bfseries]{Geological data }{2050-10}{2050-03} \\
-\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=red}]{Deposit data collection}{2021-05}{2022-09}
+\ganttgroup[group label font=\small\bfseries]{\textit{Paper 2:}Dynamic topography}{2021-01}{2021-08} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=silver}]{Experiments}{2021-01}{2021-06} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=frugalGreyishPurple}]{Initial manuscript submission}{2021-02}{2021-08} \\
+%\ganttlinkedbar[progress=0, bar label font=\scriptsize, bar incomplete/.append style={fill=orange}]{Write up}{2022-04}{2022-09} 
 \\
 
 \ganttset{progress label text={}, link/.style={black, -to}}
-\ganttgroup[group label font=\small\bfseries]{Thesis}{2022-10}{2023-03} \\
-\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=purple}]{Intro. \& conc.}{2022-10}{2022-12} \\
-\ganttbar[progress=0, bar label font=\scriptsize, bar incomplete/.append style={fill=purple}]{Editing}{2023-01}{2023-03} 
+\ganttgroup[group label font=\small\bfseries]{\textit{Paper 3:} Volcanic topography }{2021-07}{2022-08} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=silver}]{Experiments}{2021-07}{2022-01} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=frugalGreyishPurple}]{Initial manuscript submission}{2022-01}{2022-08} \\
+\\
+
+
+\ganttset{progress label text={}, link/.style={black, -to}}
+\ganttgroup[group label font=\small\bfseries]{Bonus project }{2022-08}{2023-03} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=frugalGreyishPurple}]{If it makes sense}{2022-08}{2023-03} \\
+\\
+
+\ganttset{progress label text={}, link/.style={black, -to}}
+\ganttgroup[group label font=\small\bfseries]{Thesis}{2022-10}{2023-10} \\
+\ganttbar[progress=0, name=T1A, bar label font=\scriptsize, bar incomplete/.append style={fill=frugalGreyishPurple}]{Writing}{2022-10}{2023-10} \\
 \\
 
 
@@ -164,7 +223,7 @@
 
 %\input{tex/abstract}
 
-%\tableofcontents
+
 %\listoffigures
 
 %\input{tex/introduction}

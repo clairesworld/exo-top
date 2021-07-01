@@ -343,8 +343,13 @@ def trapzmean(A):
     return np.trapz(A) / (len(A) - 1)
 
 
-def peak_and_rms(h):
-    return np.max(h), np.sqrt(trapzmean(h ** 2))
+def peak_and_rms(h, trap=False):
+    peak = np.max(h)
+    if trap:
+        rms = np.sqrt(trapzmean(h ** 2))
+    else:
+        rms = np.sqrt(np.mean(h ** 2))
+    return peak, rms
 
 
 def test_h_avg(case, data_path=data_path_bullard):

@@ -67,18 +67,16 @@ cmap_path = '/home/claire/Works/exo-top/exotop/plot/cmaps/'
 hex_list = ['#ffd8e2', '#dce5e9', '#d6fcdd', '#bbfde1', '#a4fde1', '#49fffc', '#4cd5e8', '#56c3e0', '#72b2d3', '#3b5e71']
 float_list = [1e-5, 5e-5, 6e-5, 8e-5, 1e-4, 1.1e-4, 1.3e-4, 2e-4, 2.3e-4, 3e-4]
 fln = None  # minmaxnorm(float_list, a=0, b=1)
-cmap = get_continuous_cmap(hex_list, N=12,
-                           float_list=fln)
-
+cmap = 'gist_earth_r'  # get_continuous_cmap(hex_list, N=12, float_list=fln)
 
 slides = True
-nplanets = 2
+nplanets = 8
 n_stats = 1000
 
 if slides:
     textc = 'xkcd:off white'
     c_dt = 'xkcd:orange red'
-    alpha_w = 0.9
+    alpha_w = 0.8  # 0.6
 else:
     textc = 'k'
     c_dt = 'xkcd:bordeaux'
@@ -86,15 +84,15 @@ else:
 
 xlabel = 'Planet mass ' + r'($M_{\oplus}$)'
 labelsize = 30 #33.5  # 30
-legsize = 30 # 24  # 20
+legsize = 22
 ticksize = 26  # 20
-clabelpad = 45
+clabelpad = 50
 
 
 print('\nfirst call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets, version=0,
                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
-                                                 titlesize=32, fig_path=fig_path, save=False, log=True, alpha_w=0.3,
+                                                 titlesize=32, fig_path=fig_path, save=False, log=True, alpha_w=alpha_w,
                                                  vol_0='Earth', simple_scaling=False,
                                                  defaults='Venusbaseline', textc=textc,
                                                  # title='Water volume to submerge land',
@@ -159,7 +157,7 @@ ax.set_xlabel(xlabel, fontsize=labelsize, c=textc,
               labelpad=20)
 
 ax.set_xlim((0.1, 5))
-ax.set_ylim((1e-1, 1.4))
+ax.set_ylim((2e-1, 1.8))
 # ax.set_ylim((1e-2, 4e0))
 
 ax.text(0.03, 0.97, '4.5 Gyr\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
@@ -172,7 +170,7 @@ ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
 ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 ax.set_xticks([0.1, 1, 2, 3, 4, 5])
-ax.set_yticks([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1, 1.4])
+ax.set_yticks([0.3, 0.4, 0.5, 0.6, 0.7, 1, 1.4])
 # ax.set_yticks([0.2, 0.3, 1, 2])
 
 handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,
@@ -184,7 +182,7 @@ handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,
            # mlines.Line2D([], [], color='g', ls='--', lw=3,
            #               label='Simple scaling')
            ]
-ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=22, ncol=1)
+ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize, ncol=1)
 
 if slides:
     fig, *axes = dark_background(fig, axes)

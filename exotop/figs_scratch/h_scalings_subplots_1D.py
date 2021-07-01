@@ -15,10 +15,11 @@ fig_format = '.png'
 benchmark_path = '../benchmarks/'
 planet_icon_path = '/home/claire/Pictures/science-graphics/planet_png/'
 labelsize = 30
-legsize = 30
-xlabelpad = 30
+legsize = 22  # 30
+xlabelpad = 50
 ticksize = 25
 linec = 'xkcd:ocean green'  # 'xkcd:british racing green'  # '#d88868'
+alpha = 0.6  # 0.3
 
 # how h varies across key input parameters
 x_vars = ['t',
@@ -36,10 +37,10 @@ xscales = [p.sec2Gyr,
 xlabels = ['Age\n(Gyr)',
            'Planet mass\n($M_E$)', 'CMF', 'Radiogenic heating\n(pW kg$^{-1}$)']
 
-fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=1000, x_res=7,
+fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=1000, x_res=5,
                                                            defaults='baseline',
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
-                                                           legend=True, lw=4, ylabel=r'$h_{\rm rms}$ (m)',
+                                                           legend=True, lw=4, ylabel=r'RMS topography (m)',
                                                            labelpad=20, legendtop=True, tickwidth=2,
                                                            save=False, fname='relative_h_slides', fig_path=fig_path,
                                                            update_kwargs={'visc_type': 'KW'},
@@ -47,22 +48,22 @@ fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=100
                                                            x_vars=x_vars, units=units, log=log, x_range=x_range,
                                                            xscales=xscales, xlabels=xlabels,
                                                            linec=linec, leg_loc='upper right',
-                                                           textc='k', #'xkcd:off white',
-                                                           alpha=0.3, legsize=legsize,
+                                                           textc='xkcd:off white',
+                                                           alpha=alpha, legsize=legsize, xlabelpad=xlabelpad,
                                                            )
 
 for i, ax in enumerate(axes):
     ax.set_xlim([x*xscales[i] for x in x_range[i]])
     ax.set_xticks(xticks[i])
     ax.set_yscale('log')
-    ax.set_ylim((350, 1100))
+    ax.set_ylim((500, 1500))
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
 axes[0].yaxis.set_minor_formatter(ticker.NullFormatter())
-axes[0].set_yticks([400, 500, 600, 700, 800, 900, 1000])
+axes[0].set_yticks([600, 700, 800, 900, 1000, 1200,  1500])
 
-# axes[0].set_xlim(2, 5)  # ensure time axis lims
+axes[0].set_xlim(2, 5)  # ensure time axis lims
 
 # VENUS: 850 m
 # h_Venus = 865.4906656355711
@@ -96,9 +97,9 @@ handles = [mlines.Line2D([], [], color=linec, ls='-',
 #                         borderaxespad=0,
 #                         loc='lower left', bbox_to_anchor=(0.0, 1.01), ncol=3, )
 
-# fig, *axes = dark_background(fig, axes)
+fig, *axes = dark_background(fig, axes)
 plt.subplots_adjust(wspace=0.2)
 # plt.tight_layout()
 
-fig.savefig(fig_path+'h_parameters'+fig_format, bbox_inches='tight')
+fig.savefig(fig_path+'h_parameters_slides'+fig_format, bbox_inches='tight')
 plt.show()
