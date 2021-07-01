@@ -22,12 +22,12 @@ postprocess_kwargs = {'X_extent': X_extent, 'Y_extent': Y_extent, 'alpha_m': alp
 Ra_ls = np.array(['1e6', '3e6', '1e7', '3e7', '1e8', '2e8', '3e8'])  # 3e5 no convection
 eta_ls = np.array(['1e5', '1e6', '1e7', '1e8', '1e9'])
 
-# Ra from 1e6 to 3e8
+# Ra from 1e6 , 3e6, 1e7, 3e7, 1e8, 2e8,  3e8
 t1_grid = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 0, 0.0590015],  # eta 1e5
-                    [0.9, 0.3, 0.3, 0.4, 0.3, 0.01, 0.07],  # eta 1e6
-                    [0, 0.7, 0.35, 0.4, 0.3, 0.01, 0.075],  # eta 1e7
-                    [0, 0, 0.6, 0.55, 0.09, 0.01, 0.085],  # eta 1e8
-                    [0, 0, 0, 0, 0.08, 0, 0.07]])  # eta 1e9 ???
+                    [0.9, 0.3, 0.3, 0.4, 0.3, 0.06, 0.07],  # eta 1e6
+                    [0, 0.7, 0.35, 0.4, 0.3, 0.065, 0.075],  # eta 1e7
+                    [0, 0, 0.6, 0.55, 0.09, 0.06, 0.085],  # eta 1e8
+                    [0, 0, 0, 0, 0.15, 0, 0.1]])  # eta 1e9 ???
 
 # Ra from 1e6 to 3e8
 # regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 'not ready', 'sluggish'],  # eta 1e5
@@ -37,11 +37,11 @@ t1_grid = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 0, 0.0590015],  # eta 1e5
 #                            ['not ran', 'not ran', 'not ran', 'not ran', 'chaotic', 'not ran', 'chaotic']  # eta 1e9???
 #                            ])  # normal one
 regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 'not ready', 'sluggish'],  # eta 1e5
-                           ['steady', 'steady', 'steady', 'trans.', 'weird', 'not ready', 'chaotic'],  # eta 1e6
-                           ['no convection', 'steady', 'steady', 'trans.', 'chaotic', 'not ready', 'chaotic'],  # eta 1e7
-                           ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'not ready', 'chaotic'],  # eta 1e8
-                           ['not ran', 'not ran', 'not ran', 'not ran', 'weird', 'not ran', 'chaotic']  # eta 1e9???
-                           ])  # exclude some bad points
+                           ['steady', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e6
+                           ['no convection', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e7
+                           ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e8
+                           ['not ran', 'not ran', 'not ran', 'not ran', 'chaotic', 'not ran', 'chaotic']  # eta 1e9???
+                           ])  # exclude some bad points??
 
 regime_names_td = ['steady', 'trans.', 'chaotic', 'not ready']
 c_regimes_td = ['xkcd:sage green', 'xkcd:blood red', 'xkcd:azure']

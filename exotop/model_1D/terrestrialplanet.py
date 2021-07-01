@@ -110,6 +110,7 @@ class TerrestrialPlanet():
         self.SA_p = geom.SA(R=self.R_p)
         self.SA_c = geom.SA(R=self.R_c) # core surface area 
         self.g_sfc = ast.grav(self.M_p, self.R_p)
+        self.rho_m = geom.mantle_density(self.R_p, self.M_p, self.CMF)
         if self.CMF>0:
             self.g_cmb = ast.grav(self.M_c, self.R_c)
         else:
