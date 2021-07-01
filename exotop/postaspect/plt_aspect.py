@@ -1005,7 +1005,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                     print('    Grabbing graphical output for', case)
                 except FileNotFoundError:
                     try:
-                        fig, ax = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10, t1=t1_ii,
+                        fig, ax = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10,
                                                  cmap='gist_heat', c='k', cbar=False, title='', fig=fig, ax=ax,
                                                  shading='nearest', return_artists=False, save=False, i_n=-1, avg=False)
                         print('    Plotting graphical output from solution for', case)
@@ -1241,16 +1241,14 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     i_time = np.argmax(time >= t1)  # index of first timestep to process
     sols_in_time = sol_files[i_time:]
     n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
-    print('n_quasi', n_quasi, 'starts at ts', i_time+1, 'given t1', t1, 'time[i_time]', time[i_time])
-    # print('sols stored\n', T_params[['sol', 'time']], '\n\n\n\n\n\n')
     sols_stored = T_params['sol'].to_numpy()
-
-    idx_stored = T_params.index.values
-    droppy = np.isin(sols_stored, n_quasi)
-    print('dropping idx (ts?)', idx_stored[~droppy])
-    T_params = pro.pickle_drop(case, '_T', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
-                   # index_key='sol',
-                    **kwargs)
+    if sols_stored[0] < n_quasi[0]:
+        print('n_quasi', n_quasi, 'starts at ts', i_time + 1, 'given t1', t1, 'time[i_time]', time[i_time])
+        idx_stored = T_params.index.values
+        droppy = np.isin(sols_stored, n_quasi)
+        print('dropping idx (ts?)', idx_stored[~droppy])
+        T_params = pro.pickle_drop(case, '_T', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
+                        **kwargs)
 
     if n == 'mean':  # avg of all steady state sols
         print('    plotting time-mean T profile')
@@ -1346,14 +1344,15 @@ def plot_pdf(case, df=None, keys=None, dat=None, t1=None, fig_path=fig_path_bull
     ts_save = np.arange(i_time+1, len(time))
     print('ts range', ts_save, 'given t1', t1, 'time[i_time]', time[i_time])
     idx_stored = df.index.values
-    droppy = np.isin(idx_stored, ts_save)  # these are what u want to keep but im attache to the name droppy
-    print('dropping idx (ts?)', idx_stored[~droppy])
-    df = pro.pickle_drop(case, '_h_all', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
-                    test_run=False, **kwargs)
-    _ = pro.pickle_drop(case, '_h', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
-                    test_run=False, **kwargs)
-    _ = pro.pickle_drop(case, '_Nu', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
-                    test_run=False, **kwargs)
+    if idx_stored[0] < ts_save[0]:
+        droppy = np.isin(idx_stored, ts_save)  # these are what u want to keep but im attache to the name droppy
+        print('dropping idx (ts?)', idx_stored[~droppy])
+        df = pro.pickle_drop(case, '_h_all', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
+                        test_run=False, **kwargs)
+        _ = pro.pickle_drop(case, '_h', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
+                        test_run=False, **kwargs)
+        _ = pro.pickle_drop(case, '_Nu', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
+                        test_run=False, **kwargs)
 
 
     for ii, key in enumerate(keys):

@@ -69,13 +69,13 @@ from postaspect import aspect_post as ap
 #     includepd=True, # turn on once you know where steady state starts
 #    )
 
-# eta 1e9 --> this has been subsumed into above
-# fig, ax = plat.subplots_cases(
-#     ['Ra1e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
-#     labels=['Ra 1e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path,
-#     t1=[0.085, 0.07], load='auto', fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
-#     includepd=True, includeTz=False,  # turn on once you know where steady state starts
-# )
+# eta 1e9 --> this has been subsumed into above tho
+fig, ax = plat.subplots_cases(
+    ['Ra1e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
+    labels=['Ra 1e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path,
+    t1=[0.15, 0.1], load=True, fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
+    includepd=True, includeTz=True, includegraphic=True,  # turn on once you know where steady state starts
+)
 
 # Ra2e8 -->
 fig, ax = plat.subplots_cases(
