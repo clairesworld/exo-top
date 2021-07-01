@@ -1235,6 +1235,8 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
             print('No T parameterisation found for solution n =', n)
             return fig, ax
 
+    print('T_params\n', T_params.keys())
+
     delta_rh_n = np.array(T_params['delta_rh'])  # ensure not list
     delta_0_n = np.array(T_params['delta_0'])
     D_l_n = np.array(T_params['y_L'])

@@ -7,11 +7,12 @@ from postaspect import plt_aspect as plat
 from useful_and_bespoke import colourised_legend
 import matplotlib.ticker as ticker
 from matplotlib import rc
-
-rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
+from datetime import date
 
 """setup"""
 
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
+today = date.today().strftime("%b-%d-%Y")
 load = True  # load_grid
 labelsize = 16
 ms = 10
@@ -75,5 +76,5 @@ ax1 = colourised_legend(axes[1], clist=c_rms[1:-1], cleglabels=cleglabels[1:-1],
 fig.suptitle(r'Fit to $C$ Ra$_{i,eff}^p$', fontsize=labelsize)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.35)
-fig.savefig(fig_path + 'h_Ra_scalings.png', bbox_inches='tight')
+fig.savefig(fig_path + 'h_Ra_scalings'+today+'.png', bbox_inches='tight')
 
