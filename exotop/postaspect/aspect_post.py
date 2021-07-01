@@ -226,7 +226,7 @@ def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
-    print('df\n', df)
+    print('df loaded\n', df.head(10))
     if index_key is not None:
         df.set_index(index_key, drop=False, inplace=False)
     if keys is not None:  # drop columns
@@ -241,10 +241,10 @@ def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore
         df2 = df.drop(labels=index, axis=0, errors=errors)
     else:
         raise Exception('pickle_drop(): Must provide keys or index to drop')
-    if not df2.equals(df):
-        df2.reset_index(drop=False, inplace=False)
-        print('test dumping new df2\n', df2)
-        # pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
+
+    df2.reset_index(drop=False, inplace=False)
+    print('test dumping new df2\n', df2.head(10), '\n', df2.keys())
+    # pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
 
 
 def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):
