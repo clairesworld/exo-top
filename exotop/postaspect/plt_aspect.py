@@ -1220,12 +1220,16 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
                    setylabel=True, setxlabel=True, save=True, load='auto',
                    fig_path=fig_path_bullard, fig=None, ax=None, fend='_T-z', fig_fmt='.png',
                    legend=True, labelsize=16, **kwargs):
+    if fig is None:
+        fig, ax = plt.subplots(figsize=(4, 4))
     if T_params is None:
         T_params = pro.pickleio(case, suffix='_T', t1=t1,
                                 dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
     print('T_params', type(T_params), '\n', T_params)
+    print('     ', T_params.keys())
     # check for T av which is weirdly missing sometimes
     if 'T_av' not in T_params.keys():
+        print(case, 'missing T_av in loaded T_params....')
         df = T_params.copy()
         try:
             time = dat.stats_time
@@ -1239,6 +1243,7 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
         i_time = np.argmax(time >= t1)  # index of first timestep to process
         sols_in_time = sol_files[i_time:]
         n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
+        print('n_quasi', n_quasi)
         n_ts = n_indices + i_time
         df = df.set_index('sol')
         for ii, n in enumerate(n_quasi):
@@ -1252,13 +1257,11 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
             d_n_old = df.loc[n, :]
             print('d_n_old', d_n_old)
 
-
-    if fig is None:
-        fig, ax = plt.subplots(figsize=(4, 4))
-
     if n == 'mean':  # avg of all steady state sols
+        print('    plotting time-mean T profile')
         T_params = T_params.mean(axis=0)  # T params df already only contains steady state values
     else:
+        print('    plotting T profile at n =', n)
         try:
             T_params = T_params.loc[T_params['sol'] == n]
         except IndexError:
