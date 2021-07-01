@@ -1244,10 +1244,10 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     print('n_quasi', n_quasi, 'starts at ts', i_time+1, 'given t1', t1, 'time[i_time]', time[i_time])
     # print('sols stored\n', T_params[['sol', 'time']], '\n\n\n\n\n\n')
     sols_stored = T_params['sol'].to_numpy()
-    ts_stored = T_params['ts'].to_numpy()
+    idx_stored = T_params.index.values
     droppy = np.isin(sols_stored, n_quasi)
-    print('dropping ts', ts_stored[~droppy])
-    pro.pickle_drop(case, '_T', keys=None, index=ts_stored[~droppy], errors='raise', data_path=data_path,
+    print('dropping idx (ts?)', idx_stored[~droppy])
+    pro.pickle_drop(case, '_T', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
                    # index_key='sol',
                     **kwargs)
 
