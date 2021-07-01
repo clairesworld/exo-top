@@ -1227,25 +1227,24 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
         T_params = pro.pickleio(case, suffix='_T', t1=t1,
                                 dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
-    # test sols used
-    try:
-        time = dat.stats_time
-    except AttributeError:
-        dat.read_times(**kwargs)
-        time = dat.stats_time
-    try:
-        sol_files = dat.sol_files
-    except AttributeError:
-        sol_files = dat.read_stats_sol_files(**kwargs)
-    i_time = np.argmax(time >= t1)  # index of first timestep to process
-    sols_in_time = sol_files[i_time:]
-    n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
-    print('n_quasi', n_quasi)
+    # # test sols used
+    # try:
+    #     time = dat.stats_time
+    # except AttributeError:
+    #     dat.read_times(**kwargs)
+    #     time = dat.stats_time
+    # try:
+    #     sol_files = dat.sol_files
+    # except AttributeError:
+    #     sol_files = dat.read_stats_sol_files(**kwargs)
+    # i_time = np.argmax(time >= t1)  # index of first timestep to process
+    # sols_in_time = sol_files[i_time:]
+    # n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
+    # print('n_quasi', n_quasi)
+    # print('sols stored\n', T_params['sol'])
 
-    print('sols stored', T_params['sol'])
-
-    # print('T_params', type(T_params), '\n', T_params)
-    # print('     ', T_params.keys())
+    print('T_params', type(T_params), '\n', T_params)
+    print('     ', T_params.keys())
     # check for T av which is weirdly missing sometimes
     if 'T_av' not in T_params.keys():
         print(case, 'missing T_av in loaded T_params....')
@@ -1288,14 +1287,19 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
         uv_mag_av, y = pro.time_averaged_profile_from_df(T_params, 'uv_mag_av')
         dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y,
                                          data_path=data_path, **kwargs)  # actually a dict
+        print('dic_av\n', dic_av.keys(), '\n', dic_av)
+
         # really hacky bit
         for k in ['T_av', 'uv_mag_av', 'y']:
             dic_av.pop(k, None)
             T_params = T_params.drop(k, axis=1)  # drop lists you don't need
         df_av = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
+        print('df_av\n', df_av.keys(), '\n', df_av)
         T_params_plot = T_params.mean(axis=0).to_frame().transpose()  # mean of other parameters
         T_params_plot.set_index(pd.Series([0]))
+        print('T_params_plot\n', T_params_plot.keys(), '\n', T_params_plot)
         T_params_plot.update(df_av)  # update with properly timefirst-averaged temperature params
+        print('updated: T_params_plot\n', T_params_plot.keys(), '\n', T_params_plot)
     else:
         print('    plotting T profile at n =', n)
         try:
