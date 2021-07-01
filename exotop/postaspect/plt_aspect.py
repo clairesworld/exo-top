@@ -1259,23 +1259,24 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
 
     if n == 'mean':  # avg of all steady state sols
         print('    plotting time-mean T profile')
-        T_params = T_params.mean(axis=0)  # T params df already only contains steady state values
+        T_params_plot = T_params.mean(axis=0)  # T params df already only contains steady state values
+        print('T_params_plot', type(T_params_plot), '\n', T_params_plot)
+        print('     ', T_params_plot.keys())
     else:
         print('    plotting T profile at n =', n)
         try:
-            T_params = T_params.loc[T_params['sol'] == n]
+            T_params_plot = T_params.loc[T_params['sol'] == n]
         except IndexError:
             print('No T parameterisation found for solution n =', n)
             return fig, ax
 
-
-    delta_rh_n = np.array(T_params['delta_rh'])  # ensure not list
-    delta_0_n = np.array(T_params['delta_0'])
-    D_l_n = np.array(T_params['y_L'])
-    T_l_n = np.array(T_params['T_l'])
-    T_i_n = np.array(T_params['T_i'])
-    T_f = np.array(T_params['T_av'].tolist())
-    y_f = np.array(T_params['y'].tolist())
+    delta_rh_n = np.array(T_params_plot['delta_rh'])  # ensure not list
+    delta_0_n = np.array(T_params_plot['delta_0'])
+    D_l_n = np.array(T_params_plot['y_L'])
+    T_l_n = np.array(T_params_plot['T_l'])
+    T_i_n = np.array(T_params_plot['T_i'])
+    T_f = np.array(T_params_plot['T_av'].tolist())
+    y_f = np.array(T_params_plot['y'].tolist())
 
     ax.plot(T_f, y_f, c='k', lw=1)
     ax.axhline(D_l_n, label='$\delta_{L}$', c='xkcd:tangerine', lw=0.5)
