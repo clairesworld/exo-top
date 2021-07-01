@@ -71,7 +71,7 @@ axes[1].xaxis.set_minor_formatter(ticker.ScalarFormatter())
 axes[1].xaxis.set_major_formatter(ticker.ScalarFormatter())
 
 # show colours outside
-ax1 = colourised_legend(axes[1], clist=c_rms[1:-1], cleglabels=cleglabels[1:-1], lw=0, marker=mark, markersize=ms,
+ax1 = colourised_legend(axes[1], clist=c_rms[1:], cleglabels=cleglabels[1:], lw=0, marker=mark, markersize=ms,
                         legsize=legsize, ncol=1)
 
 fig.suptitle(r'Fit to $C$ Ra$_{i,eff}^p$', fontsize=labelsize)
