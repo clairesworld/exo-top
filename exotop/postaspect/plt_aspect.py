@@ -1341,24 +1341,15 @@ def plot_pdf(case, df=None, keys=None, dat=None, t1=None, fig_path=fig_path_bull
     except AttributeError:
         dat.read_times(**kwargs)
         time = dat.stats_time
-    try:
-        sol_files = dat.sol_files
-    except AttributeError:
-        sol_files = dat.read_stats_sol_files(**kwargs)
     i_time = np.argmax(time >= t1)  # index of first timestep to process
-    sols_in_time = sol_files[i_time:]
-    n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
-    print('n_quasi', n_quasi, 'starts at ts', i_time+1, 'given t1', t1, 'time[i_time]', time[i_time])
-    # print('sols stored\n', T_params[['sol', 'time']], '\n\n\n\n\n\n')
-    sols_stored = df['sol'].to_numpy()
+    ts_save = np.arange(i_time+1, len(time))
+    print('ts range', ts_save, 'given t1', t1, 'time[i_time]', time[i_time])
     idx_stored = df.index.values
-    droppy = np.isin(sols_stored, n_quasi)
+    droppy = np.isin(idx_stored, ts_save)  # these are what u want to keep but im attache to the name droppy
     print('dropping idx (ts?)', idx_stored[~droppy])
     df = pro.pickle_drop(case, '_h_all', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
-                   # index_key='sol',
                     test_run=True, **kwargs)
     _ = pro.pickle_drop(case, '_h', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
-                   # index_key='sol',
                     test_run=True, **kwargs)
 
 
