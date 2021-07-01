@@ -226,9 +226,9 @@ def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
-    print('df loaded\n', df.head(10))
     if index_key is not None:
         df.set_index(index_key, drop=False, inplace=False)
+    print('df loaded and indexed\n', df.head(10))
     if keys is not None:  # drop columns
         bad = []
         for key in keys:
