@@ -902,6 +902,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
             else:
                 load_ii = load
             dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=True, **kwargs)
+
             if ii == ncases - 1:  # show x label in bottom row only
                 setxlabel = True
             else:
@@ -1225,8 +1226,26 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     if T_params is None:
         T_params = pro.pickleio(case, suffix='_T', t1=t1,
                                 dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
-    print('T_params', type(T_params), '\n', T_params)
-    print('     ', T_params.keys())
+
+    # test sols used
+    try:
+        time = dat.stats_time
+    except AttributeError:
+        dat.read_times(**kwargs)
+        time = dat.stats_time
+    try:
+        sol_files = dat.sol_files
+    except AttributeError:
+        sol_files = dat.read_stats_sol_files(**kwargs)
+    i_time = np.argmax(time >= t1)  # index of first timestep to process
+    sols_in_time = sol_files[i_time:]
+    n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
+    print('n_quasi', n_quasi)
+
+    print('sols stored', T_params['sol'])
+
+    # print('T_params', type(T_params), '\n', T_params)
+    # print('     ', T_params.keys())
     # check for T av which is weirdly missing sometimes
     if 'T_av' not in T_params.keys():
         print(case, 'missing T_av in loaded T_params....')
@@ -1259,9 +1278,24 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
 
     if n == 'mean':  # avg of all steady state sols
         print('    plotting time-mean T profile')
-        T_params_plot = T_params.mean(axis=0)  # T params df already only contains steady state values
-        print('T_params_plot', type(T_params_plot), '\n', T_params_plot)
-        print('     ', T_params_plot.keys())
+        # bug here where taking this mean returns a series with the array columns missing
+        # T_params_plot = T_params.mean(axis=0)  # T params df already only contains steady state values
+        # print('T_params_plot', type(T_params_plot), '\n', T_params_plot)
+        # print('     ', T_params_plot.keys())
+
+        # load time-averages
+        T_av, y = pro.time_averaged_profile_from_df(T_params, 'T_av')
+        uv_mag_av, y = pro.time_averaged_profile_from_df(T_params, 'uv_mag_av')
+        dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y,
+                                         data_path=data_path, **kwargs)  # actually a dict
+        # really hacky bit
+        for k in ['T_av', 'uv_mag_av', 'y']:
+            dic_av.pop(k, None)
+            T_params = T_params.drop(k, axis=1)  # drop lists you don't need
+        df_av = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
+        T_params_plot = T_params.mean(axis=0).to_frame().transpose()  # mean of other parameters
+        T_params_plot.set_index(pd.Series([0]))
+        T_params_plot.update(df_av)  # update with properly timefirst-averaged temperature params
     else:
         print('    plotting T profile at n =', n)
         try:
