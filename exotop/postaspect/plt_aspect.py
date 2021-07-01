@@ -1244,6 +1244,7 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     print('n_quasi', n_quasi, 'starts at ts', i_time+1, 'given t1', t1, 'time[i_time]', time[i_time])
     # print('sols stored\n', T_params[['sol', 'time']], '\n\n\n\n\n\n')
     sols_stored = T_params['sol'].to_numpy()
+
     idx_stored = T_params.index.values
     droppy = np.isin(sols_stored, n_quasi)
     print('dropping idx (ts?)', idx_stored[~droppy])
@@ -1335,7 +1336,7 @@ def plot_pdf(case, df=None, keys=None, dat=None, t1=None, fig_path=fig_path_bull
         ax = plt.gca()
 
 
-    # test sols used - temp fix here for some reason lol
+    # test sols used - temp fix here for some reason lol - drop early ones
     try:
         time = dat.stats_time
     except AttributeError:
@@ -1348,8 +1349,10 @@ def plot_pdf(case, df=None, keys=None, dat=None, t1=None, fig_path=fig_path_bull
     droppy = np.isin(idx_stored, ts_save)  # these are what u want to keep but im attache to the name droppy
     print('dropping idx (ts?)', idx_stored[~droppy])
     df = pro.pickle_drop(case, '_h_all', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
+                    test_run=False, **kwargs)
+    _ = pro.pickle_drop(case, '_h', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
                     test_run=True, **kwargs)
-    _ = pro.pickle_drop(case, '_h', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
+    _ = pro.pickle_drop(case, '_Nu', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
                     test_run=True, **kwargs)
 
 
