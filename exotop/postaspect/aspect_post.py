@@ -396,7 +396,11 @@ def time_averaged_profile_from_df(df, col):
         print(df.head(5))
     y = df.y.to_numpy()[0]
     profs = np.zeros((nsols, len(srs[0])))
+    print('nsols', nsols, 'len(srs[0])', len(srs[0]))
+    print('srs\n', srs)
+    print('srs[0]\n', srs[0])
     for ii in range(nsols):
+        print('ii', ii)
         profs[ii, :] = srs[ii]
     av = np.mean(profs, axis=0)
     return av, y
