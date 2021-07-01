@@ -1008,9 +1008,9 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                         fig, ax = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10, t1=t1_ii,
                                                  cmap='gist_heat', c='k', cbar=False, title='', fig=fig, ax=ax,
                                                  shading='nearest', return_artists=False, save=False, i_n=-1, avg=False)
-                        fig, ax = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10, t1=t1_ii,
-                                                 cmap='gist_heat', c='k', cbar=False, title='', fig=None, ax=None,
-                                                 shading='nearest', return_artists=False, save=True, i_n=-1, avg=False)
+                        # _, _ = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10, t1=t1_ii,
+                        #                          cmap='gist_heat', c='k', cbar=False, title='', fig=None, ax=None,
+                        #                          shading='nearest', return_artists=False, save=True, i_n=-1, avg=False)
                         print('    Plotting graphical output from solution for', case)
                     except Exception as e:
                         print(e)
