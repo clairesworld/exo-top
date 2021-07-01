@@ -17,10 +17,10 @@ from postaspect import aspect_post as ap
 #                         load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
 # Ra 2e8
-ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
-                        t1_grid=t1_grid[:, -2], end_grid=end_grid[:, -2], data_path=data_path, redo=False,
-                        load_grid=load_grid[:, -2], regime_grid=regime_grid_td[:, -2],
-                        postprocess_kwargs=postprocess_kwargs)
+# ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
+#                         t1_grid=t1_grid[:, -2], end_grid=end_grid[:, -2], data_path=data_path, redo=False,
+#                         load_grid=load_grid[:, -2], regime_grid=regime_grid_td[:, -2],
+#                         postprocess_kwargs=postprocess_kwargs)
 
 """plot summaries across delta eta and/or Ra """
 
@@ -78,12 +78,12 @@ ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu
 # )
 
 # Ra2e8 -->
-# fig, ax = plat.subplots_cases(
-#     ['Ra2e8-eta1e6-wide', 'Ra2e8-eta1e7-wide-ascii', 'Ra2e8-eta1e8-wide-ascii'],
-#     labels=['$\Delta \eta$=1e6', '$\Delta \eta$=1e7', '$\Delta \eta$=1e8'], data_path=data_path, fig_path=fig_path,
-#     t1=[0.01, 0.01, 0.01], load='auto', fname='all-Ra2e8', suptitle='Ra=2e8',
-#     includepd=True, includeTz=False,  # turn on once you know where steady state starts
-# )
+fig, ax = plat.subplots_cases(
+    ['Ra2e8-eta1e6-wide', 'Ra2e8-eta1e7-wide-ascii', 'Ra2e8-eta1e8-wide-ascii'],
+    labels=['$\Delta \eta$=1e6', '$\Delta \eta$=1e7', '$\Delta \eta$=1e8'], data_path=data_path, fig_path=fig_path,
+    t1=[0.06, 0.065, 0.06], load='auto', fname='all-Ra2e8', suptitle='Ra=2e8',
+    includepd=True, includeTz=True,  # turn on once you know where steady state starts
+)
 
 """look at individual case data"""
 
