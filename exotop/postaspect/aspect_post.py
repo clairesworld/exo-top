@@ -221,10 +221,14 @@ def pickle_drop_duplicate_row(case, suffix, which='sol', fend='.pkl', data_path=
 
 
 def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore', data_path=data_path_bullard,
+                index_key=None,
                 **kwargs):
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
     df = pkl.load(open(case_path + 'pickle/' + fname, "rb"))  # open pickled file
+    print('df\n', df)
+    if index_key is not None:
+        df.set_index(index_key, drop=False, inplace=False)
     if keys is not None:  # drop columns
         bad = []
         for key in keys:
@@ -238,8 +242,9 @@ def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore
     else:
         raise Exception('pickle_drop(): Must provide keys or index to drop')
     if not df2.equals(df):
-        print('dumping new df2\n', df2)
-        pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
+        df2.reset_index(drop=False, inplace=False)
+        print('test dumping new df2\n', df2)
+        # pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
 
 
 def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):

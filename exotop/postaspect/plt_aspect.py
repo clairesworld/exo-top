@@ -1245,9 +1245,9 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     # print('sols stored\n', T_params[['sol', 'time']], '\n\n\n\n\n\n')
     sols_stored = T_params['sol'].to_numpy()
     droppy = np.isin(sols_stored, n_quasi)
-
-    pro.pickle_drop(case, '_T', keys=None, index=droppy, errors='ignore', data_path=data_path,
-                **kwargs)
+    print(sols_stored[droppy])
+    pro.pickle_drop(case, '_T', keys=None, index=sols_stored[droppy], errors='ignore', data_path=data_path,
+                    index_key='sol', **kwargs)
 
     if n == 'mean':  # avg of all steady state sols
         print('    plotting time-mean T profile')
