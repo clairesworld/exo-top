@@ -1247,7 +1247,7 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     idx_stored = T_params.index.values
     droppy = np.isin(sols_stored, n_quasi)
     print('dropping idx (ts?)', idx_stored[~droppy])
-    pro.pickle_drop(case, '_T', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
+    T_params = pro.pickle_drop(case, '_T', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
                    # index_key='sol',
                     **kwargs)
 

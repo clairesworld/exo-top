@@ -243,8 +243,9 @@ def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore
         raise Exception('pickle_drop(): Must provide keys or index to drop')
 
     df2.reset_index(drop=False, inplace=False)
-    print('test dumping new df2\n', df2.head(10), '\n', df2.keys())
-    # pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
+    print('dumping new df2\n', df2.head(10), '\n', df2.keys())
+    pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
+    return df2
 
 
 def pickle_concat(case, keys=None, suffixes=None, new_suffix=None, fend='.pkl', data_path=data_path_bullard):
