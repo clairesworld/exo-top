@@ -958,9 +958,9 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                               dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
                                               **kwargs)
 
-                    fig, ax = plot_T_profile(case, T_params=sol_df, n='mean', data_path=data_path, setylabel=False,
+                    fig, ax = plot_T_profile(case, T_params=sol_df, dat=dat, n='mean', data_path=data_path, setylabel=False,
                                              setxlabel=setxlabel, save=False, fig_path=fig_path, fig=fig, ax=ax,
-                                             legend=legend, labelsize=labelsize)
+                                             legend=legend, labelsize=labelsize, **kwargs)
                 else:
                     ax.text(0.01, 0.95, '\n\n\nnot converged?',
                             horizontalalignment='left', verticalalignment='top',
@@ -1223,6 +1223,36 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     if T_params is None:
         T_params = pro.pickleio(case, suffix='_T', t1=t1,
                                 dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
+    print('T_params', type(T_params), '\n', T_params)
+    # check for T av which is weirdly missing sometimes
+    if 'T_av' not in T_params.keys():
+        df = T_params.copy()
+        try:
+            time = dat.stats_time
+        except AttributeError:
+            dat.read_times(**kwargs)
+            time = dat.stats_time
+        try:
+            sol_files = dat.sol_files
+        except AttributeError:
+            sol_files = dat.read_stats_sol_files(**kwargs)
+        i_time = np.argmax(time >= t1)  # index of first timestep to process
+        sols_in_time = sol_files[i_time:]
+        n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
+        n_ts = n_indices + i_time
+        df = df.set_index('sol')
+        for ii, n in enumerate(n_quasi):
+            ts = n_ts[ii]  # timestep at this solution
+            print('\nn', n, '(', ii, '/', len(n_quasi), ')')
+            d_n_new = pro.T_parameters_at_sol(case, n, dat=dat, T_av=None, uv_mag_av=None, y=None, data_path=data_path,
+                                              **kwargs)
+
+            print('d_n_new', d_n_new)
+            # look at existing row for this n
+            d_n_old = df.loc[n, :]
+            print('d_n_old', d_n_old)
+
+
     if fig is None:
         fig, ax = plt.subplots(figsize=(4, 4))
 
@@ -1235,7 +1265,6 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
             print('No T parameterisation found for solution n =', n)
             return fig, ax
 
-    print('T_params\n', T_params.keys())
 
     delta_rh_n = np.array(T_params['delta_rh'])  # ensure not list
     delta_0_n = np.array(T_params['delta_0'])
