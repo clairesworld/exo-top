@@ -1242,7 +1242,7 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     sols_in_time = sol_files[i_time:]
     n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
     print('n_quasi', n_quasi, 'starts at ts', i_time+1, 'given t1', t1, 'time[i_time]', time[i_time])
-    print('sols stored\n', T_params[('sol', 'time')], '\n\n\n\n\n\n')
+    print('sols stored\n', T_params['sol', 'time'], '\n\n\n\n\n\n')
 
     # print('T_params', type(T_params), '\n', T_params)
     # print('     ', T_params.keys())
