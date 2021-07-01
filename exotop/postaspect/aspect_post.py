@@ -221,7 +221,7 @@ def pickle_drop_duplicate_row(case, suffix, which='sol', fend='.pkl', data_path=
 
 
 def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore', data_path=data_path_bullard,
-                index_key=None,
+                index_key=None, test_run=False,
                 **kwargs):
     case_path = data_path + 'output-' + case + '/'
     fname = case + suffix + fend
@@ -244,7 +244,10 @@ def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore
 
     df2.reset_index(drop=False, inplace=False)
     print('dumping new df2\n', df2.head(10), '\n', df2.keys())
-    pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
+    if not test_run:
+        pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
+    else:
+        print('  (just a test)')
     return df2
 
 

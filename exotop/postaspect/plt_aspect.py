@@ -983,7 +983,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                          dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
                                          **kwargs)
 
-                    fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'],  t1=t1_ii, fig=fig, ax=ax, save=False,
+                    fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'], dat=dat, t1=t1_ii, fig=fig, ax=ax, save=False,
                                        settitle=False, setxlabel=setxlabel, legend=legend, labelsize=labelsize,
                                        c_list=[c_rms, c_peak], path=data_path)
                 else:
@@ -1321,9 +1321,9 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     return fig, ax
 
 
-def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=None, save=True, settitle=True,
+def plot_pdf(case, df=None, keys=None, dat=None, t1=None, fig_path=fig_path_bullard, fig=None, ax=None, save=True, settitle=True,
              setxlabel=True, legend=True, labelsize=16, c_list=None, labels=None, fend='h_hist', fig_fmt='.png',
-             xlabel='dynamic topography', **kwargs):
+             xlabel='dynamic topography', data_path=data_path_bullard, **kwargs):
     if c_list is None:
         c_list = ['xkcd:forest green', 'xkcd:periwinkle']
     if labels is None:
@@ -1333,6 +1333,34 @@ def plot_pdf(case, df=None, keys=None, fig_path=fig_path_bullard, fig=None, ax=N
     if ax is None:
         fig = plt.figure()
         ax = plt.gca()
+
+
+    # test sols used - temp fix here for some reason lol
+    try:
+        time = dat.stats_time
+    except AttributeError:
+        dat.read_times(**kwargs)
+        time = dat.stats_time
+    try:
+        sol_files = dat.sol_files
+    except AttributeError:
+        sol_files = dat.read_stats_sol_files(**kwargs)
+    i_time = np.argmax(time >= t1)  # index of first timestep to process
+    sols_in_time = sol_files[i_time:]
+    n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
+    print('n_quasi', n_quasi, 'starts at ts', i_time+1, 'given t1', t1, 'time[i_time]', time[i_time])
+    # print('sols stored\n', T_params[['sol', 'time']], '\n\n\n\n\n\n')
+    sols_stored = df['sol'].to_numpy()
+    idx_stored = df.index.values
+    droppy = np.isin(sols_stored, n_quasi)
+    print('dropping idx (ts?)', idx_stored[~droppy])
+    df = pro.pickle_drop(case, '_h_all', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
+                   # index_key='sol',
+                    test_run=True, **kwargs)
+    _ = pro.pickle_drop(case, '_h', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
+                   # index_key='sol',
+                    test_run=True, **kwargs)
+
 
     for ii, key in enumerate(keys):
         try:
