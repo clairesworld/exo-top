@@ -396,15 +396,13 @@ def time_averaged_profile_from_df(df, col):
         print(df.head(5))
     y = df.y.to_numpy()[0]
     profs = np.zeros((nsols, len(srs[-1])))
-    print('nsols', nsols, 'len(srs[-1])', len(srs[-1]))
-    print('srs[-1]\n', srs[-1])
     for ii in range(nsols):
         try:
             profs[ii, :] = srs[ii]
         except:
+            # this is probably because the mesh size changed lol
             print('error at ii', ii)
             print('np.shape(srs[ii])', np.shape(srs[ii]))
-            print('srs[ii]', srs[ii])
     av = np.mean(profs, axis=0)
     return av, y
 

@@ -1227,24 +1227,24 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
         T_params = pro.pickleio(case, suffix='_T', t1=t1,
                                 dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
-    # # test sols used
-    # try:
-    #     time = dat.stats_time
-    # except AttributeError:
-    #     dat.read_times(**kwargs)
-    #     time = dat.stats_time
-    # try:
-    #     sol_files = dat.sol_files
-    # except AttributeError:
-    #     sol_files = dat.read_stats_sol_files(**kwargs)
-    # i_time = np.argmax(time >= t1)  # index of first timestep to process
-    # sols_in_time = sol_files[i_time:]
-    # n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
-    # print('n_quasi', n_quasi)
-    # print('sols stored\n', T_params['sol'])
+    # test sols used
+    try:
+        time = dat.stats_time
+    except AttributeError:
+        dat.read_times(**kwargs)
+        time = dat.stats_time
+    try:
+        sol_files = dat.sol_files
+    except AttributeError:
+        sol_files = dat.read_stats_sol_files(**kwargs)
+    i_time = np.argmax(time >= t1)  # index of first timestep to process
+    sols_in_time = sol_files[i_time:]
+    n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
+    print('n_quasi', n_quasi, 'starts at ts', i_time+1, 'given t1', t1, 'time[i_time]', time[i_time])
+    print('sols stored\n', T_params['sol'], '\n\n\n\n\n\n')
 
-    print('T_params', type(T_params), '\n', T_params)
-    print('     ', T_params.keys())
+    # print('T_params', type(T_params), '\n', T_params)
+    # print('     ', T_params.keys())
     # check for T av which is weirdly missing sometimes
     if 'T_av' not in T_params.keys():
         print(case, 'missing T_av in loaded T_params....')
