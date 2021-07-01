@@ -238,6 +238,7 @@ def pickle_drop(case, suffix, keys=None, index=None, fend='.pkl', errors='ignore
     else:
         raise Exception('pickle_drop(): Must provide keys or index to drop')
     if not df2.equals(df):
+        print('dumping new df2\n', df2)
         pkl.dump(df2, open(case_path + 'pickle/' + fname, "wb"))
 
 

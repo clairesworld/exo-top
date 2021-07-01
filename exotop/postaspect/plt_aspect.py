@@ -1228,7 +1228,7 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
         T_params = pro.pickleio(case, suffix='_T', t1=t1,
                                 dat_new=dat, load=load, data_path=data_path, fig_path=fig_path, **kwargs)
 
-    # test sols used
+    # test sols used - temp fix here for some reason lol
     try:
         time = dat.stats_time
     except AttributeError:
@@ -1242,39 +1242,12 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     sols_in_time = sol_files[i_time:]
     n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
     print('n_quasi', n_quasi, 'starts at ts', i_time+1, 'given t1', t1, 'time[i_time]', time[i_time])
-    print('sols stored\n', T_params[['sol', 'time']], '\n\n\n\n\n\n')
+    # print('sols stored\n', T_params[['sol', 'time']], '\n\n\n\n\n\n')
+    sols_stored = T_params['sol'].to_numpy()
+    droppy = np.isin(sols_stored, n_quasi)
 
-    # print('T_params', type(T_params), '\n', T_params)
-    # print('     ', T_params.keys())
-    # check for T av which is weirdly missing sometimes
-    if 'T_av' not in T_params.keys():
-        print(case, 'missing T_av in loaded T_params....')
-        df = T_params.copy()
-        try:
-            time = dat.stats_time
-        except AttributeError:
-            dat.read_times(**kwargs)
-            time = dat.stats_time
-        try:
-            sol_files = dat.sol_files
-        except AttributeError:
-            sol_files = dat.read_stats_sol_files(**kwargs)
-        i_time = np.argmax(time >= t1)  # index of first timestep to process
-        sols_in_time = sol_files[i_time:]
-        n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
-        print('n_quasi', n_quasi)
-        n_ts = n_indices + i_time
-        df = df.set_index('sol')
-        for ii, n in enumerate(n_quasi):
-            ts = n_ts[ii]  # timestep at this solution
-            print('\nn', n, '(', ii, '/', len(n_quasi), ')')
-            d_n_new = pro.T_parameters_at_sol(case, n, dat=dat, T_av=None, uv_mag_av=None, y=None, data_path=data_path,
-                                              **kwargs)
-
-            print('d_n_new', d_n_new)
-            # look at existing row for this n
-            d_n_old = df.loc[n, :]
-            print('d_n_old', d_n_old)
+    pro.pickle_drop(case, '_T', keys=None, index=droppy, errors='ignore', data_path=data_path,
+                **kwargs)
 
     if n == 'mean':  # avg of all steady state sols
         print('    plotting time-mean T profile')
