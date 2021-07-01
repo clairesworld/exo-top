@@ -1351,9 +1351,9 @@ def plot_pdf(case, df=None, keys=None, dat=None, t1=None, fig_path=fig_path_bull
     df = pro.pickle_drop(case, '_h_all', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
                     test_run=False, **kwargs)
     _ = pro.pickle_drop(case, '_h', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
-                    test_run=True, **kwargs)
+                    test_run=False, **kwargs)
     _ = pro.pickle_drop(case, '_Nu', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
-                    test_run=True, **kwargs)
+                    test_run=False, **kwargs)
 
 
     for ii, key in enumerate(keys):
