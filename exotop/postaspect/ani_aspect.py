@@ -268,8 +268,8 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
 
 
 def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
-                   legsize=12, legtext='',
-                   shading='nearest', return_artists=False, save=True, i_n=0, avg=False, c='k', cbar=True, dark=False,
+                   legsize=12, legtext='', t1=None,
+                   shading='nearest', return_artists=False, save=True, i_n=-1, avg=False, c='k', cbar=True, dark=False,
                    title='Nondimensional temperature', fig=None, ax=None, col_vis=20, ticklabels=True, ylabelpad=20):
 
     if dark:
@@ -279,7 +279,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
     # preload data
     dat = ap.Aspect_Data(directory=data_path + 'output-' + case + '/')
-    df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    df = pro.pickleio(case=case, load=True, suffix='_T', t1=t1, postprocess_functions=None, data_path=data_path)
     try:
         n = df.sol.to_numpy()
     except AttributeError:
@@ -287,19 +287,19 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
         n = np.array(dat.sol_files)
 
     if len(n) > 100:
-        n = n[::2]
+        n = n[::2]  # to save memory
 
     T_n = []
     if return_artists or avg:
         iter = n
     else:
         iter = [i_n]
-        print('reading sol n =', i_n)
+        print('reading temperature field at sol n =', i_n)
 
     for nn in iter:
         x, y, _, T = dat.read_temperature(nn, verbose=False)
         T_n.append(T)
-    print('loaded', len(n), 'T fields')
+    print('loaded', len(iter), 'T fields')
 
     if avg:
         T_n = np.array(T_n)
