@@ -401,8 +401,7 @@ def time_averaged_profile_from_df(df, col):
             profs[ii, :] = srs[ii]
         except:
             # this is probably because the mesh size changed lol
-            print('error at ii', ii)
-            print('np.shape(srs[ii])', np.shape(srs[ii]))
+            raise Exception('error at ii', ii, 'with size', len(srs[ii]), '--> probably due to adaptive mesh size')
     av = np.mean(profs, axis=0)
     return av, y
 

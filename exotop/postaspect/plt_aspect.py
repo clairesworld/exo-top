@@ -913,7 +913,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 legend = True
 
             if show_sols:  # load df
-                if t1[ii] < 1:
+                if t1_ii < 1:
                     sol_df = pro.pickleio(case, suffix='_T', t1=t1_ii,
                                           dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
                 else:
@@ -938,7 +938,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 ax = axes[ii, icol]
             except IndexError:
                 ax = axes[icol]
-            fig, ax = plot_evol(case, 'heatflux_top', fig=fig, ax=ax, save=False, mark_used=False, dat=dat,
+            fig, ax = plot_evol(case, 'heatflux_top', fig=fig, ax=ax, save=False, mark_used=False, t1=t1_ii, dat=dat,
                                 show_sols=False, ylabel='heat flux', c='xkcd:light red', settitle=False,
                                 setxlabel=setxlabel, setylabel=setylabel, labelsize=labelsize, labelpad=labelpad,
                                 label='top')
@@ -959,7 +959,8 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                               dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
                                               **kwargs)
 
-                    fig, ax = plot_T_profile(case, T_params=sol_df, dat=dat, n='mean', data_path=data_path, setylabel=False,
+                    fig, ax = plot_T_profile(case, T_params=sol_df, dat=dat, n='mean', t1=t1_ii, data_path=data_path,
+                                             setylabel=False,
                                              setxlabel=setxlabel, save=False, fig_path=fig_path, fig=fig, ax=ax,
                                              legend=legend, labelsize=labelsize, **kwargs)
                 else:
@@ -982,7 +983,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                          dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
                                          **kwargs)
 
-                    fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'], fig=fig, ax=ax, save=False,
+                    fig, ax = plot_pdf(case, df=ts_df, keys=['h_rms', 'h_peak'],  t1=t1_ii, fig=fig, ax=ax, save=False,
                                        settitle=False, setxlabel=setxlabel, legend=legend, labelsize=labelsize,
                                        c_list=[c_rms, c_peak], path=data_path)
                 else:
@@ -1004,7 +1005,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                     print('    Grabbing graphical output for', case)
                 except FileNotFoundError:
                     try:
-                        fig, ax = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10,
+                        fig, ax = static_T_field(case, data_path=data_path, labelsize=labelsize, ticksize=10, t1=t1_ii,
                                                  cmap='gist_heat', c='k', cbar=False, title='', fig=fig, ax=ax,
                                                  shading='nearest', return_artists=False, save=False, i_n=-1, avg=False)
                         print('    Plotting graphical output from solution for', case)
@@ -1241,7 +1242,7 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
     sols_in_time = sol_files[i_time:]
     n_quasi, n_indices = np.unique(sols_in_time, return_index=True)  # find graphical snapshots within time range
     print('n_quasi', n_quasi, 'starts at ts', i_time+1, 'given t1', t1, 'time[i_time]', time[i_time])
-    print('sols stored\n', T_params['sol'], '\n\n\n\n\n\n')
+    print('sols stored\n', T_params[('sol', 'time')], '\n\n\n\n\n\n')
 
     # print('T_params', type(T_params), '\n', T_params)
     # print('     ', T_params.keys())
