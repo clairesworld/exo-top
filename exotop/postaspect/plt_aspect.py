@@ -1282,24 +1282,30 @@ def plot_T_profile(case, T_params=None, n=-1, dat=None, data_path=data_path_bull
         # print('T_params_plot', type(T_params_plot), '\n', T_params_plot)
         # print('     ', T_params_plot.keys())
 
-        # load time-averages
-        T_av, y = pro.time_averaged_profile_from_df(T_params, 'T_av')
-        uv_mag_av, y = pro.time_averaged_profile_from_df(T_params, 'uv_mag_av')
-        dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y,
-                                         data_path=data_path, **kwargs)  # actually a dict
-        print('dic_av\n', dic_av.keys(), '\n', dic_av)
+        # get proper time-averages
+        T_av_proper, _ = pro.time_averaged_profile_from_df(T_params, 'T_av')
+        uv_mag_av_proper, y_proper = pro.time_averaged_profile_from_df(T_params, 'uv_mag_av')
 
+        d_n = dat.T_components(n=None, T_av=T_av_proper, uv_mag_av=uv_mag_av_proper, y=y_proper, data_path=data_path,
+                               **kwargs)
+        print('d_n\n', d_n.keys())
+        T_params_plot = d_n.copy()
+
+        # dic_av = pro.T_parameters_at_sol(case, n=None, T_av=T_av, uv_mag_av=uv_mag_av, y=y,
+        #                                  data_path=data_path, **kwargs)  # actually a dict
+        # print('dic_av\n', dic_av.keys())  # this has the stuff you want to plot
         # really hacky bit
-        for k in ['T_av', 'uv_mag_av', 'y']:
-            dic_av.pop(k, None)
-            T_params = T_params.drop(k, axis=1)  # drop lists you don't need
-        df_av = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
-        print('df_av\n', df_av.keys(), '\n', df_av)
-        T_params_plot = T_params.mean(axis=0).to_frame().transpose()  # mean of other parameters
-        T_params_plot.set_index(pd.Series([0]))
-        print('T_params_plot\n', T_params_plot.keys(), '\n', T_params_plot)
-        T_params_plot.update(df_av)  # update with properly timefirst-averaged temperature params
-        print('updated: T_params_plot\n', T_params_plot.keys(), '\n', T_params_plot)
+        # for k in ['T_av', 'uv_mag_av', 'y']:
+        #     dic_av.pop(k, None)
+        #     T_params = T_params.drop(k, axis=1)  # drop lists you don't need
+
+        # df_av = pd.DataFrame({key: value for (key, value) in dic_av.items()}, index=[0])
+        # print('df_av\n', df_av.keys())
+        # T_params_plot = T_params.mean(axis=0).to_frame().transpose()  # mean of other parameters
+        # T_params_plot.set_index(pd.Series([0]))
+        # print('T_params_plot\n', T_params_plot.keys())
+        # T_params_plot.update(df_av)  # update with properly timefirst-averaged temperature params
+        # print('updated: T_params_plot\n', T_params_plot.keys())
     else:
         print('    plotting T profile at n =', n)
         try:
