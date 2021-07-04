@@ -1203,6 +1203,9 @@ def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, fit_linear=True, **kwargs):
             const_err = 2.302585 * 10 ** beta[0] * sd_beta[0]
         else:
             # fit power law directly
+            print('x1 =', x1)
+            print('x2 =', x2)
+            print('h =', h)
             beta, sd_beta, chisqr, MSE = fit_powererror(x1=x1, h=h, x2=x2, err_x=xerr, err_h=yerr, **kwargs)
             const = beta[0]
             const_err = sd_beta[0]
