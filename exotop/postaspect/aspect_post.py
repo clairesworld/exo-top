@@ -918,6 +918,72 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
     return output.beta, output.sd_beta, chisqr, MSE
 
 
+
+def fit_powererror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, **kwargs):
+    def func_pow1(beta, u):
+        a, b = beta
+        return a * u ** b
+
+    def func_pow2(beta, u):
+        a, b = beta
+        return a * u[0] ** (b * u[1])
+
+    if len(np.shape(x1)) != 1:
+        x1 = np.array(x1).reshape(np.shape(h))
+    elif x2 is None:
+        beta0 = [np.log10(0.1), -0.1]
+        func = func_pow1
+        x = x1
+    else:
+        beta0 = [np.log10(0.1), -0.1]
+        func = func_pow2
+        if len(np.shape(x2)) != 1:
+            x2 = np.array(x2).reshape(np.shape(h))
+        x = np.row_stack((x1, x2))  # odr doesn't seem to work with column_stack
+        err_x = 1  # doesn't work with multidimensional weights
+        err_h = 1
+
+    data = odr.RealData(x, h, sx=err_x, sy=err_h)
+    model = odr.Model(func)
+    try:
+        odrfit = odr.ODR(data, model, beta0)
+    except Exception as e:
+        print('x', x)
+        print('h', h)
+        raise e
+    output = odrfit.run()
+
+    if len(output.beta) == 2:
+        con, power = output.beta
+        s_con, s_pow = output.sd_beta
+    else:
+        print('beta length not implemented')
+
+    # confidence intervals
+    df_e = len(x1) - len(output.beta)  # degrees of freedom, error
+    conf = []
+    t_df = stats.t.ppf(ci, df_e)  # 0.975
+    for i in range(len(output.beta)):
+        conf.append([output.beta[i] - t_df * output.sd_beta[i],
+                     output.beta[i] + t_df * output.sd_beta[i]])
+
+    # chi sqr
+
+    expected = func(output.beta, x)
+    chisqr = np.sum(((h - expected) ** 2)/expected)
+    MSE = chisqr / df_e
+
+    print('\n')
+    print('       -> ODR RESULTS')
+    print('         -> reason for halting:', output.stopreason)
+    print('         -> constant:', con, '+/-', s_con, '   CI:', conf[0][0], conf[0][1])
+    print('         -> power:', power, '+/-', s_pow, '   CI:', conf[1][0], conf[1][1])
+    print('         -> chi sqr:', chisqr)
+    print('         -> MSE:', MSE)
+
+    return output.beta, output.sd_beta, chisqr, MSE
+
+
 def dimensionalise_h(hprime, p):
     try:
         return hprime * (p['alpha_m'] * p['dT_m'] * p['d_m'])
@@ -1120,7 +1186,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
 #                     print(df)
 
 
-def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, **kwargs):
+def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, fit_linear=True, **kwargs):
 
     if len(x) > 1:  # can only fit if at least 2 data
         slope = True
@@ -1131,9 +1197,15 @@ def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, **kwargs):
             x2 = x[1]
         elif n_fitted == 1:
             slope = False
-        beta, sd_beta, chisqr, MSE = fit_logerror(x1=x1, h=h, x2=x2, err_x=xerr, err_h=yerr, slope=slope, **kwargs)
-        const = 10 ** beta[0]
-        const_err = 2.302585 * 10 ** beta[0] * sd_beta[0]
+        if fit_linear:
+            beta, sd_beta, chisqr, MSE = fit_logerror(x1=x1, h=h, x2=x2, err_x=xerr, err_h=yerr, slope=slope, **kwargs)
+            const = 10 ** beta[0]
+            const_err = 2.302585 * 10 ** beta[0] * sd_beta[0]
+        else:
+            # fit power law directly
+            beta, sd_beta, chisqr, MSE = fit_powererror(x1=x1, h=h, x2=x2, err_x=xerr, err_h=yerr, **kwargs)
+            const = beta[0]
+            const_err = sd_beta[0]
         if len(beta) > 1:
             expon = [beta[1]]
             expon_err = [sd_beta[1]]

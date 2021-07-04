@@ -38,10 +38,10 @@ fig, axes = plt.subplots(1, 1, figsize=(5, 5))
 axes = [axes]
 
 """all eta on one axis"""
-fig, ax0 = plat.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load_grid,
+fig, ax0 = plat.plot_h_vs_2component(Ra=Ra_ls, eta=eta_ls, t1_grid=t1_grid, end_grid=end_grid, load_grid=load,
                                      data_path=data_path,
                                      fig_path=fig_path, averagescheme=averagescheme, p_dimensionals=None,
-                                     which_xs=which_xs,
+                                     which_xs=which_xs, fit_linear=False,
                                      beta0=[0.1, -0.1], sigma=1, fiterror=False, legend=False, fig=fig, ax=axes[0],
                                      include_regimes=include_regimes, save=False, labelsize=labelsize,
                                      xlabel=xlabel, ylabel=r'Dynamic topography $h^\prime_{\rm rms}$',
