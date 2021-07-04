@@ -78,12 +78,12 @@ fig, ax = plat.subplots_cases(
 )
 
 # Ra2e8 -->
-fig, ax = plat.subplots_cases(
-    ['Ra2e8-eta1e6-wide', 'Ra2e8-eta1e7-wide-ascii', 'Ra2e8-eta1e8-wide-ascii'],
-    labels=['$\Delta \eta$=1e6', '$\Delta \eta$=1e7', '$\Delta \eta$=1e8'], data_path=data_path, fig_path=fig_path,
-    t1=[0.06, 0.065, 0.06], load=True, fname='all-Ra2e8', suptitle='Ra=2e8', postprocess_kwargs=postprocess_kwargs,
-    includepd=True, includeTz=True, includegraphic=True,  # turn on once you know where steady state starts
-)
+# fig, ax = plat.subplots_cases(
+#     ['Ra2e8-eta1e6-wide', 'Ra2e8-eta1e7-wide-ascii', 'Ra2e8-eta1e8-wide-ascii'],
+#     labels=['$\Delta \eta$=1e6', '$\Delta \eta$=1e7', '$\Delta \eta$=1e8'], data_path=data_path, fig_path=fig_path,
+#     t1=[0.06, 0.065, 0.06], load=True, fname='all-Ra2e8', suptitle='Ra=2e8', postprocess_kwargs=postprocess_kwargs,
+#     includepd=True, includeTz=True, includegraphic=True,  # turn on once you know where steady state starts
+# )
 
 """look at individual case data"""
 
