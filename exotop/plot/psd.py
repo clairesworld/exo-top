@@ -2,11 +2,12 @@ import sh_things as sh
 import numpy as np
 import postaspect.plt_aspect as plat
 from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, data_path_home, fig_path_home, \
-    fig_fmt, regime_grid_td, load_grid, p_Earth, postprocess_kwargs, benchmark_path
+    fig_fmt, regime_grid_td, load_grid, p_Earth, postprocess_kwargs, benchmark_path, data_path_bullard, fig_path_bullard
 from useful_and_bespoke import dark_background
+import matplotlib.pyplot as plt
 
-data_path = data_path_home
-fig_path = fig_path_home
+data_path = data_path_bullard
+fig_path = fig_path_bullard
 labelsize = 18
 ticksize = 14
 legsize = 14
@@ -20,33 +21,35 @@ R_p = 6371  # Earth
 d, dT, alpha = 1, 1, 1
 regimes_use = ['chaotic']
 
+fig, axes = plt.subplots(2, 1, figsize=(7, 10))
+
 """ manu - all norm spectra with fit and Venus (and Hoggard?) """
-fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='bone', end_grid=end_grid, regime_grid=regime_grid_td,
+fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_grid, regime_grid=regime_grid_td,
                                   include_regimes=regimes_use, save=False, show_natscales=False,
                                   data_path=data_path, pend='_sph', fend='.pkl', test=False,
-                                  fig=None, ax=None, figsize=(8, 5), z_name='Ra_i_eff', cbar=True,
-                                  show_beta_guide=False, clabelpad=30,
+                                  figsize=(8, 5), z_name='case', cbar=True,
+                                  show_beta_guide=False, clabelpad=30, fig=fig, ax=axes[0],
                                   labelsize=labelsize, ticksize=ticksize, marker=None, lw=1, alpha=0.4, labelpad=16,
                                   # xlim=(1e-3, 3e-2),
                                   max_dscale=2, bl_fudge=5, legsize=legsize, # c_guide='xkcd:off white',
                                   xlabel='Nondimensional wavenumber', ylabel='Power spectral density\n'+'(\% relative to total)',
-                                  x2label='Nondimensional wavenumber', clabel=r'log(Ra$_{i, {\rm eff}})$',
+                                  x2label='Nondimensional wavenumber', clabel='Case', #clabel=r'log(Ra$_{i, {\rm eff}})$',
                                   norm='rel_power', whole=False, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
-                                 xlim_l=(0.3, 130), x1_name='wavenumber', show_degrees=False,
+                                 xlim_l=(0.3, 130), x1_name='wavenumber', show_degrees=True,
                                    vmin=6, vmax=7.2)
-print('axs', np.shape(axs))
-_, _, fig, ax = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
+
+_, _, fig, axes = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
                                     R_base=2, lmin=1, set_axlabels=False, c_fit='xkcd:bordeaux', c_Ve='xkcd:squash',#'xkcd:dark',
                                     x_name='wavenumber',
                                     save=False, plot=True, units='m3', scale_to=1.0, alpha=0.9, labelsize=labelsize,
-                                    legsize=legsize, fig=fig, ax=axs[0])  # axs[0] if no secondary ax; this plots degrees
+                                    legsize=legsize, fig=fig, ax=axes[1])  # axs[0] if no secondary ax; this plots degrees
 
-_, _, fig, ax = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
+_, _, fig, axes = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
                                     load_fname='spectrum_-2.pkl', is_1D=True, show_orig=False, V_label=r'$k^{-2}$',
                                     R_base=2, lmin=1, set_axlabels=False, c_fit='xkcd:dark', c_Ve='xkcd:reddish orange', #'xkcd:bubblegum pink',
                                     x_name='wavenumber', marker_Ve='v', legsize=legsize,
                                     save=False, plot=True, units='m3', scale_to=1.0, alpha=0.9, labelsize=labelsize,
-                                    fig=fig, ax=axs[0])  # axs[0] if no secondary ax; this plots degrees
+                                    fig=fig, ax=axes[1])  # axs[0] if no secondary ax; this plots degrees
 fig.savefig(fig_path + 'psd_stacked_k.png', bbox_inches='tight')
 
 

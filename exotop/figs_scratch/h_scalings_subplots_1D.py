@@ -37,7 +37,7 @@ xscales = [p.sec2Gyr,
 xlabels = ['Age\n(Gyr)',
            'Planet mass\n($M_E$)', 'CMF', 'Radiogenic heating\n(pW kg$^{-1}$)']
 
-fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=1000, x_res=5,
+fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=100, x_res=5,
                                                            defaults='baseline',
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
                                                            legend=True, lw=4, ylabel=r'RMS topography (m)',
@@ -97,9 +97,9 @@ handles = [mlines.Line2D([], [], color=linec, ls='-',
 #                         borderaxespad=0,
 #                         loc='lower left', bbox_to_anchor=(0.0, 1.01), ncol=3, )
 
-fig, *axes = dark_background(fig, axes)
+# fig, *axes = dark_background(fig, axes)
 plt.subplots_adjust(wspace=0.2)
 # plt.tight_layout()
 
-fig.savefig(fig_path+'h_parameters_slides'+fig_format, bbox_inches='tight')
+fig.savefig(fig_path+'h_parameters_'+fig_format, bbox_inches='tight')
 plt.show()

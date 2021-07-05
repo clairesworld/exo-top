@@ -33,7 +33,9 @@ def simple_vol_scaling(pl, verbose=False, at_age=None, it=None, **kwargs):
 
 def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0=None, plot=False, verbose=False,
               spectrum_fname='base_spectrum_l1.pkl', spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
-              **kwargs):
+              rho_w=1000, **kwargs):
+    water_load_ratio = pl.rho_m / (pl.rho_m - rho_w)
+
     if phi0 is None:
         degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
 
@@ -79,13 +81,13 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
             rms_nondim = np.sqrt(np.mean(data**2))
             # if verbose:
             #     print('RMS of map nondimensional', rms_nondim)
-            grid_dim = dimensionalise(data, pl, i=ii)
+            grid_dim = dimensionalise(data, pl, i=ii) * water_load_ratio
             vol = sh.integrate_to_peak_GLQ(grid_dim, R=pl.R_p, lmax=lmax, verbose=verbose)
             if np.isnan(vol):
                 print('phi0', phi0, 'h_ratio', h_ratio)
                 raise Exception('ocean vol nan!')
-            rms_dim = np.sqrt(np.mean(grid_dim ** 2))
             vols.append(vol)
+            rms_dim = np.sqrt(np.mean(grid_dim ** 2))
             peaks.append(np.max(grid_dim))
             rms_nondims.append(rms_nondim)
             rms_dims.append(rms_dim)
@@ -114,10 +116,11 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         pltshow()
     return pl
 
-def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_w=1000, spectrum_fname='base_spectrum_l1.pkl',
+def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_m=3500, rho_w=1000, spectrum_fname='base_spectrum_l1.pkl',
              spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/', verbose=False, **kwargs):
     """ predict min rms topography for land given sfc water mass frac and radius"""
     vol_EO = 1.4e21/rho_w
+    water_load_ratio = rho_m / (rho_m - rho_w)
 
     if phi0 is None:
         degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
@@ -139,7 +142,7 @@ def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_w=
         while n < n_stats:
             h_ratio = h_rms / h_rms0
             clm = sh.random_harms_from_psd(phi0, l, R=2, h_ratio=h_ratio, plot=False, verbose=verbose)
-            grid = clm.expand(grid='GLQ', extend=False).to_array()
+            grid = clm.expand(grid='GLQ', extend=False).to_array() * water_load_ratio
             lmax = clm.lmax
             vol = sh.integrate_to_peak_GLQ(grid, R=R_p, lmax=lmax, verbose=verbose)
             vols.append(vol)

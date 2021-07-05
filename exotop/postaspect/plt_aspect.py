@@ -2178,7 +2178,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                         z_vec.append(np.log10(float(Ra_ls[ii])))
                     elif z_name == 'eta':
                         z_vec.append(np.log10(float(eta_str)))
-                    elif z_name == 'Ra_i_eff':
+                    elif z_name == 'Ra_i_eff' or z_name == 'case':
                         print('data path', data_path)
                         z_vec.append(np.log10(
                             plot_getx(Ra_ls[ii], eta_str, case=case, which_x='Ra_i_eff', averagescheme='timefirst',
@@ -2192,6 +2192,11 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                 print(case, 'rms/peak', h_rms/h_peak, '| peak', h_peak)
 
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
+    if z_name == 'case':
+        print('original z_vec', z_vec)
+        clist, z_vec = [(x, y) for y, x in sorted(zip(z_vec, clist))]
+        print('sorted z_vec', z_vec)
+        z_vec = np.arange(1, len(z_vec))
 
     # load spectra
     zz = 0
