@@ -6,8 +6,8 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
 from useful_and_bespoke import dark_background
 import matplotlib.pyplot as plt
 
-data_path = data_path_home  #bullard
-fig_path = fig_path_home #bullard
+data_path = data_path_bullard
+fig_path = fig_path_bullard
 labelsize = 18
 ticksize = 14
 legsize = 14
