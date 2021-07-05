@@ -2194,7 +2194,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
     if z_name == 'case':
         print('original z_vec', z_vec)
-        clist, z_vec = [(x, y) for y, x in sorted(zip(z_vec, clist))]
+        clist, z_vec = [list(x, y) for y, x in sorted(zip(z_vec, clist))]
         print('sorted z_vec', z_vec)
         z_vec = np.arange(1, len(z_vec))
 
