@@ -2227,6 +2227,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             k_min = np.min(k)
         else:
             k_min, k_max = 2*np.pi / wl_max, 2*np.pi / wl_min
+            print('k', k)
+            print('k min', k_min)
+            print('k max', k_max)
             if k_min is not None and (k_min > np.min(k)):
                 i_min = np.argmax(k >= k_min)
             if k_max is not None and (k_max < np.max(k)):
