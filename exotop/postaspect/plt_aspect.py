@@ -2297,6 +2297,8 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         secax.set_xlabel(x2label, fontsize=labelsize, labelpad=labelpad)
         secax.tick_params(axis='both', which='major', labelsize=ticksize)
         axes.append(secax)
+        print('xlim_k', xlim_k)
+        print('xlim_l', xlim_l)
 
     if cbar:
         if cmap is None:

@@ -36,11 +36,12 @@ fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_g
                                   x2label='Nondimensional wavenumber', clabel='Case', #clabel=r'log(Ra$_{i, {\rm eff}})$',
                                   norm='rel_power', whole=False, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
                                  xlim_l=(0.3, 130), x1_name='wavenumber', show_degrees=True,
-                                   vmin=6, vmax=7.2)
+                                   #vmin=6, vmax=7.2
+                                )
 
 _, _, fig, _ = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
                                     R_base=2, lmin=1, set_axlabels=False, c_fit='xkcd:bordeaux', c_Ve='xkcd:squash',#'xkcd:dark',
-                                    x_name='wavenumber',
+                                    x_name='wavenumber', ticksize=ticksize,
                                     save=False, plot=True, units='m3', scale_to=1.0, alpha=0.9, labelsize=labelsize,
                                     legsize=legsize, fig=fig, ax=axes[1])  # axs[0] if no secondary ax; this plots degrees
 
