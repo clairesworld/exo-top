@@ -32,8 +32,8 @@ fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=end_g
                                   labelsize=labelsize, ticksize=ticksize, marker=None, lw=1, alpha=0.4, labelpad=16,
                                   # xlim=(1e-3, 3e-2),
                                   max_dscale=2, bl_fudge=5, legsize=legsize, # c_guide='xkcd:off white',
-                                  xlabel='Nondimensional wavenumber', ylabel='Power spectral density\n'+'(\% relative to total)',
-                                  x2label='Nondimensional wavenumber', clabel='Case', #clabel=r'log(Ra$_{i, {\rm eff}})$',
+                                  xlabel='', ylabel='Power spectral density\n'+'(\% relative to total)',
+                                  x2label='', clabel='Case', #clabel=r'log(Ra$_{i, {\rm eff}})$',
                                   norm='rel_power', whole=False, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
                                  xlim_l=(0.3, 130), x1_name='wavenumber', show_degrees=True,
                                    #vmin=6, vmax=7.2
@@ -48,9 +48,11 @@ _, _, fig, _ = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_pa
 _, _, fig, _ = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
                                     load_fname='spectrum_-2.pkl', is_1D=True, show_orig=False, V_label=r'$k^{-2}$',
                                     R_base=2, lmin=1, set_axlabels=False, c_fit='xkcd:dark', c_Ve='xkcd:reddish orange', #'xkcd:bubblegum pink',
-                                    x_name='wavenumber', marker_Ve='v', legsize=legsize,
+                                    x_name='wavenumber', marker_Ve='v', legsize=legsize, ticksize=ticksize,
                                     save=False, plot=True, units='m3', scale_to=1.0, alpha=0.9, labelsize=labelsize,
                                     fig=fig, ax=axes[1])  # axs[0] if no secondary ax; this plots degrees
+
+axes[1].set_xlabel('Nondimensional wavenumber', fontsize=labelsize)
 fig.savefig(fig_path + 'psd_stacked_k.png', bbox_inches='tight')
 
 

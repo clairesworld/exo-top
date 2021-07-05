@@ -864,7 +864,7 @@ def get_pysh_constants(body, name):
 def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, lmin=1, lmax=None, set_axlabels=True,
                      save=True, plot=True, units='km4', scale_to='Venus', labelsize=16, legsize=12, alpha=0.5,
                      fig=None, ax=None, c_Ve='xkcd:sea', c_fit='xkcd:slate', x_name='degrees', load_fname=None,
-                     show_orig=True, V_label='Venus (Wieczorek 2015)', is_1D=False, marker_Ve='o', **kwargs):
+                     show_orig=True, V_label='Venus (Wieczorek 2015)', is_1D=False, marker_Ve='o', ticksize=12, **kwargs):
     R_Venus = get_pysh_constants('Venus', 'r')
     if 'km' in units:
         R_Venus = R_Venus * 1e-3  # in km
@@ -967,6 +967,7 @@ def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, 
                 ylabel = r'1D PSD (km$^{2}$ km)'
             ax.set_ylabel(ylabel, fontsize=labelsize)
         ax.legend(frameon=False, fontsize=legsize)
+        ax.tick_params(axis='both', which='major', labelsize=ticksize)
         if save:
             plot_save(fig, fname='Venus_correction', fig_path=fig_path)
 
