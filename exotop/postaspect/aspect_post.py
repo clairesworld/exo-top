@@ -901,8 +901,8 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
 
     # chi sqr
 
-    expected = func(output.beta, logx)
-    chisqr = np.sum(((logh - expected) ** 2)/expected)
+    expected = 10**func(output.beta, logx)
+    chisqr = np.sum(((h - expected) ** 2)/expected)
     MSE = chisqr / df_e
 
     print('\n')
