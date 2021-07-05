@@ -19,7 +19,7 @@ def hpeak_from_spectrum(power, norm='4pi', lmax=40, n=10, **kwargs):
     return np.mean(h_peak)  # average of a bunch of random spectra consistent with given
 
 
-def load_model_spectrum_pkl(fname='base_spectrum.pkl', path='', data_path='', case=None):
+def load_model_spectrum_pkl(fname='base_spectrum.pkl', path='', data_path='', case=None, **kwargs):
     import pickle as pkl
 
     if case is not None:
