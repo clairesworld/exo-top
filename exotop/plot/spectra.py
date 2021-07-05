@@ -22,18 +22,18 @@ ecapsize = 8
 # ts = [[133000, 133900],[137000, 137900]]
 
 """ all chaotic cases get DCT-II and psd """
-# include_regimes = ['chaotic']
-# for ii, eta in enumerate(eta_ls):  # across eta_ls
-#         cases = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
-#         for jj, case in enumerate(cases):
-#             if regime_grid_td[ii][jj] in include_regimes:
-#                 sh.dct_spectrum_avg(case, t0=t1_grid[ii][jj], t_res=1000, x_res=1, norm='ortho', data_path=data_path,
-#                                        fig_path=fig_path, plot=True, dim=True, test=True)
+include_regimes = ['chaotic']
+for ii, eta in enumerate(eta_ls):  # across eta_ls
+        cases = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
+        for jj, case in enumerate(cases):
+            if regime_grid_td[ii][jj] in include_regimes:
+                sh.dct_spectrum_avg(case, t0=t1_grid[ii][jj], t_res=1000, x_res=1, norm='ortho', data_path=data_path,
+                                       fig_path=fig_path, plot=True, dim=True, test=True)
 
 """ just Lees 2D benchmark """
-sh.dct_spectrum_avg('Lees-Ra1e6-2D', t0=0.6, t_res=100, x_res=1, norm='ortho', data_path=data_path,
-                    fig_path=fig_path, plot=True, load=False, dim=False, fit=False,
-                    show_nat_scales=False, show_guide=False)
+# sh.dct_spectrum_avg('Lees-Ra1e6-2D', t0=0.6, t_res=100, x_res=1, norm='ortho', data_path=data_path,
+#                     fig_path=fig_path, plot=True, load=False, dim=False, fit=False,
+#                     show_nat_scales=False, show_guide=False)
 
 # sh.dct_spectrum_jfr('Lees-Ra1e6-2D', ts0=ts, x_res=1, data_path=data_path, plot_test=True, check_norm=True, dim=False)
 

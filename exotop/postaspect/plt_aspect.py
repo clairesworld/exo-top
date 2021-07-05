@@ -2195,6 +2195,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
     if z_name == 'case':
         clist = [x for y, x in sorted(zip(z_vec, clist))]
         z_vec = np.arange(1, len(z_vec))
+        cticks = z_vec
+    else:
+        cticks = None
 
     # load spectra
     zz = 0
@@ -2305,7 +2308,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             print('cbar not implemented without cmap')
         else:
             cb = colourbar(vector=z_vec, ax=ax, vmin=vmin, vmax=vmax, label=clabel, labelsize=labelsize,
-                            ticksize=ticksize, ticks=None, ticklabels=None, labelpad=clabelpad,
+                            ticksize=ticksize, ticks=cticks, ticklabels=None, labelpad=clabelpad,
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.1, log=False)
         axes.append(cb.ax)
 
