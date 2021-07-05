@@ -28,7 +28,7 @@ for ii, eta in enumerate(eta_ls):  # across eta_ls
         for jj, case in enumerate(cases):
             if regime_grid_td[ii][jj] in include_regimes:
                 sh.dct_spectrum_avg(case, t0=t1_grid[ii][jj], t_res=1000, x_res=1, norm='ortho', data_path=data_path,
-                                       fig_path=fig_path, plot=True, dim=True, test=False, load=False)
+                                       fig_path=fig_path, plot=True, dim=False, test=False, load=False)
 
 """ just Lees 2D benchmark """
 # sh.dct_spectrum_avg('Lees-Ra1e6-2D', t0=0.6, t_res=100, x_res=1, norm='ortho', data_path=data_path,

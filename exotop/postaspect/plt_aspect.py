@@ -2187,9 +2187,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                 else:
                     print(fname, 'not found')
 
-                h_rms, h_peak = plot_geth(case=case, averagescheme='timelast', data_path=data_path, return_all=False,
-                                          t1=0)
-                print(case, 'rms/peak', h_rms/h_peak, '| peak', h_peak)
+                # h_rms, h_peak = plot_geth(case=case, averagescheme='timelast', data_path=data_path, return_all=False,
+                #                           t1=0)
+                # print(case, 'rms/peak', h_rms/h_peak, '| peak', h_peak)
 
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
     if z_name == 'case':
@@ -2207,6 +2207,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
         S, k = pkl.load(open(fname, "rb"))
+        print('loaded k', k[0], k[-1])
         if test:
             test_rms_ratio(S, k, n_stats=10, R=R_p)
         if k[0] == 0:  # only wavenumbers greater than 0
@@ -2227,7 +2228,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             k_min = np.min(k)
         else:
             k_min, k_max = 2*np.pi / wl_max, 2*np.pi / wl_min
-            print('k', k)
+
             print('k min', k_min)
             print('k max', k_max)
             if k_min is not None and (k_min > np.min(k)):
