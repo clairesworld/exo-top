@@ -109,7 +109,6 @@ df = save_table(Ra_ls, eta_ls, fname='test.csv', fig_path=fig_path_bullard, t1_g
                 sort_cases='Ra_i_eff',
                 regime_grid=regime_grid_td, end_grid=end_grid, data_path=data_path_bullard, include_regimes=['chaotic'])
 
-print('returned\n', df.head(10))
 table_to_latex(df)
 
 # f = 1.12e9

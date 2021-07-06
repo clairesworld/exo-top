@@ -55,9 +55,10 @@ ax = colourised_legend(axes[0], clist=colorize(cases, cmap=cmap)[0],
                        legsize=legsize, ncol=1, title='Case')
 model_c = (0.02156863, 0.68274886, 0.93022931)
 
+ylim = (1e-3, 8e1)
 fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
                            R=2, lmin=1, c=model_c ,  # 'xkcd:bordeaux',
-                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
+                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=ylim,
                            save=False, labelsize=labelsize, legend=True, label='Model dynamic topography',
                            show_degrees=True, x2label='Spherical harmonic degree', marker='^',
                            ylabel='Power spectral density\n' + '(% relative to total)',
@@ -65,21 +66,21 @@ fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_p
 
 fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
                            R=2, lmin=1, c=model_c ,  # 'xkcd:bordeaux',
-                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
+                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=ylim,
                            show_degrees=False, save=False, labelsize=labelsize, legend=False,
                            label='Model dynamic topography', marker='^', lmax=53,
                            legsize=legsize, fig=fig, ax=axes[1])
 
 fig, ax = sh.plot_norm_psd(baseline_fname='Venus', fig_path=fig_path, data_path=data_path,
                            R=2, lmin=1, c='xkcd:squash', lmax=53,
-                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
+                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=ylim,
                            show_degrees=True, save=False, labelsize=labelsize, legend=False,
                            label='Venus (Wieczorek 2015)', marker='v',
                            legsize=legsize, fig=fig, ax=axes[1])
 
 fig, ax = sh.plot_norm_psd(baseline_fname='spectrum_-2.pkl', fig_path=fig_path, data_path=data_path,
                            R=2, lmin=1, c='xkcd:reddish orange', lmax=53,
-                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
+                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=ylim,
                            show_degrees=True, save=False, labelsize=labelsize, legend=True,
                            label=r'$k^{-2}$', marker='o', ylabel='Power spectral density\n' + '(% relative to total)',
                            legsize=legsize, fig=fig, ax=axes[1])
