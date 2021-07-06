@@ -6,10 +6,11 @@ from useful_and_bespoke import not_iterable
 import os
 import numpy as np
 import pandas as pd
+from num2tex import num2tex
 
 
 def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_grid=None, end_grid=None, regime_grid=None,
-               data_path=data_path_bullard, include_regimes=None, regime_names=None, cols=None,
+               data_path=data_path_bullard, include_regimes=None, regime_names=None, cols=None, sort_cases=None,
                postprocess_kwargs=postprocess_kwargs, **kwargs):
     if include_regimes is None:
         include_regimes = regime_names
@@ -61,18 +62,37 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                 # print('row\n', row)
                 df_print.loc[i] = row
                 i = i + 1
+    if sort_cases is not None:
+        df.sort_values(by=sort_cases, axis=1, inplace=True)
+
     df_print.to_csv(fig_path + fname)
     print(df_print.head())
     return df_print
 
 
-def table_to_latex(df):
+def table_to_latex(df, include_cols=None):
     # print in latex form
     cols = df.keys()
+    if include_cols is None:
+        include_cols = cols
 
-save_table(Ra_ls, eta_ls, fname='test.csv', fig_path=fig_path_bullard, t1_grid=t1_grid, load_grid=load_grid,
+    n = len(df)
+    s = []
+    for row in range(n):
+        s.append(str(row + 1) + ' &')  # case number
+        for col in cols:
+            val = df.loc(row, col)
+            s.append('{:.0e}'.format(num2tex(val)) + ' &')
+            # if col == 'Ra_1' or 'delta_eta'
+
+    print(s)
+
+
+df = save_table(Ra_ls, eta_ls, fname='test.csv', fig_path=fig_path_bullard, t1_grid=t1_grid, load_grid=load_grid,
+           sort_cases='Ra_i_ieff',
            regime_grid=regime_grid_td, end_grid=end_grid, data_path=data_path_bullard, include_regimes=['chaotic'])
 
+table_to_latex(df)
 
 
 
