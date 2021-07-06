@@ -53,9 +53,10 @@ ax = colourised_legend(axes[0], clist=colorize(cases, cmap=cmap)[0],
                        cleglabels=cases, lw=1, ls='-', marker=None,
                        markersize=0,
                        legsize=legsize, ncol=1, title='Case')
+model_c = (0.02156863, 0.68274886, 0.93022931)
 
 fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
-                           R=2, lmin=1, c=(1., 0.38410575, 0.19584547),  # 'xkcd:bordeaux',
+                           R=2, lmin=1, c=model_c ,  # 'xkcd:bordeaux',
                            x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
                            save=False, labelsize=labelsize, legend=True, label='Model dynamic topography',
                            show_degrees=True, x2label='Spherical harmonic degree', marker='^',
@@ -63,7 +64,7 @@ fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_p
                            legsize=legsize, fig=fig, ax=axes[0])
 
 fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
-                           R=2, lmin=1, c=(1., 0.38410575, 0.19584547),  # 'xkcd:bordeaux',
+                           R=2, lmin=1, c=model_c ,  # 'xkcd:bordeaux',
                            x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
                            show_degrees=False, save=False, labelsize=labelsize, legend=False,
                            label='Model dynamic topography', marker='^', lmax=53,
