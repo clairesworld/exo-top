@@ -66,6 +66,10 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
     return df_print
 
 
+def table_to_latex(df):
+    # print in latex form
+    cols = df.keys()
+
 save_table(Ra_ls, eta_ls, fname='test.csv', fig_path=fig_path_bullard, t1_grid=t1_grid, load_grid=load_grid,
            regime_grid=regime_grid_td, end_grid=end_grid, data_path=data_path_bullard, include_regimes=['chaotic'])
 

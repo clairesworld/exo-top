@@ -48,7 +48,7 @@ fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, end_grid=end_grid, regime_grid
                                    x1_name='wavenumber', show_degrees=False, legend=True,
                                    # vmin=6, vmax=7.2
                                    )
-cases = np.arange(1, 6 + 1)
+cases = np.arange(1, 11 + 1)
 ax = colourised_legend(axes[0], clist=colorize(cases, cmap=cmap)[0],
                        cleglabels=cases, lw=1, ls='-', marker=None,
                        markersize=0,
