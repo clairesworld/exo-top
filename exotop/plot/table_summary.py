@@ -73,6 +73,15 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
     return df_print
 
 
+def latex_float(f):
+    float_str = "{0:.3g}".format(f)
+    if "e" in float_str:
+        base, exponent = float_str.split("e")
+        return r"{0} \times 10^{{{1}}}".format(base, int(exponent))
+    else:
+        return float_str
+
+
 def table_to_latex(df, include_cols=None):
     # print in latex form
     cols = df.keys()
@@ -80,15 +89,17 @@ def table_to_latex(df, include_cols=None):
         include_cols = cols
 
     n = len(df)
-    s = []
+    s = ''
     for row in range(n):
         s.append(str(row + 1) + ' &')  # case number
         for col in cols:
-            val = df.loc[row, col]
-            print('row, col', row, col, '-' ,  val)
-            s.append('{:.0e}'.format(num2tex(val)) + ' &')
-            # if col == 'Ra_1' or 'delta_eta'
-        s.append(r'\\')
+            if col in include_cols:
+                val = df.loc[row, col]
+                # print('row, col', row, col, '=',  val)
+                # s = s + '${:.0e}$'.format(num2tex(val)) + ' &'
+                s = s + '$' + latex_float(val) + '$ &'
+                # if col == 'Ra_1' or 'delta_eta'
+        s = s + r'\\'
     print(s)
 
 
@@ -97,3 +108,7 @@ df = save_table(Ra_ls, eta_ls, fname='test.csv', fig_path=fig_path_bullard, t1_g
                 regime_grid=regime_grid_td, end_grid=end_grid, data_path=data_path_bullard, include_regimes=['chaotic'])
 
 table_to_latex(df)
+
+# f = 1.12e9
+# print(latex_float(f))
+# print('${:.0e}$'.format(num2tex(f)))
