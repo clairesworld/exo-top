@@ -6,12 +6,12 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
 from useful_and_bespoke import dark_background, colourised_legend, colorize
 import matplotlib.pyplot as plt
 
-data_path = data_path_home  # bullard
-fig_path = fig_path_home  # bullard
+data_path = data_path_bullard
+fig_path = fig_path_bullard
 labelsize = 18
 ticksize = 14
 legsize = 14
-cmap = 'rainbow_r'
+cmap = 'rainbow'
 
 """ set dimensionalisation factors """
 R_p = 6371  # Earth
@@ -77,7 +77,7 @@ fig, ax = sh.plot_norm_psd(baseline_fname='Venus', fig_path=fig_path, data_path=
                            legsize=legsize, fig=fig, ax=axes[1])
 
 fig, ax = sh.plot_norm_psd(baseline_fname='spectrum_-2.pkl', fig_path=fig_path, data_path=data_path,
-                           R=2, lmin=1, c='xkcd:bordeaux', lmax=53,
+                           R=2, lmin=1, c='xkcd:reddish orange', lmax=53,
                            x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
                            show_degrees=True, save=False, labelsize=labelsize, legend=True,
                            label=r'$k^{-2}$', marker='o', ylabel='Power spectral density\n' + '(% relative to total)',
