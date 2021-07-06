@@ -15,7 +15,7 @@ from postaspect import aspect_post as pro
 from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard, highlight_colour, \
     cmap_path  # noqa: E402
 from useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, not_iterable, \
-    colourbar, cmap_from_ascii, not_string, minmaxnorm, mahalanobis, colourised_legend
+    colourbar, cmap_from_ascii, not_string, minmaxnorm, mahalanobis, colourised_legend, find_nearest_idx
 
 def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
     path = fig_path + fname + fig_fmt
@@ -2140,12 +2140,12 @@ def plot_error_contours(fig, ax, errs=None, c='k', fc='w', fontsize=9, labels=Tr
 def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=None, include_regimes=None,
                       data_path=data_path_bullard, pend='_sph', fend='.pkl', figname='h_spectra_stacked',
                       marker='.', lw=0.5, xlabel=None, ylabel='Normalised power spectral density', clabelpad=25,
-                      x2label='Spherical harmonic degree', save=True, alpha=1, labelsize=16, ticksize=12,
+                      x2label='Spherical harmonic degree', save=True, alpha=1, labelsize=16, ticksize=12, legend=False,
                       fig=None, ax=None, figsize=(5, 5), z_name='Ra', vmin=None, vmax=None, clabel=None,
                       norm='min_l', dim=False, d=1, alpha_m=1, dT=1, R_p=None, cbar=False, show_degrees=True,
                       add_files=None, add_label=None, legsize=12, xlim=None, ylim=None, show_beta_guide=False,
                       max_dscale=2, bl_fudge=1, c_guide='xkcd:slate', labelpad=20, whole=False, show_natscales=False,
-                      relative_power=False, test=True, xlim_l=None, x1_name='wavenumber', **kwargs):
+                      relative_power=False, test=True, xlim_l=None, x1_name='wavenumber', verbose=False, **kwargs):
     import pickle as pkl
     import sh_things as sh
     global R
@@ -2167,6 +2167,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
     # get colouring
     ji_use = []
     z_vec = []
+    z_mdl = None
     for jj, eta_str in enumerate(eta_ls):
         cases, Ra_var = pro.get_cases_list(Ra_ls, eta_str, end_grid[jj])
         for ii, case in enumerate(cases):
@@ -2175,15 +2176,17 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                 if os.path.isfile(fname):
                     ji_use.append((jj, ii))
                     if z_name == 'Ra':
-                        z_vec.append(np.log10(float(Ra_ls[ii])))
+                        zval = np.log10(float(Ra_ls[ii]))
                     elif z_name == 'eta':
-                        z_vec.append(np.log10(float(eta_str)))
+                        zval = np.log10(float(eta_str))
                     elif z_name == 'Ra_i_eff' or z_name == 'case':
-                        print('data path', data_path)
-                        z_vec.append(np.log10(
+                        zval = np.log10(
                             plot_getx(Ra_ls[ii], eta_str, case=case, which_x='Ra_i_eff', averagescheme='timefirst',
                                       data_path=data_path, load=True, postprocess_kwargs=None, return_all=False, t1=0,
-                                      alpha_m=alpha_m, **kwargs)))
+                                      alpha_m=alpha_m, **kwargs))
+                    z_vec.append(zval)
+                    if eta_str == '1e7' and Ra_var[ii] == '1e8':
+                        z_mdl = zval
                 else:
                     print(fname, 'not found')
 
@@ -2193,24 +2196,33 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
 
     clist = colorize(z_vec, cmap=cmap, vmin=vmin, vmax=vmax)[0]
     if z_name == 'case':
-        clist = [x for y, x in sorted(zip(z_vec, clist))]
-        z_vec = np.arange(1, len(z_vec))
-        cticks = z_vec
+        z_vec_orig = z_vec
+        clist = [x for y, x in sorted(zip(z_vec_orig, clist))]
+        ji_use = [x for y, x in sorted(zip(z_vec_orig, ji_use))]
+        z_vec_sorted = sorted(z_vec)
+        cticks = np.arange(1, len(z_vec) + 1)
     else:
         cticks = None
+    if zval is not None:
+        iz = find_nearest_idx(z_vec_sorted, z_mdl)
+        print('c of model', clist[iz], 'case', iz+1)
 
     # load spectra
+    print('plotting', len(z_vec), 'spectra')
     zz = 0
     for (jj, ii) in ji_use:
         case = 'Ra' + Ra_ls[ii] + '-eta' + eta_ls[jj] + end_grid[jj, ii]
-        print('\n\n\n', case)
-        fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
-
+        fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend  # numerical spectra at fixed k
         S, k = pkl.load(open(fname, "rb"))
-        print('loaded k', k[0], k[-1])
+        if verbose:
+            print('\n\n', case)
+            print('jj, ii', jj, ii)
+            print('loaded k', k[0], ':', k[-1])
         if test:
             test_rms_ratio(S, k, n_stats=10, R=R_p)
         if k[0] == 0:  # only wavenumbers greater than 0
+            if verbose:
+                print('removing 0 wavenumber')
             k = k[1:]
             S = S[1:]
 
@@ -2228,9 +2240,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             k_min = np.min(k)
         else:
             k_min, k_max = 2*np.pi / wl_max, 2*np.pi / wl_min
-
-            print('k min', k_min)
-            print('k max', k_max)
+            if verbose:
+                print('wl max', wl_max, 'k min', k_min)
+                print('wl min', wl_min, 'k max', k_max)
             if k_min is not None and (k_min > np.min(k)):
                 i_min = np.argmax(k >= k_min)
             if k_max is not None and (k_max < np.max(k)):
@@ -2250,11 +2262,15 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
             ylabel = "Power (% relative to total)"
             print(case, 'max power @', kv[Sv_norm == np.max(Sv_norm)])
 
+        if z_name == 'case':
+            label = None  # str(find_nearest_idx(z_vec, z_vec_sorted[zz]))
         if x1_name == 'degrees':
             lv = sh.k_to_l(kv, R_p)
-            ax.plot(lv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
-        else:
-            ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker)
+            ax.plot(lv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker, label=label)
+        elif x1_name == 'wavenumber':
+            if verbose:
+                print('plotting k from', kv[0], 'to', kv[-1])
+            ax.plot(kv, Sv_norm, c=clist[zz], alpha=alpha, lw=lw, marker=marker, label=label)
         zz = zz + 1
 
     if not relative_power:
@@ -2266,8 +2282,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
     ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
     ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=labelpad)
     ax.tick_params(axis='both', which='major', labelsize=ticksize)
-    if xlim is not None:
-        ax.set_xlim(xlim)
+
     if ylim is not None:
         ax.set_ylim(ylim)
 
@@ -2284,7 +2299,7 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                                plot_kwargs={'c': 'k'}, is_2D=True, is_wl=True, normalise=True, norm=norm)
         ax.legend(frameon=False, fontsize=legsize)
 
-    if show_degrees:
+    if show_degrees and x1_name == 'wavenumber':
         R = R_p
 
         def to_deg(k):
@@ -2293,19 +2308,23 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         def to_wn(l):
             return (l + 0.5) / (2 * np.pi * R)
 
-        # secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
-        secax = ax.twiny()
-        if xlim_l is None:
-            xlim_k = ax.get_xlim()
-        else:
-            xlim_k = sh.l_to_k(np.array(xlim_l), R)
-        xlim_l = sh.k_to_l(np.array(xlim_k), R)
-        secax.set_xlim(xlim_l)
+        secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
+        # secax = ax.twiny()
+        # if xlim_l is None:
+        #     xlim_k = ax.get_xlim()
+        #     xlim_l = sh.k_to_l(np.array(xlim_k), R)
+        # else:
+        #     xlim_k = sh.l_to_k(np.array(xlim_l), R)
+
+        # secax.set_xlim(xlim_l)
+        # ax.set_xlim(xlim_k)
         secax.set_xlabel(x2label, fontsize=labelsize, labelpad=labelpad)
         secax.tick_params(axis='both', which='major', labelsize=ticksize)
-        axes.append(secax)
-        print('xlim_k', xlim_k)
-        print('xlim_l', xlim_l)
+        # axes.append(secax)
+        # print('xlim_k', xlim_k)
+        # print('xlim_l', xlim_l)
+    if xlim is not None:
+        ax.set_xlim(xlim)
 
     if cbar:
         if cmap is None:
@@ -2315,13 +2334,20 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
                             ticksize=ticksize, ticks=cticks, ticklabels=None, labelpad=clabelpad,
                             rot=None, discrete=False, cmap=cmap, tickformatter=None, pad=0.1, log=False)
         axes.append(cb.ax)
-
-
-
+    # if legend:
+    #     # ax.legend(fontsize=legsize, frameon=False)
+    #     # show colours outside
+    #     ax = colourised_legend(ax, clist=colorize(cticks, cmap=cmap)[0],
+    #                             cleglabels=cticks, lw=1, marker=None,
+    #                                 markersize=0,
+    #                                 legsize=legsize, ncol=1, title='Case')
 
     if save:
         plot_save(fig, fname=figname, **kwargs)
-    return (fig, *axes)
+    if cbar:
+        return (fig, *axes)
+    else:
+        return fig, ax
 
 
 def plot_from_txt(filepath, ax, label=None, header=0, additional_mod_fn=None, plot_kwargs=None, **kwargs):

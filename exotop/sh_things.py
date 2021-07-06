@@ -62,7 +62,7 @@ def norm_spectrum(k, S, norm='min_l', k_min=None, verbose=False, **kwargs):
         # assume S is psd
         S_norm = scale_psd_to_rms(phi0=S, k=k, **kwargs)
     elif norm == 'rel_power':  # S must be density
-        S_norm = 100*S/np.sum(S)
+        S_norm = 100 * S / np.sum(S)
     else:
         print('no PSD normalisation scheme recognised')
         S_norm = S
@@ -861,10 +861,78 @@ def get_pysh_constants(body, name):
     return eval('pyshtools.constants.' + body + '.' + name + '.value')
 
 
+def plot_norm_psd(baseline_fname='base_spectrum.pkl', fig_path='', lmin=1, lmax=None, x_name='degrees',
+                  norm='rel_power', c='xkcd:sea', marker='o', label='', dims='1D', R=2, xlim=None, ylim=None,
+                  fig=None, ax=None, labelsize=16, legsize=12, ticksize=12, save=True, labelpad=12, x2label='',
+                  xlabel=None, ylabel=None, fname='norm_psd', legend=True, show_degrees=False, **kwargs):
+    print('\n')
+    # generic plotting a spectrum
+    if R == 'Venus':
+        R = get_pysh_constants('Venus', 'r')
+    if baseline_fname == 'Venus':
+        l, phi_iso = get_psd_Venus(unit='per_lm', to_1D=False, lmax=lmax, to_km=False,
+                                   verbose=False)  # power per lm in m^2 m^2, 2D
+        k = l_to_k(l, R)
+        phi = k * phi_iso
+    else:
+        # get PSDs - model spectra are 1D and at fixed degrees
+        l, phi = load_model_spectrum_pkl(fname=baseline_fname, path=fig_path, **kwargs)
+        # print('loaded l', l)
+        k = l_to_k(l, R)
+        phi_iso = 1 / k * phi
+
+    if lmax is None:
+        lmax = np.max(l)
+    if l[0] == 0:
+        # remove 0 degree
+        l, phi_iso, phi, k = l[lmin:lmax + 1], phi_iso[lmin:lmax + 1], phi[lmin:lmax + 1], k[lmin:lmax + 1]
+
+    # normalise
+    _, phi_norm = norm_spectrum(k, phi, k_min=None, norm=norm, **kwargs)
+
+    # print('l to plot', l[0], ':', l[-1])
+    # print('k to plot', k[0], ':', k[-1])
+    if fig is None:
+        fig, ax = plt.subplots()
+    if x_name == 'degrees':
+        ax.loglog(l, phi_norm, marker=marker, ls='-', lw=1, c=c, label=label)
+    elif x_name == 'wavenumber':
+        ax.loglog(k, phi_norm, marker=marker, ls='-', lw=1, c=c, label=label)
+    ax.set_xlabel(xlabel, fontsize=labelsize, labelpad=labelpad)
+    ax.set_ylabel(ylabel, fontsize=labelsize, labelpad=labelpad)
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    if legend:
+        ax.legend(frameon=False, fontsize=legsize)
+    if save:
+        plot_save(fig, fname=fname, fig_path=fig_path)
+
+    if show_degrees and x_name == 'wavenumber':
+        def to_deg(k):
+            return k * R - 0.5
+
+        def to_wn(l):
+            return (l + 0.5) / (R)
+
+        secax = ax.secondary_xaxis('top', functions=(to_deg, to_wn))
+        secax.set_xlabel(x2label, fontsize=labelsize, labelpad=labelpad)
+        secax.tick_params(axis='both', which='major', labelsize=ticksize)
+        # secax.plot(l, phi_norm, marker='v', ls='--', lw=1, c='k', alpha=0.5, label='degrees test')
+
+    # print('xlim k ', ax.get_xlim())
+    # print('xlim l should be', k_to_l(np.array(ax.get_xlim()), R))
+    return fig, ax
+
+
 def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, lmin=1, lmax=None, set_axlabels=True,
                      save=True, plot=True, units='km4', scale_to='Venus', labelsize=16, legsize=12, alpha=0.5,
                      fig=None, ax=None, c_Ve='xkcd:sea', c_fit='xkcd:slate', x_name='degrees', load_fname=None,
-                     show_orig=True, V_label='Venus (Wieczorek 2015)', is_1D=False, marker_Ve='o', ticksize=12, **kwargs):
+                     xlim=None,
+                     show_orig=True,
+                     V_label='Venus (Wieczorek 2015)', is_1D=False, marker_Ve='o', ticksize=12, **kwargs):
     R_Venus = get_pysh_constants('Venus', 'r')
     if 'km' in units:
         R_Venus = R_Venus * 1e-3  # in km
@@ -901,8 +969,8 @@ def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, 
     print('lV', lV[0], '-', lV[-1])
 
     # remove 0 degree
-    l, phi_iso, phi, k = l[lmin:lmax+1], phi_iso[lmin:lmax+1], phi[lmin:lmax+1], k[lmin:lmax+1]
-    lV, phiV, kV = lV[lmin:lmax+1], phiV[lmin:lmax+1], kV[lmin:lmax+1]
+    l, phi_iso, phi, k = l[lmin:lmax + 1], phi_iso[lmin:lmax + 1], phi[lmin:lmax + 1], k[lmin:lmax + 1]
+    lV, phiV, kV = lV[lmin:lmax + 1], phiV[lmin:lmax + 1], kV[lmin:lmax + 1]
 
     # scale to Venus RMS at power
     # if to_1D:
@@ -968,6 +1036,8 @@ def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, 
             ax.set_ylabel(ylabel, fontsize=labelsize)
         ax.legend(frameon=False, fontsize=legsize)
         ax.tick_params(axis='both', which='major', labelsize=ticksize)
+        if xlim is not None:
+            ax.set_xlim(xlim)
         if save:
             plot_save(fig, fname='Venus_correction', fig_path=fig_path)
 
@@ -998,12 +1068,12 @@ def make_any_reference(slope=-2, l_rolloff=None, newfname='spectrum', fig_path='
     import pickle as pkl
     # make a new spectrum with given slope, rms doesn't matter here
 
-    l = np.arange(0, lmax+1)
+    l = np.arange(0, lmax + 1)
     Sl = np.ones_like(l, dtype=np.float64)
     if l_rolloff is None:
         # use same as ASPECT
-        wl_min = d*max_dscale
-        k_min = 2*np.pi/wl_min
+        wl_min = d * max_dscale
+        k_min = 2 * np.pi / wl_min
         l_rolloff = int(np.floor(k_to_l(k_min, R)))
 
     print('l rolloff', l_rolloff)
@@ -1014,9 +1084,9 @@ def make_any_reference(slope=-2, l_rolloff=None, newfname='spectrum', fig_path='
 
     b = logS0 - slope * logl_rolloff  # intercept of line based lin (x,y) = (l_rolloff, S0)
     logSl = slope * np.array(logl) + b
-    Sl = 10**logSl
-    Sl[:lmin] = [0]*lmin  # e.g. 0 power at l=0
-    Sl[1:l_rolloff] = [S0]*(l_rolloff - lmin)  # flat slope from lmin to rolloff
+    Sl = 10 ** logSl
+    Sl[:lmin] = [0] * lmin  # e.g. 0 power at l=0
+    Sl[1:l_rolloff] = [S0] * (l_rolloff - lmin)  # flat slope from lmin to rolloff
 
     if plot:
         print('l', l)
@@ -1028,4 +1098,3 @@ def make_any_reference(slope=-2, l_rolloff=None, newfname='spectrum', fig_path='
     fname = newfname + '_' + str(slope) + '.pkl'
     pkl.dump((l, Sl), open(fig_path + fname, "wb"))
     return l, Sl
-
