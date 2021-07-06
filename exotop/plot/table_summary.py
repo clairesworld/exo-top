@@ -64,7 +64,6 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                 df_print.loc[i] = row
                 i = i + 1
 
-    print(df_print.head())
     if sort_cases is not None:
         df_print = df_print.sort_values(by=sort_cases)
 
@@ -102,7 +101,7 @@ def table_to_latex(df, include_cols=None):
                 s = s + '$' + latex_float(float(val)) + '$'
                 if ic < ncols - 1:
                     s = s + ' & '
-        s = s + r'\\'
+        s = s + r' \\' + '\n'
     print(s)
 
 
