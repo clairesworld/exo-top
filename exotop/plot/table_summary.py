@@ -66,7 +66,7 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
 
     print(df_print.head())
     if sort_cases is not None:
-        df.sort_values(by=sort_cases, axis=0, inplace=True)
+        df_print = df_print.sort_values(by=sort_cases)
 
     df_print.to_csv(fig_path + fname)
     print('sorted\n', df_print.head())
@@ -74,6 +74,7 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
 
 
 def latex_float(f):
+    f = float(f)
     float_str = "{0:.3g}".format(f)
     if "e" in float_str:
         base, exponent = float_str.split("e")
@@ -89,15 +90,18 @@ def table_to_latex(df, include_cols=None):
         include_cols = cols
 
     n = len(df)
+    ncols = len(df.keys())
     s = ''
     for row in range(n):
-        s = s + str(row + 1) + ' &'  # case number
-        for col in cols:
+        s = s + str(row + 1) + ' & '  # case number
+        for ic, col in enumerate(cols):
             if col in include_cols:
                 val = df.loc[row, col]
                 # print('row, col', row, col, '=',  val)
                 # s = s + '${:.0e}$'.format(num2tex(val)) + ' &'
-                s = s + '$' + latex_float(float(val)) + '$ &'
+                s = s + '$' + latex_float(float(val)) + '$'
+                if ic < ncols - 1:
+                    s = s + ' & '
         s = s + r'\\'
     print(s)
 
