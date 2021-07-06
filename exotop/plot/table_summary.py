@@ -91,14 +91,13 @@ def table_to_latex(df, include_cols=None):
     n = len(df)
     s = ''
     for row in range(n):
-        s.append(str(row + 1) + ' &')  # case number
+        s = s + str(row + 1) + ' &'  # case number
         for col in cols:
             if col in include_cols:
                 val = df.loc[row, col]
                 # print('row, col', row, col, '=',  val)
                 # s = s + '${:.0e}$'.format(num2tex(val)) + ' &'
                 s = s + '$' + latex_float(val) + '$ &'
-                # if col == 'Ra_1' or 'delta_eta'
         s = s + r'\\'
     print(s)
 
