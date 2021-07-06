@@ -97,7 +97,7 @@ def table_to_latex(df, include_cols=None):
                 val = df.loc[row, col]
                 # print('row, col', row, col, '=',  val)
                 # s = s + '${:.0e}$'.format(num2tex(val)) + ' &'
-                s = s + '$' + latex_float(val) + '$ &'
+                s = s + '$' + latex_float(float(val)) + '$ &'
         s = s + r'\\'
     print(s)
 
