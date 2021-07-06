@@ -65,7 +65,7 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                 i = i + 1
 
     if sort_cases is not None:
-        df_print = df_print.sort_values(by=sort_cases)
+        df_print = df_print.sort_values(by=sort_cases, ignore_index=True)
 
     df_print.to_csv(fig_path + fname)
     print('sorted\n', df_print.head())
