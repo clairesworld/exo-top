@@ -84,7 +84,8 @@ def table_to_latex(df, include_cols=None):
     for row in range(n):
         s.append(str(row + 1) + ' &')  # case number
         for col in cols:
-            val = df.loc(row, col)
+            val = df.loc[row, col]
+            print('row, col', row, col, '-' ,  val)
             s.append('{:.0e}'.format(num2tex(val)) + ' &')
             # if col == 'Ra_1' or 'delta_eta'
         s.append(r'\\')
