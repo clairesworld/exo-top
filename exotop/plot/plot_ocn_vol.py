@@ -8,6 +8,7 @@ import model_1D.parameters as p
 import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
 import numpy as np
+from postaspect.plt_aspect import plot_error_contours
 
 
 fig_path = '/home/claire/Works/exo-top/exotop/figs_scratch/'
@@ -69,9 +70,9 @@ float_list = [1e-5, 5e-5, 6e-5, 8e-5, 1e-4, 1.1e-4, 1.3e-4, 2e-4, 2.3e-4, 3e-4]
 fln = None  # minmaxnorm(float_list, a=0, b=1)
 cmap = 'gist_earth_r'  # get_continuous_cmap(hex_list, N=12, float_list=fln)
 
-slides = True
-nplanets = 8
-n_stats = 1000
+slides = False
+nplanets = 4
+n_stats = 100
 
 if slides:
     textc = 'xkcd:off white'
@@ -109,42 +110,42 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  fname='ocean-vol', ytitle=1.05,  # vmax=3e-3,
                                                  mass_frac_sfcwater=np.logspace(-5, -3, num=30),
                                                  # [1e-5, 3e-5, 1e-4, 3e-4, 1e-3]
-                                                 )
-# print('\nsecond call')
-# fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
-#                                                  fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
-#                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
-#                                                  titlesize=32, fig_path=fig_path, save=False,
-#                                                  simple_scaling=False, log=True,
-#                                                  defaults='Venusbaseline',
-#                                                  # title='Water volume to submerge land',
-#                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
-#                                                  spectrum_fname='Venus_spectrum_l1.pkl',
-#                                                  #                                                  c='#81f79f',
-#                                                  c='xkcd:squash', ls='--',
-#                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
-#                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
-#                                                  x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
-#                                                  xlabels=[xlabel],
-#                                                  leg_bbox=(0, 1.01), clabelpad=clabelpad, ytitle=1.05, vmax=3e-3,
-#                                                  mass_frac_sfcwater=None)
+                                                 show_contours=[3e-5, 1e-4, 3e-4])
+print('\nsecond call')
+fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
+                                                 fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
+                                                 legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
+                                                 titlesize=32, fig_path=fig_path, save=False,
+                                                 simple_scaling=False, log=True,
+                                                 defaults='Venusbaseline',
+                                                 # title='Water volume to submerge land',
+                                                 spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
+                                                 spectrum_fname='Venus_spectrum_l1.pkl',
+                                                 #                                                  c='#81f79f',
+                                                 c='xkcd:squash', ls='--',
+                                                 alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
+                                                 set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
+                                                 x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
+                                                 xlabels=[xlabel],
+                                                 leg_bbox=(0, 1.01), clabelpad=clabelpad, ytitle=1.05, vmax=3e-3,
+                                                 mass_frac_sfcwater=None)
 
-# print('\nthird call')
-# fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
-#                                                  fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
-#                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
-#                                                  titlesize=32, fig_path=fig_path, save=False,
-#                                                  simple_scaling=False, log=True,
-#                                                  defaults='Venusbaseline',
-#                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
-#                                                  spectrum_fname='spectrum_-2.pkl',
-#                                                  c='xkcd:reddish orange', ls='-.',
-#                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
-#                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
-#                                                  x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
-#                                                  xlabels=[xlabel],
-#                                                  leg_bbox=(0, 1.01), clabelpad=clabelpad, ytitle=1.05, vmax=3e-3,
-#                                                  mass_frac_sfcwater=None)
+print('\nthird call')
+fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
+                                                 fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
+                                                 legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
+                                                 titlesize=32, fig_path=fig_path, save=False,
+                                                 simple_scaling=False, log=True,
+                                                 defaults='Venusbaseline',
+                                                 spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
+                                                 spectrum_fname='spectrum_-2.pkl',
+                                                 c='xkcd:reddish orange', ls='-.',
+                                                 alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
+                                                 set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
+                                                 x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
+                                                 xlabels=[xlabel],
+                                                 leg_bbox=(0, 1.01), clabelpad=clabelpad, ytitle=1.05, vmax=3e-3,
+                                                 mass_frac_sfcwater=None)
 
 ax = axes[0]
 ax.axhline(y=1, c='xkcd:off white', alpha=0.5, zorder=0)
@@ -160,10 +161,11 @@ ax.set_xlim((0.1, 5))
 ax.set_ylim((2e-1, 1.8))
 # ax.set_ylim((1e-2, 4e0))
 
-ax.text(0.03, 0.97, '4.5 Gyr\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
-        horizontalalignment='left', c=textc,
-        verticalalignment='top',
-        transform=ax.transAxes)
+
+# ax.text(0.03, 0.97, '4.5 Gyr\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
+#         horizontalalignment='left', c=textc,
+#         verticalalignment='top',
+#         transform=ax.transAxes)
 
 ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
 ax.xaxis.set_minor_formatter(ticker.NullFormatter())
@@ -175,16 +177,16 @@ ax.set_yticks([0.3, 0.4, 0.5, 0.6, 0.7, 1, 1.4])
 
 handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,
                          label='Pure dynamic topography'),
-           # mlines.Line2D([], [], color='xkcd:squash', ls='--', lw=3,
-           #               label='Venus-like topography'),
-           # mlines.Line2D([], [], color='xkcd:reddish orange', ls='-.', lw=3,
-           #               label='Red noise topography'),
-           # mlines.Line2D([], [], color='g', ls='--', lw=3,
-           #               label='Simple scaling')
+           mlines.Line2D([], [], color='xkcd:squash', ls='--', lw=3,
+                         label='Venus-like topography'),
+           mlines.Line2D([], [], color='xkcd:reddish orange', ls='-.', lw=3,
+                         label='Red noise topography'),
+           mlines.Line2D([], [], color='g', ls='--', lw=3,
+                         label='Simple scaling')
            ]
 ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize, ncol=1)
 
 if slides:
     fig, *axes = dark_background(fig, axes)
-fig.savefig(fig_path + 'ocn_vol_slides.png', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol.png', bbox_inches='tight')
 plt.show()

@@ -21,6 +21,7 @@ from useful_and_bespoke import age_index, dark_background, not_iterable, coloriz
 from model_1D.parameters import M_E
 import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
+from num2tex import num2tex
 
 "                      PLOTTING                           "
 
@@ -1267,7 +1268,8 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                                  relative=True, fig=None, axes=None, vol_0=None, simple_scaling=False, c2='g',
                                  mass_iax=0, leg_bbox=(1.7, 1.01), log=False, figsize=(10, 10), ytitle=1.1, x_range=None,
                                  cmap='terrain_r', vmin=None, vmax=None, mass_EO=1.4e21, rho_w=1000, version=0, alpha_w=0.5,
-                                 defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$', **kwargs):
+                                 defaults='Venusbaseline', ylabel=r'$V_{\mathrm{max}}/V_{\mathrm{max, Ve}}$',
+                                 show_contours=None, **kwargs):
     # phi0, degree = harm.load_spectrum(fpath=spectrum_fpath, fname=spectrum_fname)
     # h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
     degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
@@ -1304,7 +1306,7 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                                               postprocessors=['topography', 'ocean_capacity'], phi0=phi0, log=log,
                                               fig=fig, relval=vol_0,
                                               axes=axes, ticksize=ticksize, labelsize=labelsize, relative=relative,
-                                               **kwargs)
+                                              **kwargs)
 
 
     if mass_frac_sfcwater is not None:
@@ -1337,6 +1339,30 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                     ax.plot(masses, vol_w, alpha=1, lw=0.5, zorder=1, c=colours[ii])
                 ax.plot(masses[::14], vol_w[::14], alpha=alpha_w, lw=0, markersize=10, zorder=0, c=colours[ii])
             # ax.pcolormesh(masses, vol_ws, vol_ws, alpha=0.2, zorder=0, cmap=cmap)
+        if show_contours is not None:
+            for ii, X in enumerate(show_contours):
+                M_w = masses * parameters.M_E * X  # mass of sfc water in kg
+                vol_w = M_w / rho_w  # corresponding volume
+                if relative:
+                    vol_w = vol_w / vol_0
+                x = masses
+                y = vol_w
+                l, = ax.plot(x, y, alpha=1, lw=0.5, zorder=1, c='k')
+                # labels
+                fY = interpolate.interp1d(x, y)
+                fX = interpolate.interp1d(y, x)
+                if log:
+                    pos = [10 ** ((np.log10(x[0]) + np.log10(fX(y[-1]))) / 2.),
+                           10 ** ((np.log10(fY(x[0])) + np.log10(y[-1])) / 2.)]
+
+                # transform data points to screen space
+                xscreen = ax.transData.transform(np.array((x[-2::], y[-2::])))
+                rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
+                # if (x0[0] < pos[0] < x0[1]) and (y0[0] < pos[1] < y0[1]):
+                s = str(num2tex(X))[7:]
+                ltex = ax.text(pos[0], pos[1], s, size=legsize, rotation=rot,
+                               color=l.get_color(),
+                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec='w', fc='w'))
 
         if vmin is None:
             vmin = np.min(mass_frac_sfcwater)
