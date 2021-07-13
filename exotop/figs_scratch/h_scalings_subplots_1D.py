@@ -23,7 +23,7 @@ alpha = 0.6  # 0.3
 
 # how h varies across key input parameters
 x_vars = ['t',
-          'M_p', 'CMF', 'H_f']
+          'M_p', 'CMF', 'x_Eu']  # 'H_f'
 units = ['Gyr',
          '$M_E$', 'CMF', 'pW kg$^{-1}$']
 log = [False,
@@ -33,9 +33,9 @@ x_range = [(2, 5),
 xticks = [[2, 3, 4, 5],
           [0.1, 1, 5], [0.1, 0.2, 0.3, 0.4], [2, 5, 10]]
 xscales = [p.sec2Gyr,
-           p.M_E ** -1, 1, 1e12]
+           p.M_E ** -1, 1, 1e2]  # 1e12
 xlabels = ['Age\n(Gyr)',
-           'Planet mass\n($M_E$)', 'CMF', 'Radiogenic heating\n(pW kg$^{-1}$)']
+           'Planet mass\n($M_E$)', 'CMF', 'U and Th abundance\n(% relative to solar)']  #  'Radiogenic heating\n(pW kg$^{-1}$)'
 
 fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=100, x_res=5,
                                                            defaults='baseline',

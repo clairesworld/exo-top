@@ -99,7 +99,7 @@ def bdy_thickness(dT=None, d_m=None, Ra_crit=None, beta=1/3, g=None, Ra_rh=None,
     return d_m * (Ra_crit / Ra_rh) ** beta
 
 
-def h_rad(t, tf=None, H_0=None, H_f=None, c_n=None, p_n=None, lambda_n=None, backwards_cooling=False, verbose=False, **kwargs):
+def h_rad_old(t, tf=None, H_0=None, H_f=None, c_n=None, p_n=None, lambda_n=None, backwards_cooling=False, verbose=False, **kwargs):
     """Calculate radiogenic heating in W kg^-1 from Korenaga (2006)"""
     c_n = np.array(c_n)
     p_n = np.array(p_n)
@@ -137,6 +137,24 @@ def h_rad(t, tf=None, H_0=None, H_f=None, c_n=None, p_n=None, lambda_n=None, bac
                 h[ii] = H_0 / sum(h_n * np.exp(lambda_n * t_val))
 
     return h
+
+
+def h_rad(t, c_i, h_i, tau_i, age, x_Eu=1):
+    """ radiogenic heating in W/kg after Table 1 and eqn 1 in O'Neill+ 2020 (SSR) """
+    # order of isotopes (IMPORTANT) is [40K, 238U, 235U, 232Th]
+    # convert times to Myr to be consistent with units of tau
+    t_Myr = t*p.sec2Gyr*1e3
+    h_K = np.array(c_i[0] * h_i[0] * np.exp((age*1e3 - t_Myr) * np.log(2) / tau_i[0]))
+    try:
+        h_UTh = np.array(sum(c_i[1:] * h_i[1:] * np.exp((age*1e3 - t_Myr) * np.log(2) / tau_i[1:])))
+    except ValueError:
+        t_Myr = np.vstack((t_Myr, t_Myr, t_Myr))
+        c_i = c_i.reshape((4, 1))
+        h_i = h_i.reshape((4, 1))
+        tau_i = tau_i.reshape((4, 1))
+        h_UTh = np.array(np.sum(c_i[1:] * h_i[1:] * np.exp((age*1e3 - t_Myr) * np.log(2) / tau_i[1:]), axis=0))
+
+    return h_K + x_Eu * h_UTh
 
 
 def H_rad(h=None, M=None, **kwargs):

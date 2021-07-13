@@ -58,7 +58,7 @@ model_c = (0.02156863, 0.68274886, 0.93022931)
 ylim = (1e-3, 8e1)
 fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
                            R=2, lmin=1, c=model_c ,  # 'xkcd:bordeaux',
-                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=ylim,
+                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
                            save=False, labelsize=labelsize, legend=True, label='Model dynamic topography',
                            show_degrees=True, x2label='Spherical harmonic degree', marker='^',
                            ylabel='Power spectral density\n' + '(% relative to total)',

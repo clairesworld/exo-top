@@ -15,9 +15,11 @@ baseline_in = dict(
     k_m=3,
     alpha_m=2.5e-5,
     # H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0  based on below
-    H_f=4.6e-12,  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
+    # H_f=4.6e-12,  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
     T_s=273,
-    eta_pre=2.5e11,  # arrhenius pre-exponential factor
+    eta_pre=1.6e11,  # arrhenius pre-exponential factor - dry olivine
+    Ea=300e3,
+    x_Eu=1,
 
     #     # viscosity
     #     nu_0 = 0.27e17, # use for constant visc option
@@ -32,7 +34,7 @@ baseline_in = dict(
     #     B_rh=0.5e-9, # Burgers vector, K&W (1993)  dry olivine
     #     m_rh=2.5, # grain size exponent, K&W (1993)  dry olivine
 )
-baseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW', backwards_cooling=True)  # model params
+baseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW', memoryless=False)  # model params
 
 
 Earthbaseline_in = dict(
@@ -84,7 +86,7 @@ Venusbaseline_in = dict(
     Ea=300e3,
     nu_0=0.27e17,  # use for constant visc case
     H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0 (Mars value from Thiriet - UPDATE)
-    H_f=4.6e-12  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
+    # H_f=4.6e-12  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
 )
 Venusbaseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW', backwards_cooling=False)  # model params
 

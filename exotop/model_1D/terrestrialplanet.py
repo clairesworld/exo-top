@@ -37,7 +37,7 @@ class TerrestrialPlanet():
                             k_m = 4, # thermal conductivity of silicate mantle in W m^−1 K^−1
                             k_lm = 4, # thermal conductivity lower mantle in W m^−1 K^−1, 10 from Driscoll & Bercovici
                             
-                            # radioisotope defaults
+                            # radioisotope defaults - old version as in Seales & Lenardic
                             lambda_n = parameters.lambda_n, # astrophysically constant
                             p_n = parameters.p_n,
                             K_0 = parameters.K_0,
@@ -48,13 +48,21 @@ class TerrestrialPlanet():
                             X_Th = 7e-2, # initial abundance of Th in wt ppm ""
                             H_f = 4.6e-12, # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999), CI chondrites
                             H_0 = 22.65771894e-12,  # radiogenic heating at t0 based on above
-                            
+
+                            # radioisotope defaults using O'Neill+ 2020 SSR equation (1)
+                            tau_i=np.array([1250, 4468, 703.8, 14050]),  # half life in Myr
+                            h_i = np.array([28.761e-6, 94.946e-6, 568.402e-6, 26.368e-6]),  # heat production in W/kg
+                            c_i = np.array([30.4e-9, 22.7e-9, 0.16e-9, 85e-9]),  # BSE concentration in kg/kg
+                            x_Eu = 1,  # concentration of r-process elements wrt solar (i.e. Eu, U, Th)
+
                             # viscosity defaults
                             a_rh=2.44, # for beta=1/3 from Thiriet+ (2019)
-                            eta_pre=None,
+                            eta_pre=1.6e11,  # corresponding to dry olvine
+                            Ea=300e3,  # activation energy in J, K&W (1993) dry olivine
+
+                            # old viscosity model (not used)
                             eta_0 = 1e21, # reference eta from Thiriet+ (2019)
                             T_ref = 1600, # reference T from Thiriet+ (2019)
-                            Ea=300e3, # activation energy in J, K&W (1993) dry olivine
                             V_rh=6e-6, # activation volume in m^3, K&W (1993)  dry olivine
                             mu=80e9, # shear modulus in Pa, K&W (1993)  dry olivine
                             A_rh=8.7e15, # pre-exponential factor in s^-1, K&W (1993)  dry olivine

@@ -13,7 +13,7 @@ sb = 5.67e-8  # Stefan Boltzmann constant in W m^-2 K^-4
 # order: [238U, 235U, 232Th, 40K]
 lambda_n = [a * 1e-9 / years2sec for a in [0.15541417, 0.98458406, 0.04951051, 0.55011681]]  # decay constant in s^-1
 p_n = [95.13e-6, 568.47e-6, 26.3e-6, 28.47e-6]  # heating rate in W kg^-1
-U_0_238 = 0.9927  # ratio of 238-U to total U at time 0
+U_0_238 = 0.9927  # ratio of 238-U to total U at time 0 (natural abundance)
 U_0_235 = 0.0072  # ratio of 235-U to total U at time 0
 Th_0 = 1  # ratio of 232-Th to total Th at time 0
 K_0 = 0.0117e-2  # ratio of 40-K to total K at time 0, think these ratios are by weight but double check

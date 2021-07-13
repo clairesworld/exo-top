@@ -318,18 +318,18 @@ def dark_background(fig, ax, fgc='xkcd:off white', bgc='xkcd:black'):
     return (fig, *ax)
 
 
-def cornertext(ax, text, pos='top right', size=12, **kwargs):
+def cornertext(ax, text, pos='top right', size=12, pad=0.05, **kwargs):
     if 'top' in pos:
-        y = 0.95
+        y = 1 - pad
         va = 'top'
     elif 'bottom' in pos:
-        y = 0.05
+        y = pad
         va = 'bottom'
     if 'left' in pos:
-        x = 0.05
+        x = pad
         ha = 'left'
     elif 'right' in pos:
-        x = 0.95
+        x = 1 - pad
         ha = 'right'
 
     # update?

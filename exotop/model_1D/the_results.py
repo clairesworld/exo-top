@@ -544,7 +544,7 @@ def plot_distribution(yvars, default='baseline',
                       names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
                       mini=[240e3, 1.5e10, 1000, 2000, 100e3],
                       maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
-                      xlabelpad=None, ylabelpad=None, n_sigma=1, ylims=None, tickpad=10,
+                      xlabelpad=None, ylabelpad=None, n_sigma=1, ylims=None, tickpad=10, show_sigma=False,
                       fig=None, axes=None, c='k', lw=0.5, alpha=0.7, c_mean='k', log=None, xticks=None, yticks=None,
                       xlabel='Time (Gyr)', ylabels=None, yscales=None, labelsize=16, ticksize=12, save=False,
                       fname='evol_dist', fig_path='', legtext=None, legsize=16, **kwargs):
@@ -592,17 +592,19 @@ def plot_distribution(yvars, default='baseline',
             t = pl.t * parameters.sec2Gyr
             y = eval('pl.' + yvar) * yscales[ii]
             y_all.append(y)
-            ax.plot(t, y, c=c, lw=lw, alpha=alpha)
+            ax.plot(t, y, c=c, lw=lw, alpha=alpha, zorder=1)
 
         # mean, std
         y_all = np.array(y_all)
         y_av = np.mean(y_all, axis=0)
-        ax.plot(t, y_av, c=c_mean, lw=4)
-        y_std = np.std(y_all, axis=0)
-        y_upper = y_av + y_std * n_sigma  # todo for log scape
-        y_lower = y_av - y_std * n_sigma
-        ax.plot(y, y_lower, c=c_mean, lw=1, ls='--')
-        ax.plot(y, y_upper, c=c_mean, lw=1, ls='--')
+        ax.plot(t, y_av, c=c_mean, lw=4, zorder=10)
+        if show_sigma:
+            y_std = np.std(y_all, axis=0)
+            y_upper = y_av + y_std * n_sigma  # todo for log scape
+            y_lower = y_av - y_std * n_sigma
+            ax.plot(y, y_lower, c=c_mean, lw=1, ls='--', zorder=10)
+            ax.plot(y, y_upper, c=c_mean, lw=1, ls='--', zorder=10)
+        print(yvar, 'tf =', y[-1])
 
         # format
         if ii == len(yvars) - 1:
@@ -1359,8 +1361,15 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
                 xscreen = ax.transData.transform(np.array((x[-2::], y[-2::])))
                 rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
                 # if (x0[0] < pos[0] < x0[1]) and (y0[0] < pos[1] < y0[1]):
-                s = str(num2tex(X))[7:]
-                ltex = ax.text(pos[0], pos[1], s, size=legsize, rotation=rot,
+                sX = format(X, ".0e")
+                s = num2tex(sX, display_singleton=False)
+                print(    's[0]', s[0])
+                if s[0] == '\\':  # if singleton
+                    s = s[7:]
+                    print('removing times')
+                # s = '$' + str(num2tex(X))[7:] + '$'
+                print('s', s)
+                ltex = ax.text(pos[0], pos[1], '$' + s + '$', size=legsize, rotation=rot,
                                color=l.get_color(),
                                ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec='w', fc='w'))
 

@@ -49,7 +49,7 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, random=False,
 
 
 def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model_kwargs={}, t_eval=None, log=False,
-                    T_m0_options=[1273, 1523, 1773, 2023, 2273], **kwargs):
+                    T_m0_options=[1273, 1523, 1773, 2023, 2273], verbose=False, **kwargs):
     """varying multiple parameters in 'names' between mini and maxi, use default values otherwise.
     update_kwargs can include any TerrestrialPlanet attribute
     initial_kwargs can include T_m0, T_c0, D_l0, t0, tf. names, mini, and maxi are in order and must have same lenghts"""
@@ -72,10 +72,12 @@ def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model
                 new_kwargs_model.update({name: val})
             else:
                 new_kwargs_pl.update({name: val})
+            if verbose:
+                print(ii, '/', n-1, ': drew random', name, val)
 
         if t_eval is None and ii > 0:
             t_eval = planets[0].t
-        pl = build_planet(new_kwargs_pl, new_kwargs_model, t_eval=t_eval, **kwargs)
+        pl = build_planet(new_kwargs_pl, new_kwargs_model, t_eval=t_eval, verbose=verbose, **kwargs)
         planets.append(pl)
         ii += 1
     return planets
@@ -99,12 +101,12 @@ def build_planet(planet_kwargs, run_kwargs, solve_ODE=True, steady=False, **kwar
         planet_kwargs = {}
     pl = tp.TerrestrialPlanet(**planet_kwargs)
     if steady:
-        age = run_kwargs['tf']/p.sec2Gyr
+        age = run_kwargs['tf'] / p.sec2Gyr
         pl = steadystate(pl, age=age, **run_kwargs, **planet_kwargs, **kwargs)
+        pl = postprocess_planet(pl, **kwargs)
     elif solve_ODE:
         pl = solve(pl, run_kwargs=run_kwargs, **kwargs)  # T_m, T_c, D_l
-    pl = postprocess_planet(pl, **kwargs)
-
+        pl = postprocess_planet(pl, **kwargs)
     return pl
 
 
@@ -122,30 +124,34 @@ def postprocess_planet(pl, postprocessors=None, nondimensional=True, **kwargs):
     return pl
 
 
-def solve(pl, run_kwargs={}, t0=0, t_eval=None, verbose=False, **kwargs):
+def solve(pl, run_kwargs={}, t0=0, t_eval=None, t0_buffer=5, verbose=False, atol=(1e-6, 1e-6, 1e-6), **kwargs):
     """ call ODE solver """
 
     tf = run_kwargs['tf']
     T_m0 = run_kwargs['T_m0']
     T_c0 = run_kwargs['T_c0']
     D_l0 = run_kwargs['D_l0']
+    pl.age = tf
+
+    if t0_buffer is not None:
+        t0i = t0 - t0_buffer
+        pre_f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(pl=pl, **run_kwargs, **kwargs)),
+                                    t_span=(t0i* 1e9 * p.years2sec, t0* 1e9 * p.years2sec), y0=[T_m0, T_c0, D_l0],
+                                    t_eval=None,
+                                    max_step=100e6 * p.years2sec,
+                                    method='BDF',  # 'RK45',
+                                    atol=atol,
+                                    )
+        T_m0, T_c0, D_l0 = pre_f.y[:, -1]
 
     if verbose:
         print('Solving 1D thermal history with T_m0 =', T_m0, 'K, T_c0 =', T_c0, 'K, D_l0 =', D_l0, 'm, tf =', tf,
               'Gyr')
-        back = run_kwargs['backwards_cooling']
-        if back:
-            print('radiogenic calculated backwards =', back, 'H_f =', pl.H_f*1e12, 'pW/kg')
-        else:
-            print('radiogenic calculated backwards =', back, 'H_0 =', pl.H_0 * 1e12, 'pW/kg')
-        # print('\nplanet object', pprint(vars(pl)))
-
-    t0 = t0 * 1e9 * p.years2sec  # convert input times to Gyr
-    tf = tf * 1e9 * p.years2sec
 
     f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(pl=pl, **run_kwargs, **kwargs)),
-                            t_span=(t0, tf), y0=[T_m0, T_c0, D_l0], t_eval=t_eval, max_step=100e6 * p.years2sec,
-                            method='RK45', dense_output=False)
+                            t_span=(t0 * 1e9 * p.years2sec, tf * 1e9 * p.years2sec), y0=[T_m0, T_c0, D_l0], t_eval=t_eval,
+                            max_step=100e6 * p.years2sec,
+                            method='RK45', atol=atol)
 
     # initial postprocessing to get values of derived parameters across time
     pl.T_m = f.y[0]
@@ -172,11 +178,12 @@ def LHS(t, y, pl=None, **kwargs):
     dDdt = th.lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l, rho_m=pl.rho_m,
                          T_s=pl.T_s,
                          c_m=pl.c_m, k_m=pl.k_m, **kwargs)
+    # print('t =', t*p.sec2Gyr, 'Gyr, T_m =', pl.T_m, 'dD/dt =', dDdt*1e-3/p.sec2Gyr, 'km/Gyr', 'h =', pl.h_rad_m*1e12, 'pW/kg')
 
     return [dTdt_m, dTdt_c, dDdt]
 
 
-def recalculate(t, pl, verbose=False, **kwargs):
+def recalculate(t, pl, verbose=False, pre=False, **kwargs):
     """ calcualte all the thermal convection parameters (single time step or postprocess all timesteps"""
 
     # if verbose:
@@ -203,7 +210,12 @@ def recalculate(t, pl, verbose=False, **kwargs):
     pl.M_conv = pl.M_m - pl.M_lid  # mass of convecting region
 
     # radiogenic heating
-    pl.h_rad_m = th.h_rad(t, H_0=pl.H_0, H_f=pl.H_f, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, verbose=verbose, **kwargs)  # W kg^-1
+    # pl.h_rad_m = th.h_rad(t, H_0=pl.H_0, H_f=pl.H_f, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, verbose=verbose, **kwargs)  # W kg^-1
+    if not pre:
+        pl.h_rad_m = th.h_rad(t, pl.c_i, pl.h_i, pl.tau_i, pl.age, pl.x_Eu)  # W kg^-1
+    else:
+        # use 0 Gyr time
+        pl.h_rad_m = th.h_rad(0, pl.c_i, pl.h_i, pl.tau_i, pl.age, pl.x_Eu)  # W kg^-1
     pl.a0 = pl.h_rad_m * pl.rho_m  # volumetric heating in W m^-3
     pl.H_rad_m = th.H_rad(h=pl.h_rad_m, M=pl.M_conv, **kwargs)  # mantle radiogenic heating in W
     pl.H_rad_lid = th.H_rad(h=pl.h_rad_m, M=pl.M_lid, **kwargs)  # lid radiogenic heating in W
@@ -242,7 +254,8 @@ def recalculate(t, pl, verbose=False, **kwargs):
 
     # core
 
-    pl.TBL_c = th.bdy_thickness(dT=abs(pl.T_c - pl.dT_m), d_m=pl.d_m, eta_m=pl.eta_cmb, g=pl.g_cmb, Ra_crit=pl.Ra_crit_c,
+    pl.TBL_c = th.bdy_thickness(dT=abs(pl.T_c - pl.dT_m), d_m=pl.d_m, eta_m=pl.eta_cmb, g=pl.g_cmb,
+                                Ra_crit=pl.Ra_crit_c,
                                 kappa_m=pl.kappa_m, alpha_m=pl.alpha_m, rho_m=pl.rho_m, **kwargs)
     pl.q_core = th.q_bl(deltaT=pl.T_c - pl.T_m, k=pl.k_lm, d_bl=pl.TBL_c, beta=pl.beta_c, **kwargs)
     pl.Q_core = th.Q_bl(q=pl.q_core, R=pl.R_c)
@@ -262,7 +275,7 @@ def recalculate(t, pl, verbose=False, **kwargs):
     return pl
 
 
-def steadystate(pl, age=4.5/p.sec2Gyr, T_m0=2000, tol=1e-1, verbose=False, **kwargs):
+def steadystate(pl, age=4.5 / p.sec2Gyr, T_m0=2000, tol=1e-1, verbose=False, **kwargs):
     # ADAPTED FROM KITE+ 2009 - only works with reference viscosity model
     T_s = pl.T_s
     kappa_m = pl.kappa_m
@@ -283,7 +296,8 @@ def steadystate(pl, age=4.5/p.sec2Gyr, T_m0=2000, tol=1e-1, verbose=False, **kwa
     d_m0 = R_p - pl.R_c  # mantle depth ignoring lid
     M_m0 = pl.M_m  # mantle mass ignoring lid
     kwargs.update({'backwards_cooling': False, 'visc_type': 'Thi'})
-    h_t = th.h_rad(t=age, H_0=pl.H_0, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, **kwargs)  # rad heating per unit mass
+    h_t = th.h_rad(t=age, H_0=pl.H_0, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n,
+                   **kwargs)  # rad heating per unit mass
     # print('h(t)', h_t*1e12, 'pW/kg')
     T_m1 = T_m0
     # d_m = d_m0
@@ -305,14 +319,14 @@ def steadystate(pl, age=4.5/p.sec2Gyr, T_m0=2000, tol=1e-1, verbose=False, **kwa
         eta_m = rh.dynamic_viscosity(T_m, visc_type='Thi')
         # print('eta_m', eta_m)
         T_l = th.T_lid(T_m, a_rh, Ea)
-        Nu = (rho_m*g*alpha_m*(T_m - T_l)*d_m**3 / (kappa_m * eta_m * Ra_crit))**beta
-        T_m1 = M_m/SA_p * h_t * d_m / (Nu * k_m) + T_l
+        Nu = (rho_m * g * alpha_m * (T_m - T_l) * d_m ** 3 / (kappa_m * eta_m * Ra_crit)) ** beta
+        T_m1 = M_m / SA_p * h_t * d_m / (Nu * k_m) + T_l
         diff = abs(T_m - T_m1)
         # print('T_m1', T_m1)
     if verbose:
-        print('T_m', T_m1, 'K | d_lid', d_lid*1e-3, 'km')
+        print('T_m', T_m1, 'K | d_lid', d_lid * 1e-3, 'km')
 
-    #save
+    # save
     pl.T_m = T_m1
     pl.T_c = pl.T_m  # no core thermally
     pl.D_l = d_lid
@@ -371,6 +385,3 @@ def steadystate(pl, age=4.5/p.sec2Gyr, T_m0=2000, tol=1e-1, verbose=False, **kwa
 #         Q_sfc = th.Q_bl(q=q_sfc, R=pl.R_p)  # W
 #
 #     # TODO: sympy?
-
-
-

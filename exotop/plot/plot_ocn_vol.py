@@ -1,7 +1,7 @@
 # GOOD COPY OF PLOT FOR SLIDES
 import sh_things as sh
 import matplotlib.pyplot as plt
-from useful_and_bespoke import dark_background, cmap_from_ascii, get_continuous_cmap, minmaxnorm
+from useful_and_bespoke import dark_background, cmap_from_ascii, get_continuous_cmap, minmaxnorm, cornertext
 # import postaspect.plt_aspect as plat
 import model_1D.the_results as results
 import model_1D.parameters as p
@@ -68,7 +68,6 @@ cmap_path = '/home/claire/Works/exo-top/exotop/plot/cmaps/'
 hex_list = ['#ffd8e2', '#dce5e9', '#d6fcdd', '#bbfde1', '#a4fde1', '#49fffc', '#4cd5e8', '#56c3e0', '#72b2d3', '#3b5e71']
 float_list = [1e-5, 5e-5, 6e-5, 8e-5, 1e-4, 1.1e-4, 1.3e-4, 2e-4, 2.3e-4, 3e-4]
 fln = None  # minmaxnorm(float_list, a=0, b=1)
-cmap = 'gist_earth_r'  # get_continuous_cmap(hex_list, N=12, float_list=fln)
 
 slides = False
 nplanets = 4
@@ -78,10 +77,12 @@ if slides:
     textc = 'xkcd:off white'
     c_dt = 'xkcd:orange red'
     alpha_w = 0.8  # 0.6
+    cmap = 'gist_earth_r'
 else:
     textc = 'k'
     c_dt = 'xkcd:bordeaux'
-    alpha_w = 0.3
+    alpha_w = 0.4
+    cmap = get_continuous_cmap(hex_list, N=12, float_list=fln)
 
 xlabel = 'Planet mass ' + r'($M_{\oplus}$)'
 labelsize = 30 #33.5  # 30
@@ -110,7 +111,8 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  fname='ocean-vol', ytitle=1.05,  # vmax=3e-3,
                                                  mass_frac_sfcwater=np.logspace(-5, -3, num=30),
                                                  # [1e-5, 3e-5, 1e-4, 3e-4, 1e-3]
-                                                 show_contours=[3e-5, 1e-4, 3e-4])
+                                                 show_contours=None  #[3e-5, 1e-4, 3e-4]
+                                                )
 print('\nsecond call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets,
                                                  fig=fig, axes=axes, vol_0='Earth',  # 8.468613612559923e+17,
@@ -185,6 +187,8 @@ handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,
                          label='Simple scaling')
            ]
 ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize, ncol=1)
+ax = cornertext(ax, 'WATER\nPLANETS', pos='top left', size=labelsize, pad=0.03)
+ax = cornertext(ax, 'LAND\nPLANETS', pos='bottom right', size=labelsize, pad=0.03)
 
 if slides:
     fig, *axes = dark_background(fig, axes)
