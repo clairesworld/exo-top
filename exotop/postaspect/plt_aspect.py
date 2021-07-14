@@ -972,13 +972,13 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 if setylabel:
                     ax.set_ylabel('depth', fontsize=labelsize)
 
-            if includepdf and t1_ii > 0:
+            if includepdf:
                 icol = icol + 1
                 try:
                     ax = axes[ii, icol]
                 except IndexError:
                     ax = axes[icol]
-                if t1_ii < 1:
+                if t1_ii < 1 and t1_ii > 0:
                     ts_df = pro.pickleio(case, suffix='_h_all', t1=t1_ii,
                                          dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
                                          **kwargs)
