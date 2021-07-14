@@ -1137,7 +1137,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                     else:
                         load = 'auto'
                     for ip, suffix in enumerate(psuffixes):
-                        pickleio(case, suffix=suffix, t1=t1_ii,
+                        df = pickleio(case, suffix=suffix, t1=t1_ii,
                                  data_path=data_path, load=load, **kwargs)
                         if check_t0:
                             dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/',
@@ -1149,11 +1149,11 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                                 time = dat.stats_time
                             i_time = np.argmax(time >= t1_ii)  # index of first timestep to process
                             ts_save = np.arange(i_time+1, len(time))
-                            # print('ts range', ts_save, 'given t1', t1, 'time[i_time]', time[i_time])
+                            print('           ts range', ts_save, 'given t1', t1_ii, 'time[i_time]', time[i_time])
                             idx_stored = df.index.values
                             if idx_stored[0] < ts_save[0]:
                                 droppy = np.isin(idx_stored, ts_save)  # these are what u want to keep but im attache to the name droppy
-                                print('dropping idx (ts?)', idx_stored[~droppy])
+                                print('           dropping idx (ts?)', idx_stored[~droppy])
                                 df = pickle_drop(case, suffix, keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
                                                  test_run=test_run, **kwargs)
     print('>>>>>>>  done reprocessing!')
