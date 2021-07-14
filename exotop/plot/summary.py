@@ -12,9 +12,9 @@ from postaspect import aspect_post as ap
 #                         include_regimes=['chaotic'],
 #                         data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 
-ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
-                        t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
-                        load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
+# ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
+#                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
+#                         load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
 # Ra 2e8
 # ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
@@ -71,8 +71,8 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
 
 # eta 1e9 --> this has been subsumed into above tho
 fig, ax = plat.subplots_cases(
-    ['Ra1e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
-    labels=['Ra 1e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path, col_vis=23,  # not sure why 23 for eta 1e9 only
+    ['Ra1e8-eta1e9-wide-ascii', 'Ra2e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
+    labels=['Ra 1e8', 'Ra 2e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path, col_vis=23,  # not sure why 23 for eta 1e9 only
     t1=[0.15, 0.1], load=True, fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
     includepd=True, includeTz=True, includegraphic=True,  # turn on once you know where steady state starts
 )
