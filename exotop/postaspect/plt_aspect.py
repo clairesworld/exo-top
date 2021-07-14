@@ -913,7 +913,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 legend = True
 
             if show_sols:  # load df
-                if t1_ii < 1:
+                if (t1_ii < 1) and (t1_ii > 0):
                     sol_df = pro.pickleio(case, suffix='_T', t1=t1_ii,
                                           dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path, **kwargs)
                 else:
