@@ -947,13 +947,13 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                 settitle=False, setxlabel=setxlabel, setylabel=setylabel, legend=legend,
                                 labelsize=labelsize, labelpad=labelpad, label='bottom', sol_df=sol_df)
 
-            if includeTz and t1_ii > 0:
+            if includeTz:
                 icol = icol + 1
                 try:
                     ax = axes[ii, icol]
                 except IndexError:
                     ax = axes[icol]
-                if t1_ii < 1:
+                if t1_ii < 1 and t1_ii > 0:
                     if not show_sols:
                         sol_df = pro.pickleio(case, suffix='_T', t1=t1_ii,
                                               dat_new=dat, load=load_ii, data_path=data_path, fig_path=fig_path,
@@ -964,7 +964,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                              setxlabel=setxlabel, save=False, fig_path=fig_path, fig=fig, ax=ax,
                                              legend=legend, labelsize=labelsize, **kwargs)
                 else:
-                    ax.text(0.01, 0.95, '\n\n\nnot converged?',
+                    ax.text(0.01, 0.95, '\n\n\nnot converged',
                             horizontalalignment='left', verticalalignment='top',
                             transform=ax.transAxes, fontsize=labelsize)
                 if setxlabel:

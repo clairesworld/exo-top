@@ -36,7 +36,7 @@ t1_grid = np.array([[0.5, 0.3, 0.25, 0.7, 0.2, 0, 0.0590015],  # eta 1e5
 #                            ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'not ready', 'chaotic'],  # eta 1e8
 #                            ['not ran', 'not ran', 'not ran', 'not ran', 'chaotic', 'not ran', 'chaotic']  # eta 1e9???
 #                            ])  # normal one
-regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 'not ready', 'sluggish'],  # eta 1e5
+regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 'not ran', 'sluggish'],  # eta 1e5
                            ['steady', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e6
                            ['no convection', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e7
                            ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e8
