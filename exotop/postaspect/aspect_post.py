@@ -147,6 +147,7 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
 
             elif load:
                 print('    File', fname, 'not found')
+                return None
             else:
                 if not load:  # load is False so automatically calculate shit
                     print('    Declined to load', fname, ', processing afresh...')
