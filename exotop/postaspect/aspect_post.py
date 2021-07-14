@@ -21,7 +21,7 @@ from useful_and_bespoke import colorize, iterable_not_string, not_iterable, find
 def find_ts(case, t, dat=None, data_path=data_path_bullard, **kwargs):
     if dat is None:
         dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=False,
-                               read_parameters=False, **kwargs)
+                             read_parameters=False, **kwargs)
 
     dat.read_times(**kwargs)
     time = dat.stats_time
@@ -39,7 +39,6 @@ def read_topo_stats(case, ts, data_path=data_path_bullard, fast=False, **kwargs)
 
 
 def reshape_one_input(A, proper, default):
-
     if not_iterable(A) and not_string(A):
         B = np.empty_like(proper, dtype=object)
         if A is None:
@@ -365,7 +364,7 @@ def peak_and_rms(h, trap=False):
 
 def test_h_avg(case, data_path=data_path_bullard):
     dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/', read_statistics=True)
-    ts =  dat.stats_timestep[-1] # final
+    ts = dat.stats_timestep[-1]  # final
     x, h = read_topo_stats(case, ts)
     h_mean = np.mean(h)
     h_peak = np.max(h)
@@ -731,6 +730,7 @@ def fit_log(x, h, intercept=False, weights=None, slope=1, **kwargs):
         intercept, slope = np.polynomial.polynomial.polyfit(x1, h1, deg=1, w=weights)
     return slope, 10 ** intercept
 
+
 #
 # def fit_2log(x1, x2, h, **kwargs):
 #     # https://stackoverflow.com/questions/35041266/scipy-odr-multiple-variable-regression
@@ -902,8 +902,8 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
 
     # chi sqr
 
-    expected = 10**func(output.beta, logx)
-    chisqr = np.sum(((h - expected) ** 2)/expected)
+    expected = 10 ** func(output.beta, logx)
+    chisqr = np.sum(((h - expected) ** 2) / expected)
     MSE = chisqr / df_e
 
     print('\n')
@@ -917,7 +917,6 @@ def fit_logerror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, slope=True, **kwargs
     print('         -> MSE:', MSE)
 
     return output.beta, output.sd_beta, chisqr, MSE
-
 
 
 def fit_powererror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, **kwargs):
@@ -971,7 +970,7 @@ def fit_powererror(x1, h, x2=None, err_x=1, err_h=1, ci=0.95, **kwargs):
     # chi sqr
 
     expected = func(output.beta, x)
-    chisqr = np.sum(((h - expected) ** 2)/expected)
+    chisqr = np.sum(((h - expected) ** 2) / expected)
     MSE = chisqr / df_e
 
     print('\n')
@@ -1061,7 +1060,7 @@ def Ra_F_eff(delta_L=None, q_sfc=None, T_i=None, d_eta=None, T1=1, T0=0, Z=1):
     theta = np.log(d_eta)  # gamma for this delta eta
     gamma = theta / (np.array(T1) - np.array(T0))
     eta_i = np.exp(-gamma * np.array(T_i))
-    return (Z - delta_L)**4 * q_sfc / eta_i
+    return (Z - delta_L) ** 4 * q_sfc / eta_i
 
 
 def regime_to_digital(ii=None, jj=None, regime_grid=None, regime_names=None, **kwargs):
@@ -1117,7 +1116,7 @@ def Nu_eff(gamma=None, d_m=None, delta_L=None, alpha_m=None, g=None, b=None, kap
 
 def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                          data_path=data_path_bullard, redo=True, load_grid=None, regime_grid=None, include_regimes=None,
-                         regime_names=None, **kwargs):
+                         regime_names=None, check_t0=False, test_run=False, **kwargs):
     Ra_ls, eta_ls, (t1_grid, load_grid, end_grid, regime_grid) = reshape_inputs(Ra_ls, eta_ls, (
         t1_grid, load_grid, end_grid, regime_grid))
     if include_regimes is None:
@@ -1140,6 +1139,23 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                     for ip, suffix in enumerate(psuffixes):
                         pickleio(case, suffix=suffix, t1=t1_ii,
                                  data_path=data_path, load=load, **kwargs)
+                        if check_t0:
+                            dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/',
+                                                 read_statistics=False, read_parameters=False, **kwargs)
+                            try:
+                                time = dat.stats_time
+                            except AttributeError:
+                                dat.read_times(**kwargs)
+                                time = dat.stats_time
+                            i_time = np.argmax(time >= t1_ii)  # index of first timestep to process
+                            ts_save = np.arange(i_time+1, len(time))
+                            # print('ts range', ts_save, 'given t1', t1, 'time[i_time]', time[i_time])
+                            idx_stored = df.index.values
+                            if idx_stored[0] < ts_save[0]:
+                                droppy = np.isin(idx_stored, ts_save)  # these are what u want to keep but im attache to the name droppy
+                                print('dropping idx (ts?)', idx_stored[~droppy])
+                                df = pickle_drop(case, suffix, keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
+                                                 test_run=test_run, **kwargs)
     print('>>>>>>>  done reprocessing!')
 
 
@@ -1188,7 +1204,6 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
 
 
 def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, fit_linear=True, **kwargs):
-
     if len(x) > 1:  # can only fit if at least 2 data
         slope = True
         x1 = x
@@ -1222,8 +1237,6 @@ def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, fit_linear=True, **kwargs):
 
     else:
         print('    Not enough points to fit')
-        return [None]*6
+        return [None] * 6
 
     return const, expon, const_err, expon_err, chisqr, MSE
-
-

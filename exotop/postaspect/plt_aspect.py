@@ -1317,24 +1317,24 @@ def plot_pdf(case, df=None, keys=None, dat=None, t1=None, fig_path=fig_path_bull
 
 
     # test sols used - temp fix here for some reason lol - drop early ones
-    try:
-        time = dat.stats_time
-    except AttributeError:
-        dat.read_times(**kwargs)
-        time = dat.stats_time
-    i_time = np.argmax(time >= t1)  # index of first timestep to process
-    ts_save = np.arange(i_time+1, len(time))
-    print('ts range', ts_save, 'given t1', t1, 'time[i_time]', time[i_time])
-    idx_stored = df.index.values
-    if idx_stored[0] < ts_save[0]:
-        droppy = np.isin(idx_stored, ts_save)  # these are what u want to keep but im attache to the name droppy
-        print('dropping idx (ts?)', idx_stored[~droppy])
-        df = pro.pickle_drop(case, '_h_all', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
-                        test_run=False, **kwargs)
-        _ = pro.pickle_drop(case, '_h', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
-                        test_run=False, **kwargs)
-        _ = pro.pickle_drop(case, '_Nu', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
-                        test_run=False, **kwargs)
+    # try:
+    #     time = dat.stats_time
+    # except AttributeError:
+    #     dat.read_times(**kwargs)
+    #     time = dat.stats_time
+    # i_time = np.argmax(time >= t1)  # index of first timestep to process
+    # ts_save = np.arange(i_time+1, len(time))
+    # # print('ts range', ts_save, 'given t1', t1, 'time[i_time]', time[i_time])
+    # idx_stored = df.index.values
+    # if idx_stored[0] < ts_save[0]:
+    #     droppy = np.isin(idx_stored, ts_save)  # these are what u want to keep but im attache to the name droppy
+    #     print('dropping idx (ts?)', idx_stored[~droppy])
+    #     df = pro.pickle_drop(case, '_h_all', keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
+    #                     test_run=False, **kwargs)
+    #     _ = pro.pickle_drop(case, '_h', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
+    #                     test_run=False, **kwargs)
+    #     _ = pro.pickle_drop(case, '_Nu', keys=None, index=idx_stored[~droppy], errors='ignore', data_path=data_path,
+    #                     test_run=False, **kwargs)
 
 
     for ii, key in enumerate(keys):

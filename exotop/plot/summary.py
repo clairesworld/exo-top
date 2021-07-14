@@ -12,9 +12,9 @@ from postaspect import aspect_post as ap
 #                         include_regimes=['chaotic'],
 #                         data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 
-# ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
-#                         t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, redo=False,
-#                         load_grid=load_grid, regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
+ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
+                        t1_grid=t1_grid[:, -2], end_grid=end_grid[:, -2], data_path=data_path, redo=False, check_t0=True, test_run=True,
+                        load_grid=load_grid[:, -2], regime_grid=regime_grid_td[:, -2], postprocess_kwargs=postprocess_kwargs)
 
 # Ra 2e8
 # ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
@@ -38,19 +38,19 @@ from postaspect import aspect_post as ap
 #             postprocess_kwargs=postprocess_kwargs,
 #         )
 #
-i_plot = [4, 5, 6]  # list(range(len(Ra_ls)))  # range(4,5)
-for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
-    if ii in i_plot:
-        cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
-        labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
-        plat.subplots_cases(
-            cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
-            fname='all-Ra' + Ra, suptitle='Ra = ' + Ra, c_rms=c_rms, c_peak=c_peak,
-            includepdf=True, includeTz=False, show_sols=True,  # set False for faster summary with stats only
-            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
-            regime_grid=regime_grid_td.T[ii],
-            postprocess_kwargs=postprocess_kwargs,
-        )
+# i_plot = [4, 5, 6]  # list(range(len(Ra_ls)))  # range(4,5)
+# for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
+#     if ii in i_plot:
+#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
+#         labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
+#         plat.subplots_cases(
+#             cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
+#             fname='all-Ra' + Ra, suptitle='Ra = ' + Ra, c_rms=c_rms, c_peak=c_peak,
+#             includepdf=True, includeTz=False, show_sols=True,  # set False for faster summary with stats only
+#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
+#             regime_grid=regime_grid_td.T[ii],
+#             postprocess_kwargs=postprocess_kwargs,
+#         )
 
 # """ 2D isoviscous benchmark """
 # plat.subplots_cases(
@@ -70,12 +70,12 @@ for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
 #    )
 
 # eta 1e9 --> this has been subsumed into above tho
-fig, ax = plat.subplots_cases(
-    ['Ra1e8-eta1e9-wide-ascii', 'Ra2e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
-    labels=['Ra 1e8', 'Ra 2e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path, col_vis=23,  # not sure why 23 for eta 1e9 only
-    t1=[0.15, 0.1], load=True, fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
-    includepd=True, includeTz=True, includegraphic=True,  # turn on once you know where steady state starts
-)
+# fig, ax = plat.subplots_cases(
+#     ['Ra1e8-eta1e9-wide-ascii', 'Ra2e8-eta1e9-wide-ascii', 'Ra3e8-eta1e9-wide-ascii'],
+#     labels=['Ra 1e8', 'Ra 2e8', 'Ra 3e8'], data_path=data_path, fig_path=fig_path, col_vis=23,  # not sure why 23 for eta 1e9 only
+#     t1=[0.15, 0.1], load=True, fname='all-eta1e9', suptitle='$\Delta \eta$=1e9',
+#     includepd=True, includeTz=True, includegraphic=True,  # turn on once you know where steady state starts
+# )
 
 # Ra2e8 -->
 # fig, ax = plat.subplots_cases(
