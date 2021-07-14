@@ -56,6 +56,7 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                 df['h_peak'] = df_h.h_peak.mean()
                 df['Nu'] = df_h.Nu.mean()
 
+                # add to good df to save
                 row = [Ra[ii], etastr]
                 for col in cols[2:]:
                     # print('df[', col, ']', float(df[col]))
