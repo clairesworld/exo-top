@@ -947,7 +947,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                                 settitle=False, setxlabel=setxlabel, setylabel=setylabel, legend=legend,
                                 labelsize=labelsize, labelpad=labelpad, label='bottom', sol_df=sol_df)
 
-            if includeTz:
+            if includeTz and t1_ii > 0:
                 icol = icol + 1
                 try:
                     ax = axes[ii, icol]
@@ -972,7 +972,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 if setylabel:
                     ax.set_ylabel('depth', fontsize=labelsize)
 
-            if includepdf:
+            if includepdf and t1_ii > 0:
                 icol = icol + 1
                 try:
                     ax = axes[ii, icol]
