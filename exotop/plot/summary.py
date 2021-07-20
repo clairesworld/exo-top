@@ -12,9 +12,10 @@ from postaspect import aspect_post as ap
 #                         include_regimes=['chaotic'],
 #                         data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 
-ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls[:-1], psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
-                        t1_grid=t1_grid[:-1, -2], end_grid=end_grid[:-1, -2], data_path=data_path, redo=False, check_t0=True, test_run=False,
-                        load_grid=load_grid[:-1, -2], regime_grid=regime_grid_td[:-1, -2], postprocess_kwargs=postprocess_kwargs)
+ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
+                        t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, load_grid=load_grid, redo=False,
+                        check_t0=False, test_run=True,
+                        regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
 
 # Ra 2e8
 # ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
