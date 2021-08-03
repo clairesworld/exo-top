@@ -25,19 +25,19 @@ alpha = 0.6  # 0.3
 x_vars = ['t',
           'M_p', 'CMF', 'x_Eu']  # 'H_f'
 units = ['Gyr',
-         '$M_E$', 'CMF', 'pW kg$^{-1}$']
+         '$M_E$', 'CMF', r'$\%$ U, Th']  # pW kg$^{-1}$
 log = [False,
        True, False, False]
 x_range = [(2, 5),
-           (0.1 * p.M_E, 5 * p.M_E),  (0.1, 0.4), (2e-12, 10e-12)]
+           (0.1 * p.M_E, 5 * p.M_E),  (0.1, 0.4), (0.3, 3)]  # (2e-12, 10e-12)
 xticks = [[2, 3, 4, 5],
-          [0.1, 1, 5], [0.1, 0.2, 0.3, 0.4], [2, 5, 10]]
+          [0.1, 1, 5], [0.1, 0.2, 0.3, 0.4], [30, 100, 300]]  # [2, 5, 10]
 xscales = [p.sec2Gyr,
            p.M_E ** -1, 1, 1e2]  # 1e12
 xlabels = ['Age\n(Gyr)',
-           'Planet mass\n($M_E$)', 'CMF', 'U and Th abundance\n(% relative to solar)']  #  'Radiogenic heating\n(pW kg$^{-1}$)'
+           'Planet mass\n($M_E$)', 'CMF', 'U and Th abundance\n($\%$ relative to solar)']  #  'Radiogenic heating\n(pW kg$^{-1}$)'
 
-fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=100, x_res=5,
+fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=1000, x_res=5,
                                                            defaults='baseline',
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
                                                            legend=True, lw=4, ylabel=r'RMS topography (m)',
@@ -48,7 +48,7 @@ fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=100
                                                            x_vars=x_vars, units=units, log=log, x_range=x_range,
                                                            xscales=xscales, xlabels=xlabels,
                                                            linec=linec, leg_loc='upper right',
-                                                           textc='xkcd:off white',
+                                                           textc='k',  # 'xkcd:off white',
                                                            alpha=alpha, legsize=legsize, xlabelpad=xlabelpad,
                                                            )
 
@@ -56,12 +56,12 @@ for i, ax in enumerate(axes):
     ax.set_xlim([x*xscales[i] for x in x_range[i]])
     ax.set_xticks(xticks[i])
     ax.set_yscale('log')
-    ax.set_ylim((500, 1500))
+    ax.set_ylim((10, 600))
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
 axes[0].yaxis.set_minor_formatter(ticker.NullFormatter())
-axes[0].set_yticks([600, 700, 800, 900, 1000, 1200,  1500])
+# axes[0].set_yticks([600, 700, 800, 900, 1000, 1200,  1500])
 
 axes[0].set_xlim(2, 5)  # ensure time axis lims
 

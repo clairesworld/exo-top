@@ -70,8 +70,9 @@ float_list = [1e-5, 5e-5, 6e-5, 8e-5, 1e-4, 1.1e-4, 1.3e-4, 2e-4, 2.3e-4, 3e-4]
 fln = None  # minmaxnorm(float_list, a=0, b=1)
 
 slides = False
-nplanets = 4
+nplanets = 10
 n_stats = 100
+baseline = 'baseline'
 
 if slides:
     textc = 'xkcd:off white'
@@ -95,8 +96,8 @@ print('\nfirst call')
 fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True, nplanets=nplanets, version=0,
                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False, log=True, alpha_w=alpha_w,
-                                                 vol_0='Earth', simple_scaling=False,
-                                                 defaults='Venusbaseline', textc=textc,
+                                                 vol_0='Earth', simple_scaling=False, M0=1,
+                                                 defaults=baseline, textc=textc,
                                                  # title='Water volume to submerge land',
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  # benchmark_path+'wei_Venus/',
@@ -119,7 +120,7 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False,
                                                  simple_scaling=False, log=True,
-                                                 defaults='Venusbaseline',
+                                                 defaults=baseline,
                                                  # title='Water volume to submerge land',
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  spectrum_fname='Venus_spectrum_l1.pkl',
@@ -138,7 +139,7 @@ fig, axes = results.plot_ocean_capacity_relative(n_stats=n_stats, relative=True,
                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
                                                  titlesize=32, fig_path=fig_path, save=False,
                                                  simple_scaling=False, log=True,
-                                                 defaults='Venusbaseline',
+                                                 defaults=baseline,
                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
                                                  spectrum_fname='spectrum_-2.pkl',
                                                  c='xkcd:reddish orange', ls='-.',
@@ -160,8 +161,8 @@ ax.set_xlabel(xlabel, fontsize=labelsize, c=textc,
               labelpad=20)
 
 ax.set_xlim((0.1, 5))
-ax.set_ylim((2e-1, 1.8))
-# ax.set_ylim((1e-2, 4e0))
+ax.set_ylim((2e-1, 1.8))  # old Ra i eff scaling
+# ax.set_ylim((0.01, 0.2))  # low b scaling
 
 
 # ax.text(0.03, 0.97, '4.5 Gyr\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
@@ -174,8 +175,8 @@ ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
 ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 ax.set_xticks([0.1, 1, 2, 3, 4, 5])
-ax.set_yticks([0.3, 0.4, 0.5, 0.6, 0.7, 1, 1.4])
-# ax.set_yticks([0.2, 0.3, 1, 2])
+ax.set_yticks([0.3, 0.4, 0.5, 0.6, 0.7, 1, 1.4]) # old Ra i eff scaling
+# ax.set_yticks([0.01, 0.1, 0.2])  # low b scaling
 
 handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,
                          label='Pure dynamic topography'),
@@ -183,8 +184,8 @@ handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,
                          label='Venus-like topography'),
            mlines.Line2D([], [], color='xkcd:reddish orange', ls='-.', lw=3,
                          label='Red noise topography'),
-           mlines.Line2D([], [], color='g', ls='--', lw=3,
-                         label='Simple scaling')
+           # mlines.Line2D([], [], color='g', ls='--', lw=3,
+           #               label='Simple scaling')
            ]
 ax.legend(handles=handles, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize, ncol=1)
 ax = cornertext(ax, 'WATER\nPLANETS', pos='top left', size=labelsize, pad=0.03)
@@ -192,5 +193,5 @@ ax = cornertext(ax, 'LAND\nPLANETS', pos='bottom right', size=labelsize, pad=0.0
 
 if slides:
     fig, *axes = dark_background(fig, axes)
-fig.savefig(fig_path + 'ocn_vol.png', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_Ti.png', bbox_inches='tight')
 plt.show()

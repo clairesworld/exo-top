@@ -84,7 +84,7 @@ class TerrestrialPlanet():
         self.t = None
 
             
-    def init_derived(self, **kwargs):
+    def init_derived(self, bug_Rc=False, verbose=False, **kwargs):
         """ Parameters derived from input parameters """
         if 'ident' not in kwargs.keys():
             try:
@@ -97,7 +97,12 @@ class TerrestrialPlanet():
             self.R_p = self.R_p0
 
         if self.CMF is not None:
-            self.CRF = self.CMF ** 2
+            if bug_Rc:
+                if verbose:
+                    print('    doing R_c wrong')
+                self.CRF = self.CMF ** 2
+            else:
+                self.CRF = self.CMF ** 0.5
             self.R_c = self.R_p * self.CRF
             self.M_m = self.M_p * (
                     1 - self.CMF)  # mass of mantle, updated immediately in thermal code including lid dynamics
@@ -115,6 +120,7 @@ class TerrestrialPlanet():
             self.M_c = self.M_p * self.CMF  # M_p - M_m
             self.R_c = self.R_p * self.CRF
 
+        self.d = self.R_p - self.R_c
         self.SA_p = geom.SA(R=self.R_p)
         self.SA_c = geom.SA(R=self.R_c) # core surface area 
         self.g_sfc = ast.grav(self.M_p, self.R_p)
@@ -175,7 +181,7 @@ class TerrestrialPlanet():
         self.c_m_prime = 1
         self.c_c_prime = 1
 
-        self.eta_m_prime = 1/self.Ra_i * np.exp(-np.log(self.delta_eta) * self.T_m_prime)
+        self.eta_m_prime = 1/self.Ra_i * np.exp(-self.b * self.T_m_prime)
         self.dyn_top_rms_prime = self.dyn_top_rms/(self.alpha_m*T0*L)
         self.heuristic_h_prime = self.heuristic_h/(self.alpha_m*T0*L)
 

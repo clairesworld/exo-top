@@ -7,7 +7,7 @@ def dimensionalise(h_prime, pl, i=None, **kwargs):
         dim_factor = (pl.T_c[i] - pl.T_s) * pl.alpha_m * (pl.R_p - pl.R_c)
         # print('dim factor', dim_factor)
     else:
-        dim_factor = (pl.T_c - pl.T_s) * pl.alpha_m * (pl.R_p - pl.R_c)
+        dim_factor = (pl.d) * pl.alpha_m * (pl.delta_T)
         # h = h_prime*(np.maximum(pl.T_c[-1], pl.T_m[-1]) - pl.T_s)*pl.alpha_m*(pl.R_p - pl.R_c)
 
         # h = pl.eta_m[-1] * pl.kappa_m / (pl.d_m[-1]**2 * pl.rho_m * pl.g_sfc)  # alternate scaling K&H
@@ -15,10 +15,15 @@ def dimensionalise(h_prime, pl, i=None, **kwargs):
     return h
 
 
-def topography(pl, **kwargs):
+def topography(pl, rms_type='new', **kwargs):
     # get all topography parameters for a planet (given its thermal history)
     pl.heuristic_h = pl.delta_rh * pl.dT_rh * pl.alpha_m
-    pl.dyn_top_aspect_prime = dyn_topo_prime_aspect(pl, **kwargs)
+    if rms_type == 'Ra_i_eff':
+        print('using Ra i eff scaling')
+        pl.dyn_top_aspect_prime = dyn_topo_prime_aspect(pl, **kwargs)
+    else:
+        print('using Ra, b scaling')
+        pl.dyn_top_aspect_prime = dyn_topo_prime_aspect_lin(pl, **kwargs)
     pl.dyn_top_heuristic = dyn_topo_heuristic(pl, **kwargs)
     pl.dyn_top_KH = dyn_topo_KH(pl)
     pl.dyn_top_rms_isoviscous = dyn_topo_Lees(pl)
@@ -27,11 +32,6 @@ def topography(pl, **kwargs):
 
     pl.dyn_top_peak_prime = dyn_topo_peak_prime_aspect(pl)
     pl.dyn_top_peak = dimensionalise(pl.dyn_top_peak_prime, pl)
-    # print('\nRa_i_eff', pl.Ra_i_eff[-1])
-    # print('h rms prime', pl.dyn_top_aspect_prime[-1])
-    # print('h peak prime', pl.dyn_top_peak_prime[-1])
-    # print('h rms', pl.dyn_top_rms[-1])
-    # print('h peak', pl.dyn_top_peak[-1], '\n')
     return pl
 
 
@@ -40,17 +40,28 @@ def dyn_topo_heuristic(pl, **kwargs):
     return h_prime
 
 
-def dyn_topo_prime_aspect(pl, C=10.65, p=-0.1329, err_C=0, err_p=0, **kwargs):
-    h_prime = ((C + err_C) * (pl.Ra_i_eff*1e-6)**(p + err_p))*1e-3  # fit to chaotic regime with scaling
-    return h_prime
+def dyn_topo_prime_aspect(pl, A=-0.14024140659945217, B=-1.1344436818366221, err_A=0, err_B=0,
+                          C=10.65, p=-0.1329, err_C=0, err_p=0, **kwargs):
+    # h_prime = ((C + err_C) * (pl.Ra_i_eff*1e-6)**(p + err_p))*1e-3  # fit to chaotic regime with scaling
+    logRa = np.log10(pl.Ra_i_eff)
+    logh_prime = (A + err_A) * logRa + (B + err_B)
+    return 10**logh_prime
 
 
-def dyn_topo_prime_aspect_fit2(pl, A=15129.127744674453, B=-2.536958799974066, C=0.07783089181861645,
-                               D=-1.4871556683761225, err_A=0, err_B=0, err_C=0, err_D=0, **kwargs):
-    # from fit to h*1e3 and Ra_1e-6
-    b = pl.Ea/p.R_b * (1/pl.T_l - 1/pl.T_c)
-    h_prime = ((A + err_A) * b**(B + err_B) * (pl.Ra_i_eff*1e-6)**((C + err_C)*b + D + err_D))*1e-3
-    return h_prime
+def dyn_topo_prime_aspect_lin(pl, A=9.987050269427673, B=-0.6219144264939613, C=-1.5557808578586123,
+                               D=0.08017720267851403, err_A=0, err_B=0, err_C=0, err_D=0, **kwargs):
+    b = pl.b
+    logRa = np.log10(pl.Ra_i)
+    logh_prime = (A + err_A) + b*(B + err_B) + logRa*(C + err_C) + (b*logRa)*(D + err_D)
+    return 10**logh_prime
+
+
+# def dyn_topo_prime_aspect_fit2(pl, A=15129.127744674453, B=-2.536958799974066, C=0.07783089181861645,
+#                                D=-1.4871556683761225, err_A=0, err_B=0, err_C=0, err_D=0, **kwargs):
+#     # from fit to h*1e3 and Ra_1e-6
+#     b = pl.Ea/p.R_b * (1/pl.T_l - 1/pl.T_m)
+#     h_prime = ((A + err_A) * b**(B + err_B) * (pl.Ra_i_eff*1e-6)**((C + err_C)*b + D + err_D))*1e-3
+#     return h_prime
 
 
 def dyn_topo_peak_prime_aspect(pl, **kwargs):

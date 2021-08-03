@@ -1,7 +1,6 @@
 import numpy as np
 from . import parameters as p
 
-
 ###### SOME TEMPERATURES AND FLUXES ######
 from .parameters import R_b
 
@@ -61,8 +60,8 @@ def T_mean(T_m=None, T_l=None, R_p=None, R_l=None, R_c=None, T_s=None, k_m=None,
     c1 = k_m * (T_l - T_s - a0 / (6 * k_m) * (R_p ** 2 - R_l ** 2)) / (R_l ** -1 - R_p ** -1)
     c2 = T_s + a0 / (6 * k_m) * R_p ** 2 - c1 / (k_m * R_p)
     return 3 / (R_p ** 3 - R_c ** 3) * (
-                (T_m / 3) * (R_l ** 3 - R_c ** 3) - a0 / (30 * k_m) * (R_p ** 5 - R_l ** 5) + c1 / (2 * k_m) * (
-                    R_p ** 2 - R_l ** 2) + c2 / 3 * (R_p ** 3 - R_l ** 3))
+            (T_m / 3) * (R_l ** 3 - R_c ** 3) - a0 / (30 * k_m) * (R_p ** 5 - R_l ** 5) + c1 / (2 * k_m) * (
+            R_p ** 2 - R_l ** 2) + c2 / 3 * (R_p ** 3 - R_l ** 3))
 
 
 #####################################################################
@@ -82,7 +81,6 @@ def Ra(nu=None, eta=None, kappa=None, alpha=None, rho=None, g=None, deltaT=None,
     return rho * alpha * deltaT * l ** 3 * g / (kappa * eta)
 
 
-
 def Ra_F(nu=None, eta=None, kappa=None, H=None, alpha=None, k=None, rho=None, g=None, l=None,
          F_b=None):  # basal heating Ra
     """ calculate flux Ra, H is volumetric heating, F_b is bottom heating in W/m^2 """
@@ -91,15 +89,16 @@ def Ra_F(nu=None, eta=None, kappa=None, H=None, alpha=None, k=None, rho=None, g=
     return rho * g * alpha * (F_b + H * l) * l ** 4 / (k * kappa * eta)
 
 
-def bdy_thickness(dT=None, d_m=None, Ra_crit=None, beta=1/3, g=None, Ra_rh=None,
-                       kappa_m=None, eta_m=None, alpha_m=None, rho_m=None, **kwargs):
+def bdy_thickness(dT=None, d_m=None, Ra_crit=None, beta=1 / 3, g=None, Ra_rh=None,
+                  kappa_m=None, eta_m=None, alpha_m=None, rho_m=None, **kwargs):
     """Thickness of thermal boundary layer based on critical Ra """
     if Ra_rh is None:
         Ra_rh = Ra(eta=eta_m, kappa=kappa_m, alpha=alpha_m, rho=rho_m, g=g, deltaT=dT, l=d_m)
     return d_m * (Ra_crit / Ra_rh) ** beta
 
 
-def h_rad_old(t, tf=None, H_0=None, H_f=None, c_n=None, p_n=None, lambda_n=None, backwards_cooling=False, verbose=False, **kwargs):
+def h_rad_old(t, tf=None, H_0=None, H_f=None, c_n=None, p_n=None, lambda_n=None, backwards_cooling=False, verbose=False,
+              **kwargs):
     """Calculate radiogenic heating in W kg^-1 from Korenaga (2006)"""
     c_n = np.array(c_n)
     p_n = np.array(p_n)
@@ -143,16 +142,16 @@ def h_rad(t, c_i, h_i, tau_i, age, x_Eu=1):
     """ radiogenic heating in W/kg after Table 1 and eqn 1 in O'Neill+ 2020 (SSR) """
     # order of isotopes (IMPORTANT) is [40K, 238U, 235U, 232Th]
     # convert times to Myr to be consistent with units of tau
-    t_Myr = t*p.sec2Gyr*1e3
-    h_K = np.array(c_i[0] * h_i[0] * np.exp((age*1e3 - t_Myr) * np.log(2) / tau_i[0]))
+    t_Myr = t * p.sec2Gyr * 1e3
+    h_K = np.array(c_i[0] * h_i[0] * np.exp((age * 1e3 - t_Myr) * np.log(2) / tau_i[0]))
     try:
-        h_UTh = np.array(sum(c_i[1:] * h_i[1:] * np.exp((age*1e3 - t_Myr) * np.log(2) / tau_i[1:])))
+        h_UTh = np.array(sum(c_i[1:] * h_i[1:] * np.exp((age * 1e3 - t_Myr) * np.log(2) / tau_i[1:])))
     except ValueError:
         t_Myr = np.vstack((t_Myr, t_Myr, t_Myr))
         c_i = c_i.reshape((4, 1))
         h_i = h_i.reshape((4, 1))
         tau_i = tau_i.reshape((4, 1))
-        h_UTh = np.array(np.sum(c_i[1:] * h_i[1:] * np.exp((age*1e3 - t_Myr) * np.log(2) / tau_i[1:]), axis=0))
+        h_UTh = np.array(np.sum(c_i[1:] * h_i[1:] * np.exp((age * 1e3 - t_Myr) * np.log(2) / tau_i[1:]), axis=0))
 
     return h_K + x_Eu * h_UTh
 
@@ -175,9 +174,9 @@ def Q_bl(q=None, k=None, deltaT=None, d_bl=None, R=None, **kwargs):
     return SA * q
 
 
-def T_lid(T_m, a_rh=None, Ea=None, **kwargs):
+def T_lid(T_m, a_rh, dT_visc, **kwargs):
     """ temperature at lid base """
-    return T_m - a_rh * (p.R_b * T_m ** 2 / Ea)  # Thiriet+ eq. 15
+    return T_m - a_rh * dT_visc  # Thiriet+ eq. 15
 
 
 def lid_growth(T_m=None, q_ubl=None, h0=None, R_p=None, R_l=None, T_l=None, rho_m=None, T_s=None,
@@ -201,13 +200,35 @@ def dTdt(Q=None, M=None, C=None, **kwargs):
         return Q / (M * C)
 
 
-def d_lid_ss(Tm, a_rh=None, k=None, Ea=None, H0=None, Ra_crit=None, eta_0=None, T_ref=None,
-          kappa_m=None, alpha_m=None, g_sfc=None, rho_m=None, Ts=None, **kwargs):
+# def potential_temperature(pl=None, T_m=None, alpha_m=None, c_m=None, ):
+def T_solidus()
+
+def d_lid_ss(pl=None, Tm=None, a_rh=None, k=None, Ea=None, H0=None, Ra_crit=None, eta_0=None, T_ref=None,
+             kappa_m=None, alpha_m=None, g_sfc=None, rho_m=None, Ts=None, **kwargs):
     """ from sympy solution for d in steady state """
-    return (-R_b * Tm ** 2 * a_rh * k + np.sqrt(k * (2.0 * Ea ** 2 * H0 * Tm * (Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** 0.666666666666667 - 2.0 * Ea ** 2 * H0 * Ts * (Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** 0.666666666666667 - 2.0 * Ea * H0 * R_b * Tm ** 2 * a_rh * (Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** 0.666666666666667 + R_b ** 2 * Tm ** 4 * a_rh ** 2 * k))) / (Ea * H0 * (Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** (1 / 3))
+    if pl is not None:
+        Tm = pl.T_m
+        a_rh = pl.a_rh
+        k = pl.k_m
+        Ea = pl.Ea
+        H0 = pl.H_0
+        Ra_crit = pl.Ra_crit_u
+        eta_0 = pl.eta_0  # reference visc
+        T_ref = pl.T_ref
+        kappa_m = pl.kappa_m
+        alpha_m = pl.alpha_m
+        g_sfc = pl.g_sfc
+        rho_m = pl.rho_m
+        Ts = pl.T_s
 
-
-
-
-
-
+    return (-R_b * Tm ** 2 * a_rh * k + np.sqrt(k * (2.0 * Ea ** 2 * H0 * Tm * (
+                Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (
+                    R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** 0.666666666666667 - 2.0 * Ea ** 2 * H0 * Ts * (
+                                                                 Ea * Ra_crit * eta_0 * kappa_m * np.exp(
+                                                             Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (
+                                                                             R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** 0.666666666666667 - 2.0 * Ea * H0 * R_b * Tm ** 2 * a_rh * (
+                                                                 Ea * Ra_crit * eta_0 * kappa_m * np.exp(
+                                                             Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (
+                                                                             R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** 0.666666666666667 + R_b ** 2 * Tm ** 4 * a_rh ** 2 * k))) / (
+                       Ea * H0 * (Ea * Ra_crit * eta_0 * kappa_m * np.exp(Ea / (R_b * Tm) - Ea / (R_b * T_ref)) / (
+                           R_b * Tm ** 2 * a_rh * alpha_m * g_sfc * rho_m)) ** (1 / 3))

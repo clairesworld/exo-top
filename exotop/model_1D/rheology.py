@@ -3,6 +3,8 @@ from . import parameters as p
 
 
 def dynamic_viscosity(T=None, pl=None, visc_type=None, **kwargs):  # note kwargs can contain planet object
+    # if np.size(T)> 1:
+    #     print('using', visc_type, 'rheology')
     if visc_type == 'constant':
         return pl.nu_0 * pl.rho_m
     elif visc_type == 'Dorn':
@@ -94,5 +96,12 @@ def grain_size(A_rh, eta_0, Ea, T_ref, m, B_rh, mu):
     return B_rh * (2 * A_rh * eta_0 * np.exp(-Ea / (p.R_b * T_ref)) / mu) ** (1 / m)
 
 
-def viscosity_contrast(T1, T2):
-    pass
+def visc_factor(pl=None, T_i=None, Ea=None, dT=None, which_Ti='T_m', **kwargs):
+    if pl is not None:
+        if which_Ti == 'T_m':
+            T_i = pl.T_m
+        elif which_Ti == 'T_ubl':
+            T_i = (pl.T_l + pl.T_m) / 2
+        Ea = pl.Ea
+        dT = pl.delta_T
+    return dT / (p.R_b * T_i ** 2 / Ea)

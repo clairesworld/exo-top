@@ -21,12 +21,12 @@ def simple_vol_scaling(pl, verbose=False, at_age=None, it=None, **kwargs):
     for ii in it:
         h_peak = dimensionalise(h_peak_prime[ii], pl=pl, i=ii)
         if at_age is None:
-            pl.simple_ocean[ii] = h_peak * (4 * np.pi * R**2)
+            pl.simple_ocean[ii] = h_peak * (4 * np.pi * R ** 2)
         else:
             if verbose:
                 print('h peak from scaling', h_peak, 'm')
                 print('h rms', pl.dyn_top_rms[ii], 'm')
-            pl.simple_ocean = h_peak * (4 * np.pi * R**2)
+            pl.simple_ocean = h_peak * (4 * np.pi * R ** 2)
 
     return pl
 
@@ -42,7 +42,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
     h_rms1 = eval('pl.' + name_rms)
     if verbose:
         h_rms1_dim = eval('pl.' + 'dyn_top_rms')
-        print('nondimensional h rms',  h_rms1[-1])
+        print('nondimensional h rms', h_rms1[-1])
         print('dimensional h rms', h_rms1_dim[-1])
 
     l = np.arange(len(phi0))
@@ -53,13 +53,13 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         print('k', k)
         raise Exception('rms of model spectrum is nan!')
 
-    # get time index nearest to desired snap given in Gyr
     if at_age is not None:
-        it = age_index(pl.t, at_age, parameters.sec2Gyr)
+        it = age_index(pl.t, at_age, parameters.sec2Gyr)  # get time index nearest to desired snap given in Gyr
         it = range(it, it + 1)
-    else:
+    else:  # all times
         it = range(len(pl.t))
         pl.max_ocean = np.zeros_like(it, dtype=np.float64)
+        pl.h_peak_spectral = np.zeros_like(it, dtype=np.float64)
     for ii in it:
         h_rms = h_rms1[ii]
         h_ratio = h_rms / h_rms0
@@ -78,7 +78,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
             # vol = sh.integrate_to_peak(grid_dim, lats, lons, R=pl.R_p, lmax=shgrid.lmax, verbose=verbose)
             data = clm.expand(grid='GLQ', extend=False).to_array()
             lmax = clm.lmax
-            rms_nondim = np.sqrt(np.mean(data**2))
+            rms_nondim = np.sqrt(np.mean(data ** 2))
             # if verbose:
             #     print('RMS of map nondimensional', rms_nondim)
             grid_dim = dimensionalise(data, pl, i=ii) * water_load_ratio
@@ -104,9 +104,20 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
 
         if at_age is None:
             pl.max_ocean[ii] = basin_capacity
+            pl.h_peak_spectral[ii] = np.mean(peaks)
         else:
             pl.max_ocean = basin_capacity
-            print(pl.M_p/parameters.M_E, 'M_E |', basin_capacity/1.4e18, 'EO | V_shell =', 4/3*np.pi*((pl.R_p + np.mean(peaks))**3 - pl.R_p**3)/1.4e18, 'EO | h_peak =', np.mean(peaks)*1e-3, 'km | h_rms =', np.mean(rms_dims)*1e-3, 'km =', np.mean(rms_nondims))
+            pl.h_peak_spectral = np.mean(peaks)
+            print('\n')
+            print('scaled h_rms', name_rms, '=', dimensionalise(h_rms1[-1], pl=pl, i=-1), 'm without water loading')
+            print('      water load ratio', water_load_ratio)
+            print("%.2f" % (pl.M_p / parameters.M_E), 'M_E |', "%.2f" % (pl.R_p * 1e-3), 'km radius | ocean vol:',
+                  "%.2f" % (basin_capacity / 1.4e18), 'EO | V_shell =',
+                  "%.2f" % (4 / 3 * np.pi * ((pl.R_p + np.mean(peaks)) ** 3 - pl.R_p ** 3) / 1.4e18), 'EO | h_peak =',
+                  "%.2f" % (np.mean(peaks) * 1e-3), 'km | h_rms =', "%.2f" % (np.mean(rms_dims) * 1e-3), 'km')
+            print('h_rms_prime =', "%.5f" % np.mean(rms_nondims), '| b =', "%.2f" % pl.b[-1], '| log Ra_i =',
+                  "%.2f" % np.log10(pl.Ra_i[-1]), '| d =', "%.2f" % (pl.d * 1e-3), '| dT =', "%.2f" % pl.delta_T[-1],
+                  '| alpha_m =', "%.2f" % pl.alpha_m)
 
         # print('t', ii, 'R_p:', pl.R_p * 1e-3, 'km, h_rms', h_rms1[ii]*1e-3, 'km, h_peak', h_spectrum_max * 1e-3, 'km, ocn vol:', basin_capacity / parameters.TO, 'TO')
     # print('final h_ratio', h_ratio)
@@ -116,10 +127,12 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         pltshow()
     return pl
 
-def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_m=3500, rho_w=1000, spectrum_fname='base_spectrum_l1.pkl',
+
+def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_m=3500, rho_w=1000,
+             spectrum_fname='base_spectrum_l1.pkl',
              spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/', verbose=False, **kwargs):
     """ predict min rms topography for land given sfc water mass frac and radius"""
-    vol_EO = 1.4e21/rho_w
+    vol_EO = 1.4e21 / rho_w
     water_load_ratio = rho_m / (rho_m - rho_w)
 
     if phi0 is None:
@@ -131,7 +144,7 @@ def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_m=
     M_w = M_p * parameters.M_E * x_h2o  # mass of sfc water in kg
     vol_w = M_w / rho_w  # corresponding volume
 
-    print('vol_w', vol_w/vol_EO, 'EO')
+    print('vol_w', vol_w / vol_EO, 'EO')
 
     h_rms = rms_1
     flag = True
@@ -149,10 +162,12 @@ def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_m=
             n = n + 1
         vol = np.mean(vols)
         diff = vol_w - vol
-        if abs(diff) < tol*vol_EO:
+        if abs(diff) < tol * vol_EO:
             flag = False
             print('h_rms', h_rms, 'm | vol', vol / vol_EO, 'EO')
         else:
-            h_rms = h_rms * (vol_w/vol)
+            h_rms = h_rms * (vol_w / vol)
     print('ANS:', 'h_rms', h_rms, 'm | vol', vol / vol_EO, 'EO')
     return h_rms
+
+# def no_h_scaling(pl):

@@ -145,22 +145,25 @@ def plot_output(pl, names, ncols=6, tspan=None, title=None, plots_save=False, wr
     if plots_save:
         plt.savefig(fig_path + fname + fformat, bbox_inches='tight')
     if write_out:
-        print('\n        n timesteps =', len(t))
-        print('$t_f$ =', t[-1] * parameters.sec2Gyr, 'Gyr')
+        # print('\n        n timesteps =', len(t))
+        # print('$t_f$ =', t[-1] * parameters.sec2Gyr, 'Gyr')
         print(r'$R_p$ =', '%.2f' % (pl.R_p / parameters.R_E), 'R_E =', '%.2f' % (pl.R_p * 1e-3), 'km')
         #         print(r'$R_c$ =', '%.2f'%(kwargs['CRF']*kwargs['R_p']*1e-3), 'km')
-        print('M_c', '%.2e' % pl.M_c, 'kg')
-        print(r'$M_{m+lid}$ =', '%.2e' % (pl.M_m), 'kg')
-        print(r'$g_{sfc}$ =', '%.2f' % pl.g_sfc, 'm s^-2')
-        print(r'$g_{cmb}$ =', '%.2f' % pl.g_cmb, 'm s^-2')
-        print(r'$\kappa_m$', '%.6f' % pl.kappa_m, 'm^2 s^-1')
-        print(r'CRF =', '%.2f' % pl.CRF)
+        # print('M_c', '%.2e' % pl.M_c, 'kg')
+        # print(r'$M_{m+lid}$ =', '%.2e' % (pl.M_m), 'kg')
+        # print(r'$g_{sfc}$ =', '%.2f' % pl.g_sfc, 'm s^-2')
+        # print(r'$g_{cmb}$ =', '%.2f' % pl.g_cmb, 'm s^-2')
+        # print(r'$\kappa_m$', '%.6f' % pl.kappa_m, 'm^2 s^-1')
+        # print(r'CRF =', '%.2f' % pl.CRF)
         print(r'$h_0$ =', '%.2f' % (pl.h_rad_m[0] * 1e12), 'pW kg^-1')
         print(r'$h_{4.5}$ =', '%.2f' % (pl.h_rad_m[-1] * 1e12), 'pW kg^-1')
         #         print(r'$H_0$ =', '%.2f'%(H_rad_m[0] + H_rad_lid[0]), 'TW')
         #         print(r'$H_{4.5}$ =', '%.2f'%(H_rad_m[-1] + H_rad_lid[-1]), 'TW')
         print(r'Urey ratio @ $t_f$ =', '%.2f' % pl.urey[-1])
-        print('q_sfc(t=0)', '%.2f' % (pl.q_sfc[0] * 1e3), 'mW m^-3')
+        print('q_sfc f', '%.2f' % (pl.q_sfc[-1] * 1e3), 'mW m^-3')
+        print('T_mf', '%.2f' % (pl.T_m[-1]), 'K')
+        print('log eta_mf', '%.2f' % (np.log10(pl.eta_m[-1])))
+
     return fig, axes
 
 
@@ -452,11 +455,11 @@ def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100,
     """generate ensemble of planets depending on x independent variable over some random variations of other
      parameters -- do this for """
     if maxi is None:
-        maxi = [300e3, 2.5e12, 2000, 200e3]
+        maxi = [300e3, 2.6e12] # [300e3, 2.6e12, 2000, 200e3]
     if mini is None:
-        mini = [240e3, 1.5e10, 1000, 50e3]
+        mini = [240e3, 1.6e10]  # [240e3, 1.6e10, 1000, 50e3]
     if names is None:
-        names = ['Ea', 'eta_pre', 'T_m0', 'D_l0']
+        names = ['Ea', 'eta_pre']  # ['Ea', 'eta_pre', 'T_m0', 'D_l0']
 
     if default is not None:
         pl_kwargs_base = eval('inputs.' + default + '_in').copy()
@@ -540,14 +543,14 @@ def ensemble_time_distribution(yvar, default='baseline',
 
 def plot_distribution(yvars, default='baseline',
                       # xmin=0.1*M_E, xmax=6*M_E, logx=True, xres=100,
-                      num=100, update_kwargs=None, run_kwargs=None,
+                      num=100, update_kwargs=None, run_kwargs=None, check_dist=False,
                       names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
                       mini=[240e3, 1.5e10, 1000, 2000, 100e3],
                       maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
                       xlabelpad=None, ylabelpad=None, n_sigma=1, ylims=None, tickpad=10, show_sigma=False,
                       fig=None, axes=None, c='k', lw=0.5, alpha=0.7, c_mean='k', log=None, xticks=None, yticks=None,
                       xlabel='Time (Gyr)', ylabels=None, yscales=None, labelsize=16, ticksize=12, save=False,
-                      fname='evol_dist', fig_path='', legtext=None, legsize=16, **kwargs):
+                      fname='evol_dist', fig_path='', legtext=None, legsize=16, big_lw=2, **kwargs):
     # generate ensemble of planets depending on x independent variable over some random variations of other parameters and plot evol
     if yscales is None:
         yscales = [1] * len(yvars)
@@ -567,18 +570,12 @@ def plot_distribution(yvars, default='baseline',
         pl_kwargs.update(update_kwargs)
     if run_kwargs is not None:
         model_kwargs.update(run_kwargs)
-
-    # if logx:
-    #     xvec = np.logspace(np.log10(xmin), np.log10(xmax), xres)
-    # else:
-    #     xvec = np.linspace(xmin, xmax, xres)
-    # for x in xvec:
-    #     pl_kwargs.update({xvar: x})
+    lognormal_vars = ['Ra_i', 'Ra_i_eff']  # use log mean for calculating
 
     pl_ensemble = evol.bulk_planets_mc(n=num, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
                                        model_kwargs=model_kwargs, **kwargs)
 
-    # plot ensemble
+       # plot ensemble
     if fig is None and axes is None:
         fig, axes = plt.subplots(len(yvars), 1, figsize=(2.5, 2 * len(yvars)))
 
@@ -592,13 +589,24 @@ def plot_distribution(yvars, default='baseline',
             t = pl.t * parameters.sec2Gyr
             y = eval('pl.' + yvar) * yscales[ii]
             y_all.append(y)
-            ax.plot(t, y, c=c, lw=lw, alpha=alpha, zorder=1)
+            try:
+                ax.plot(t, y, c=c, lw=lw, alpha=alpha, zorder=1)
+            except ValueError:
+                ax.plot(t, [y]*len(t), c=c, lw=lw, alpha=alpha, zorder=1)
 
         # mean, std
         y_all = np.array(y_all)
-        y_av = np.mean(y_all, axis=0)
-        ax.plot(t, y_av, c=c_mean, lw=4, zorder=10)
+        if yvar in lognormal_vars:
+            y_av = 10**np.mean(np.log10(y_all), axis=0)
+        else:
+            y_av = np.mean(y_all, axis=0)
+        try:
+            ax.plot(t, y_av, c=c_mean, lw=big_lw, zorder=10)
+        except ValueError:
+            ax.plot(t, [y_av]*len(t), c=c_mean, lw=big_lw, zorder=10)
         if show_sigma:
+            if yvar in lognormal_vars:
+                raise NotImplementedError('sigma not implemented for log scale!')
             y_std = np.std(y_all, axis=0)
             y_upper = y_av + y_std * n_sigma  # todo for log scape
             y_lower = y_av - y_std * n_sigma
@@ -625,6 +633,74 @@ def plot_distribution(yvars, default='baseline',
         ax.set_xlim(t[0], t[-1])
         if ylims[ii] is not None:
             ax.set_ylim(ylims[ii])
+
+        if legtext is not None and ii == 0:
+            ax.text(0.95, 0.95, legtext, fontsize=legsize, transform=ax.transAxes, ha='right', va='top')
+
+    plt.tight_layout()
+    if save:
+        plot_save(fig, fname, fig_path=fig_path)
+    # else:
+    #     plt.show()
+    return fig, axes
+
+
+
+def check_distribution(yvars, default='baseline',
+                      num=100, update_kwargs=None, run_kwargs=None, log=False,
+                      names=['Ea', 'eta_pre', 'T_m0', 'T_c0', 'D_l0'],
+                      mini=[240e3, 1.5e10, 1000, 2000, 100e3],
+                      maxi=[300e3, 2.5e12, 2000, 2500, 300e3],
+                      xlabelpad=None, ylabelpad=None, ylims=None, tickpad=10,
+                      fig=None, axes=None, c='k', xticks=None, yticks=None,
+                      xlabel='Time (Gyr)', ylabels=None, yscales=None, labelsize=16, ticksize=12, save=False,
+                      fname='evol_dist', fig_path='', legtext=None, legsize=16, **kwargs):
+    # generate ensemble of planets depending on x independent variable over some random variations of other parameters and plot evol
+    if yscales is None:
+        yscales = [1] * len(yvars)
+    if ylabels is None:
+        ylabels = [''] * len(yvars)
+    if ylims is None:
+        ylims = [None] * len(yvars)
+    if default is not None:
+        pl_kwargs = eval('inputs.' + default + '_in')
+        model_kwargs = eval('inputs.' + default + '_run')
+    else:
+        pl_kwargs = {}  # use defaults given in terrestrialplanet.py
+        model_kwargs = {}  # initial conditions defaults given in thermal.py
+    if update_kwargs is not None:
+        pl_kwargs.update(update_kwargs)
+    if run_kwargs is not None:
+        model_kwargs.update(run_kwargs)
+
+    pl_ensemble = evol.bulk_planets_mc(n=num, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
+                                       model_kwargs=model_kwargs, **kwargs)
+
+    # plot ensemble
+    if fig is None and axes is None:
+        fig, axes = plt.subplots(len(yvars), 1, figsize=(2.5, 2 * len(yvars)))
+
+    for ii, yvar in enumerate(yvars):
+        try:
+            ax = axes[ii]
+        except TypeError:
+            ax = axes
+        y_all = []
+        for pl in pl_ensemble:
+            t = pl.t * parameters.sec2Gyr
+            y = eval('pl.' + yvar) * yscales[ii]
+            y_all.append(y[-1])
+
+        if log:
+            y_all = np.log10(np.array(y_all))
+        else:
+            y_all = np.array(y_all)
+        ax.hist(y_all, histtype='step', color=c)
+
+        # format
+        ax.set_ylabel(ylabels[ii], fontsize=labelsize, labelpad=xlabelpad)
+        ax.tick_params(axis='x', labelsize=ticksize, pad=tickpad)
+        ax.tick_params(axis='y', labelsize=ticksize, pad=tickpad)
 
         if legtext is not None and ii == 0:
             ax.text(0.95, 0.95, legtext, fontsize=legsize, transform=ax.transAxes, ha='right', va='top')
@@ -823,6 +899,7 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
             elif (not isinstance(y, Iterable)) and isinstance(x, Iterable):
                 x, y = zip(*sorted(zip(x, [y] * np.ones_like(x))))
 
+            print('x', x, 'y', y)
             ax.plot(x, y, ls=ls, c=c, lw=lw, alpha=alpha, zorder=zorder_l, label=label_l)
             if printrange:
                 print('range:', np.min(y), np.max(y))
@@ -1292,7 +1369,6 @@ def plot_ocean_capacity_relative(age=4.5, legsize=16, fname='ocean_vol', mass_fr
         vol_0 = pl0.max_ocean
     elif vol_0 == 'Earth':
         vol_0 = mass_EO / rho_w
-    print('vol_0', vol_0)
 
     if axes is None:
         fig, axes = plt.subplots(figsize=figsize)

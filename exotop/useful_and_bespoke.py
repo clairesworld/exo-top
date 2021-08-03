@@ -142,7 +142,7 @@ def printe(name, obj, showall=False):
 
 
 def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='', labelsize=16, ticksize=14,
-              ticks=None, ticklabels=None, labelpad=17,
+              ticks=None, ticklabels=None, labelpad=17, loc='right',
               rot=None, discrete=False, cmap='rainbow', tickformatter=None, c='k', pad=0.05, log=False):
     from mpl_toolkits.axes_grid1 import make_axes_locatable
     import matplotlib.colors as colors
@@ -170,9 +170,16 @@ def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='
 
     fig = ax.figure
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=pad)
-    cbar = fig.colorbar(mappable, cax=cax)
-    cbar.set_label(label, rotation=270, labelpad=labelpad, fontsize=labelsize, c=c)
+    cax = divider.append_axes(loc, size="5%", pad=pad)
+    if loc == 'top':
+        cbar = fig.colorbar(mappable, cax=cax, orientation='horizontal')
+        cax.xaxis.set_ticks_position("top")
+        cbar.ax.xaxis.set_label_position('top')
+        rotation = 0
+    else:
+        cbar = fig.colorbar(mappable, cax=cax)
+        rotation = 270
+    cbar.set_label(label, rotation=rotation, labelpad=labelpad, fontsize=labelsize, c=c)
 
     if ticks is not None:
         cbar.set_ticks(ticks)
