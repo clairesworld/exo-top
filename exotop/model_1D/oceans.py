@@ -35,6 +35,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
               spectrum_fname='base_spectrum_l1.pkl', spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
               rho_w=1000, **kwargs):
     water_load_ratio = pl.rho_m / (pl.rho_m - rho_w)
+    print('including water loading')
 
     if phi0 is None:
         degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)

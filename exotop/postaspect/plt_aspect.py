@@ -1753,7 +1753,6 @@ def fit_cases_on_plot(yx_all, ax, yerr=1, xerr=1, legend=True, showallscatter=Fa
 
         # error
         SE_y = pro.fit_SE(flatx, flaty, [np.log10(const), expon], xn=xprime)
-
         yn_upper = hprime + SE_y
         yn_lower = hprime - SE_y
         ax.fill_between(xprime, yn_lower, yn_upper, fc=c, alpha=0.15)

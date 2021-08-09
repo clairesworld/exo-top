@@ -8,9 +8,12 @@ from model_1D.astroenvironment import radius_zeng, grav
 from useful_and_bespoke import dark_background, imscatter
 import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
+from datetime import date
+
+today = date.today().strftime("%b-%d-%Y")
 
 # set paths
-fig_path = ''  # laptop
+fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
 fig_format = '.png'
 benchmark_path = '../benchmarks/'
 planet_icon_path = '/home/claire/Pictures/science-graphics/planet_png/'
@@ -21,30 +24,42 @@ ticksize = 25
 linec = 'xkcd:ocean green'  # 'xkcd:british racing green'  # '#d88868'
 alpha = 0.6  # 0.3
 
+planet_kwargs = {
+    # 'visc_type': 'KW'
+}
+run_kwargs = {
+    # 'rms_type': 'Ra_i_eff'
+}
+
 # how h varies across key input parameters
 x_vars = ['t',
           'M_p', 'CMF', 'x_Eu']  # 'H_f'
-units = ['Gyr',
-         '$M_E$', 'CMF', r'$\%$ U, Th']  # pW kg$^{-1}$
+units = [' Gyr',
+         r' $M_{\oplus}$', ' CMF', r'$\%$ U, Th']  # pW kg$^{-1}$
 log = [False,
        True, False, False]
 x_range = [(2, 5),
-           (0.1 * p.M_E, 5 * p.M_E),  (0.1, 0.4), (0.3, 3)]  # (2e-12, 10e-12)
+           (0.1 * p.M_E, 5 * p.M_E), (0.1, 0.4), (0.3, 3)]  # (2e-12, 10e-12)
 xticks = [[2, 3, 4, 5],
           [0.1, 1, 5], [0.1, 0.2, 0.3, 0.4], [30, 100, 300]]  # [2, 5, 10]
 xscales = [p.sec2Gyr,
            p.M_E ** -1, 1, 1e2]  # 1e12
 xlabels = ['Age\n(Gyr)',
-           'Planet mass\n($M_E$)', 'CMF', 'U and Th abundance\n($\%$ relative to solar)']  #  'Radiogenic heating\n(pW kg$^{-1}$)'
+           'Planet mass\n' + r'($M_{\oplus}$)', 'CMF',
+           'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=1000, x_res=5,
-                                                           defaults='baseline',
+dist_res = 300
+x_res = 10
+n_sigma = 1
+
+fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_res=x_res, n_sigma=n_sigma,
+                                                           defaults='baseline', age=4.5,
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
                                                            legend=True, lw=4, ylabel=r'RMS topography (m)',
-                                                           labelpad=20, legendtop=True, tickwidth=2,
-                                                           save=False, fname='relative_h_slides', fig_path=fig_path,
-                                                           update_kwargs={'visc_type': 'KW'},
-                                                           models=['dyn_top_rms'], labels=[''],
+                                                           labelpad=20, legendtop=True, tickwidth=1,
+                                                           save=False,
+                                                           update_kwargs=planet_kwargs, run_kwargs=run_kwargs,
+                                                           model_param='dyn_top_rms', labels=[''],
                                                            x_vars=x_vars, units=units, log=log, x_range=x_range,
                                                            xscales=xscales, xlabels=xlabels,
                                                            linec=linec, leg_loc='upper right',
@@ -52,11 +67,30 @@ fig, axes = plottop.plot_change_with_observeables_ensemble(age=4.5, dist_res=100
                                                            alpha=alpha, legsize=legsize, xlabelpad=xlabelpad,
                                                            )
 
+# # add second scaling relationship
+# fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=10, x_res=5,
+#                                                            defaults='baseline', age=4.5,
+#                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
+#                                                            legend=False, lw=4, ylabel=r'RMS topography (m)',
+#                                                            labelpad=20, legendtop=True, tickwidth=2,
+#                                                            fig=fig, axes=axes, save=False,
+#                                                            update_kwargs=planet_kwargs, run_kwargs=run_kwargs,
+#                                                            model_param='dyn_top_rms_1param', labels=[''],
+#                                                            x_vars=x_vars, units=units, log=log, x_range=x_range,
+#                                                            xscales=xscales, xlabels=xlabels,
+#                                                            linec='#749af3', leg_loc='upper right',
+#                                                            textc='k',  # 'xkcd:off white',
+#                                                            alpha=alpha, legsize=legsize, xlabelpad=xlabelpad,
+#                                                            )
+
 for i, ax in enumerate(axes):
-    ax.set_xlim([x*xscales[i] for x in x_range[i]])
+    ax.set_xlim([x * xscales[i] for x in x_range[i]])
     ax.set_xticks(xticks[i])
     ax.set_yscale('log')
-    ax.set_ylim((10, 600))
+    # ax.set_ylim((200, 1000))
+    # ax.set_yticks((200, 800, 1000))
+    ax.set_ylim((10, 800))
+    ax.set_yticks((10, 100, 800))
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
@@ -82,15 +116,16 @@ axes[0].set_xlim(2, 5)  # ensure time axis lims
 #     ax.scatter(M_Venus, h, marker='^', s=70, alpha=0.5, c='xkcd:orchid', label=r'Huang+ (2013)', zorder=1)
 
 
-handles = [mlines.Line2D([], [], color=linec, ls='-',
-                         markersize=0, lw=4, label='$\Delta h^\prime = 0.14$ Ra$_{i, eff}^{-0.18}$'),
-           #          mlines.Line2D([], [], color='#749af3', ls='-',
-           #                                  markersize=0, lw=4, label='h = f($\delta_{rh}, \Delta T_{rh}$)'),
-           # mlines.Line2D([], [], color='xkcd:goldenrod', marker='$V$',
-           #               markersize=15, lw=0, label=r'Venus'),
-           #                    mlines.Line2D([], [], color='xkcd:orchid', marker='^',
-           #                                  markersize=15, lw=0, label=r'Huang+ (2013) 3D model'),
-           ]
+handles = [
+    mlines.Line2D([], [], color=linec, ls='-',
+                  markersize=0, lw=4, label=r'$h^\prime_{\rm rms}$ = $f$(Ra$_i$, $b$)'),
+    mlines.Line2D([], [], color='#749af3', ls='-',
+                  markersize=0, lw=4, label=r'$h^\prime_{\rm rms}$ = $f$(Ra$_{i, {\rm eff}}$)'),
+    # mlines.Line2D([], [], color='xkcd:goldenrod', marker='$V$',
+    #               markersize=15, lw=0, label=r'Venus'),
+    #                    mlines.Line2D([], [], color='xkcd:orchid', marker='^',
+    #                                  markersize=15, lw=0, label=r'Huang+ (2013) 3D model'),
+]
 
 # legend?
 # legend = axes[0].legend(handles=handles, frameon=False, fontsize=legsize,
@@ -101,5 +136,6 @@ handles = [mlines.Line2D([], [], color=linec, ls='-',
 plt.subplots_adjust(wspace=0.2)
 # plt.tight_layout()
 
-fig.savefig(fig_path+'h_parameters_'+fig_format, bbox_inches='tight')
+# plt.suptitle(r'Ra$_{i, {\rm eff}}$ scaling')
+fig.savefig(fig_path + 'h_parameters' + today + fig_format, bbox_inches='tight')
 plt.show()

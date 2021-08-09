@@ -15,19 +15,22 @@ def dimensionalise(h_prime, pl, i=None, **kwargs):
     return h
 
 
-def topography(pl, rms_type='new', **kwargs):
+def topography(pl, rms_type='new', verbose=True, **kwargs):
     # get all topography parameters for a planet (given its thermal history)
-    pl.heuristic_h = pl.delta_rh * pl.dT_rh * pl.alpha_m
+    # pl.heuristic_h = pl.delta_rh * pl.dT_rh * pl.alpha_m
     if rms_type == 'Ra_i_eff':
         print('using Ra i eff scaling')
         pl.dyn_top_aspect_prime = dyn_topo_prime_aspect(pl, **kwargs)
     else:
         print('using Ra, b scaling')
         pl.dyn_top_aspect_prime = dyn_topo_prime_aspect_lin(pl, **kwargs)
-    pl.dyn_top_heuristic = dyn_topo_heuristic(pl, **kwargs)
+
+    pl.dyn_top_aspect_prime_1param = dyn_topo_prime_aspect(pl, **kwargs)  # useful to store this anyways
+    # pl.dyn_top_heuristic = dyn_topo_heuristic(pl, **kwargs)
     pl.dyn_top_KH = dyn_topo_KH(pl)
-    pl.dyn_top_rms_isoviscous = dyn_topo_Lees(pl)
+    # pl.dyn_top_rms_isoviscous = dyn_topo_Lees(pl)
     pl.dyn_top_rms = dimensionalise(pl.dyn_top_aspect_prime, pl)
+    pl.dyn_top_rms_1param = dimensionalise(pl.dyn_top_aspect_prime_1param, pl)
     pl.h_dim_factor = (pl.T_c - pl.T_s) * pl.alpha_m * (pl.R_p - pl.R_c)
 
     pl.dyn_top_peak_prime = dyn_topo_peak_prime_aspect(pl)
@@ -48,12 +51,12 @@ def dyn_topo_prime_aspect(pl, A=-0.14024140659945217, B=-1.1344436818366221, err
     return 10**logh_prime
 
 
-def dyn_topo_prime_aspect_lin(pl, A=9.987050269427673, B=-0.6219144264939613, C=-1.5557808578586123,
-                               D=0.08017720267851403, err_A=0, err_B=0, err_C=0, err_D=0, **kwargs):
+def dyn_topo_prime_aspect_lin(pl, beta_h=p.beta_h, **kwargs):
+    A, B, C, D = beta_h
     b = pl.b
     logRa = np.log10(pl.Ra_i)
-    logh_prime = (A + err_A) + b*(B + err_B) + logRa*(C + err_C) + (b*logRa)*(D + err_D)
-    return 10**logh_prime
+    logh_prime = A + b * B + logRa * C + (b * logRa) * D
+    return np.maximum(10**logh_prime, np.zeros_like(logh_prime))
 
 
 # def dyn_topo_prime_aspect_fit2(pl, A=15129.127744674453, B=-2.536958799974066, C=0.07783089181861645,

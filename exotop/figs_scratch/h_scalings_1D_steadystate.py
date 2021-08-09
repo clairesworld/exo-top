@@ -36,21 +36,13 @@ xscales = [#p.sec2Gyr,
 xlabels = [#'Age\n(Gyr)',
            'Planet mass\n($M_E$)', 'Core mass fraction', 'Present rad. heating\n(pW kg$^{-1}$)']
 
-fig, axes = plottop.plot_change_with_observeables(age=4.5, dist_res=1000, x_res=7, relative=False,
-                                                           defaults='baseline',
-                                                           ticksize=ticksize, labelsize=labelsize, fig_height=6,
-                                                           legend=True, lw=4, ylabel='$h_{rms}$ (m)',
-                                                           labelpad=20, legendtop=True, tickwidth=2,
-                                                           save=False, fname='relative_h_slides', fig_path=fig_path,
-                                                           # update_kwargs={'visc_type': 'KW'},
-                                                           models=['dyn_top_rms'], labels=[''],
-                                                           x_vars=x_vars, units=units, log=log, x_range=x_range,
-                                                           xscales=xscales, xlabels=xlabels,
-                                                           linec=linec,
-                                                           textc='k', #'xkcd:off white',
-                                                           alpha=0.3, legsize=legsize,
-                                                           solve_ODE=False, steady=True,
-                                                           )
+fig, axes = plottop.plot_change_with_observeables(defaults='baseline', tickwidth=2, relative=False, textc='k', age=4.5,
+                                                  x_vars=x_vars, ylabel='$h_{rms}$ (m)', fig_height=6, xlabels=xlabels,
+                                                  log=log, x_range=x_range, xscales=xscales, units=units, legend=True,
+                                                  legsize=legsize, dist_res=1000, x_res=7, ticksize=ticksize,
+                                                  labelsize=labelsize, lw=4, labelpad=20, legendtop=True, save=False,
+                                                  fname='relative_h_slides', fig_path=fig_path, models=['dyn_top_rms'],
+                                                  labels=[''], linec=linec, alpha=0.3, solve_ODE=False, steady=True)
 
 for i, ax in enumerate(axes):
     ax.set_xlim([x*xscales[i] for x in x_range[i]])

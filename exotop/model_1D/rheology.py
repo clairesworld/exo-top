@@ -72,7 +72,6 @@ def eta_Thi(T, pl=None, eta_0=1e21, T_ref=1600, Ea=300e3, **kwargs):  # diffusio
         Ea = pl.Ea
         eta_0 = pl.eta_0
         T_ref = pl.T_ref
-
     return eta_0 * np.exp(Ea / p.R_b * (T ** -1 - T_ref ** -1))
 
 
@@ -89,6 +88,11 @@ def eta_FK(T, pl=None, T_s=None, eta_s=None, T_i=None, Ea=300e3, P=0, V_rh=6e-6,
     Q = Ea + P * V_rh
     gamma = Q / (p.R_b * T_i ** 2)
     return eta_s * np.exp(-gamma * (T - T_s))
+
+
+def theta_FK(Ea, T_i, T_s, R_b=8.314):
+    # Foley & Smye eqn 3
+    return Ea * (T_i - T_s) / (R_b*T_i**2)
 
 
 def grain_size(A_rh, eta_0, Ea, T_ref, m, B_rh, mu):

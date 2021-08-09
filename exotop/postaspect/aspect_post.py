@@ -797,7 +797,7 @@ def fit_SE(x, h, beta, err_x=1, err_h=1, xn=None, num=20):
         print('x', x, type(x))
         raise e
 
-    # standard error (single parameter only)
+    # standard error (single parameter only) - where is this from??
 
     if xn is None:
         logxn1 = np.linspace(np.min(logx1), np.max(logx1), num)

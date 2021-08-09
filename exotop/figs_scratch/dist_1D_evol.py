@@ -8,9 +8,12 @@ from model_1D.astroenvironment import radius_zeng, grav
 from useful_and_bespoke import dark_background, imscatter
 import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
+from datetime import date
+
+today = date.today().strftime("%b-%d-%Y")
 
 # set paths
-fig_path = ''  # laptop
+fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
 fig_format = '.png'
 benchmark_path = '../benchmarks/'
 legsize = 16
@@ -24,7 +27,7 @@ names_mc = ['Ea', 'eta_pre',
 mini_mc = [240e3, 1.6e10,
            # 0.3
            ]
-maxi_mc = [300e3, 2.6e12,
+maxi_mc = [340e3, 2.6e12,
            # 3
            ]
 
@@ -38,39 +41,48 @@ yvars = ['T_m',
          'b',
          'Ra_i',
          'h_dim_factor',
-         'dyn_top_rms'
+         'dyn_top_rms',
+         # 'dyn_top_rms_1param'
          ]
 ylabels = [r'$T_m$ (K)',
            # r'$h_{rad}$ (pW/kg)',
            r'$\eta_m$ (Pa s)',
            r'$b$',
            r'Ra$_i$',
-           r'$d_m \Delta T_m \alpha_m$'+'\n'+r'($\times 10^5$ m)',
-           r'$h_{\rm rms}$ (m)']
+           r'$d_m \Delta T_m \alpha_m$' + '\n' + r'($\times 10^5$ m)',
+           r'$h_{\rm rms}$ (m)', # + '\n' + r'$f$(Ra$_i$, $b$)',
+           # r'$h_{\rm rms}$ (m)' + '\n' + r'$f$(Ra$_{i, {\rm eff}}$)',
+           ]
 ylims = [(1600, 3000),
          # None,
          (1e17, 1e20),
          (8, 20),
          (1e7, 1e13),
          (1e-1, 5e0),
-         (1e0, 1e3)]
+         (1e0, 1e3),
+         # (1e2, 1e3),
+         ]
 log = [False,
        # False,
        True,
        False,
        True,
        False,
-       True]
+       True,
+       # True
+       ]
 yscales = [1,
            # 1e12,
            1,
            1,
            1,
            1e-5,
-           1]
+           1,
+           # 1
+           ]
 
-num_dist = 1000
-masses = np.array([0.1, 1, 5])*p.M_E
+num_dist = 500
+masses = np.array([0.1, 1, 5]) * p.M_E
 verbose = False
 labelsize = 16
 
@@ -89,6 +101,11 @@ labelsize = 16
 # verbose = True
 # labelsize = 12
 
+planet_kwargs = {}
+run_kwargs = {
+    # 'rms_type': 'Ra_i_eff'
+}
+
 fig, axes = plt.subplots(len(yvars), len(masses), figsize=(5, 9.5))
 if len(np.shape(axes)) == 1:
     axes = axes[:, np.newaxis]
@@ -97,17 +114,34 @@ for ii, mass in enumerate(masses):
         ylabels = None
         # yticks = [[]] * len(yvars)
     print('\n', mass / p.M_E, 'M_E')
-    fig, ax_col = plottop.plot_distribution(yvars, default='baseline', update_kwargs={'M_p': mass},
-                                       num=num_dist, names=names_mc, mini=mini_mc, maxi=maxi_mc,
-                                       xlabelpad=None, ylabelpad=10, n_sigma=1, ylims=ylims, tickpad=5,
-                                       fig=fig, axes=axes[:, ii], c='k', lw=0.5, alpha=0.05, c_mean=linec,
-                                       xticks=None, yticks=yticks, log=log,
-                                       xlabel='', ylabels=ylabels, yscales=yscales, labelsize=labelsize,
-                                       ticksize=ticksize, legsize=legsize, save=False,
-                                       fig_path=fig_path, legtext=str(mass / p.M_E) + r' $M_E$',
-                                       verbose=verbose)
+    planet_kwargs.update({'M_p': mass})
+    if mass >= (1 * p.M_E):
+        legtext = str(int(mass / p.M_E)) + r' $M_{\oplus}$'
+    else:
+        legtext = str(mass / p.M_E) + r' $M_{\oplus}$'
+    fig, ax_col = plottop.plot_distribution(yvars, default='baseline',
+                                            update_kwargs=planet_kwargs, run_kwargs=run_kwargs,
+                                            num=num_dist, names=names_mc, mini=mini_mc, maxi=maxi_mc,
+                                            xlabelpad=None, ylabelpad=10, n_sigma=1, ylims=ylims, tickpad=5,
+                                            fig=fig, axes=axes[:, ii], c='k', lw=0.5, alpha=0.05, c_mean=linec,
+                                            xticks=None, yticks=yticks, log=log,
+                                            xlabel='', ylabels=ylabels, yscales=yscales, labelsize=labelsize,
+                                            ticksize=ticksize, legsize=legsize, save=False,
+                                            fig_path=fig_path, legtext=legtext, verbose=verbose)
+
+    # # highlight baseline case
+    # fig, ax_col = plottop.plot_distribution(yvars, default='baseline',
+    #                                         update_kwargs=planet_kwargs, run_kwargs=run_kwargs,
+    #                                         num=1, names=['Ea', 'eta_pre'], mini=[300e3, 1.6e11], maxi=[300e3, 1.6e11],
+    #                                         xlabelpad=None, ylabelpad=10, n_sigma=0, ylims=ylims, tickpad=5,
+    #                                         fig=fig, axes=axes[:, ii], c='k', lw=0.5, alpha=0.05, c_mean='r',
+    #                                         xticks=None, yticks=yticks, log=log,
+    #                                         xlabel='', ylabels=ylabels, yscales=yscales, labelsize=labelsize,
+    #                                         ticksize=ticksize, legsize=legsize, save=False,
+    #                                         fig_path=fig_path, legtext='',
+    #                                         verbose=verbose)
     for ax in ax_col:
-        # postprocessing
+        # postprocessing matplotlib
         if ii > 0:
             tk = [item.get_text() for item in ax.get_yticklabels()]
             empty_string_labels = [''] * len(tk)
@@ -117,5 +151,5 @@ for ii, mass in enumerate(masses):
 fig.supxlabel(xlabel, fontsize=labelsize, y=0.02)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.1)
-plt.savefig('evol_dist.png', bbox_inches='tight')
+plt.savefig(fig_path + 'evol_dist_' + today + '.png', bbox_inches='tight')
 plt.show()

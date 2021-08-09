@@ -11,7 +11,7 @@ baseline_in = dict(
     rho_c=7200,
     c_m=1142,
     c_c=840,
-    beta_u=1/3,
+    beta_u=1 / 3,
     k_m=4,
     alpha_m=2.5e-5,
     H_0=22.65771894e-12,  # not used -radiogenic heating in W/kg at t0  based on below
@@ -19,13 +19,13 @@ baseline_in = dict(
     T_s=273,
     eta_pre=1.6e11,  # arrhenius pre-exponential factor - dry olivine
     Ea=300e3,
-    x_Eu=1,  # at 0.7 this is similar to Thiriet
+    x_Eu=1,  # at 0.7 this is similar to older Treatise values
 
     #     # viscosity
     #     nu_0 = 0.27e17, # use for constant visc option
     #     a_rh=2.44, # for beta=1/3 from Thiriet+ (2019)
-        eta_0 = 1e21, # reference eta from Thiriet+ (2019)
-        T_ref = 1600, # reference T from Thiriet+ (2019)
+    eta_0=1e21,  # reference eta from Thiriet+ (2019)
+    T_ref=1600,  # reference T from Thiriet+ (2019)
     #     Ea=300e3, # activation energy in J, K&W (1993) dry olivine
     #     V_rh=6e-6, # activation volume in m^3, K&W (1993)  dry olivine
     #     mu=80e9, # shear modulus in Pa, K&W (1993)  dry olivine
@@ -35,7 +35,6 @@ baseline_in = dict(
     #     m_rh=2.5, # grain size exponent, K&W (1993)  dry olivine
 )
 baseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW')  # model params
-
 
 Earthbaseline_in = dict(
     ident='Earthbaseline',  # must match dict name ****_in
@@ -48,7 +47,7 @@ Earthbaseline_in = dict(
     rho_c=7200,
     c_m=1200,
     c_c=7800,
-    beta_u=1/3,
+    beta_u=1 / 3,
     k_m=3,
     alpha_m=3e-5,
     H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0  based on below
@@ -67,9 +66,8 @@ Earthbaseline_in = dict(
     #     B_rh=0.5e-9, # Burgers vector, K&W (1993)  dry olivine
     #     m_rh=2.5, # grain size exponent, K&W (1993)  dry olivine
 )
-Earthbaseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW', backwards_cooling=False)  # model params
-
-
+Earthbaseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW',
+                         backwards_cooling=False)  # model params
 
 Earth_Tosi_in = dict(
     ident='Earth_Tosi',
@@ -87,11 +85,11 @@ Earth_Tosi_in = dict(
     c_m=1100,  # specific heat mantle
     c_c=800,  # specific heat for core in J/K/kg
     k_lm=4,  # thermal conduvtivity lower mantle
-    beta_u=1/3,  # defaults to 1/3
-    beta_c=1/3,  # defaults to 1/3
+    beta_u=1 / 3,  # defaults to 1/3
+    beta_c=1 / 3,  # defaults to 1/3
     a_rh=2.9,  # for beta=1/3
-    Ea=3.35e5 + 2.5e9*4e-6,  # activation energy in J for viscosity law
-    eta_pre=6.127e10/500,  # reference dynamic viscosity in Pa s
+    Ea=3.35e5 + 2.5e9 * 4e-6,  # activation energy in J for viscosity law
+    eta_pre=6.127e10 / 500,  # reference dynamic viscosity in Pa s
     T_ref=1600,  # viscosity law reference temperature in K
     T_s=293,  # fixed surface temp in K
     M_p=p.M_E,  # only used for gravity in this case
@@ -99,6 +97,33 @@ Earth_Tosi_in = dict(
 )
 Earth_Tosi_run = dict(T_m0=1700, T_c0=1900, D_l0=100e3, tf=4.5, visc_type='KW', rad_type='H0', backwards_cooling=True)
 
+Earth_Foley_in = dict(
+    f_melt0=None,
+    ident='Earth_Foley',  # must match dict name ****_in
+    cc_slope=1.5e-10,  # Pa-1
+    rho_lith=3300,
+    rho_melt=2800,
+    L_melt=600e3,  # latnt heat of melting
+    gamma_melt=3.1e-8,  # K Pa^-1
+    gamma_m=1e-8,
+    M_p=5.972e24,
+    CMF=0.3,
+    rho_m=4000,
+    rho_c=7200,
+    c_m=1250,
+    c_c=840,
+    beta_u=1 / 3,
+    k_m=5,
+    alpha_m=3e-5,
+    H_0=22.65771894e-12,
+    H_f=4.6e-12,  # not usde - radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
+    T_s=273,
+    Ea=300e3,
+    a_rh=2.5,  # for beta=1/3
+    eta_pre=4e10,
+)
+Earth_Foley_run = dict(T_m0=2000, T_c0=2000, D_l0=100e3, tf=6, visc_type='KW', rad_type='H0',
+                       q_type='theta')  # model params
 
 Venusbaseline_in = dict(
     ident='Venusbaseline',  # must match dict name ****_in
@@ -115,11 +140,12 @@ Venusbaseline_in = dict(
     alpha_m=3e-5,
     T_s=730,
     Ea=300e3,
-    nu_0=0.27e17,  # use for constant visc case
-    H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0 (Mars value from Thiriet - UPDATE)
+    # nu_0=0.27e17,  # use for constant visc case
+    # H_0=22.65771894e-12,  # radiogenic heating in W/kg at t0 (Mars value from Thiriet - UPDATE)
     # H_f=4.6e-12  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
 )
-Venusbaseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW', backwards_cooling=False)  # model params
+Venusbaseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW',
+                         backwards_cooling=False)  # model params
 
 VenusHuang15_in = dict(
     ident='VenusHuang15',  # must match dict name ****_in
@@ -141,7 +167,8 @@ VenusHuang15_in = dict(
     H_f=4.6e-12  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
 )
 # include olivie-spinel phase change, spinel-perovskite phase change
-VenusHuang15_run = dict(T_m0=1750, T_c0=2250, D_l0=200e3, tf=4.5, visc_type='KW', backwards_cooling=False)  # model params
+VenusHuang15_run = dict(T_m0=1750, T_c0=2250, D_l0=200e3, tf=4.5, visc_type='KW',
+                        backwards_cooling=False)  # model params
 
 # VenusGolle_in = dict(
 #     ident = 'VenusGolle', # must match dict name ****_in
@@ -273,8 +300,8 @@ Mars_Breuer_in = dict(
     c_m=1142,  # <----??? TODO: check if you need constant volume c_p
     c_c=840,  # specific heat for core in J/K/kg
     k_lm=4,  # thermal conduvtivity lower mantle
-    beta_u=1/3,  # defaults to 1/3
-    beta_c=1/3,  # defaults to 1/3
+    beta_u=1 / 3,  # defaults to 1/3
+    beta_c=1 / 3,  # defaults to 1/3
     a_rh=2.21,  # for beta=1/3
     Ea=300e3,  # activation energy in J for viscosity law
     eta_0=1e21,  # reference dynamic viscosity in Pa s
@@ -304,8 +331,8 @@ Mars_Hauck_in = dict(
     c_m=1149,  # <----??? TODO: check if you need constant volume c_p
     c_c=571,  # specific heat for core in J/K/kg
     k_lm=4,  # thermal conduvtivity lower mantle
-    beta_u=1/3,  # defaults to 1/3
-    beta_c=1/3,  # defaults to 1/3
+    beta_u=1 / 3,  # defaults to 1/3
+    beta_c=1 / 3,  # defaults to 1/3
     A_rh=5.3e15,
     B_rh=5e-10,
     mu=80e9,
@@ -352,7 +379,7 @@ Venus_in = dict(
     c_m=1142,
     c_c=840,
     beta_u=0.335,  # defaults to 1/3
-    beta_c=1/3,  # defaults to 1/3
+    beta_c=1 / 3,  # defaults to 1/3
     a_rh=2.54,
     k_m=4,
     k_lm=4,
@@ -380,7 +407,7 @@ Earth_in = dict(
     c_m=1142,
     c_c=840,
     beta_u=0.335,  # defaults to 1/3
-    beta_c=1/3,  # defaults to 1/3
+    beta_c=1 / 3,  # defaults to 1/3
     a_rh=2.54,
     k_m=4,
     k_lm=4,
@@ -404,7 +431,7 @@ Moon1_in = dict(
     c_m=1142,
     c_c=840,
     beta_u=0.346,  # defaults to 1/3
-    beta_c=1/3,  # defaults to 1/3
+    beta_c=1 / 3,  # defaults to 1/3
     a_rh=2.44,
     k_m=4,
     k_lm=4,
@@ -431,7 +458,7 @@ Mercury1_in = dict(
     c_m=1142,
     c_c=840,
     beta_u=0.335,  # defaults to 1/3
-    beta_c=1/3,  # defaults to 1/3
+    beta_c=1 / 3,  # defaults to 1/3
     a_rh=2.54,
     k_m=4,
     k_lm=4,
@@ -458,17 +485,17 @@ Mars1_in = dict(
     Ra_crit_u=450,
     R_p0=3400e3,
     R_c0=1700e3,
+    g_sfc=3.7,
     alpha_m=2.5e-5,  # thermal expansivity
     k_m=4,  # silicate thermal conductivity
     CMF=0.24,  # not used
     rho_c=7200,  # core density
     rho_m=3500,  # mantle density
-    rho_lith=None,
-    c_m=1142,  # <----??? TODO: check if you need constant volume c_p
+    c_m=1142,  # <----???
     c_c=840,  # specific heat for core in J/K/kg
     k_lm=4,  # thermal conduvtivity lower mantle
-    beta_u=1/3,  # defaults to 1/3
-    beta_c=1/3,  # defaults to 1/3
+    beta_u=1 / 3,  # defaults to 1/3
+    beta_c=1 / 3,  # defaults to 1/3
     a_rh=2.44,  # for beta=1/3
     Ea=300e3,  # activation energy in J for viscosity law
     eta_0=1e21,  # reference dynamic viscosity in Pa s
@@ -477,17 +504,17 @@ Mars1_in = dict(
     M_p=6.39e23,  # only used for gravity in this case
     sma=None,
     ident='Mars1',
-    H_0 = 23e-12,
+    H_0=23e-12,
     H_f=4e-12,  # radiogenic heating in W/kg at t_f
     # backwards_cooling=True,
 )
-Mars1_run = dict(T_m0=1750, T_c0=2250, D_l0=300e3, tf=4.5, visc_type='Thi', rad_type='H0', backwards_cooling=False)
-
+Mars1_run = dict(T_m0=1750, T_c0=2250, D_l0=300e3, tf=4.5, visc_type='Thi', rad_type='H0', backwards_cooling=False,
+                 lid_heating=False)
 
 TRAPPIST1e_in = dict(
     ident='TRAPPIST1e',  # must match dict name ****_in
-    M_p=0.692*p.M_E,
-    R_p0=0.788*p.R_E,
+    M_p=0.692 * p.M_E,
+    R_p0=0.788 * p.R_E,
     T_s=273,
     CMF=0.246,
     FeMg=0.48,
@@ -501,8 +528,8 @@ TRAPPIST1e_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=6, visc_type='KW', ba
 
 TRAPPIST1f_in = dict(
     ident='TRAPPIST1f',  # must match dict name ****_in
-    M_p=1.039*p.M_E,
-    R_p0=1.045*p.R_E,
+    M_p=1.039 * p.M_E,
+    R_p0=1.045 * p.R_E,
     T_s=273,
     CMF=0.201,
     FeMg=0.45,
@@ -514,11 +541,10 @@ TRAPPIST1f_in = dict(
 )
 TRAPPIST1f_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=6, visc_type='KW', backwards_cooling=False)  # model params
 
-
 TRAPPIST1g_in = dict(
     ident='TRAPPIST1g',  # must match dict name ****_in
-    M_p=1.321*p.M_E,
-    R_p0=1.129*p.R_E,
+    M_p=1.321 * p.M_E,
+    R_p0=1.129 * p.R_E,
     T_s=273,
     CMF=0.161,
     FeMg=0.34,
@@ -532,8 +558,8 @@ TRAPPIST1g_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=6, visc_type='KW', ba
 
 TRAPPIST1h_in = dict(
     ident='TRAPPIST1h',  # must match dict name ****_in
-    M_p=0.326*p.M_E,
-    R_p0=0.755*p.R_E,
+    M_p=0.326 * p.M_E,
+    R_p0=0.755 * p.R_E,
     T_s=273,
     CMF=0.165,
     FeMg=0.35,
@@ -544,4 +570,3 @@ TRAPPIST1h_in = dict(
     H_f=4.6e-12,  # radiogenic heating in W/kg at 4.5 Gyr from Javoy (1999) BSE estimate from CI chondrites
 )
 TRAPPIST1h_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=6, visc_type='KW', backwards_cooling=False)  # model params
-

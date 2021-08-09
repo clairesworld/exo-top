@@ -165,8 +165,10 @@ def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='
         except TypeError as e:
             print(e)
             raise Exception('colourbar: if mappable is None, must provide vector')
-        dum = np.linspace(vmin, vmax, n)
-        mappable = ax.scatter(dum, dum, c=dum, cmap=cmap, s=0, norm=norm)
+        dum = np.linspace(np.min(vector), np.max(vector), n)
+        print('colourmap bounds', np.min(vector), np.max(vector))
+        print('colourmax vmin', vmin, 'vmax', vmax)
+        mappable = ax.scatter(dum, dum, c=dum, cmap=cmap, s=0, norm=norm, vmin=vmin, vmax=vmax)
 
     fig = ax.figure
     divider = make_axes_locatable(ax)
@@ -198,7 +200,7 @@ def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='
     return cbar
 
 
-def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersize=20, alpha=1, legsize=25, ncol=1, title=None, **kwargs):
+def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersize=20, alpha=1, legsize=25, titlesize=None, ncol=1, title=None, **kwargs):
     import matplotlib.lines as mlines
     handles = []
     for jj, label in enumerate(cleglabels):
@@ -206,7 +208,9 @@ def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersi
                                      markersize=markersize, lw=lw, label=str(label)))
     leg = ax.legend(handles=handles, frameon=False, fontsize=legsize, ncol=ncol, bbox_to_anchor=(1.01, 1), loc='upper left', title=title, **kwargs)
     if title is not None:
-        leg.get_title().set_fontsize(legsize)  # legend 'Title' fontsize
+        if titlesize is None:
+            titlesize = legsize
+        leg.get_title().set_fontsize(titlesize)  # legend 'Title' fontsize
     ax.add_artist(leg)
     return ax
 

@@ -25,6 +25,7 @@ class TerrestrialPlanet():
                             CMF = 0.3, # needs a value to avoid errors
                             rho_c = 7200, # Density of iron core in kg m^-3 
                             rho_m = 3500, # Density of silicate mantle in kg m^-3 rho_lith = 2800,
+                            rho_lith = 3500,
                             Ra_crit_u = 450, # critical Rayleigh number (660 in Driscoll & Bercovici 2014)
                             beta_u = 1/3, # defaults to 1/3
                             beta_c = 1/3, # defaults to 1/3
@@ -69,6 +70,16 @@ class TerrestrialPlanet():
                             h_rh=2.07e-3, # grain size in m, K&W (1993)  dry olivine
                             B_rh=0.5e-9, # Burgers vector, K&W (1993)  dry olivine
                             m_rh=2.5, # grain size exponent, K&W (1993)  dry olivine
+
+                            # turn melting off by default
+                            f_melt0 = 0,
+                            gamma_m=1e-8,  # adiabatic gradient mantle
+                            gamma_melt=3.1e-8,
+                            cc_slope=None,
+                            rho_melt=2800,
+                            L_melt=600e3,
+
+                            g_sfc=None,
                            )  
         
         
@@ -122,8 +133,9 @@ class TerrestrialPlanet():
 
         self.d = self.R_p - self.R_c
         self.SA_p = geom.SA(R=self.R_p)
-        self.SA_c = geom.SA(R=self.R_c) # core surface area 
-        self.g_sfc = ast.grav(self.M_p, self.R_p)
+        self.SA_c = geom.SA(R=self.R_c) # core surface area
+        if self.g_sfc is None:
+            self.g_sfc = ast.grav(self.M_p, self.R_p)
 
         if self.rho_m is None:
             self.rho_m = geom.mantle_density(self.R_p, self.M_p, self.CMF)
@@ -138,10 +150,10 @@ class TerrestrialPlanet():
             self.T_s = ast.T_sfc(self.q_out)
 
         # radiogenic element abundance rel. to U
-        self.c_n = [a*b for a,b in zip([self.U_0_238, self.U_0_235, self.Th_0, self.K_0],[1, 1, self.X_Th/self.X_U, 
-                                                                                         self.X_K/self.X_U])]
-#         self.c_n = np.array([self.U_0_238, self.U_0_235, self.Th_0, self.K_0])*np.array([1, 1, self.X_Th/self.X_U, 
-#                                                                                          self.X_K/self.X_U])
+        # self.c_n = [a*b for a,b in zip([self.U_0_238, self.U_0_235, self.Th_0, self.K_0],[1, 1, self.X_Th/self.X_U,
+        #                                                                                  self.X_K/self.X_U])]
+        self.c_n = np.array([self.U_0_238, self.U_0_235, self.Th_0, self.K_0])*np.array([1, 1, self.X_Th/self.X_U,
+                                                                                         self.X_K/self.X_U])
 
 
     def set_attrs(self, **kwargs):

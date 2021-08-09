@@ -49,18 +49,21 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, random=False,
 
 
 def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model_kwargs={}, t_eval=None, log=False,
-                    T_m0_options=None, verbose=False, **kwargs):
+                    T_m0_options=None, propagate_fit_err=True, verbose=False, beta_h=p.beta_h, cov_beta_h=p.cov_beta_h,
+                    **kwargs):
     """varying multiple parameters in 'names' between mini and maxi, use default values otherwise.
     update_kwargs can include any TerrestrialPlanet attribute
     initial_kwargs can include T_m0, T_c0, D_l0, t0, tf. names, mini, and maxi are in order and must have same lenghts"""
     # pl_kwargs and model_kwargs should already be taken from inputs file
     if T_m0_options is None:
         T_m0_options = np.array([1000, 1250, 1500, 1750, 2000]) + 273  # [ 1273, 1523, 1773, 2023, 2273]
+
     planets = []
     ii = 0
     while ii < n:
         new_kwargs_pl = pl_kwargs.copy()
         new_kwargs_model = model_kwargs.copy()
+
         for iii, name in enumerate(names):
             if name == 'T_m0':
                 # for initial temps do discrete values after johnny seales
@@ -74,14 +77,20 @@ def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model
                 new_kwargs_model.update({name: val})
             else:
                 new_kwargs_pl.update({name: val})
+            # if verbose:
+            print(ii, '/', n - 1, ': drew random', name, val)
+        if propagate_fit_err:
+            beta_h_new = np.random.multivariate_normal(beta_h, cov_beta_h)
+            new_kwargs_model.update({'beta_h': beta_h_new})
             if verbose:
-                print(ii, '/', n - 1, ': drew random', name, val)
+                print('       & drew random errors on h scaling', beta_h_new)
 
         if t_eval is None and ii > 0:
             t_eval = planets[0].t
         pl = None
         while pl is None:  # returns None if numerical issue e.g. D_l0 negative
-            pl = build_planet(new_kwargs_pl, new_kwargs_model, t_eval=t_eval, verbose=verbose, **kwargs)
+            pl = build_planet(planet_kwargs=new_kwargs_pl, run_kwargs=new_kwargs_model, t_eval=t_eval, verbose=verbose,
+                              **kwargs)
         planets.append(pl)
         ii += 1
     return planets
@@ -114,7 +123,7 @@ def build_planet(planet_kwargs, run_kwargs, solve_ODE=True, steady=False, **kwar
     return pl
 
 
-def postprocess_planet(pl, postprocessors=None, nondimensional=True, **kwargs):
+def postprocess_planet(pl, postprocessors=None, nondimensional=False, **kwargs):
     if postprocessors is None:
         postprocessors = ['topography']
 
@@ -186,7 +195,7 @@ def LHS(t, y, pl=None, **kwargs):
     pl = recalculate(t, pl, **kwargs)
 
     dTdt_c = th.dTdt(-pl.Q_core, pl.M_c, pl.c_c)
-    dTdt_m = th.dTdt(-pl.Q_ubl + pl.H_rad_m + pl.Q_core, pl.M_conv, pl.c_m)
+    dTdt_m = th.dTdt(-pl.Q_ubl + pl.H_rad_m + pl.Q_core - pl.Q_melt, pl.M_conv, pl.c_m)
     dDdt = th.lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l, rho_m=pl.rho_m,
                          T_s=pl.T_s,
                          c_m=pl.c_m, k_m=pl.k_m, **kwargs)
@@ -195,7 +204,7 @@ def LHS(t, y, pl=None, **kwargs):
     return [dTdt_m, dTdt_c, dDdt]
 
 
-def recalculate(t, pl, verbose=False, rad_type=None, **kwargs):
+def recalculate(t, pl, verbose=False, rad_type=None, q_type='Ra_crit', lid_heating=True, **kwargs):
     """ calcualte all the thermal convection parameters (single time step or postprocess all timesteps"""
 
     # if verbose:
@@ -225,7 +234,7 @@ def recalculate(t, pl, verbose=False, rad_type=None, **kwargs):
     # radiogenic heating
     # pl.h_rad_m = th.h_rad(t, H_0=pl.H_0, H_f=pl.H_f, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, verbose=verbose, **kwargs)  # W kg^-1
     if rad_type == 'H0':
-
+        # pl.h_rad_m = th.h_rad_old_old(t, age=pl.age)
         pl.h_rad_m = th.h_rad_old(t, H_0=pl.H_0, H_f=pl.H_f, c_n=pl.c_n, p_n=p.p_n, lambda_n=p.lambda_n,
                                   verbose=verbose, **kwargs)
         if np.size(t) > 1:  # and verbose:
@@ -272,9 +281,14 @@ def recalculate(t, pl, verbose=False, rad_type=None, **kwargs):
     pl.Ra_i = th.Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, kappa=pl.kappa_m, alpha=pl.alpha_m,
                     deltaT=pl.delta_T,
                     l=pl.d)
+    pl.theta_FK = rh.theta_FK(Ea=pl.Ea, T_i=pl.T_m, T_s=pl.T_s)
 
     pl.delta_rh = th.bdy_thickness(d_m=pl.d_m, Ra_crit=pl.Ra_crit_u, beta=pl.beta_u, Ra_rh=pl.Ra_rh_u, **kwargs)
-    pl.q_ubl = th.q_bl(deltaT=pl.T_m - pl.T_l, k=pl.k_m, d_bl=pl.delta_rh, beta=pl.beta_u, **kwargs)
+    if q_type == 'theta':  # i.e. like Foley & Smye
+        pl.q_ubl = th.q_theta_scaling(theta_FK=pl.theta_FK, Ra_i=pl.Ra_i, T_m=pl.T_m, T_s=pl.T_s, d=pl.d, k=pl.k_m,
+                                      c1=0.5)
+    else:
+        pl.q_ubl = th.q_bl(deltaT=pl.T_m - pl.T_l, k=pl.k_m, d_bl=pl.delta_rh, beta=pl.beta_u, **kwargs)
     pl.Q_ubl = th.Q_bl(q=pl.q_ubl, R=pl.R_l)
 
     # core
@@ -282,20 +296,32 @@ def recalculate(t, pl, verbose=False, rad_type=None, **kwargs):
     pl.Ra_rh_c = th.Ra(eta=pl.eta_cmb, rho=pl.rho_m, g=pl.g_cmb, deltaT=abs(pl.T_c - pl.T_m), l=pl.d_m,
                        kappa=pl.kappa_m, alpha=pl.alpha_m)
     pl.TBL_c = th.bdy_thickness(d_m=pl.d_m, Ra_crit=pl.Ra_crit_c, Ra_rh=pl.Ra_rh_c, beta=pl.beta_c, **kwargs)
-    pl.q_core = th.q_bl(deltaT=pl.T_c - pl.T_m, k=pl.k_lm, d_bl=pl.TBL_c, beta=pl.beta_c, **kwargs)
+    pl.dT_cmb = pl.T_c - pl.T_m
+    pl.q_core = th.q_bl(deltaT=pl.dT_cmb, k=pl.k_lm, d_bl=pl.TBL_c, beta=pl.beta_c, **kwargs)
     pl.Q_core = th.Q_bl(q=pl.q_core, R=pl.R_c)
 
     pl.Ra_F = th.Ra_F(eta=pl.eta_m, kappa=pl.kappa_m, H=pl.h_rad_m, alpha=pl.alpha_m, k=pl.k_m, rho=pl.rho_m,
                       g=pl.g_sfc, l=pl.R_l - pl.R_c, F_b=pl.q_core)
 
-    pl.q_sfc = th.sph_flux(pl.R_p, a0=pl.a0, T_l=pl.T_l, R_l=pl.R_l, k_m=pl.k_m, T_s=pl.T_s, R_p=pl.R_p,
+    if lid_heating:
+        a0_lid = pl.a0
+    else:
+        a0_lid = 0
+    pl.q_sfc = th.sph_flux(pl.R_p, a0=a0_lid, T_l=pl.T_l, R_l=pl.R_l, k_m=pl.k_m, T_s=pl.T_s, R_p=pl.R_p,
                            **kwargs)  # W m^-2
+    # pl.q_sfc = th.sfc_flux_Nu(eta=pl.eta_m, kappa=pl.kappa_m, alpha=pl.alpha_m, k=pl.k_m, rho=pl.rho_m, g_sfc=pl.g_sfc,
+    #                           d=pl.d, deltaT_visc=pl.dT_visc)
 
     pl.Q_sfc = th.Q_bl(q=pl.q_sfc, R=pl.R_p)
     pl.urey = (pl.H_rad_m + pl.H_rad_lid) / pl.Q_sfc
 
-    pl.T_avg = th.T_mean(T_m=pl.T_m, T_l=pl.T_l, R_p=pl.R_p, R_l=pl.R_l, R_c=pl.R_c, T_s=pl.T_s, k_m=pl.k_m,
-                         a0=pl.a0, **kwargs)
+    pl.T_avg = th.T_mean_old(T_m=pl.T_m, T_l=pl.T_l, R_p=pl.R_p, R_l=pl.R_l, R_c=pl.R_c, T_s=pl.T_s, k_m=pl.k_m,
+                             a0=a0_lid, **kwargs)
+    # pl.T_avg = th.T_mean(R_c=pl.R_c, R_l=pl.R_l, R_p=pl.R_p, k_m=pl.k_m, T_m=pl.T_m, T_l=pl.T_l, T_s=pl.T_s, a0=a0_lid,
+    #                      delta_rh=pl.delta_rh)
+
+    # melting
+    pl = th.melting(pl, **kwargs)
 
     return pl
 

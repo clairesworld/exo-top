@@ -18,5 +18,12 @@ U_0_235 = 0.0072  # ratio of 235-U to total U at time 0
 Th_0 = 1  # ratio of 232-Th to total Th at time 0
 K_0 = 0.0117e-2  # ratio of 40-K to total K at time 0, think these ratios are by weight but double check
 
+# topography scaling relationship
+beta_h = [9.89740982668948, -0.6152343723446979, -1.5443110320797528, 0.07931325815824782]
+cov_beta_h = [[7.45323542e+00, -4.16473310e-01, -9.54106642e-01, 5.33170341e-02],
+                      [-4.16473310e-01, 2.37589726e-02, 5.33161007e-02, -3.04171922e-03],
+                      [-9.54106642e-01, 5.33161007e-02, 1.22225467e-01, -6.83058121e-03],
+                      [5.33170341e-02, -3.04171922e-03, -6.83058121e-03, 3.89707528e-04]]
+
 
 
