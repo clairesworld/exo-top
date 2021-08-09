@@ -7,15 +7,17 @@ from postaspect import aspect_post as ap
 
 """(re)process all"""
 
-# ap.reprocess_all_at_sol(Ra_ls, eta_ls[4], psuffixes=['_T', '_h', '_h_all', '_Nu'],  redo=True,
-#                         t1_grid=t1_grid[4,:], end_grid=end_grid[4,:], load_grid=load_grid[4,:], regime_grid=regime_grid_td[4,:],
-#                         include_regimes=['chaotic'],
-#                         data_path=data_path, postprocess_kwargs=postprocess_kwargs)
+ap.reprocess_all_at_sol(Ra_ls[4:], eta_ls[1:], psuffixes=['_h', '_h_all'],  redo=True,
+                        t1_grid=t1_grid[1:, 4:], end_grid=end_grid[1:, 4:], load_grid=load_grid[1:, 4:],
+                        regime_grid=regime_grid_td[1:, 4:],
+                        include_regimes=['chaotic'],
+                        data_path=data_path, postprocess_kwargs=postprocess_kwargs)
 
-ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
-                        t1_grid=t1_grid, end_grid=end_grid, data_path=data_path, load_grid=load_grid, redo=False,
-                        check_t0=False, test_run=True,
-                        regime_grid=regime_grid_td, postprocess_kwargs=postprocess_kwargs)
+ap.reprocess_all_at_sol(Ra_ls[4:], eta_ls[1:], psuffixes=['_T', '_h', '_h_all', '_Nu'], redo=False,
+                        t1_grid=t1_grid[1:, 4:], end_grid=end_grid[1:, 4:], load_grid=load_grid[1:, 4:],
+                        regime_grid=regime_grid_td[1:, 4:],
+                        check_t0=False, test_run=True, data_path=data_path, regime_names=regime_names_td,
+                        postprocess_kwargs=postprocess_kwargs)
 
 # Ra 2e8
 # ap.reprocess_all_at_sol(Ra_ls[-2], eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], regime_names=regime_names_td,
@@ -25,33 +27,33 @@ ap.reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes=['_T', '_h', '_h_all', '_Nu'], 
 
 """plot summaries across delta eta and/or Ra """
 
-# i_plot = [1, 2, 3, 4, ]  # list(range(len(eta_ls)))
-# for ii, eta in enumerate(eta_ls):  # across eta_ls
-#     if ii in i_plot:
-#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
-#         labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
-#         plat.subplots_cases(
-#             cases_ii, labels=labels_ii, t1=t1_grid[ii], save=True, load=True, #load_grid[ii],
-#             fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta, c_rms=c_rms, c_peak=c_peak,
-#             includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
-#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
-#             regime_grid=regime_grid_td[ii],
-#             postprocess_kwargs=postprocess_kwargs,
-#         )
-#
-# i_plot = [4, 5, 6]  # list(range(len(Ra_ls)))  # range(4,5)
-# for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
-#     if ii in i_plot:
-#         cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
-#         labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
-#         plat.subplots_cases(
-#             cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
-#             fname='all-Ra' + Ra, suptitle='Ra = ' + Ra, c_rms=c_rms, c_peak=c_peak,
-#             includepdf=True, includeTz=False, show_sols=True,  # set False for faster summary with stats only
-#             includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
-#             regime_grid=regime_grid_td.T[ii],
-#             postprocess_kwargs=postprocess_kwargs,
-#         )
+i_plot = [1, 2, 3, 4]  # list(range(len(eta_ls)))
+for ii, eta in enumerate(eta_ls):  # across eta_ls
+    if ii in i_plot:
+        cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
+        labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
+        plat.subplots_cases(
+            cases_ii, labels=labels_ii, t1=t1_grid[ii], save=True, load=True, #load_grid[ii],
+            fname='all-eta' + eta, suptitle='$\Delta \eta$ = ' + eta, c_rms=c_rms, c_peak=c_peak,
+            includepdf=True, includeTz=True, show_sols=True,  # set False for faster summary with stats only
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
+            regime_grid=regime_grid_td[ii],
+            postprocess_kwargs=postprocess_kwargs,
+        )
+
+i_plot = [4, 5, 6]  # list(range(len(Ra_ls)))  # range(4,5)
+for ii, Ra in enumerate(Ra_ls):  # across Ra_ls
+    if ii in i_plot:
+        cases_ii = ['Ra' + Ra + '-eta' + eta + e for eta, e in zip(eta_ls, end_grid.T[ii])]
+        labels_ii = [r'$\Delta \eta$=' + eta for eta in eta_ls]
+        plat.subplots_cases(
+            cases_ii, labels=labels_ii, t1=t1_grid.T[ii], save=True, load=True,
+            fname='all-Ra' + Ra, suptitle='Ra = ' + Ra, c_rms=c_rms, c_peak=c_peak,
+            includepdf=True, includeTz=False, show_sols=True,  # set False for faster summary with stats only
+            includegraphic=True, data_path=data_path, fig_path=fig_path, fig_fmt=fig_fmt,
+            regime_grid=regime_grid_td.T[ii],
+            postprocess_kwargs=postprocess_kwargs,
+        )
 
 # """ 2D isoviscous benchmark """
 # plat.subplots_cases(
