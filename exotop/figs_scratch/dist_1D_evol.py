@@ -16,7 +16,8 @@ today = date.today().strftime("%b-%d-%Y")
 fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
 fig_format = '.png'
 benchmark_path = '../benchmarks/'
-legsize = 16
+labelsize = 14
+legsize = 14
 xlabelpad = 20
 ticksize = 12
 linec = 'xkcd:pale turquoise'  # 'xkcd:british racing green'  # '#d88868'
@@ -24,10 +25,10 @@ linec = 'xkcd:pale turquoise'  # 'xkcd:british racing green'  # '#d88868'
 names_mc = ['Ea', 'eta_pre',
             # 'x_Eu'
             ]
-mini_mc = [240e3, 1.6e10,
+mini_mc = [240e3, 1.6e10, #4.8e10, #1.6e10, #4.8e10,
            # 0.3
            ]
-maxi_mc = [340e3, 2.6e12,
+maxi_mc = [340e3, 2.6e12, #2.6e13, #2.6e12, #2.6e13,
            # 3
            ]
 
@@ -42,16 +43,18 @@ yvars = ['T_m',
          'Ra_i',
          'h_dim_factor',
          'dyn_top_rms',
-         # 'dyn_top_rms_1param'
+         # 'dyn_top_rms_1param',
+         # 'urey'
          ]
 ylabels = [r'$T_m$ (K)',
            # r'$h_{rad}$ (pW/kg)',
            r'$\eta_m$ (Pa s)',
            r'$b$',
            r'Ra$_i$',
-           r'$d_m \Delta T_m \alpha_m$' + '\n' + r'($\times 10^5$ m)',
+           r'$d \Delta T \alpha_m$' + '\n' + r'($\times 10^5$ m)',
            r'$h_{\rm rms}$ (m)', # + '\n' + r'$f$(Ra$_i$, $b$)',
            # r'$h_{\rm rms}$ (m)' + '\n' + r'$f$(Ra$_{i, {\rm eff}}$)',
+           # 'Ur'
            ]
 ylims = [(1600, 3000),
          # None,
@@ -61,6 +64,7 @@ ylims = [(1600, 3000),
          (1e-1, 5e0),
          (1e0, 1e3),
          # (1e2, 1e3),
+         # None
          ]
 log = [False,
        # False,
@@ -69,7 +73,8 @@ log = [False,
        True,
        False,
        True,
-       # True
+       # True,
+       # False
        ]
 yscales = [1,
            # 1e12,
@@ -78,13 +83,13 @@ yscales = [1,
            1,
            1e-5,
            1,
+           # 1,
            # 1
            ]
 
 num_dist = 500
 masses = np.array([0.1, 1, 5]) * p.M_E
 verbose = False
-labelsize = 16
 
 # # testing version
 # yvars = ['T_m',
@@ -119,7 +124,7 @@ for ii, mass in enumerate(masses):
         legtext = str(int(mass / p.M_E)) + r' $M_{\oplus}$'
     else:
         legtext = str(mass / p.M_E) + r' $M_{\oplus}$'
-    fig, ax_col = plottop.plot_distribution(yvars, default='baseline',
+    fig, ax_col = plottop.plot_distribution(yvars, default='baseline', tf=4.5, propagate_fit_err=False,
                                             update_kwargs=planet_kwargs, run_kwargs=run_kwargs,
                                             num=num_dist, names=names_mc, mini=mini_mc, maxi=maxi_mc,
                                             xlabelpad=None, ylabelpad=10, n_sigma=1, ylims=ylims, tickpad=5,
@@ -151,5 +156,5 @@ for ii, mass in enumerate(masses):
 fig.supxlabel(xlabel, fontsize=labelsize, y=0.02)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.1)
-plt.savefig(fig_path + 'evol_dist_' + today + '.png', bbox_inches='tight')
+plt.savefig(fig_path + 'evol_dist' + today + '.png', bbox_inches='tight')
 plt.show()

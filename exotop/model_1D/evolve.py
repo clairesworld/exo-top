@@ -77,8 +77,8 @@ def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model
                 new_kwargs_model.update({name: val})
             else:
                 new_kwargs_pl.update({name: val})
-            # if verbose:
-            print(ii, '/', n - 1, ': drew random', name, val)
+            if verbose:
+                print(ii, '/', n - 1, ': drew random', name, val)
         if propagate_fit_err:
             beta_h_new = np.random.multivariate_normal(beta_h, cov_beta_h)
             new_kwargs_model.update({'beta_h': beta_h_new})

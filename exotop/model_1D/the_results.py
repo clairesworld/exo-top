@@ -26,10 +26,10 @@ from num2tex import num2tex
 vars_mc_default = ['Ea', 'eta_pre',
                    # 'herr_A', 'herr_B', 'herr_C', 'herr_D'
                    ]
-vmin_mc_default = [240e3, 1.6e10,
+vmin_mc_default = [240e3, 4.8e10,
                    # 0, 0, 0, 0
                    ]
-vmax_mc_default = [340e3, 2.6e12,
+vmax_mc_default = [340e3, 2.6e13,
                    # 2.7300614307095596, 0.15413945817985505, 0.34960759040966743, 0.019741011328985238
                    ]
 # herr_A etc used by passing propagate_fit_err=True to bulk_planets_mc()
@@ -477,7 +477,7 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
 def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100, update_kwargs=None, run_kwargs=None,
                                    yscale=1, age=4.5, x_res=8, minx=None, maxx=None, verbose=False,
                                    names=vars_mc_default, mini=vmin_mc_default, maxi=vmax_mc_default, t_eval=None,
-                                   n_sigma=1, log=False, **kwargs):
+                                   n_sigma=1, log=False, return_planets=False, **kwargs):
     """generate ensemble of planets depending on x independent variable over some random variations of other
      parameters -- do this for """
     print('n sigma', n_sigma)
@@ -498,6 +498,7 @@ def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100,
         x_vec = np.logspace(np.log10(minx), np.log10(maxx), x_res)
     else:
         x_vec = np.linspace(minx, maxx, x_res)
+    planets_x = []
     for ii, x in enumerate(x_vec):
         # reset
         pl_kwargs = pl_kwargs_base.copy()
@@ -509,13 +510,13 @@ def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100,
         pl_ensemble = evol.bulk_planets_mc(n=dist_res, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
                                            model_kwargs=model_kwargs, t_eval=t_eval, log=False, verbose=verbose,
                                            **kwargs)
-
+        planets_x.append(pl_ensemble)
         it = age_index(pl_ensemble[0].t, age, age_scale=parameters.sec2Gyr)  # should all be evaluated at same time
 
         try:
             col = np.array([vars(pl)[yvar][it] for pl in pl_ensemble]) * yscale
         except IndexError:
-            print('vars(pl)[yvar]', vars(pl_ensemble[0])[yvar])
+            # print('vars(pl)[yvar]', vars(pl_ensemble[0])[yvar])
             col = np.array([vars(pl)[yvar] for pl in pl_ensemble]) * yscale
         grid[ii, :] = col
         if verbose:
@@ -527,7 +528,10 @@ def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100,
     y_upper = y_av + y_std * n_sigma  # todo for log scape
     y_lower = y_av - y_std * n_sigma
 
-    return x_vec, y_av, y_upper, y_lower
+    if return_planets:
+        return x_vec, y_av, y_upper, y_lower, planets_x
+    else:
+        return x_vec, y_av, y_upper, y_lower
 
 
 def ensemble_time_distribution(yvar, default='baseline',
@@ -568,7 +572,7 @@ def ensemble_time_distribution(yvar, default='baseline',
 
 def plot_distribution(yvars, default='baseline',
                       # xmin=0.1*M_E, xmax=6*M_E, logx=True, xres=100,
-                      num=100, update_kwargs=None, run_kwargs=None, check_dist=False,
+                      num=100, update_kwargs=None, run_kwargs=None, tf=4.5, check_dist=False,
                       names=vars_mc_default, mini=vmin_mc_default, maxi=vmax_mc_default,
                       xlabelpad=None, ylabelpad=None, n_sigma=1, ylims=None, tickpad=10, show_sigma=False,
                       fig=None, axes=None, c='k', lw=0.5, alpha=0.7, c_mean='k', log=None, xticks=None, yticks=None,
@@ -593,6 +597,7 @@ def plot_distribution(yvars, default='baseline',
         pl_kwargs.update(update_kwargs)
     if run_kwargs is not None:
         model_kwargs.update(run_kwargs)
+    model_kwargs.update({'tf': tf})
     lognormal_vars = ['Ra_i', 'Ra_i_eff']  # use log mean for calculating
 
     pl_ensemble = evol.bulk_planets_mc(n=num, names=names, mini=mini, maxi=maxi, pl_kwargs=pl_kwargs,
@@ -635,7 +640,7 @@ def plot_distribution(yvars, default='baseline',
             y_lower = y_av - y_std * n_sigma
             ax.plot(t, y_lower, c=c_mean, lw=1, ls='--', zorder=10)
             ax.plot(t, y_upper, c=c_mean, lw=1, ls='--', zorder=10)
-        print(yvar, 'tf =', y_av[-1])
+        print(yvar, 't0', y_av[0], '-- tf =', y_av[-1], '   | min:', np.min(y_all, axis=0)[-1], ' max:', np.max(y_all, axis=0)[-1])
 
         # format
         if ii == len(yvars) - 1:
@@ -1118,7 +1123,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                            dist_res=10, ylim=None, leg_loc='upper left',
                                            xlabels=None, log=None, x_range=None, xscales=None, units=None, x_res=8,
                                            fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
-                                           yscale=1, alpha=0.2,
+                                           yscale=1, alpha=0.2, return_planets=False,
                                            linec='k', ls='-', labelsize=16, lw=3, ticksize=12,
                                            update_kwargs={}, run_kwargs={}, verbose=False, **kwargs):
     if x_vars is None:
@@ -1155,6 +1160,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
     elif relative:
         yscale = relval ** -1
 
+    planets_axes = []
     for i_ax, x_var in enumerate(x_vars):
         print('axis', i_ax + 1, '/', len(axes))
         xmin, xmax = x_range[i_ax]
@@ -1170,15 +1176,16 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
         else:
             if verbose:
                 print('generating planets across', x_var, '...')
-            x_vec, y_av, y_upper, y_lower = ensemble_marginal_distribution(yvar=model_param, xvar=x_var,
+            x_vec, y_av, y_upper, y_lower, planets_x = ensemble_marginal_distribution(yvar=model_param, xvar=x_var,
                                                                            default=defaults, dist_res=dist_res,
                                                                            update_kwargs=update_kwargs,
                                                                            run_kwargs=run_kwargs,
                                                                            yscale=yscale, age=age,
                                                                            x_res=x_res, minx=xmin, maxx=xmax,
                                                                            log=log[i_ax], verbose=verbose,
+                                                                                    return_planets=True,
                                                                            **kwargs)
-
+            planets_axes.append(planets_x)
         print('      range:', y_av[0], '-', y_av[-1], '| % diff:', abs(y_av[-1] - y_av[0]) / y_av[0])
         x_vec = x_vec * xscales[i_ax]
         axes[i_ax].plot(x_vec, y_av, c=linec, lw=lw, ls=ls)
@@ -1220,7 +1227,10 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
         ax.xaxis.set_tick_params(width=tickwidth)
         ax.yaxis.set_tick_params(width=tickwidth)
     # plt.subplots_adjust(wspace=wspace)
-    return fig, axes
+    if return_planets:
+        return fig, axes, planets_axes
+    else:
+        return fig, axes
 
 
 def plot_change_with_observeables(defaults='Earthbaseline', wspace=0.1, tickwidth=1, relative=True, textc='k', c='k',
@@ -1422,7 +1432,7 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
         model_param = 'max_ocean'
 
     if ensemble:
-        fig, axes = plot_change_with_observeables_ensemble(defaults=defaults, relative=relative, textc=textc, linec=c,
+        fig, axes, planets_axes = plot_change_with_observeables_ensemble(defaults=defaults, relative=relative, textc=textc, linec=c,
                                                            age=age, alpha=alpha_dist,
                                                            ylabel=ylabel,  # log=[log],
                                                            x_range=x_range, fig=fig, axes=axes,
@@ -1430,7 +1440,7 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
                                                            pl_baseline=pl0, x_res=nplanets, dist_res=dist_res,
                                                            relval=vol_0, at_age=age, label_l=None,
                                                            postprocessors=['topography', 'ocean_capacity'], phi0=phi0,
-                                                           ticksize=ticksize, labelsize=labelsize,
+                                                           ticksize=ticksize, labelsize=labelsize, return_planets=True,
                                                            names=names_mc, maxi=maxi_mc, mini=mini_mc, **kwargs)
     else:
         fig, axes = plot_change_with_observeables(defaults=defaults, relative=relative, textc=textc, c=c, age=age,
@@ -1529,7 +1539,11 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
 
     if save:
         plot_save(fig, fname, **kwargs)
-    return fig, axes
+
+    if ensemble:
+        return fig, axes, planets_axes
+    else:
+        return fig, axes
 
 
 def read_JFR(fname='', path='/home/claire/Works/exo-top/benchmarks/JFR/'):

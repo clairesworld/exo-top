@@ -7,11 +7,17 @@ from postaspect import aspect_post as ap
 
 """(re)process all"""
 
-ap.reprocess_all_at_sol(Ra_ls[4:], eta_ls[1:], psuffixes=['_h', '_h_all'],  redo=True,
-                        t1_grid=t1_grid[1:, 4:], end_grid=end_grid[1:, 4:], load_grid=load_grid[1:, 4:],
-                        regime_grid=regime_grid_td[1:, 4:],
+ap.reprocess_all_at_sol(Ra_ls[4:], eta_ls[1:-1], psuffixes=['_h', '_h_all'],  redo=True,
+                        t1_grid=t1_grid[1:-1, 4:], end_grid=end_grid[1:-1, 4:], load_grid=load_grid[1:-1, 4:],
+                        regime_grid=regime_grid_td[1:-1, 4:],
                         include_regimes=['chaotic'],
                         data_path=data_path, postprocess_kwargs=postprocess_kwargs)
+
+ap.reprocess_all_at_sol(Ra_ls[4:], eta_ls[-1:], psuffixes=['_h', '_h_all'],  redo=True, col_vis=23,
+                        t1_grid=t1_grid[-1:, 4:], end_grid=end_grid[-1:, 4:], load_grid=load_grid[-1:, 4:],
+                        regime_grid=regime_grid_td[-1:, 4:],
+                        include_regimes=['chaotic'],
+                        data_path=data_path, postprocess_kwargs=postprocess_kwargs)  # eta 1e9 has diff col vis
 
 ap.reprocess_all_at_sol(Ra_ls[4:], eta_ls[1:], psuffixes=['_T', '_h', '_h_all', '_Nu'], redo=False,
                         t1_grid=t1_grid[1:, 4:], end_grid=end_grid[1:, 4:], load_grid=load_grid[1:, 4:],

@@ -22,7 +22,7 @@ legsize = 22  # 30
 xlabelpad = 50
 ticksize = 25
 linec = 'xkcd:ocean green'  # 'xkcd:british racing green'  # '#d88868'
-alpha = 0.6  # 0.3
+alpha = 0.3  # 0.3
 
 planet_kwargs = {
     # 'visc_type': 'KW'
@@ -31,6 +31,16 @@ run_kwargs = {
     # 'rms_type': 'Ra_i_eff'
 }
 
+names = ['Ea', 'eta_pre',
+                   # 'herr_A', 'herr_B', 'herr_C', 'herr_D'
+                   ]
+mini = [300e3, 1.6e11,
+                   # 0, 0, 0, 0
+                   ]
+maxi = [300e3, 1.6e11,
+                   # 2.7300614307095596, 0.15413945817985505, 0.34960759040966743, 0.019741011328985238
+                   ]
+
 # how h varies across key input parameters
 x_vars = ['t',
           'M_p', 'CMF', 'x_Eu']  # 'H_f'
@@ -38,21 +48,22 @@ units = [' Gyr',
          r' $M_{\oplus}$', ' CMF', r'$\%$ U, Th']  # pW kg$^{-1}$
 log = [False,
        True, False, False]
-x_range = [(2, 5),
+x_range = [(2, 4.5),
            (0.1 * p.M_E, 5 * p.M_E), (0.1, 0.4), (0.3, 3)]  # (2e-12, 10e-12)
-xticks = [[2, 3, 4, 5],
+xticks = [[2, 3, 4],
           [0.1, 1, 5], [0.1, 0.2, 0.3, 0.4], [30, 100, 300]]  # [2, 5, 10]
 xscales = [p.sec2Gyr,
            p.M_E ** -1, 1, 1e2]  # 1e12
 xlabels = ['Age\n(Gyr)',
-           'Planet mass\n' + r'($M_{\oplus}$)', 'CMF',
+           'Planet mass\n' + r'($M_{\oplus}$)', 'Core Mass Fraction',
            'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-dist_res = 300
-x_res = 10
+dist_res = 2
+x_res = 4
 n_sigma = 1
 
 fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_res=x_res, n_sigma=n_sigma,
+                                                           names=names, mini=mini, maxi=maxi,
                                                            defaults='baseline', age=4.5,
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
                                                            legend=True, lw=4, ylabel=r'RMS topography (m)',
@@ -97,7 +108,7 @@ axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
 axes[0].yaxis.set_minor_formatter(ticker.NullFormatter())
 # axes[0].set_yticks([600, 700, 800, 900, 1000, 1200,  1500])
 
-axes[0].set_xlim(2, 5)  # ensure time axis lims
+axes[0].set_xlim(x_range[0])  # ensure time axis lims
 
 # VENUS: 850 m
 # h_Venus = 865.4906656355711
@@ -137,5 +148,5 @@ plt.subplots_adjust(wspace=0.2)
 # plt.tight_layout()
 
 # plt.suptitle(r'Ra$_{i, {\rm eff}}$ scaling')
-fig.savefig(fig_path + 'h_parameters' + today + fig_format, bbox_inches='tight')
+fig.savefig(fig_path + 'h_parameterstest' + today + fig_format, bbox_inches='tight')
 plt.show()

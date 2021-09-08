@@ -19,10 +19,10 @@ def topography(pl, rms_type='new', verbose=True, **kwargs):
     # get all topography parameters for a planet (given its thermal history)
     # pl.heuristic_h = pl.delta_rh * pl.dT_rh * pl.alpha_m
     if rms_type == 'Ra_i_eff':
-        print('using Ra i eff scaling')
+        # print('using Ra i eff scaling')
         pl.dyn_top_aspect_prime = dyn_topo_prime_aspect(pl, **kwargs)
     else:
-        print('using Ra, b scaling')
+        # print('using Ra, b scaling')
         pl.dyn_top_aspect_prime = dyn_topo_prime_aspect_lin(pl, **kwargs)
 
     pl.dyn_top_aspect_prime_1param = dyn_topo_prime_aspect(pl, **kwargs)  # useful to store this anyways

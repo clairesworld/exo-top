@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from useful_and_bespoke import dark_background, cmap_from_ascii, get_continuous_cmap, minmaxnorm, cornertext
 # import postaspect.plt_aspect as plat
 import model_1D.the_results as results
+import model_1D.evolve as evol
 import model_1D.parameters as p
 import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
@@ -62,6 +63,7 @@ d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph dim factors
 
 
 """ money plot """
+spec_path = '/home/claire/Works/exo-top/exotop/top_spectra/'
 cmap_path = '/plot/cmaps/'
 # cmap_name = 'c3t3a'
 # cmap = cmap_from_ascii(cmap_name, path=cmap_path, end='.txt').reversed()
@@ -111,7 +113,7 @@ run_kwargs = {
 
 nplanets = 7
 n_stats = 100
-dist_res = 300
+dist_res = 10
 n_sigma = 1
 
 
@@ -128,11 +130,11 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spe
         else:
             show_cbar = False
         planet_kwargs.update({'x_Eu': rad})
-        fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1,
+        fig, ax, planets_l = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1,
                                               mass_frac_sfcwater=np.logspace(-6, -3, num=60), #vmin=1e-6, vmax=1e-2,
                                               textc=textc, titlesize=32,
                                               save=False, spectrum_fname=spec, c=c_spec[ii], ls=ls_rad[jj],
-                                              spectrum_fpath='/home/claire/Works/exo-top/exotop/top_spectra/',
+                                              spectrum_fpath=spec_path,
                                               ticksize=ticksize, labelsize=labelsize, clabelpad=clabelpad,
                                               relative=True,
                                               vol_0='Earth', simple_scaling=False, leg_bbox=(0, 1.01), log=True,
@@ -145,6 +147,13 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spe
                                               x_vars=['M_p'], units=['$M_E$'], xscales=[p.M_E ** -1],
                                               xlabels=[xlabel], n_sigma=n_sigma, legsize=legsize,
                                               )
+
+        # hacky but will run faster - need to rearrange order of rad loop and spec loop
+        # planets = planets_l[0]  # because it's a list over axes
+        # degree, phi0 = sh.load_model_spectrum_pkl(fname=spec, path=spec_path)
+        # for pl in planets:
+        #     # recalculate ocn
+        #     pl = evol.postprocess_planet(pl, postprocessors=['ocean_capacity'], phi0=phi0, n_stats=n_stats)
 
         # show single test case
         # fig, axes = results.plot_ocean_capacity_relative(fig=fig, axes=axes, n_stats=n_stats, relative=True, nplanets=nplanets, version=0,
@@ -234,5 +243,5 @@ if slides:
     fig, *axes = dark_background(fig, axes)
 
 plt.subplots_adjust(wspace=0.1)
-fig.savefig(fig_path + 'ocn_vol_ensemble_' + today + '.png', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_ensemble_soft_' + today + '.png', bbox_inches='tight')
 plt.show()

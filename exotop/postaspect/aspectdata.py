@@ -376,8 +376,9 @@ class Aspect_Data():
         if verbose:
             print("Reading solution files from", filename)
         data = np.genfromtxt(open(filename, 'r'), comments='#', dtype=None, usecols=col_vis)
-        last = 0
         files = np.zeros(len(data), dtype=np.int64)
+
+        last = 0
         #  find last instance that's not ""
         for n, d in enumerate(data):
             try:
@@ -385,7 +386,6 @@ class Aspect_Data():
             except IndexError as e:
                 print('d =', d)
                 print('col vis', col_vis)
-                raise e
             if not s.decode() == '""':
                 last = int(re.search(r'\d+', s.decode()).group(0))
             files[n] = last

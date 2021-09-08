@@ -1,0 +1,1321 @@
+\begin{thebibliography}{155}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Abbot et~al.(2012)Abbot, Cowan, and Ciesla]{Abbot2012}
+Abbot, D.~S., Cowan, N.~B., and Ciesla, F.~J.
+\newblock Indication of insensitivity of planetary weathering behavior and
+  habitable zone to surface land fraction.
+\newblock \emph{The Astrophysical Journal}, 756\penalty0 (2):\penalty0 178,
+  September 2012.
+\newblock ISSN 0004-637X, 1538-4357.
+\newblock \doi{10.1088/0004-637X/756/2/178}.
+
+\bibitem[Aizawa et~al.(2020)Aizawa, Kawahara, and Fan]{Aizawa2020}
+Aizawa, M., Kawahara, H., and Fan, S.
+\newblock Global {{Mapping}} of an {{Exo}}-{{Earth}} using {{Sparse Modeling}}.
+\newblock \emph{arXiv:2004.03941 [astro-ph]}, April 2020.
+
+\bibitem[Anderson(1987)]{Anderson1987}
+Anderson, D.~L.
+\newblock A seismic equation of state {{II}}. {{Shear}} properties and
+  thermodynamics of the lower mantle.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 45\penalty0
+  (4):\penalty0 307--323, May 1987.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/0031-9201(87)90039-2}.
+
+\bibitem[{Andrews-Hanna} et~al.(2008){Andrews-Hanna}, Zuber, and
+  Banerdt]{Andrews-Hanna2008}
+{Andrews-Hanna}, J.~C., Zuber, M.~T., and Banerdt, W.~B.
+\newblock The {{Borealis}} basin and the origin of the martian crustal
+  dichotomy.
+\newblock \emph{Nature}, 453:\penalty0 1212--1215, June 2008.
+\newblock ISSN 0028-0836.
+\newblock \doi{10.1038/nature07011}.
+
+\bibitem[Armann and Tackley(2012)]{Armann2012}
+Armann, M. and Tackley, P.~J.
+\newblock Simulating the thermochemical magmatic and tectonic evolution of
+  {{Venus}}'s mantle and lithosphere: {{Two}}-dimensional models.
+\newblock \emph{Journal of Geophysical Research: Planets}, 117\penalty0 (E12),
+  2012.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/2012JE004231}.
+
+\bibitem[Bangerth et~al.(2018)Bangerth, Dannberg, Gassm{\"o}ller, and
+  Heister]{Bangerth2018}
+Bangerth, W., Dannberg, J., Gassm{\"o}ller, R., and Heister, T.
+\newblock {{ASPECT}} v2.0.1 [software], 2018.
+
+\bibitem[Bean et~al.(2017)Bean, Abbot, and Kempton]{Bean2017}
+Bean, J.~L., Abbot, D.~S., and Kempton, E. M.-R.
+\newblock A {{Statistical Comparative Planetology Approach}} to the {{Hunt}}
+  for {{Habitable Exoplanets}} and {{Life Beyond}} the {{Solar System}}.
+\newblock \emph{The Astrophysical Journal Letters}, 841:\penalty0 L24, June
+  2017.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.3847/2041-8213/aa738a}.
+
+\bibitem[Bene{\v s}ov{\'a} and {\v C}{\'i}{\v z}kov{\'a}(2012)]{Benesova2012}
+Bene{\v s}ov{\'a}, N. and {\v C}{\'i}{\v z}kov{\'a}, H.
+\newblock Geoid and topography of {{Venus}} in various thermal convection
+  models.
+\newblock \emph{Studia Geophysica et Geodaetica}, 56:\penalty0 621--639, April
+  2012.
+\newblock ISSN 0039-3169.
+\newblock \doi{10.1007/s11200-011-0251-7}.
+
+\bibitem[Bitsch and Battistini(2020)]{Bitsch2020}
+Bitsch, B. and Battistini, C.
+\newblock Influence of sub- and super-solar metallicities on the composition of
+  solid planetary building blocks.
+\newblock \emph{Astronomy and Astrophysics}, 633:\penalty0 A10, January 2020.
+\newblock ISSN 0004-6361.
+\newblock \doi{10.1051/0004-6361/201936463}.
+
+\bibitem[Bower et~al.(2019)Bower, Kitzmann, Wolf, Sanan, Dorn, and
+  Oza]{Bower2019}
+Bower, D.~J., Kitzmann, D., Wolf, A.~S., Sanan, P., Dorn, C., and Oza, A.~V.
+\newblock Linking the evolution of terrestrial interiors and an early outgassed
+  atmosphere to astrophysical observations.
+\newblock \emph{Astronomy and Astrophysics}, 631:\penalty0 A103, November 2019.
+\newblock ISSN 0004-6361.
+\newblock \doi{10.1051/0004-6361/201935710}.
+
+\bibitem[Breuer and Moore(2015)]{Breuer2015}
+Breuer, D. and Moore, W.~B.
+\newblock 10.08 - {{Dynamics}} and {{Thermal History}} of the {{Terrestrial
+  Planets}}, the {{Moon}}, and {{Io}}.
+\newblock In Schubert, G., editor, \emph{Treatise on {{Geophysics}} ({{Second
+  Edition}})}, pages 255--305. {Elsevier}, {Oxford}, January 2015.
+\newblock ISBN 978-0-444-53803-1.
+\newblock \doi{10.1016/B978-0-444-53802-4.00173-1}.
+
+\bibitem[Breuer et~al.(2010)Breuer, Labrosse, and Spohn]{Breuer2010}
+Breuer, D., Labrosse, S., and Spohn, T.
+\newblock Thermal {{Evolution}} and {{Magnetic Field Generation}} in
+  {{Terrestrial Planets}} and {{Satellites}}.
+\newblock \emph{Space Science Reviews}, 152\penalty0 (1-4):\penalty0 449--500,
+  May 2010.
+\newblock ISSN 0038-6308, 1572-9672.
+\newblock \doi{10.1007/s11214-009-9587-5}.
+
+\bibitem[Brugger et~al.(2017)Brugger, Mousis, Deleuil, and
+  Deschamps]{Brugger2017}
+Brugger, B., Mousis, O., Deleuil, M., and Deschamps, F.
+\newblock Constraints on {{Super}}-{{Earth Interiors}} from {{Stellar
+  Abundances}}.
+\newblock \emph{The Astrophysical Journal}, 850\penalty0 (1):\penalty0 93,
+  November 2017.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.3847/1538-4357/aa965a}.
+
+\bibitem[Bunge et~al.(1996)Bunge, Richards, and Baumgardner]{Bunge1996}
+Bunge, H.-P., Richards, M.~A., and Baumgardner, J.~R.
+\newblock Effect of depth-dependent viscosity on the planform of mantle
+  convection.
+\newblock \emph{Nature}, 379\penalty0 (6564):\penalty0 436--438, February 1996.
+\newblock ISSN 1476-4687.
+\newblock \doi{10.1038/379436a0}.
+
+\bibitem[Checlair et~al.(2020)Checlair, Feng, Webber, Bean, Robinson, and
+  Abbot]{Checlair2020}
+Checlair, J.~H., Feng, Y., Webber, R.~J., Bean, J.~L., Robinson, T.~D., and
+  Abbot, D.~S.
+\newblock Testing the {{Habitable Zone}}.
+\newblock 235:\penalty0 354.01, January 2020.
+
+\bibitem[Choblet and Parmentier(2009)]{Choblet2009}
+Choblet, G. and Parmentier, E.~M.
+\newblock Thermal convection heated both volumetrically and from below:
+  {{Implications}} for predictions of planetary evolution.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 173\penalty0
+  (3):\penalty0 290--296, April 2009.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/j.pepi.2009.01.005}.
+
+\bibitem[Christensen(1984)]{Christensen1984}
+Christensen, U.
+\newblock Convection with pressure- and temperature-dependent non-{{Newtonian}}
+  rheology.
+\newblock \emph{Geophysical Journal of the Royal Astronomical Society},
+  77\penalty0 (2):\penalty0 343--384, 1984.
+\newblock ISSN 1365-246X.
+\newblock \doi{10.1111/j.1365-246X.1984.tb01939.x}.
+
+\bibitem[Cowan and Abbot(2014)]{Cowan2014}
+Cowan, N.~B. and Abbot, D.~S.
+\newblock {{WATER CYCLING BETWEEN OCEAN AND MANTLE}}: {{SUPER}}-{{EARTHS NEED
+  NOT BE WATERWORLDS}}.
+\newblock \emph{The Astrophysical Journal}, 781\penalty0 (1):\penalty0 27,
+  January 2014.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.1088/0004-637X/781/1/27}.
+
+\bibitem[Cowan and Fujii(2018)]{Cowan2018}
+Cowan, N.~B. and Fujii, Y.
+\newblock Mapping {{Exoplanets}}.
+\newblock \emph{arXiv:1704.07832 [astro-ph]}, pages 1469--1484, 2018.
+\newblock \doi{10.1007/978-3-319-55333-7_147}.
+
+\bibitem[Davaille and Jaupart(1993)]{Davaille1993}
+Davaille, A. and Jaupart, C.
+\newblock Transient high-{{Rayleigh}}-number thermal convection with large
+  viscosity variations.
+\newblock \emph{Journal of Fluid Mechanics}, 253:\penalty0 141--166, August
+  1993.
+\newblock ISSN 1469-7645, 0022-1120.
+\newblock \doi{10.1017/S0022112093001740}.
+
+\bibitem[Davies(1980)]{Davies1980}
+Davies, G.~F.
+\newblock Thermal histories of convective {{Earth}} models and constraints on
+  radiogenic heat production in the {{Earth}}.
+\newblock \emph{Journal of Geophysical Research: Solid Earth}, 85\penalty0
+  (B5):\penalty0 2517--2530, 1980.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/JB085iB05p02517}.
+
+\bibitem[Dorn et~al.(2017{\natexlab{a}})Dorn, Venturini, Khan, Heng, Alibert,
+  Helled, Rivoldini, and Benz]{Dorn2017}
+Dorn, C., Venturini, J., Khan, A., Heng, K., Alibert, Y., Helled, R.,
+  Rivoldini, A., and Benz, W.
+\newblock A generalized bayesian inference method for constraining the
+  interiors of super {{Earths}} and sub-{{Neptunes}}.
+\newblock \emph{Astronomy \& Astrophysics}, 597:\penalty0 A37, January
+  2017{\natexlab{a}}.
+\newblock ISSN 0004-6361, 1432-0746.
+\newblock \doi{10.1051/0004-6361/201628708}.
+
+\bibitem[Dorn et~al.(2018{\natexlab{a}})Dorn, Noack, and Rozel]{Dorn2018a}
+Dorn, C., Noack, L., and Rozel, A.~B.
+\newblock Outgassing on stagnant-lid super-{{Earths}}.
+\newblock \emph{Astronomy \& Astrophysics}, 614:\penalty0 A18, June
+  2018{\natexlab{a}}.
+\newblock ISSN 0004-6361, 1432-0746.
+\newblock \doi{10.1051/0004-6361/201731513}.
+
+\bibitem[Dorn et~al.(2019)Dorn, Harrison, Bonsor, and Hands]{Dorn2019}
+Dorn, C., Harrison, J. H.~D., Bonsor, A., and Hands, T.~O.
+\newblock A new class of {{Super}}-{{Earths}} formed from high-temperature
+  condensates: {{HD219134}} b, 55 {{Cnc}} e, {{WASP}}-47 e.
+\newblock \emph{Monthly Notices of the Royal Astronomical Society},
+  484:\penalty0 712--727, March 2019.
+\newblock ISSN 0035-8711.
+\newblock \doi{10.1093/mnras/sty3435}.
+
+\bibitem[Dorn et~al.(2017{\natexlab{b}})Dorn, Hinkel, and Venturini]{Dorn2017a}
+Dorn, C., Hinkel, N.~R., and Venturini, J.
+\newblock Bayesian analysis of interiors of {{HD}} 219134b, {{Kepler}}-10b,
+  {{Kepler}}-93b, {{CoRoT}}-7b, 55 {{Cnc}} e, and {{HD}} 97658b using stellar
+  abundance proxies.
+\newblock \emph{Astronomy and Astrophysics}, 597:\penalty0 A38, January
+  2017{\natexlab{b}}.
+\newblock ISSN 0004-6361.
+\newblock \doi{10.1051/0004-6361/201628749}.
+
+\bibitem[Dorn et~al.(2018{\natexlab{b}})Dorn, Bower, and Rozel]{Dorn2018}
+Dorn, C., Bower, D.~J., and Rozel, A.~B.
+\newblock Assessing the {{Interior Structure}} of {{Terrestrial Exoplanets}}
+  with {{Implications}} for {{Habitability}}.
+\newblock \emph{arXiv:1710.05605 [astro-ph]}, pages 3111--3135,
+  2018{\natexlab{b}}.
+\newblock \doi{10.1007/978-3-319-55333-7_66}.
+
+\bibitem[Dressing and Charbonneau(2015)]{Dressing2015}
+Dressing, C.~D. and Charbonneau, D.
+\newblock The {{Occurrence}} of {{Potentially Habitable Planets Orbiting M
+  Dwarfs Estimated}} from the {{Full Kepler Dataset}} and an {{Empirical
+  Measurement}} of the {{Detection Sensitivity}}.
+\newblock \emph{arXiv:1501.01623 [astro-ph]}, May 2015.
+
+\bibitem[Driscoll and Bercovici(2014)]{Driscoll2014}
+Driscoll, P. and Bercovici, D.
+\newblock On the thermal and magnetic histories of {{Earth}} and {{Venus}}:
+  {{Influences}} of melting, radioactivity, and conductivity.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 236:\penalty0
+  36--51, November 2014.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/j.pepi.2014.08.004}.
+
+\bibitem[Dumoulin et~al.(2013)Dumoulin, {\v C}adek, and Choblet]{Dumoulin2013}
+Dumoulin, C., {\v C}adek, O., and Choblet, G.
+\newblock Predicting surface dynamic topographies of stagnant lid planetary
+  bodies.
+\newblock \emph{Geophysical Journal International}, 195\penalty0 (3):\penalty0
+  1494--1508, December 2013.
+\newblock ISSN 0956-540X.
+\newblock \doi{10.1093/gji/ggt363}.
+
+\bibitem[{Elkins-Tanton}(2008)]{Elkins-Tanton2008}
+{Elkins-Tanton}, L.~T.
+\newblock Linked magma ocean solidification and atmospheric growth for
+  {{Earth}} and {{Mars}}.
+\newblock \emph{Earth and Planetary Science Letters}, 271\penalty0
+  (1):\penalty0 181--191, July 2008.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/j.epsl.2008.03.062}.
+
+\bibitem[Farr et~al.(2018)Farr, Farr, Cowan, Haggard, and Robinson]{Farr2018}
+Farr, B., Farr, W.~M., Cowan, N.~B., Haggard, H.~M., and Robinson, T.
+\newblock Exocartographer: {{A Bayesian Framework}} for {{Mapping Exoplanets}}
+  in {{Reflected Light}}.
+\newblock \emph{The Astronomical Journal}, 156\penalty0 (4):\penalty0 146,
+  September 2018.
+\newblock ISSN 1538-3881.
+\newblock \doi{10.3847/1538-3881/aad775}.
+
+\bibitem[Foley and Driscoll(2016)]{Foley2016}
+Foley, B.~J. and Driscoll, P.~E.
+\newblock Whole planet coupling between climate, mantle, and core:
+  {{Implications}} for rocky planet evolution.
+\newblock \emph{Geochemistry, Geophysics, Geosystems}, 17:\penalty0 1885--1914,
+  May 2016.
+\newblock ISSN 1525-2027.
+\newblock \doi{10.1002/2015GC006210}.
+
+\bibitem[Foley and Smye(2018)]{Foley2018}
+Foley, B.~J. and Smye, A.~J.
+\newblock Carbon cycling and habitability of {{Earth}}-size stagnant lid
+  planets.
+\newblock \emph{Astrobiology}, 18\penalty0 (7):\penalty0 873--896, July 2018.
+\newblock ISSN 1531-1074, 1557-8070.
+\newblock \doi{10.1089/ast.2017.1695}.
+
+\bibitem[{Foreman-Mackey} et~al.(2014){Foreman-Mackey}, Hogg, and
+  Morton]{Foreman-Mackey2014}
+{Foreman-Mackey}, D., Hogg, D.~W., and Morton, T.~D.
+\newblock Exoplanet population inference and the abundance of {{Earth}} analogs
+  from noisy, incomplete catalogs.
+\newblock \emph{The Astrophysical Journal}, 795\penalty0 (1):\penalty0 64,
+  October 2014.
+\newblock ISSN 1538-4357.
+\newblock \doi{10.1088/0004-637X/795/1/64}.
+
+\bibitem[Fowler(1985)]{Fowler1985}
+Fowler, A.~C.
+\newblock Fast {{Thermoviscous Convection}}.
+\newblock \emph{Studies in Applied Mathematics}, 72\penalty0 (3):\penalty0
+  189--219, 1985.
+\newblock ISSN 1467-9590.
+\newblock \doi{10.1002/sapm1985723189}.
+
+\bibitem[Gaidos et~al.(2010)Gaidos, Conrad, Manga, and Hernlund]{Gaidos2010}
+Gaidos, E., Conrad, C.~P., Manga, M., and Hernlund, J.
+\newblock Thermodynamic {{Limits}} on {{Magnetodynamos}} in {{Rocky
+  Exoplanets}}.
+\newblock \emph{The Astrophysical Journal}, 718:\penalty0 596--609, August
+  2010.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.1088/0004-637X/718/2/596}.
+
+\bibitem[Giannandrea and Christensen(1993)]{Giannandrea1993}
+Giannandrea, E. and Christensen, U.
+\newblock Variable viscosity convection experiments with a stress-free upper
+  boundary and implications for the heat transport in the {{Earth}}'s mantle.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 78\penalty0
+  (1):\penalty0 139--152, June 1993.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/0031-9201(93)90090-V}.
+
+\bibitem[Golle et~al.(2012)Golle, Dumoulin, Choblet, and Cadek]{Golle2012}
+Golle, O., Dumoulin, C., Choblet, G., and Cadek, O.
+\newblock Topography and geoid induced by a convecting mantle beneath an
+  elastic lithosphere.
+\newblock \emph{Geophysical Journal International}, 189\penalty0 (1):\penalty0
+  55--72, April 2012.
+\newblock ISSN 0956-540X.
+\newblock \doi{10.1111/j.1365-246X.2012.05364.x}.
+
+\bibitem[Graham and Pierrehumbert(2020)]{Graham2020}
+Graham, R.~J. and Pierrehumbert, R.~T.
+\newblock Thermodynamic and {{Energetic Limits}} on {{Continental Silicate
+  Weathering Strongly Impact}} the {{Climate}} and {{Habitability}} of {{Wet}},
+  {{Rocky Worlds}}.
+\newblock \emph{arXiv e-prints}, 2004:\penalty0 arXiv:2004.14058, April 2020.
+
+\bibitem[Grimm and Phillips(1991)]{Grimm1991}
+Grimm, R.~E. and Phillips, R.~J.
+\newblock Gravity anomalies, compensation mechanisms, and the geodynamics of
+  {{Western Ishtar Terra}}, {{Venus}}.
+\newblock \emph{Journal of Geophysical Research: Solid Earth}, 96\penalty0
+  (B5):\penalty0 8305--8324, 1991.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/91JB00055}.
+
+\bibitem[Grimm and Phillips(1992)]{Grimm1992}
+Grimm, R.~E. and Phillips, R.~J.
+\newblock Anatomy of a {{Venusian}} hot spot: {{Geology}}, gravity, and mantle
+  dynamics of {{Eistla Regio}}.
+\newblock \emph{Journal of Geophysical Research: Planets}, 97\penalty0
+  (E10):\penalty0 16035--16054, 1992.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/92JE01500}.
+
+\bibitem[Guimond and Cowan(2018)]{Guimond2018}
+Guimond, C.~M. and Cowan, N.~B.
+\newblock The direct imaging search for {{Earth}} 2.0: {{Quantifying}} biases
+  and planetary false positives.
+\newblock \emph{The Astronomical Journal}, 155\penalty0 (6):\penalty0 230, May
+  2018.
+\newblock ISSN 1538-3881.
+\newblock \doi{10.3847/1538-3881/aabb02}.
+
+\bibitem[Hansen and Yuen(1993)]{Hansen1993}
+Hansen, U. and Yuen, D.~A.
+\newblock High {{Rayleigh}} number regime of temperature-dependent viscosity
+  convection and the earth's early thermal history.
+\newblock \emph{Geophysical Research Letters}, 20:\penalty0 2191--2194, October
+  1993.
+\newblock ISSN 0094-8276.
+\newblock \doi{10.1029/93GL02416}.
+
+\bibitem[Hauck(2002)]{Hauck2002}
+Hauck, S.~A.
+\newblock Thermal and crustal evolution of {{Mars}}.
+\newblock \emph{Journal of Geophysical Research}, 107\penalty0 (E7):\penalty0
+  5052, 2002.
+\newblock ISSN 0148-0227.
+\newblock \doi{10.1029/2001JE001801}.
+
+\bibitem[Hoggard et~al.(2016)Hoggard, White, and {Al-Attar}]{Hoggard2016}
+Hoggard, M.~J., White, N., and {Al-Attar}, D.
+\newblock Global dynamic topography observations reveal limited influence of
+  large-scale mantle flow.
+\newblock \emph{Nature Geoscience}, 9\penalty0 (6):\penalty0 456--463, June
+  2016.
+\newblock ISSN 1752-0908.
+\newblock \doi{10.1038/ngeo2709}.
+
+\bibitem[Huang et~al.(2013)Huang, Yang, and Zhong]{Huang2013}
+Huang, J., Yang, A., and Zhong, S.
+\newblock Constraints of the topography, gravity and volcanism on {{Venusian}}
+  mantle dynamics and generation of plate tectonics.
+\newblock \emph{Earth and Planetary Science Letters}, 362:\penalty0 207--214,
+  January 2013.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/j.epsl.2012.11.051}.
+
+\bibitem[H{\"u}ttig and Breuer(2011)]{Huttig2011}
+H{\"u}ttig, C. and Breuer, D.
+\newblock Regime classification and planform scaling for internally heated
+  mantle convection.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 186\penalty0
+  (3-4):\penalty0 111--124, June 2011.
+\newblock ISSN 00319201.
+\newblock \doi{10.1016/j.pepi.2011.03.011}.
+
+\bibitem[James et~al.(2014)James, Solomon, Zuber, and Phillips]{James2014}
+James, P.~B., Solomon, S.~C., Zuber, M.~T., and Phillips, R.~J.
+\newblock What {{Mercury}}'s {{Topographic Rises}} tell {{Us About}} the
+  {{Interior}}.
+\newblock 45:\penalty0 1452, March 2014.
+
+\bibitem[James et~al.(2013)James, Zuber, and Phillips]{James2013}
+James, P.~B., Zuber, M.~T., and Phillips, R.~J.
+\newblock Crustal thickness and support of topography on {{Venus}}.
+\newblock \emph{Journal of Geophysical Research: Planets}, 118\penalty0
+  (4):\penalty0 859--875, 2013.
+\newblock ISSN 2169-9100.
+\newblock \doi{10.1029/2012JE004237}.
+
+\bibitem[Jaupart et~al.(2015)Jaupart, Labrosse, Lucazeau, and
+  Mareschal]{Jaupart2015}
+Jaupart, C., Labrosse, S., Lucazeau, F., and Mareschal, J.-C.
+\newblock Temperatures, {{Heat}}, and {{Energy}} in the {{Mantle}} of the
+  {{Earth}}.
+\newblock In \emph{Treatise on {{Geophysics}}}, pages 223--270. {Elsevier},
+  2015.
+\newblock ISBN 978-0-444-53803-1.
+\newblock \doi{10.1016/B978-0-444-53802-4.00126-3}.
+
+\bibitem[{Jontof-Hutter}(2019)]{Jontof-Hutter2019}
+{Jontof-Hutter}, D.
+\newblock The {{Compositional Diversity}} of {{Low}}-{{Mass Exoplanets}}.
+\newblock \emph{Annual Review of Earth and Planetary Sciences}, 47\penalty0
+  (1):\penalty0 141--171, 2019.
+\newblock \doi{10.1146/annurev-earth-053018-060352}.
+
+\bibitem[Karato(2011)]{Karato2011}
+Karato, S.-i.
+\newblock Rheological structure of the mantle of a super-{{Earth}}: {{Some}}
+  insights from mineral physics.
+\newblock \emph{Icarus}, 212:\penalty0 14--23, March 2011.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1016/j.icarus.2010.12.005}.
+
+\bibitem[Karato and Wu(1993)]{Karato1993}
+Karato, S.-i. and Wu, P.
+\newblock Rheology of the {{Upper Mantle}}: {{A Synthesis}}.
+\newblock \emph{Science}, 260\penalty0 (5109):\penalty0 771--778, May 1993.
+\newblock ISSN 0036-8075, 1095-9203.
+\newblock \doi{10.1126/science.260.5109.771}.
+
+\bibitem[Kasting et~al.(1993)Kasting, Whitmire, and Reynolds]{Kasting1993}
+Kasting, J.~F., Whitmire, D.~P., and Reynolds, R.~T.
+\newblock Habitable {{Zones}} around {{Main Sequence Stars}}.
+\newblock \emph{Icarus}, 101\penalty0 (1):\penalty0 108--128, January 1993.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1006/icar.1993.1010}.
+
+\bibitem[Kawahara(2020)]{Kawahara2020}
+Kawahara, H.
+\newblock Global {{Mapping}} of the {{Surface Composition}} on an
+  {{Exo}}-{{Earth}} using {{Color Variability}}.
+\newblock \emph{arXiv:2004.03931 [astro-ph]}, April 2020.
+
+\bibitem[Keller and Tackley(2009)]{Keller2009}
+Keller, T. and Tackley, P.~J.
+\newblock Towards self-consistent modeling of the martian dichotomy: {{The}}
+  influence of one-ridge convection on crustal thickness distribution.
+\newblock \emph{Icarus}, 202:\penalty0 429--443, August 2009.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1016/j.icarus.2009.03.029}.
+
+\bibitem[Kellermann et~al.(2018)Kellermann, Becker, and Redmer]{Kellermann2018}
+Kellermann, C., Becker, A., and Redmer, R.
+\newblock Interior structure models and fluid {{Love}} numbers of exoplanets in
+  the super-{{Earth}} regime.
+\newblock \emph{Astronomy \& Astrophysics}, 615:\penalty0 A39, July 2018.
+\newblock ISSN 0004-6361, 1432-0746.
+\newblock \doi{10.1051/0004-6361/201731775}.
+
+\bibitem[Kiefer and Hager(1991)]{Kiefer1991}
+Kiefer, W.~S. and Hager, B.~H.
+\newblock A mantle plume model for the equatorial highlands of {{Venus}}.
+\newblock \emph{Journal of Geophysical Research: Planets}, 96\penalty0
+  (E4):\penalty0 20947--20966, 1991.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/91JE02221}.
+
+\bibitem[Kiefer and Hager(1992)]{Kiefer1992}
+Kiefer, W.~S. and Hager, B.~H.
+\newblock Geoid anomalies and dynamic topography from convection in cylindrical
+  geometry - {{Applications}} to mantle plumes on earth and {{Venus}}.
+\newblock \emph{Geophysical Journal International}, 108:\penalty0 198--214,
+  January 1992.
+\newblock ISSN 0956-540X.
+\newblock \doi{10.1111/j.1365-246X.1992.tb00850.x}.
+
+\bibitem[Kiefer and Kellogg(1998)]{Kiefer1998}
+Kiefer, W.~S. and Kellogg, L.~H.
+\newblock Geoid anomalies and dynamic topography from time-dependent, spherical
+  axisymmetric mantle convection.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 106\penalty0
+  (3):\penalty0 237--256, April 1998.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/S0031-9201(98)00078-8}.
+
+\bibitem[Kiefer et~al.(1986)Kiefer, Richards, Hager, and Bills]{Kiefer1986}
+Kiefer, W.~S., Richards, M.~A., Hager, B.~H., and Bills, B.~G.
+\newblock A dynamic model of {{Venus}}'s gravity field.
+\newblock \emph{Geophysical Research Letters}, 13\penalty0 (1):\penalty0
+  14--17, 1986.
+\newblock ISSN 1944-8007.
+\newblock \doi{10.1029/GL013i001p00014}.
+
+\bibitem[Kite et~al.(2009)Kite, Manga, and Gaidos]{Kite2009}
+Kite, E.~S., Manga, M., and Gaidos, E.
+\newblock Geodynamics and {{Rate}} of {{Volcanism}} on {{Massive Earth}}-like
+  {{Planets}}.
+\newblock \emph{The Astrophysical Journal}, 700\penalty0 (2):\penalty0
+  1732--1749, August 2009.
+\newblock ISSN 0004-637X, 1538-4357.
+\newblock \doi{10.1088/0004-637X/700/2/1732}.
+
+\bibitem[Komacek and Abbot(2016)]{Komacek2016}
+Komacek, T.~D. and Abbot, D.~S.
+\newblock Partitioning of water between surface and mantle on terrestrial
+  exoplanets: Effect of surface-mantle water exchange parameterizations on
+  ocean depth.
+\newblock \emph{AGU Fall Meeting Abstracts}, 44:\penalty0 P44B--08, December
+  2016.
+
+\bibitem[Korenaga(2006)]{Korenaga2006}
+Korenaga, J.
+\newblock Archean geodynamics and the thermal evolution of {{Earth}}.
+\newblock \emph{Washington DC American Geophysical Union Geophysical Monograph
+  Series}, 164:\penalty0 7--32, 2006.
+\newblock \doi{10.1029/164GM03}.
+
+\bibitem[Korenaga(2008)]{Korenaga2008a}
+Korenaga, J.
+\newblock Urey ratio and the structure and evolution of {{Earth}}'s mantle.
+\newblock \emph{Reviews of Geophysics}, 46\penalty0 (2), 2008.
+\newblock ISSN 1944-9208.
+\newblock \doi{10.1029/2007RG000241}.
+
+\bibitem[Korenaga(2009)]{Korenaga2009}
+Korenaga, J.
+\newblock Scaling of stagnant-lid convection with {{Arrhenius}} rheology and
+  the effects of mantle melting.
+\newblock \emph{Geophysical Journal International}, 179\penalty0 (1):\penalty0
+  154--170, October 2009.
+\newblock ISSN 0956-540X.
+\newblock \doi{10.1111/j.1365-246X.2009.04272.x}.
+
+\bibitem[Korenaga(2010)]{Korenaga2010}
+Korenaga, J.
+\newblock On the likelihood of plate tectonics on super-{{Earths}}: {{Does}}
+  size matter?
+\newblock \emph{The Astrophysical Journal}, 725\penalty0 (1):\penalty0
+  L43--L46, November 2010.
+\newblock ISSN 2041-8205.
+\newblock \doi{10.1088/2041-8205/725/1/L43}.
+
+\bibitem[{Krissansen-Totton} and Catling(2017)]{Krissansen-Totton2017}
+{Krissansen-Totton}, J. and Catling, D.~C.
+\newblock Constraining climate sensitivity and continental versus seafloor
+  weathering using an inverse geological carbon cycle model.
+\newblock \emph{Nature Communications}, 8\penalty0 (1):\penalty0 1--15, May
+  2017.
+\newblock ISSN 2041-1723.
+\newblock \doi{10.1038/ncomms15423}.
+
+\bibitem[Kucinskas and Turcotte(1994)]{Kucinskas1994}
+Kucinskas, A.~B. and Turcotte, D.~L.
+\newblock Isostatic {{Compensation}} of {{Equatorial Highlands}} on {{Venus}}.
+\newblock \emph{Icarus}, 112\penalty0 (1):\penalty0 104--116, November 1994.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1006/icar.1994.1172}.
+
+\bibitem[Kunimoto and Matthews(2020)]{Kunimoto2020}
+Kunimoto, M. and Matthews, J.~M.
+\newblock Searching the {{Entirety}} of {{Kepler Data}}. {{II}}. {{Occurrence
+  Rate Estimates}} for {{FGK Stars}}.
+\newblock \emph{arXiv:2004.05296 [astro-ph]}, April 2020.
+
+\bibitem[Labrosse et~al.(2007)Labrosse, Hernlund, and Coltice]{Labrosse2007}
+Labrosse, S., Hernlund, J.~W., and Coltice, N.
+\newblock A crystallizing dense magma ocean at the base of the {{Earth}}'s
+  mantle.
+\newblock \emph{Nature}, 450:\penalty0 866--869, December 2007.
+\newblock ISSN 0028-0836.
+\newblock \doi{10.1038/nature06355}.
+
+\bibitem[Lees et~al.(2019)Lees, Rudge, and McKenzie]{Lees2019}
+Lees, M.~E., Rudge, J.~F., and McKenzie, D.
+\newblock Gravity, topography, and melt generation rates from simple {{3D}}
+  models of mantle convection.
+\newblock \emph{arXiv:1911.02927 [physics]}, November 2019.
+
+\bibitem[Lorenz et~al.(2011)Lorenz, Turtle, Stiles, Le~Gall, Hayes, Aharonson,
+  Wood, Stofan, and Kirk]{Lorenz2011}
+Lorenz, R.~D., Turtle, E.~P., Stiles, B., Le~Gall, A., Hayes, A., Aharonson,
+  O., Wood, C.~A., Stofan, E., and Kirk, R.
+\newblock Hypsometry of {{Titan}}.
+\newblock \emph{Icarus}, 211:\penalty0 699--706, January 2011.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1016/j.icarus.2010.10.002}.
+
+\bibitem[Louren{\c c}o et~al.(2018)Louren{\c c}o, Rozel, Gerya, and
+  Tackley]{Lourenco2018}
+Louren{\c c}o, D.~L., Rozel, A.~B., Gerya, T., and Tackley, P.~J.
+\newblock Efficient cooling of rocky planets by intrusive magmatism.
+\newblock \emph{Nature Geoscience}, 11:\penalty0 322--327, April 2018.
+\newblock \doi{10.1038/s41561-018-0094-8}.
+
+\bibitem[Madhusudhan et~al.(2020)Madhusudhan, Nixon, Welbanks, Piette, and
+  Booth]{Madhusudhan2020}
+Madhusudhan, N., Nixon, M.~C., Welbanks, L., Piette, A. A.~A., and Booth, R.~A.
+\newblock The {{Interior}} and {{Atmosphere}} of the {{Habitable}}-zone
+  {{Exoplanet K2}}-18b.
+\newblock \emph{The Astrophysical Journal Letters}, 891:\penalty0 L7, March
+  2020.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.3847/2041-8213/ab7229}.
+
+\bibitem[Mayor and Queloz(1995)]{Mayor1995}
+Mayor, M. and Queloz, D.
+\newblock A {{Jupiter}}-mass companion to a solar-type star.
+\newblock \emph{Nature}, 378\penalty0 (6555):\penalty0 355--359, November 1995.
+\newblock ISSN 1476-4687.
+\newblock \doi{10.1038/378355a0}.
+
+\bibitem[McKenzie et~al.(1974)McKenzie, Roberts, and Weiss]{McKenzie1974}
+McKenzie, D.~P., Roberts, J.~M., and Weiss, N.~O.
+\newblock Convection in the earth's mantle: Towards a numerical simulation.
+\newblock \emph{Journal of Fluid Mechanics}, 62\penalty0 (03):\penalty0 465,
+  February 1974.
+\newblock ISSN 0022-1120, 1469-7645.
+\newblock \doi{10.1017/S0022112074000784}.
+
+\bibitem[McKenzie(1977)]{McKenzie1977}
+McKenzie, D.
+\newblock Surface deformation, gravity anomalies and convection.
+\newblock \emph{Geophysical Journal of the Royal Astronomical Society},
+  48\penalty0 (2):\penalty0 211--238, 1977.
+\newblock ISSN 1365-246X.
+\newblock \doi{10.1111/j.1365-246X.1977.tb01297.x}.
+
+\bibitem[McKenzie(1994)]{McKenzie1994}
+McKenzie, D.
+\newblock The {{Relationship}} between {{Topography}} and {{Gravity}} on
+  {{Earth}} and {{Venus}}.
+\newblock \emph{Icarus}, 112\penalty0 (1):\penalty0 55--88, November 1994.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1006/icar.1994.1170}.
+
+\bibitem[McKenzie and Richter(1981)]{McKenzie1981}
+McKenzie, D. and Richter, F.~M.
+\newblock Parameterized thermal convection in a layered region and the thermal
+  history of the {{Earth}}.
+\newblock \emph{Journal of Geophysical Research: Solid Earth}, 86\penalty0
+  (B12):\penalty0 11667--11680, 1981.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/JB086iB12p11667}.
+
+\bibitem[McTier and Kipping(2018)]{McTier2018}
+McTier, M. A.~S. and Kipping, D.~M.
+\newblock Finding mountains with molehills: The detectability of exotopography.
+\newblock \emph{Monthly Notices of the Royal Astronomical Society},
+  475\penalty0 (4):\penalty0 4978--4985, April 2018.
+\newblock ISSN 0035-8711.
+\newblock \doi{10.1093/mnras/sty143}.
+
+\bibitem[Miyagoshi et~al.(2015)Miyagoshi, Kameyama, and Ogawa]{Miyagoshi2015}
+Miyagoshi, T., Kameyama, M., and Ogawa, M.
+\newblock Thermal convection and the convective regime diagram in
+  super-{{Earths}}.
+\newblock \emph{Journal of Geophysical Research: Planets}, 120\penalty0
+  (7):\penalty0 1267--1278, 2015.
+\newblock ISSN 2169-9100.
+\newblock \doi{10.1002/2015JE004793}.
+
+\bibitem[Miyazaki and Korenaga(2020)]{Miyazaki2020}
+Miyazaki, Y. and Korenaga, J.
+\newblock Dynamic evolution of major element chemistry in protoplanetary disks
+  and its implications for chondrite formation.
+\newblock \emph{arXiv:2004.13911 [astro-ph, physics:physics]}, April 2020.
+
+\bibitem[Molnar et~al.(2015)Molnar, England, and Jones]{Molnar2015}
+Molnar, P., England, P.~C., and Jones, C.~H.
+\newblock Mantle dynamics, isostasy, and the support of high terrain.
+\newblock \emph{Journal of Geophysical Research (Solid Earth)}, 120:\penalty0
+  1932--1957, March 2015.
+\newblock ISSN 0148-0227.
+\newblock \doi{10.1002/2014JB011724}.
+
+\bibitem[Moore and Schubert(1995)]{Moore1995}
+Moore, W.~B. and Schubert, G.
+\newblock Lithospheric thickness and mantle/lithosphere density contrast
+  beneath {{Beta Regio}}, {{Venus}}.
+\newblock \emph{Geophysical Research Letters}, 22\penalty0 (4):\penalty0
+  429--432, 1995.
+\newblock ISSN 1944-8007.
+\newblock \doi{10.1029/94GL02055}.
+
+\bibitem[Moore and Schubert(1997)]{Moore1997}
+Moore, W.~B. and Schubert, G.
+\newblock Venusian {{Crustal}} and {{Lithospheric Properties}} from {{Nonlinear
+  Regressions}} of {{Highland Geoid}} and {{Topography}}.
+\newblock \emph{Icarus}, 128:\penalty0 415--428, August 1997.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1006/icar.1997.5750}.
+
+\bibitem[Moore et~al.(2017)Moore, Lenardic, Jellinek, Johnson, Goldblatt, and
+  Lorenz]{Moore2017}
+Moore, W.~B., Lenardic, A., Jellinek, A.~M., Johnson, C.~L., Goldblatt, C., and
+  Lorenz, R.~D.
+\newblock How habitable zones and super-{{Earths}} lead us astray.
+\newblock \emph{Nature Astronomy}, 1\penalty0 (2):\penalty0 1--3, February
+  2017.
+\newblock ISSN 2397-3366.
+\newblock \doi{10.1038/s41550-017-0043}.
+
+\bibitem[Moresi and Solomatov(1995)]{Moresi1995a}
+Moresi, L.-N. and Solomatov, V.~S.
+\newblock Numerical investigation of {{2D}} convection with extremely large
+  viscosity variations.
+\newblock \emph{Physics of Fluids}, 7\penalty0 (9):\penalty0 2154--2162,
+  September 1995.
+\newblock ISSN 1070-6631.
+\newblock \doi{10.1063/1.868465}.
+
+\bibitem[Moresi and Parsons(1995)]{Moresi1995}
+Moresi, L. and Parsons, B.
+\newblock Interpreting gravity, geoid, and topography for convection with
+  temperature dependent viscosity: {{Application}} to surface features on
+  {{Venus}}.
+\newblock \emph{Journal of Geophysical Research: Planets}, 100\penalty0
+  (E10):\penalty0 21155--21171, 1995.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/95JE01622}.
+
+\bibitem[Morris and Canright(1984)]{Morris1984}
+Morris, S. and Canright, D.
+\newblock A boundary-layer analysis of {{Benard}} convection in a fluid of
+  strongly temperature-dependent viscosity.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 36:\penalty0
+  355--373, December 1984.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/0031-9201(84)90057-8}.
+
+\bibitem[Nakagawa and Tackley(2012)]{Nakagawa2012}
+Nakagawa, T. and Tackley, P.~J.
+\newblock Influence of magmatism on mantle cooling, surface heat flow and
+  {{Urey}} ratio.
+\newblock \emph{Earth and Planetary Science Letters}, 329-330:\penalty0 1--10,
+  May 2012.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/j.epsl.2012.02.011}.
+
+\bibitem[Nakagawa et~al.(2015)Nakagawa, Nakakuki, and Iwamori]{Nakagawa2015}
+Nakagawa, T., Nakakuki, T., and Iwamori, H.
+\newblock Water circulation and global mantle dynamics: {{Insight}} from
+  numerical modeling.
+\newblock \emph{Geochemistry, Geophysics, Geosystems}, 16\penalty0
+  (5):\penalty0 1449--1464, 2015.
+\newblock ISSN 1525-2027.
+\newblock \doi{10.1002/2014GC005701}.
+
+\bibitem[Nimmo and McKenzie(1996)]{Nimmo1996}
+Nimmo, F. and McKenzie, D.
+\newblock Modelling plume-related uplift, gravity and melting on {{Venus}}.
+\newblock \emph{Earth and Planetary Science Letters}, 145\penalty0
+  (1):\penalty0 109--123, December 1996.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/S0012-821X(96)00200-2}.
+
+\bibitem[Noack et~al.(2014)Noack, Godolt, {von Paris}, Plesa, Stracke, Breuer,
+  and Rauer]{Noack2014}
+Noack, L., Godolt, M., {von Paris}, P., Plesa, A.~C., Stracke, B., Breuer, D.,
+  and Rauer, H.
+\newblock Can the interior structure influence the habitability of a rocky
+  planet?
+\newblock \emph{Planetary and Space Science}, 98:\penalty0 14--29, August 2014.
+\newblock ISSN 0032-0633.
+\newblock \doi{10.1016/j.pss.2014.01.003}.
+
+\bibitem[Noack et~al.(2017)Noack, Rivoldini, and Van~Hoolst]{Noack2017}
+Noack, L., Rivoldini, A., and Van~Hoolst, T.
+\newblock Volcanism and outgassing of stagnant-lid planets: {{Implications}}
+  for the habitable zone.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 269:\penalty0
+  40--57, August 2017.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/j.pepi.2017.05.010}.
+
+\bibitem[O'Neill and Lenardic(2007)]{ONeill2007}
+O'Neill, C. and Lenardic, A.
+\newblock Geological consequences of super-sized {{Earths}}.
+\newblock \emph{Geophysical Research Letters}, 34\penalty0 (19), October 2007.
+\newblock ISSN 0094-8276.
+\newblock \doi{10.1029/2007GL030598}.
+
+\bibitem[O'Rourke and Korenaga(2012)]{ORourke2012}
+O'Rourke, J.~G. and Korenaga, J.
+\newblock Terrestrial {{Planet Evolution}} in the {{Stagnant}}-{{Lid Regime}}:
+  {{Size Effects}} and the {{Formation}} of {{Self}}-{{Destabilizing Crust}}.
+\newblock \emph{Icarus}, 221\penalty0 (2):\penalty0 1043--1060, November 2012.
+\newblock ISSN 00191035.
+\newblock \doi{10.1016/j.icarus.2012.10.015}.
+
+\bibitem[Orth and Solomatov(2011)]{Orth2011}
+Orth, C.~P. and Solomatov, V.~S.
+\newblock The isostatic stagnant lid approximation and global variations in the
+  {{Venusian}} lithospheric thickness.
+\newblock \emph{Geochemistry, Geophysics, Geosystems}, 12\penalty0 (7), 2011.
+\newblock ISSN 1525-2027.
+\newblock \doi{10.1029/2011GC003582}.
+
+\bibitem[Parsons and Daly(1983)]{Parsons1983}
+Parsons, B. and Daly, S.
+\newblock The relationship between surface topography, gravity anomalies, and
+  temperature structure of convection.
+\newblock \emph{Journal of Geophysical Research: Solid Earth}, 88\penalty0
+  (B2):\penalty0 1129--1144, 1983.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/JB088iB02p01129}.
+
+\bibitem[Pauer et~al.(2006)Pauer, Fleming, and {\v C}adek]{Pauer2006}
+Pauer, M., Fleming, K., and {\v C}adek, O.
+\newblock Modeling the dynamic component of the geoid and topography of
+  {{Venus}}.
+\newblock \emph{Journal of Geophysical Research: Planets}, 111\penalty0 (E11),
+  2006.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/2005JE002511}.
+
+\bibitem[Petigura et~al.(2013)Petigura, Howard, and Marcy]{Petigura2013}
+Petigura, E.~A., Howard, A.~W., and Marcy, G.~W.
+\newblock Prevalence of {{Earth}}-size planets orbiting {{Sun}}-like stars.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 110\penalty0
+  (48):\penalty0 19273--19278, November 2013.
+\newblock ISSN 0027-8424, 1091-6490.
+\newblock \doi{10.1073/pnas.1319909110}.
+
+\bibitem[Phillips et~al.(2001)Phillips, Zuber, Solomon, Golombek, Jakosky,
+  Banerdt, Smith, Williams, Hynek, Aharonson, and Hauck~II]{Phillips2001}
+Phillips, R., Zuber, M., Solomon, S., Golombek, M., Jakosky, B., Banerdt, W.,
+  Smith, D., Williams, R., Hynek, B., Aharonson, O., and Hauck~II, S.
+\newblock Ancient geodynamics and global-scale hydrology on {{Mars}}.
+\newblock \emph{Science}, 291\penalty0 (5513):\penalty0 2587--2591, 2001.
+\newblock \doi{10.1126/science.1058701}.
+
+\bibitem[Phillips and Hansen(1998)]{Phillips1998}
+Phillips, R.~J. and Hansen, V.~L.
+\newblock Geological {{Evolution}} of {{Venus}}: {{Rises}}, {{Plains}},
+  {{Plumes}}, and {{Plateaus}}.
+\newblock \emph{Science}, 279\penalty0 (5356):\penalty0 1492--1497, March 1998.
+\newblock ISSN 0036-8075, 1095-9203.
+\newblock \doi{10.1126/science.279.5356.1492}.
+
+\bibitem[Rappaport et~al.(1999)Rappaport, Konopliv, Kucinskas, and
+  Ford]{Rappaport1999}
+Rappaport, N.~J., Konopliv, A.~S., Kucinskas, A.~B., and Ford, P.~G.
+\newblock An {{Improved}} 360 {{Degree}} and {{Order Model}} of {{Venus
+  Topography}}.
+\newblock \emph{Icarus}, 139\penalty0 (1):\penalty0 19--31, May 1999.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1006/icar.1999.6081}.
+
+\bibitem[Reese and Solomatov(2006)]{Reese2006}
+Reese, C.~C. and Solomatov, V.~S.
+\newblock Fluid dynamics of local martian magma oceans.
+\newblock \emph{Icarus}, 184:\penalty0 102--120, September 2006.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1016/j.icarus.2006.04.008}.
+
+\bibitem[Reese et~al.(2005)Reese, Solomatov, and Baumgardner]{Reese2005}
+Reese, C.~C., Solomatov, V.~S., and Baumgardner, J.~R.
+\newblock Scaling laws for time-dependent stagnant lid convection in a
+  spherical shell.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 149:\penalty0
+  361--370, April 2005.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/j.pepi.2004.11.004}.
+
+\bibitem[Ritterbex et~al.(2018)Ritterbex, Harada, and Tsuchiya]{Ritterbex2018}
+Ritterbex, S., Harada, T., and Tsuchiya, T.
+\newblock Vacancies in {{MgO}} at ultrahigh pressure: {{About}} mantle rheology
+  of super-{{Earths}}.
+\newblock \emph{Icarus}, 305:\penalty0 350--357, May 2018.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1016/j.icarus.2017.12.020}.
+
+\bibitem[Rogers and Seager(2010)]{Rogers2010}
+Rogers, L.~A. and Seager, S.
+\newblock A {{Framework}} for {{Quantifying}} the {{Degeneracies}} of
+  {{Exoplanet Interior Compositions}}.
+\newblock \emph{The Astrophysical Journal}, 712:\penalty0 974--991, April 2010.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.1088/0004-637X/712/2/974}.
+
+\bibitem[Rogers(2015)]{Rogers2015}
+Rogers, L.~A.
+\newblock Most 1.6 {{Earth}}-radius planets are not rocky.
+\newblock \emph{The Astrophysical Journal}, 801\penalty0 (1):\penalty0 41,
+  March 2015.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.1088/0004-637X/801/1/41}.
+
+\bibitem[Santos et~al.(2017)Santos, Adibekyan, Dorn, Mordasini, Noack, Barros,
+  {Delgado-Mena}, Demangeon, Faria, Israelian, and Sousa]{Santos2017}
+Santos, N.~C., Adibekyan, V., Dorn, C., Mordasini, C., Noack, L., Barros, S.
+  C.~C., {Delgado-Mena}, E., Demangeon, O., Faria, J.~P., Israelian, G., and
+  Sousa, S.~G.
+\newblock Constraining planet structure and composition from stellar chemistry:
+  Trends in different stellar populations.
+\newblock \emph{Astronomy and Astrophysics}, 608:\penalty0 A94, December 2017.
+\newblock ISSN 0004-6361.
+\newblock \doi{10.1051/0004-6361/201731359}.
+
+\bibitem[Schubert et~al.(1980)Schubert, Stevenson, and Cassen]{Schubert1980}
+Schubert, G., Stevenson, D., and Cassen, P.
+\newblock Whole planet cooling and the radiogenic heat source contents of the
+  {{Earth}} and {{Moon}}.
+\newblock \emph{Journal of Geophysical Research: Solid Earth}, 85\penalty0
+  (B5):\penalty0 2531--2538, 1980.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/JB085iB05p02531}.
+
+\bibitem[Seager et~al.(2007)Seager, Kuchner, {Hier-Majumder}, and
+  Militzer]{Seager2007}
+Seager, S., Kuchner, M., {Hier-Majumder}, C.~A., and Militzer, B.
+\newblock Mass-{{Radius Relationships}} for {{Solid Exoplanets}}.
+\newblock \emph{The Astrophysical Journal}, 669\penalty0 (2):\penalty0 1279,
+  November 2007.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.1086/521346}.
+
+\bibitem[Shahar et~al.(2019)Shahar, Driscoll, Weinberger, and Cody]{Shahar2019}
+Shahar, A., Driscoll, P., Weinberger, A., and Cody, G.
+\newblock What makes a planet habitable?
+\newblock \emph{Science}, 364\penalty0 (6439):\penalty0 434--435, May 2019.
+\newblock ISSN 0036-8075, 1095-9203.
+\newblock \doi{10.1126/science.aaw4326}.
+
+\bibitem[Shahnas et~al.(2018)Shahnas, Pysklywec, and Yuen]{Shahnas2018}
+Shahnas, M.~H., Pysklywec, R.~N., and Yuen, D.~A.
+\newblock Penetrative {{Convection}} in {{Super}}-{{Earth Planets}}:
+  {{Consequences}} of {{MgSiO3 Postperovskite Dissociation Transition}} and
+  {{Implications}} for {{Super}}-{{Earth GJ}} 876 d.
+\newblock \emph{Journal of Geophysical Research: Planets}, 123\penalty0
+  (8):\penalty0 2162--2177, 2018.
+\newblock ISSN 2169-9100.
+\newblock \doi{10.1029/2018JE005633}.
+
+\bibitem[Sharpe and Peltier(1979)]{Sharpe1979}
+Sharpe, H.~N. and Peltier, W.~R.
+\newblock A thermal history model for the {{Earth}} with parameterized
+  convection.
+\newblock \emph{Geophysical Journal International}, 59\penalty0 (1):\penalty0
+  171--203, October 1979.
+\newblock ISSN 0956-540X.
+\newblock \doi{10.1111/j.1365-246X.1979.tb02560.x}.
+
+\bibitem[Simons et~al.(1997)Simons, Solomon, and Hager]{Simons1997}
+Simons, M., Solomon, S.~C., and Hager, B.~H.
+\newblock Localization of gravity and topography: Constraints on the tectonics
+  and mantle dynamics of {{Venus}}.
+\newblock \emph{Geophysical Journal International}, 131\penalty0 (1):\penalty0
+  24--44, October 1997.
+\newblock ISSN 0956540X, 1365246X.
+\newblock \doi{10.1111/j.1365-246X.1997.tb00593.x}.
+
+\bibitem[Smrekar(1994)]{Smrekar1994}
+Smrekar, S.~E.
+\newblock Evidence for active hotspots on {{Venus}} from analysis of
+  {{Magellan}} gravity data.
+\newblock \emph{Icarus}, 112:\penalty0 2--26, November 1994.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1006/icar.1994.1166}.
+
+\bibitem[Smrekar and Parmentier(1996)]{Smrekar1996}
+Smrekar, S.~E. and Parmentier, E.~M.
+\newblock The interaction of mantle plumes with surface thermal and chemical
+  boundary layers: {{Applications}} to hotspots on {{Venus}}.
+\newblock \emph{Journal of Geophysical Research: Solid Earth}, 101\penalty0
+  (B3):\penalty0 5397--5410, 1996.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/95JB02877}.
+
+\bibitem[Smrekar and Phillips(1991)]{Smrekar1991}
+Smrekar, S.~E. and Phillips, R.~J.
+\newblock Venusian highlands: Geoid to topography ratios and their
+  implications.
+\newblock \emph{Earth and Planetary Science Letters}, 107\penalty0
+  (3):\penalty0 582--597, December 1991.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/0012-821X(91)90103-O}.
+
+\bibitem[Smrekar et~al.(2010)Smrekar, Stofan, Mueller, Treiman,
+  {Elkins-Tanton}, Helbert, Piccioni, and Drossart]{Smrekar2010}
+Smrekar, S.~E., Stofan, E.~R., Mueller, N., Treiman, A., {Elkins-Tanton}, L.,
+  Helbert, J., Piccioni, G., and Drossart, P.
+\newblock Recent {{Hotspot Volcanism}} on {{Venus}} from {{VIRTIS Emissivity
+  Data}}.
+\newblock \emph{Science}, 328\penalty0 (5978):\penalty0 605--608, April 2010.
+\newblock ISSN 0036-8075, 1095-9203.
+\newblock \doi{10.1126/science.1186785}.
+
+\bibitem[Sohl et~al.(2017)Sohl, Chandler, Way, and Jonas]{Sohl2017}
+Sohl, L.~E., Chandler, M.~A., Way, M., and Jonas, J.
+\newblock The {{Importance}} of {{Topography}} in {{Modeling}} the {{Climates}}
+  of {{Potentially Habitable Worlds}}.
+\newblock \emph{AGU Fall Meeting Abstracts}, 43, December 2017.
+
+\bibitem[Solomatov(1995)]{Solomatov1995}
+Solomatov, V.~S.
+\newblock Scaling of temperature- and stress-dependent viscosity convection.
+\newblock \emph{Physics of Fluids}, 7\penalty0 (2):\penalty0 266--274, February
+  1995.
+\newblock ISSN 1070-6631.
+\newblock \doi{10.1063/1.868624}.
+
+\bibitem[Solomatov and Moresi(1996)]{Solomatov1996a}
+Solomatov, V.~S. and Moresi, L.-N.
+\newblock Stagnant lid convection on {{Venus}}.
+\newblock \emph{Journal of Geophysical Research: Planets}, 101\penalty0
+  (E2):\penalty0 4737--4753, 1996.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/95JE03361}.
+
+\bibitem[Solomatov and Moresi(2000)]{Solomatov2000}
+Solomatov, V.~S. and Moresi, L.-N.
+\newblock Scaling of time-dependent stagnant lid convection: {{Application}} to
+  small-scale convection on {{Earth}} and other terrestrial planets.
+\newblock \emph{Journal of Geophysical Research: Solid Earth}, 105\penalty0
+  (B9):\penalty0 21795--21817, 2000.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/2000JB900197}.
+
+\bibitem[Stamenkovi{\'c} et~al.(2012)Stamenkovi{\'c}, Noack, Breuer, and
+  Spohn]{Stamenkovic2012}
+Stamenkovi{\'c}, V., Noack, L., Breuer, D., and Spohn, T.
+\newblock The {{Influence}} of {{Pressure}}-dependent {{Viscosity}} on the
+  {{Thermal Evolution}} of {{Super}}-{{Earths}}.
+\newblock \emph{The Astrophysical Journal}, 748:\penalty0 41, March 2012.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.1088/0004-637X/748/1/41}.
+
+\bibitem[Stevenson(2003)]{Stevenson2003}
+Stevenson, D.~J.
+\newblock Les styles de convection du manteau et leur influence sur
+  l'\'evolution des plan\`etes.
+\newblock \emph{Comptes Rendus Geoscience}, 335:\penalty0 99--111, January
+  2003.
+\newblock ISSN 1631-0713.
+\newblock \doi{10.1016/S1631-0713(03)00009-9}.
+
+\bibitem[Stofan et~al.(1995)Stofan, Smrekar, Bindschadler, and
+  Senske]{Stofan1995}
+Stofan, E.~R., Smrekar, S.~E., Bindschadler, D.~L., and Senske, D.~A.
+\newblock Large topographic rises on {{Venus}}: {{Implications}} for mantle
+  upwelling.
+\newblock \emph{Journal of Geophysical Research: Planets}, 100\penalty0
+  (E11):\penalty0 23317--23327, 1995.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/95JE01834}.
+
+\bibitem[Suissa et~al.(2018)Suissa, Chen, and Kipping]{Suissa2018}
+Suissa, G., Chen, J., and Kipping, D.
+\newblock A {{HARDCORE}} model for constraining an exoplanet's core size.
+\newblock \emph{Monthly Notices of the Royal Astronomical Society},
+  476\penalty0 (2):\penalty0 2613--2620, May 2018.
+\newblock ISSN 0035-8711, 1365-2966.
+\newblock \doi{10.1093/mnras/sty381}.
+
+\bibitem[Tackley et~al.(2013)Tackley, Ammann, Brodholt, Dobson, and
+  Valencia]{Tackley2013}
+Tackley, P.~J., Ammann, M., Brodholt, J.~P., Dobson, D.~P., and Valencia, D.
+\newblock Mantle dynamics in super-{{Earths}}: {{Post}}-perovskite rheology and
+  self-regulation of viscosity.
+\newblock \emph{Icarus}, 225\penalty0 (1):\penalty0 50--61, July 2013.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1016/j.icarus.2013.03.013}.
+
+\bibitem[Tasker et~al.(2017)Tasker, Tan, Heng, Kane, Spiegel, Brasser, Casey,
+  Desch, Dorn, Hernlund, Houser, Laneuville, Lasbleis, Libert, Noack,
+  Unterborn, and Wicks]{Tasker2017}
+Tasker, E., Tan, J., Heng, K., Kane, S., Spiegel, D., Brasser, R., Casey, A.,
+  Desch, S., Dorn, C., Hernlund, J., Houser, C., Laneuville, M., Lasbleis, M.,
+  Libert, A.-S., Noack, L., Unterborn, C., and Wicks, J.
+\newblock The language of exoplanet ranking metrics needs to change.
+\newblock \emph{Nature Astronomy}, 1:\penalty0 0042, February 2017.
+\newblock ISSN 2397-3366.
+\newblock \doi{10.1038/s41550-017-0042}.
+
+\bibitem[Thiriet et~al.(2019)Thiriet, Breuer, Michaut, and Plesa]{Thiriet2019}
+Thiriet, M., Breuer, D., Michaut, C., and Plesa, A.-C.
+\newblock Scaling laws of convection for cooling planets in a stagnant lid
+  regime.
+\newblock \emph{Physics of the Earth and Planetary Interiors}, 286:\penalty0
+  138--153, January 2019.
+\newblock ISSN 0031-9201.
+\newblock \doi{10.1016/j.pepi.2018.11.003}.
+
+\bibitem[Tobie et~al.(2019)Tobie, Grasset, Dumoulin, and Mocquet]{Tobie2019}
+Tobie, G., Grasset, O., Dumoulin, C., and Mocquet, A.
+\newblock Tidal response of rocky and ice-rich exoplanets.
+\newblock \emph{Astronomy and Astrophysics}, 630:\penalty0 A70, October 2019.
+\newblock ISSN 0004-6361.
+\newblock \doi{10.1051/0004-6361/201935297}.
+
+\bibitem[Tosi et~al.(2017)Tosi, Godolt, Stracke, Ruedas, Grenfell, H{\"o}ning,
+  Nikolaou, Plesa, Breuer, and Spohn]{Tosi2017}
+Tosi, N., Godolt, M., Stracke, B., Ruedas, T., Grenfell, J.~L., H{\"o}ning, D.,
+  Nikolaou, A., Plesa, A.-C., Breuer, D., and Spohn, T.
+\newblock The habitability of a stagnant-lid {{Earth}}.
+\newblock \emph{Astronomy and Astrophysics}, 605:\penalty0 A71, September 2017.
+\newblock ISSN 0004-6361.
+\newblock \doi{10.1051/0004-6361/201730728}.
+
+\bibitem[Umemoto and Wentzcovitch(2011)]{Umemoto2011}
+Umemoto, K. and Wentzcovitch, R.~M.
+\newblock Two-stage dissociation in {{MgSiO3}} post-perovskite.
+\newblock \emph{Earth and Planetary Science Letters}, 311\penalty0
+  (3):\penalty0 225--229, November 2011.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/j.epsl.2011.09.032}.
+
+\bibitem[Umemoto et~al.(2017)Umemoto, Wentzcovitch, Wu, Ji, Wang, and
+  Ho]{Umemoto2017}
+Umemoto, K., Wentzcovitch, R.~M., Wu, S., Ji, M., Wang, C.-Z., and Ho, K.-M.
+\newblock Phase transitions in {{MgSiO3}} post-perovskite in super-{{Earth}}
+  mantles.
+\newblock \emph{Earth and Planetary Science Letters}, 478:\penalty0 40--45,
+  November 2017.
+\newblock ISSN 0012821X.
+\newblock \doi{10.1016/j.epsl.2017.08.032}.
+
+\bibitem[Unterborn et~al.(2015)Unterborn, Johnson, and Panero]{Unterborn2015}
+Unterborn, C.~T., Johnson, J.~A., and Panero, W.~R.
+\newblock Thorium {{Abundances}} in {{Solar Twins}} and {{Analogs}}:
+  {{Implications}} for the {{Habitability}} of {{Extrasolar Planetary
+  Systems}}.
+\newblock \emph{The Astrophysical Journal}, 806:\penalty0 139, June 2015.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.1088/0004-637X/806/1/139}.
+
+\bibitem[Urey(1955)]{Urey1955}
+Urey, H.~C.
+\newblock The cosmic abundances of potassium, uranium, and thorium and the heat
+  balances of the {{Earth}}, the {{Moon}}, and {{Mars}}.
+\newblock \emph{Proceedings of the National Academy of Sciences of the United
+  States of America}, 41\penalty0 (3):\penalty0 127--144, March 1955.
+\newblock ISSN 0027-8424.
+
+\bibitem[Valencia and O'Connell(2009)]{Valencia2009}
+Valencia, D. and O'Connell, R.~J.
+\newblock Convection scaling and subduction on {{Earth}} and super-{{Earths}}.
+\newblock \emph{Earth and Planetary Science Letters}, 286\penalty0
+  (3-4):\penalty0 492--502, September 2009.
+\newblock ISSN 0012821X.
+\newblock \doi{10.1016/j.epsl.2009.07.015}.
+
+\bibitem[Valencia et~al.(2006)Valencia, O'Connell, and Sasselov]{Valencia2006}
+Valencia, D., O'Connell, R.~J., and Sasselov, D.
+\newblock Internal structure of massive terrestrial planets.
+\newblock \emph{Icarus}, 181\penalty0 (2):\penalty0 545--554, April 2006.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1016/j.icarus.2005.11.021}.
+
+\bibitem[Valencia et~al.(2007)Valencia, Sasselov, and O'Connell]{Valencia2007}
+Valencia, D., Sasselov, D.~D., and O'Connell, R.~J.
+\newblock Detailed {{Models}} of {{Super}}-{{Earths}}: {{How Well Can We Infer
+  Bulk Properties}}?
+\newblock \emph{The Astrophysical Journal}, 665:\penalty0 1413--1420, August
+  2007.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.1086/519554}.
+
+\bibitem[{van den Berg} et~al.(2019){van den Berg}, Yuen, Umemoto, Jacobs, and
+  Wentzcovitch]{vandenBerg2019}
+{van den Berg}, A.~P., Yuen, D.~A., Umemoto, K., Jacobs, M. H.~G., and
+  Wentzcovitch, R.~M.
+\newblock Mass-dependent dynamics of terrestrial exoplanets using ab initio
+  mineral properties.
+\newblock \emph{Icarus}, 317:\penalty0 412--426, January 2019.
+\newblock ISSN 0019-1035.
+\newblock \doi{10.1016/j.icarus.2018.08.016}.
+
+\bibitem[Vezolainen et~al.(2003)Vezolainen, Solomatov, Head, Basilevsky, and
+  Moresi]{Vezolainen2003}
+Vezolainen, A.~V., Solomatov, V.~S., Head, J.~W., Basilevsky, A.~T., and
+  Moresi, L.-N.
+\newblock Timing of formation of {{Beta Regio}} and its geodynamical
+  implications.
+\newblock \emph{Journal of Geophysical Research (Planets)}, 108:\penalty0 5002,
+  January 2003.
+\newblock ISSN 0148-0227.
+\newblock \doi{10.1029/2002JE001889}.
+
+\bibitem[Vezolainen et~al.(2004)Vezolainen, Solomatov, Basilevsky, and
+  Head]{Vezolainen2004}
+Vezolainen, A.~V., Solomatov, V.~S., Basilevsky, A.~T., and Head, J.~W.
+\newblock Uplift of {{Beta Regio}}: {{Three}}-dimensional models.
+\newblock \emph{Journal of Geophysical Research: Planets}, 109\penalty0 (E8),
+  2004.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/2004JE002259}.
+
+\bibitem[Wagner et~al.(2012)Wagner, Tosi, Sohl, Rauer, and Spohn]{Wagner2012}
+Wagner, F.~W., Tosi, N., Sohl, F., Rauer, H., and Spohn, T.
+\newblock Rocky super-{{Earth}} interiors. {{Structure}} and internal dynamics
+  of {{CoRoT}}-7b and {{Kepler}}-10b.
+\newblock \emph{Astronomy and Astrophysics}, 541:\penalty0 A103, May 2012.
+\newblock ISSN 0004-6361.
+\newblock \doi{10.1051/0004-6361/201118441}.
+
+\bibitem[Walker et~al.(1981)Walker, Hays, and Kasting]{Walker1981}
+Walker, J. C.~G., Hays, P.~B., and Kasting, J.~F.
+\newblock A negative feedback mechanism for the long-term stabilization of
+  {{Earth}}'s surface temperature.
+\newblock \emph{Journal of Geophysical Research: Oceans}, 86\penalty0
+  (C10):\penalty0 9776--9782, 1981.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/JC086iC10p09776}.
+
+\bibitem[Watts(2001)]{Watts2001}
+Watts, A.~B.
+\newblock \emph{Isostasy and {{Flexure}} of the {{Lithosphere}}}.
+\newblock {Cambridge University Press}, October 2001.
+\newblock ISBN 978-0-521-00600-2.
+
+\bibitem[Way et~al.(2016)Way, Del~Genio, Kiang, Sohl, Grinspoon, Aleinov,
+  Kelley, and Clune]{Way2016}
+Way, M.~J., Del~Genio, A.~D., Kiang, N.~Y., Sohl, L.~E., Grinspoon, D.~H.,
+  Aleinov, I., Kelley, M., and Clune, T.
+\newblock Was {{Venus}} the first habitable world of our solar system?
+\newblock \emph{Geophysical Research Letters}, 43:\penalty0 8376--8383, August
+  2016.
+\newblock ISSN 0094-8276.
+\newblock \doi{10.1002/2016GL069790}.
+
+\bibitem[Wieczorek and Zuber(2004)]{Wieczorek2004}
+Wieczorek, M.~A. and Zuber, M.~T.
+\newblock Thickness of the {{Martian}} crust: {{Improved}} constraints from
+  geoid-to-topography ratios.
+\newblock \emph{Journal of Geophysical Research: Planets}, 109\penalty0 (E1),
+  2004.
+\newblock ISSN 2156-2202.
+\newblock \doi{10.1029/2003JE002153}.
+
+\bibitem[Wordsworth(2016)]{Wordsworth2016}
+Wordsworth, R.~D.
+\newblock Atmospheric nitrogen evolution on {{Earth}} and {{Venus}}.
+\newblock \emph{Earth and Planetary Science Letters}, 447:\penalty0 103--111,
+  August 2016.
+\newblock ISSN 0012821X.
+\newblock \doi{10.1016/j.epsl.2016.04.002}.
+
+\bibitem[Wordsworth et~al.(2018)Wordsworth, Schaefer, and
+  Fischer]{Wordsworth2018}
+Wordsworth, R.~D., Schaefer, L.~K., and Fischer, R.~A.
+\newblock Redox {{Evolution}} via {{Gravitational Differentiation}} on
+  {{Low}}-mass {{Planets}}: {{Implications}} for {{Abiotic Oxygen}}, {{Water
+  Loss}}, and {{Habitability}}.
+\newblock \emph{The Astronomical Journal}, 155:\penalty0 195, May 2018.
+\newblock ISSN 0004-6256.
+\newblock \doi{10.3847/1538-3881/aab608}.
+
+\bibitem[Yang et~al.(2016)Yang, Huang, and Wei]{Yang2016}
+Yang, A., Huang, J., and Wei, D.
+\newblock Separation of dynamic and isostatic components of the {{Venusian}}
+  gravity and topography and determination of the crustal thickness of
+  {{Venus}}.
+\newblock \emph{Planetary and Space Science}, 129:\penalty0 24--31, September
+  2016.
+\newblock ISSN 0032-0633.
+\newblock \doi{10.1016/j.pss.2016.06.001}.
+
+\bibitem[Zeng and Jacobsen(2017)]{Zeng2017}
+Zeng, L. and Jacobsen, S.~B.
+\newblock A {{Simple Analytical Model}} for {{Rocky Planet Interiors}}.
+\newblock \emph{The Astrophysical Journal}, 837\penalty0 (2):\penalty0 164,
+  March 2017.
+\newblock ISSN 1538-4357.
+\newblock \doi{10.3847/1538-4357/aa6218}.
+
+\bibitem[Zeng et~al.(2016)Zeng, Sasselov, and Jacobsen]{Zeng2016}
+Zeng, L., Sasselov, D.~D., and Jacobsen, S.~B.
+\newblock Mass-radius relation for rocky planets based on {{PREM}}.
+\newblock \emph{The Astrophysical Journal}, 819\penalty0 (2):\penalty0 127,
+  March 2016.
+\newblock ISSN 0004-637X.
+\newblock \doi{10.3847/0004-637X/819/2/127}.
+
+\bibitem[Zhong(2002)]{Zhong2002}
+Zhong, S.
+\newblock Effects of lithosphere on the long-wavelength gravity anomalies and
+  their implications for the formation of the {{Tharsis}} rise on {{Mars}}.
+\newblock \emph{Journal of Geophysical Research (Planets)}, 107:\penalty0 5054,
+  July 2002.
+\newblock ISSN 0148-0227.
+\newblock \doi{10.1029/2001JE001589}.
+
+\bibitem[Zhong and Zuber(2001)]{Zhong2001}
+Zhong, S. and Zuber, M.~T.
+\newblock Degree-1 mantle convection and the crustal dichotomy on {{Mars}}.
+\newblock \emph{Earth and Planetary Science Letters}, 189:\penalty0 75--84,
+  June 2001.
+\newblock ISSN 0012-821X.
+\newblock \doi{10.1016/S0012-821X(01)00345-4}.
+
+\end{thebibliography}

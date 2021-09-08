@@ -138,8 +138,10 @@ x1 = np.log10(Ra_i)
 x2 = ln_eta
 xlim = (7.5, 8.1)
 y = np.log10(h)
-c = colorize(x2, cmap='rainbow', vmin=13, vmax=22)[0]
+# c = colorize(x2, cmap='rainbow', vmin=13, vmax=22)[0]
 lneta_unique, idx = np.unique(ln_eta, return_index=True)
+print('lnneta_unique', lneta_unique)
+c = colorize(lneta_unique, cmap='rainbow', vmin=13, vmax=22)[0]
 
 # try fully linear model with interaction term
 beta0 = [6, -0.5, -1.2, 0.05]
@@ -147,15 +149,16 @@ output = fit_ODR(y=y, x1=x1, x2=ln_eta, beta0=beta0, func=func_interaction, maxi
 beta_h = output.beta
 cov_beta = output.cov_beta * output.res_var
 for n, b in enumerate(lneta_unique):
+    bcol = c[n]  # c[idx[n]]
 
     # plot original
     mask = np.where(ln_eta == b)
-    ax.plot(x1[mask], y[mask], c=c[idx[n]], lw=0, marker='o')
+    ax.plot(x1[mask], y[mask], c=bcol, lw=0, marker='o')
 
     # plot fit
     x1_hat = np.linspace(xlim[0], xlim[-1])
     h_hat = func_interaction(beta_h, [x1_hat, b])
-    ax.plot(x1_hat, h_hat, c=c[idx[n]], lw=0.7, ls='--')
+    ax.plot(x1_hat, h_hat, c=bcol, lw=0.7, ls='--')
 
     # plot error
     var_h = np.zeros_like(h_hat)
@@ -165,7 +168,7 @@ for n, b in enumerate(lneta_unique):
     # print('b =', b, 'mean y =', np.mean(h_hat), 'mean SE =', np.mean(SE_y))
     yn_upper = h_hat + SE_y
     yn_lower = h_hat - SE_y
-    ax.fill_between(x1_hat, yn_lower, yn_upper, fc=c[idx[n]], alpha=0.1)
+    ax.fill_between(x1_hat, yn_lower, yn_upper, fc=bcol, alpha=0.1)
 
     # for nn in range(100):
     #     yhn = draw_random_yhat(u=[x1_hat, b], beta=beta_h, cov_beta=cov_beta, func=func_interaction)
@@ -174,21 +177,21 @@ for n, b in enumerate(lneta_unique):
 
     """test un log version"""
 
-    # plot original
-    ax2.plot(10**x1[mask], 10**y[mask] * dim_factor, c=c[idx[n]], lw=0, marker='o')
-
-    # plot fit
-    ax2.plot(10**x1_hat, 10**h_hat * dim_factor, c=c[idx[n]], lw=0.7)
-
-    # error
-    var_h = np.zeros_like(h_hat)
-    for ii, x1n in enumerate(x1_hat):
-        var_h[ii] = fit_variance(beta=beta_h, cov_beta=cov_beta, jac_fn=func_unlog_jac, x1n=x1n,
-                                 x2n=b)
-    SE_y = np.sqrt(var_h)
-    yn_upper = (10**h_hat + SE_y) * dim_factor
-    yn_lower = (10**h_hat - SE_y) * dim_factor
-    ax2.fill_between(10**x1_hat, yn_lower, yn_upper, fc=c[idx[n]], alpha=0.15)
+    # # plot original
+    # ax2.plot(10**x1[mask], 10**y[mask] * dim_factor, c=c[idx[n]], lw=0, marker='o')
+    #
+    # # plot fit
+    # ax2.plot(10**x1_hat, 10**h_hat * dim_factor, c=c[idx[n]], lw=0.7)
+    #
+    # # error
+    # var_h = np.zeros_like(h_hat)
+    # for ii, x1n in enumerate(x1_hat):
+    #     var_h[ii] = fit_variance(beta=beta_h, cov_beta=cov_beta, jac_fn=func_unlog_jac, x1n=x1n,
+    #                              x2n=b)
+    # SE_y = np.sqrt(var_h)
+    # yn_upper = (10**h_hat + SE_y) * dim_factor
+    # yn_lower = (10**h_hat - SE_y) * dim_factor
+    # ax2.fill_between(10**x1_hat, yn_lower, yn_upper, fc=c[idx[n]], alpha=0.15)
 
 
 handles = []

@@ -32,7 +32,7 @@ def simple_vol_scaling(pl, verbose=False, at_age=None, it=None, **kwargs):
 
 
 def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0=None, plot=False, verbose=False,
-              spectrum_fname='base_spectrum_l1.pkl', spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
+              spectrum_fname='base_spectrum_l1.pkl', spectrum_fpath='/home/claire/Works/exo-top/exotop/top_spectra/',
               rho_w=1000, **kwargs):
     water_load_ratio = pl.rho_m / (pl.rho_m - rho_w)
     print('including water loading')
