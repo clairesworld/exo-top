@@ -32,13 +32,10 @@ run_kwargs = {
 }
 
 names = ['Ea', 'eta_pre',
-                   # 'herr_A', 'herr_B', 'herr_C', 'herr_D'
                    ]
 mini = [300e3, 1.6e11,
-                   # 0, 0, 0, 0
                    ]
 maxi = [300e3, 1.6e11,
-                   # 2.7300614307095596, 0.15413945817985505, 0.34960759040966743, 0.019741011328985238
                    ]
 
 # how h varies across key input parameters
