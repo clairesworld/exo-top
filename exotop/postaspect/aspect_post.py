@@ -90,7 +90,7 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
     # retrieve eta
     eta_str = case[9:12]
     if 'col_vis' in kwargs:
-        col_vis = dict.pop('col_vis')
+        col_vis = kwargs.pop('col_vis')
     elif eta_str == '1e9':  # not sure what happened here but...
         col_vis = 23
     else:
