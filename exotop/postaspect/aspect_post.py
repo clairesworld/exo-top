@@ -89,10 +89,13 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
 
     # retrieve eta
     eta_str = case[9:12]
-    if eta_str == '1e9':  # not sure what happened here but...
+    if 'col_vis' in kwargs:
+        col_vis = dict.pop('col_vis')
+    elif eta_str == '1e9':  # not sure what happened here but...
         col_vis = 23
     else:
         col_vis = 20
+    print('using col vis', col_vis)
 
     # auto-determine postprocessing based on pickle name
     if suffix == '_T':
