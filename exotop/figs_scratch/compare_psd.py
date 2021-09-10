@@ -33,8 +33,8 @@ def cmp_dimensions(benchmark_path='/home/cmg76/Works/exo-top/benchmarks/lees_top
 
     """ plot """
     fig, ax = plt.subplots()
-    ax.loglog(k2, psd2_iso, 'o-', lw=1, alpha=0.5, c='xkcd:slate', label='2D')
-    ax.loglog(k3, psd3, '^-', lw=1, alpha=0.5, c='xkcd:forest green', label='3D')
+    ax.loglog(k2, psd2_iso, 'o-', lw=1, alpha=0.5, c='xkcd:slate', label='2D benchmark test')
+    ax.loglog(k3, psd3, '^-', lw=1, alpha=0.5, c='xkcd:forest green', label='3D form Lees')
     ax.set_xlabel(r'Wavenumber (km$^{-1}$)')
     ax.set_ylabel(r'PSD (km$^{2}$ km$^{2}$)')
     ax.legend()

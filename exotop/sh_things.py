@@ -546,9 +546,10 @@ def interpolate_degrees(phi, kv, R, lmin=1, kmin_fit=None, kmax_fit=None, kmax_i
 
 
 def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spectrum', pend='_sph', fend='.pkl',
-                        bl_fudge=1, max_dscale=2, plot=True, verbose=False, lmin=1, kmax_interp=None):
+                        bl_fudge=1, max_dscale=2, plot=True, verbose=False, lmin=1, kmax_interp=None, fname=None):
     import pickle as pkl
-    fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
+    if fname is None:
+        fname = data_path + 'output-' + case + '/pickle/' + case + pend + fend
 
     S, k = pkl.load(open(fname, "rb"))
 
