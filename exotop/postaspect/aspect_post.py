@@ -95,7 +95,7 @@ def pickleio(case, suffix, t1=0, load='auto', dat_new=None,
         col_vis = 23
     else:
         col_vis = 20
-    print('using col vis', col_vis)
+    # print('using col vis', col_vis)
 
     # auto-determine postprocessing based on pickle name
     if suffix == '_T':

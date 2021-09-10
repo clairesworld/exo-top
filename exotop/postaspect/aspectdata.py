@@ -384,8 +384,15 @@ class Aspect_Data():
             try:
                 s = d[-14:]
             except IndexError as e:
-                print('d =', d)
                 print('col vis', col_vis)
+                fh = open(filename, 'r')
+                for i, line in enumerate(fh):
+                    if i < 30:
+                        print(line)
+                    else:
+                        break
+                fh.close()
+                raise Exception('incorrect column number for solution')
             if not s.decode() == '""':
                 last = int(re.search(r'\d+', s.decode()).group(0))
             files[n] = last
