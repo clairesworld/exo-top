@@ -375,24 +375,38 @@ class Aspect_Data():
         filename = self.directory + "statistics"
         if verbose:
             print("Reading solution files from", filename)
-        data = np.genfromtxt(open(filename, 'r'), comments='#', dtype=None, usecols=col_vis)
-        files = np.zeros(len(data), dtype=np.int64)
+        try:
+            data = np.genfromtxt(open(filename, 'r'), comments='#', dtype=None, usecols=col_vis)
+            d = data[-1]  # pre-test to catch error
+            s = d[-14:]
+        except IndexError as e:
+            print('erorr with col vis =', col_vis)
+            fh = open(filename, 'r')
+            for i, line in enumerate(fh):
+                if i < 30:
+                    print(line)
+                else:
+                    break
+            fh.close()
 
+            if col_vis == 20:
+                col_vis = 23
+            elif col_vis == 23:
+                col_vis = 20
+            else:
+                raise Exception('unknown which col_vis to use...')
+            print('\n\ntrying other col_vis =', col_vis)
+            data = np.genfromtxt(open(filename, 'r'), comments='#', dtype=None, usecols=col_vis)
+
+        files = np.zeros(len(data), dtype=np.int64)
         last = 0
         #  find last instance that's not ""
         for n, d in enumerate(data):
             try:
                 s = d[-14:]
             except IndexError as e:
-                print('col vis', col_vis)
-                fh = open(filename, 'r')
-                for i, line in enumerate(fh):
-                    if i < 30:
-                        print(line)
-                    else:
-                        break
-                fh.close()
-                raise Exception('incorrect column number for solution')
+                print(e)
+                raise Exception('still using an incorrect column number for solution')
             if not s.decode() == '""':
                 last = int(re.search(r'\d+', s.decode()).group(0))
             files[n] = last
