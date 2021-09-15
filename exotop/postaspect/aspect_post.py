@@ -1166,7 +1166,8 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                                                          test_run=test_run, **kwargs)
                             except AttributeError as e:
                                 print(e)
-
+                        print('\n', case, suffix)
+                        print(df.head())
     print('>>>>>>>  done reprocessing!')
 
 
