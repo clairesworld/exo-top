@@ -46,6 +46,7 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
                 df = df_T.mean(axis=0).to_frame().transpose()  # mean of other parameters
                 df.set_index(pd.Series([0]))
                 df.update(df_av)  # update with properly timefirst-averaged temperature params
+                df['Ra_i'] = pro.Ra_i(Ra=float(Ra[ii]), d_eta=float(etastr), T_i=df['T_i'].to_numpy(), T0=1)
                 df['Ra_i_eff'] = pro.Ra_i_eff(Ra_1=float(Ra[ii]), d_eta=float(etastr), T_i=df['T_i'].to_numpy(),
                                               T_l=df['T_l'].to_numpy(), delta_L=df['delta_L'].to_numpy())
                 # print('df\n', df.head())
@@ -106,13 +107,10 @@ def table_to_latex(df, include_cols=None):
         s = s + r' \\' + '\n'
     print(s)
 
-
+cols = ('Ra_1', 'delta_eta', 'Ra_i', 'delta_L', 'delta_rh', 'T_i', 'T_l', 'dT_rh', 'Nu', 'h_rms', 'h_peak')
 df = save_table(Ra_ls, eta_ls, fname='aspect-output.csv', fig_path=fig_path_bullard, t1_grid=t1_grid, load_grid=True,
-                sort_cases='Ra_i_eff',
-                regime_grid=regime_grid_td, end_grid=end_grid, data_path=data_path_bullard, include_regimes=['chaotic'])
+                # sort_cases='Ra_i_eff',
+                regime_grid=regime_grid_td, end_grid=end_grid, data_path=data_path_bullard, include_regimes=['chaotic'],
+                cols=cols)
 
 table_to_latex(df)
-
-# f = 1.12e9
-# print(latex_float(f))
-# print('${:.0e}$'.format(num2tex(f)))

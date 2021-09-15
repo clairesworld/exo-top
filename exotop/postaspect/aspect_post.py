@@ -1142,23 +1142,31 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                     for ip, suffix in enumerate(psuffixes):
                         df = pickleio(case, suffix=suffix, t1=t1_ii,
                                  data_path=data_path, load=load, **kwargs)
-                        if check_t0 and 'index' in df.columns:
-                            dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/',
-                                                 read_statistics=False, read_parameters=False, **kwargs)
+                        if check_t0:
                             try:
-                                time = dat.stats_time
-                            except AttributeError:
-                                dat.read_times(**kwargs)
-                                time = dat.stats_time
-                            i_time = np.argmax(time >= t1_ii)  # index of first timestep to process
-                            ts_save = np.arange(i_time+1, len(time))
-                            print('           ts range', ts_save, 'given t1', t1_ii, 'time[i_time]', time[i_time])
-                            idx_stored = df.index.values
-                            if idx_stored[0] < ts_save[0]:
-                                droppy = np.isin(idx_stored, ts_save)  # these are what u want to keep but im attache to the name droppy
-                                print('           dropping idx (ts?)', idx_stored[~droppy])
-                                df = pickle_drop(case, suffix, keys=None, index=idx_stored[~droppy], errors='raise', data_path=data_path,
-                                                 test_run=test_run, **kwargs)
+                                if 'index' in df.columns:
+                                    dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/',
+                                                         read_statistics=False, read_parameters=False, **kwargs)
+                                    try:
+                                        time = dat.stats_time
+                                    except AttributeError:
+                                        dat.read_times(**kwargs)
+                                        time = dat.stats_time
+                                    i_time = np.argmax(time >= t1_ii)  # index of first timestep to process
+                                    ts_save = np.arange(i_time + 1, len(time))
+                                    print('           ts range', ts_save, 'given t1', t1_ii, 'time[i_time]',
+                                          time[i_time])
+                                    idx_stored = df.index.values
+                                    if idx_stored[0] < ts_save[0]:
+                                        droppy = np.isin(idx_stored,
+                                                         ts_save)  # these are what u want to keep but im attache to the name droppy
+                                        print('           dropping idx (ts?)', idx_stored[~droppy])
+                                        df = pickle_drop(case, suffix, keys=None, index=idx_stored[~droppy],
+                                                         errors='raise', data_path=data_path,
+                                                         test_run=test_run, **kwargs)
+                            except AttributeError as e:
+                                print(e)
+
     print('>>>>>>>  done reprocessing!')
 
 
