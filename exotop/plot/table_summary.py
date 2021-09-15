@@ -53,6 +53,9 @@ def save_table(Ra, eta, fname, fig_path=fig_path_bullard, t1_grid=None, load_gri
 
                 df_h = pro.pickleio_multi(case, psuffixes=['_h_all', '_Nu'], t1=t1_ii, load=load_ii,
                                           data_path=data_path, postprocess_kwargs=postprocess_kwargs, **kwargs)
+
+                print('\n', case, 'df_h')
+                print(df_h.head())
                 df['h_rms'] = df_h.h_rms.mean()
                 df['h_peak'] = df_h.h_peak.mean()
                 df['Nu'] = df_h.Nu.mean()
