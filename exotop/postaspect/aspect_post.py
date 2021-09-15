@@ -1142,7 +1142,7 @@ def reprocess_all_at_sol(Ra_ls, eta_ls, psuffixes, t1_grid=None, end_grid=None,
                     for ip, suffix in enumerate(psuffixes):
                         df = pickleio(case, suffix=suffix, t1=t1_ii,
                                  data_path=data_path, load=load, **kwargs)
-                        if check_t0:
+                        if check_t0 and 'index' in df.columns:
                             dat = ad.Aspect_Data(directory=data_path + 'output-' + case + '/',
                                                  read_statistics=False, read_parameters=False, **kwargs)
                             try:

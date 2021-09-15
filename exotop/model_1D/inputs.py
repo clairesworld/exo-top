@@ -28,11 +28,11 @@ baseline_in = dict(
     T_ref=1600,  # reference T from Thiriet+ (2019)
     #     Ea=300e3, # activation energy in J, K&W (1993) dry olivine
     #     V_rh=6e-6, # activation volume in m^3, K&W (1993)  dry olivine
-    #     mu=80e9, # shear modulus in Pa, K&W (1993)  dry olivine
-    #     A_rh=8.7e15, # pre-exponential factor in s^-1, K&W (1993)  dry olivine
-    #     h_rh=2.07e-3, # grain size in m, K&W (1993)  dry olivine
-    #     B_rh=0.5e-9, # Burgers vector, K&W (1993)  dry olivine
-    #     m_rh=2.5, # grain size exponent, K&W (1993)  dry olivine
+        mu=80e9, # shear modulus in Pa, K&W (1993)  dry olivine
+        A_rh=8.7e15, # pre-exponential factor in s^-1, K&W (1993)  dry olivine
+        h_rh=2.07e-3, # grain size in m, K&W (1993)  dry olivine
+        B_rh=0.5e-9, # Burgers vector, K&W (1993)  dry olivine
+        m_rh=2.5, # grain size exponent, K&W (1993)  dry olivine
 )
 baseline_run = dict(T_m0=1750, T_c0=2250, D_l0=150e3, tf=4.5, visc_type='KW')  # model params
 
