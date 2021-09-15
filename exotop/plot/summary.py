@@ -20,6 +20,11 @@ from postaspect import aspect_post as ap
 #                         data_path=data_path, postprocess_kwargs=postprocess_kwargs)  # eta 1e9 has diff col vis
 
 # Ra 2e8 even different?? that's col_vis=20??
+ap.reprocess_all_at_sol(Ra_ls[5], eta_ls[-1:], psuffixes=['_T', '_h', '_h_all', '_Nu'],  redo=True, col_vis=20,
+                        t1_grid=t1_grid[-1:, 5], end_grid=end_grid[-1:, 5], load_grid=load_grid[-1:, 5],
+                        regime_grid=regime_grid_td[-1:, 5],
+                        include_regimes=['chaotic'],
+                        data_path=data_path, postprocess_kwargs=postprocess_kwargs)  # eta 1e9 has diff col vis
 
 ap.reprocess_all_at_sol(Ra_ls[4:], eta_ls[1:], psuffixes=['_T', '_h', '_h_all', '_Nu'], redo=False,
                         t1_grid=t1_grid[1:, 4:], end_grid=end_grid[1:, 4:], load_grid=load_grid[1:, 4:],
