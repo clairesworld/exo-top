@@ -399,216 +399,216 @@ def get_continuous_cmap(hex_list, float_list=None, N=256):
 
 
 
-from colormath.color_objects import *
-from colormath.color_conversions import convert_color, color_conversion_function
-from colormath import color_diff
-
-
-class MshColor(IlluminantMixin, ColorBase):
-    '''
-    Represents an Msh color as defined by [Moreland2009]. The Msh color space
-    is basically just a polar representation of CIE Lab space.
-    See `Diverging Color Maps for Scientific Visualization
-    <http://www.kennethmoreland.com/color-maps/>` for more information.
-    '''
-
-    VALUES = ['msh_m', 'msh_s', 'msh_h']
-
-    def __init__(self, msh_m, msh_s, msh_h, observer='2', illuminant='d50'):
-        """
-        :param float msh_m: M coordinate.
-        :param float msh_s: s coordinate.
-        :param float msh_h: h coordinate.
-        :keyword str observer: Observer angle. Either ```2``` or ```10``` degrees.
-        :keyword str illuminant: See :doc:`illuminants` for valid values.
-        """
-
-        super(MshColor, self).__init__()
-        #: M coordinate
-        self.msh_m = float(msh_m)
-        #: C coordinate
-        self.msh_s = float(msh_s)
-        #: H coordinate
-        self.msh_h = float(msh_h)
-
-        #: The color's observer angle. Set with :py:meth:`set_observer`.
-        self.observer = None
-        #: The color's illuminant. Set with :py:meth:`set_illuminant`.
-        self.illuminant = None
-
-        self.set_observer(observer)
-        self.set_illuminant(illuminant)
-
-
-@color_conversion_function(LabColor, MshColor)
-def Lab_to_Msh(cobj, *args, **kwargs):
-    """
-    Convert from CIE Lab to Msh.
-    """
-
-    msh_m = math.sqrt(math.pow(float(cobj.lab_l), 2) +
-                      math.pow(float(cobj.lab_a), 2) +
-                      math.pow(float(cobj.lab_b), 2))
-    msh_s = math.acos(float(cobj.lab_l) / msh_m)
-    msh_h = math.atan2(float(cobj.lab_b), float(cobj.lab_a))
-
-    return MshColor(msh_m, msh_s, msh_h,
-                    observer=cobj.observer,
-                    illuminant=cobj.illuminant)
-
-
-@color_conversion_function(MshColor, LabColor)
-def Msh_to_Lab(cobj, *args, **kwargs):
-    """
-    Convert from Msh to Lab.
-    """
-
-    lab_l = cobj.msh_m * math.cos(float(cobj.msh_s))
-    lab_a = cobj.msh_m * math.sin(float(cobj.msh_s)) * math.cos(float(cobj.msh_h))
-    lab_b = cobj.msh_m * math.sin(float(cobj.msh_s)) * math.sin(float(cobj.msh_h))
-    return LabColor(lab_l, lab_a, lab_b,
-                    illuminant=cobj.illuminant,
-                    observer=cobj.observer)
-
-
-class SmoothDivergingColorMap:
-    def __init__(self,
-                 low_color=sRGBColor(0.230, 0.299, 0.754),
-                 high_color=sRGBColor(0.706, 0.016, 0.150),
-                 mid_color=MshColor(88.0, 0.0, 0.0)):
-        """
-        :param color low_color: The color at the low end of the map.
-        :param color high_color: The color at the high end of the map.
-        :param color mid_color: The color at the middle of the map. Should be unsaturated.
-        """
-        self.low_msh = convert_color(low_color, MshColor)
-        self.high_msh = convert_color(high_color, MshColor)
-
-        # If the points are saturated and distinct, then we place a white point
-        # in the middle. Otherwise we ignore it.
-        if self.low_msh.msh_s > 0.05:
-            if self.high_msh.msh_s > 0.05:
-                if (abs(self.low_msh.msh_h - self.high_msh.msh_h) > math.pi / 3.0) \
-                        and mid_color:
-                    # Both endpoints are saturated and unique and a midpoint was
-                    # given. Interpolate through this midpoint and compute an
-                    # appropriate hue spin.
-                    mid_msh = convert_color(mid_color, MshColor)
-                    self.midpoint_magnitude = mid_msh.msh_m
-                    self.midpoint_low_hue = self.compute_hue_spin(self.low_msh, mid_msh)
-                    self.midpoint_high_hue = self.compute_hue_spin(self.high_msh, mid_msh)
-                else:
-                    # Both endpoints are distinct colors, but they are either very close
-                    # in hue or no middle point was given. In this case, interpolate
-                    # directly between them.
-                    self.midpoint_magnitude = None
-            else:
-                # The low color is saturated but the high color is unsaturated.
-                # Interpolate directly between them, but adjust the hue of the unsaturated
-                # high color.
-                self.midpoint_magnitude = None
-                self.high_msh.msh_h = self.compute_hue_spin(self.low_msh, self.high_msh)
-        else:
-            # The low color is unsaturated. Assume the high color is saturated. (If not,
-            # then this is a boring map no matter what we do.) Interpolate directly
-            # between them, but adjust the hue of the unsaturated low color.
-            self.midpoint_magnitude = None
-            self.low_msh.msh_h = self.compute_hue_spin(self.high_msh, self.low_msh)
-
-    def compute_hue_spin(self, MshSaturated, MshUnsaturated):
-        '''
-        Given a saturated color and unsaturated color, both as MshColor objects,
-        computes a spin component to use during interpolation in Msh space. The spin
-        is considered the target hue to interpolate to.
-        '''
-        if MshSaturated.msh_m >= MshUnsaturated.msh_m:
-            return MshSaturated.msh_h
-        else:
-            hSpin = (MshSaturated.msh_s *
-                     math.sqrt(math.pow(MshUnsaturated.msh_m, 2) -
-                               math.pow(MshSaturated.msh_m, 2)) /
-                     (MshSaturated.msh_m * math.sin(MshSaturated.msh_s)))
-            if MshSaturated.msh_h > -math.pi / 3:
-                return MshSaturated.msh_h + hSpin
-            else:
-                return MshSaturated.msh_h - hSpin
-
-    def print_self(self):
-        print('Low Color:')
-        print('\t', self.low_msh)
-        print('\t', convert_color(self.low_msh, LabColor))
-        print('\t', convert_color(self.low_msh, sRGBColor))
-
-        print('Middle Color:')
-        if (self.midpoint_magnitude):
-            print('\t Magnitude', self.midpoint_magnitude)
-            print('\t Low Hue', self.midpoint_low_hue)
-            print('\t High Hue', self.midpoint_high_hue)
-        else:
-            print('\t No Midpoint')
-
-        print('High Color:')
-        print('\t', self.high_msh)
-        print('\t', convert_color(self.high_msh, LabColor))
-        print('\t', convert_color(self.high_msh, sRGBColor))
-
-    def map_scalar(self, scalar, space=MshColor):
-        '''
-        Given a scalar value between 0 and 1, map to a color. The color is
-        returned as a sRGBColor object.
-
-        :param float scalar: The value to map to a color.
-        :param color_object space: The colormath color object to do interpolation in.
-        '''
-        if scalar < 0:
-            return convert_color(self.low_msh, sRGBColor)
-        if scalar > 1:
-            return convert_color(self.high_msh, sRGBColor)
-
-        interp = scalar
-        low_color = convert_color(self.low_msh, space)
-        high_color = convert_color(self.high_msh, space)
-        if self.midpoint_magnitude:
-            # Adjust the interpolation around the midpoint
-            if scalar < 0.5:
-                interp = 2 * scalar
-                high_msh = MshColor(self.midpoint_magnitude, 0, self.midpoint_low_hue,
-                                    observer=self.low_msh.observer,
-                                    illuminant=self.low_msh.illuminant)
-                high_color = convert_color(high_msh, space)
-            else:
-                interp = 2 * scalar - 1
-                low_msh = MshColor(self.midpoint_magnitude, 0, self.midpoint_high_hue,
-                                   observer=self.low_msh.observer,
-                                   illuminant=self.low_msh.illuminant)
-                low_color = convert_color(low_msh, space)
-        low_color = np.array(low_color.get_value_tuple())
-        high_color = np.array(high_color.get_value_tuple())
-
-        mid_color = interp * (high_color - low_color) + low_color
-        rgb = convert_color(space(mid_color[0], mid_color[1], mid_color[2],
-                                  observer=self.low_msh.observer,
-                                  illuminant=self.low_msh.illuminant),
-                            sRGBColor)
-
-        if ((rgb.rgb_r < -0.0019) or (rgb.rgb_r > 1.0019) or
-                (rgb.rgb_g < -0.0019) or (rgb.rgb_g > 1.0019) or
-                (rgb.rgb_b < -0.0019) or (rgb.rgb_b > 1.0019)):
-            print('WARNING: Value at scalar %1.4f is out of range' % scalar,
-                  rgb.get_value_tuple())
-
-        # Just in case the color leaves the color gammut, clamp to valid values.
-        return sRGBColor(rgb.clamped_rgb_r,
-                         rgb.clamped_rgb_g,
-                         rgb.clamped_rgb_b)
-
-    def map_scalar_array(self, scalar_array, space=MshColor):
-        '''
-        Given an array of scalar values between 0 and 1, map them to colors.
-        The color is returned as a sRGBColor object.
-
-        :param float scalar_array: Array of values to map to colors.
-        :param color_object space: The colormath color object to do interpolation in.
-        '''
-        f = numpy.vectorize(lambda x: self.map_scalar(x, space))
-        return f(scalar_array)
+# from colormath.color_objects import *
+# from colormath.color_conversions import convert_color, color_conversion_function
+# from colormath import color_diff
+#
+#
+# class MshColor(IlluminantMixin, ColorBase):
+#     '''
+#     Represents an Msh color as defined by [Moreland2009]. The Msh color space
+#     is basically just a polar representation of CIE Lab space.
+#     See `Diverging Color Maps for Scientific Visualization
+#     <http://www.kennethmoreland.com/color-maps/>` for more information.
+#     '''
+#
+#     VALUES = ['msh_m', 'msh_s', 'msh_h']
+#
+#     def __init__(self, msh_m, msh_s, msh_h, observer='2', illuminant='d50'):
+#         """
+#         :param float msh_m: M coordinate.
+#         :param float msh_s: s coordinate.
+#         :param float msh_h: h coordinate.
+#         :keyword str observer: Observer angle. Either ```2``` or ```10``` degrees.
+#         :keyword str illuminant: See :doc:`illuminants` for valid values.
+#         """
+#
+#         super(MshColor, self).__init__()
+#         #: M coordinate
+#         self.msh_m = float(msh_m)
+#         #: C coordinate
+#         self.msh_s = float(msh_s)
+#         #: H coordinate
+#         self.msh_h = float(msh_h)
+#
+#         #: The color's observer angle. Set with :py:meth:`set_observer`.
+#         self.observer = None
+#         #: The color's illuminant. Set with :py:meth:`set_illuminant`.
+#         self.illuminant = None
+#
+#         self.set_observer(observer)
+#         self.set_illuminant(illuminant)
+#
+#
+# @color_conversion_function(LabColor, MshColor)
+# def Lab_to_Msh(cobj, *args, **kwargs):
+#     """
+#     Convert from CIE Lab to Msh.
+#     """
+#
+#     msh_m = math.sqrt(math.pow(float(cobj.lab_l), 2) +
+#                       math.pow(float(cobj.lab_a), 2) +
+#                       math.pow(float(cobj.lab_b), 2))
+#     msh_s = math.acos(float(cobj.lab_l) / msh_m)
+#     msh_h = math.atan2(float(cobj.lab_b), float(cobj.lab_a))
+#
+#     return MshColor(msh_m, msh_s, msh_h,
+#                     observer=cobj.observer,
+#                     illuminant=cobj.illuminant)
+#
+#
+# @color_conversion_function(MshColor, LabColor)
+# def Msh_to_Lab(cobj, *args, **kwargs):
+#     """
+#     Convert from Msh to Lab.
+#     """
+#
+#     lab_l = cobj.msh_m * math.cos(float(cobj.msh_s))
+#     lab_a = cobj.msh_m * math.sin(float(cobj.msh_s)) * math.cos(float(cobj.msh_h))
+#     lab_b = cobj.msh_m * math.sin(float(cobj.msh_s)) * math.sin(float(cobj.msh_h))
+#     return LabColor(lab_l, lab_a, lab_b,
+#                     illuminant=cobj.illuminant,
+#                     observer=cobj.observer)
+#
+#
+# class SmoothDivergingColorMap:
+#     def __init__(self,
+#                  low_color=sRGBColor(0.230, 0.299, 0.754),
+#                  high_color=sRGBColor(0.706, 0.016, 0.150),
+#                  mid_color=MshColor(88.0, 0.0, 0.0)):
+#         """
+#         :param color low_color: The color at the low end of the map.
+#         :param color high_color: The color at the high end of the map.
+#         :param color mid_color: The color at the middle of the map. Should be unsaturated.
+#         """
+#         self.low_msh = convert_color(low_color, MshColor)
+#         self.high_msh = convert_color(high_color, MshColor)
+#
+#         # If the points are saturated and distinct, then we place a white point
+#         # in the middle. Otherwise we ignore it.
+#         if self.low_msh.msh_s > 0.05:
+#             if self.high_msh.msh_s > 0.05:
+#                 if (abs(self.low_msh.msh_h - self.high_msh.msh_h) > math.pi / 3.0) \
+#                         and mid_color:
+#                     # Both endpoints are saturated and unique and a midpoint was
+#                     # given. Interpolate through this midpoint and compute an
+#                     # appropriate hue spin.
+#                     mid_msh = convert_color(mid_color, MshColor)
+#                     self.midpoint_magnitude = mid_msh.msh_m
+#                     self.midpoint_low_hue = self.compute_hue_spin(self.low_msh, mid_msh)
+#                     self.midpoint_high_hue = self.compute_hue_spin(self.high_msh, mid_msh)
+#                 else:
+#                     # Both endpoints are distinct colors, but they are either very close
+#                     # in hue or no middle point was given. In this case, interpolate
+#                     # directly between them.
+#                     self.midpoint_magnitude = None
+#             else:
+#                 # The low color is saturated but the high color is unsaturated.
+#                 # Interpolate directly between them, but adjust the hue of the unsaturated
+#                 # high color.
+#                 self.midpoint_magnitude = None
+#                 self.high_msh.msh_h = self.compute_hue_spin(self.low_msh, self.high_msh)
+#         else:
+#             # The low color is unsaturated. Assume the high color is saturated. (If not,
+#             # then this is a boring map no matter what we do.) Interpolate directly
+#             # between them, but adjust the hue of the unsaturated low color.
+#             self.midpoint_magnitude = None
+#             self.low_msh.msh_h = self.compute_hue_spin(self.high_msh, self.low_msh)
+#
+#     def compute_hue_spin(self, MshSaturated, MshUnsaturated):
+#         '''
+#         Given a saturated color and unsaturated color, both as MshColor objects,
+#         computes a spin component to use during interpolation in Msh space. The spin
+#         is considered the target hue to interpolate to.
+#         '''
+#         if MshSaturated.msh_m >= MshUnsaturated.msh_m:
+#             return MshSaturated.msh_h
+#         else:
+#             hSpin = (MshSaturated.msh_s *
+#                      math.sqrt(math.pow(MshUnsaturated.msh_m, 2) -
+#                                math.pow(MshSaturated.msh_m, 2)) /
+#                      (MshSaturated.msh_m * math.sin(MshSaturated.msh_s)))
+#             if MshSaturated.msh_h > -math.pi / 3:
+#                 return MshSaturated.msh_h + hSpin
+#             else:
+#                 return MshSaturated.msh_h - hSpin
+#
+#     def print_self(self):
+#         print('Low Color:')
+#         print('\t', self.low_msh)
+#         print('\t', convert_color(self.low_msh, LabColor))
+#         print('\t', convert_color(self.low_msh, sRGBColor))
+#
+#         print('Middle Color:')
+#         if (self.midpoint_magnitude):
+#             print('\t Magnitude', self.midpoint_magnitude)
+#             print('\t Low Hue', self.midpoint_low_hue)
+#             print('\t High Hue', self.midpoint_high_hue)
+#         else:
+#             print('\t No Midpoint')
+#
+#         print('High Color:')
+#         print('\t', self.high_msh)
+#         print('\t', convert_color(self.high_msh, LabColor))
+#         print('\t', convert_color(self.high_msh, sRGBColor))
+#
+#     def map_scalar(self, scalar, space=MshColor):
+#         '''
+#         Given a scalar value between 0 and 1, map to a color. The color is
+#         returned as a sRGBColor object.
+#
+#         :param float scalar: The value to map to a color.
+#         :param color_object space: The colormath color object to do interpolation in.
+#         '''
+#         if scalar < 0:
+#             return convert_color(self.low_msh, sRGBColor)
+#         if scalar > 1:
+#             return convert_color(self.high_msh, sRGBColor)
+#
+#         interp = scalar
+#         low_color = convert_color(self.low_msh, space)
+#         high_color = convert_color(self.high_msh, space)
+#         if self.midpoint_magnitude:
+#             # Adjust the interpolation around the midpoint
+#             if scalar < 0.5:
+#                 interp = 2 * scalar
+#                 high_msh = MshColor(self.midpoint_magnitude, 0, self.midpoint_low_hue,
+#                                     observer=self.low_msh.observer,
+#                                     illuminant=self.low_msh.illuminant)
+#                 high_color = convert_color(high_msh, space)
+#             else:
+#                 interp = 2 * scalar - 1
+#                 low_msh = MshColor(self.midpoint_magnitude, 0, self.midpoint_high_hue,
+#                                    observer=self.low_msh.observer,
+#                                    illuminant=self.low_msh.illuminant)
+#                 low_color = convert_color(low_msh, space)
+#         low_color = np.array(low_color.get_value_tuple())
+#         high_color = np.array(high_color.get_value_tuple())
+#
+#         mid_color = interp * (high_color - low_color) + low_color
+#         rgb = convert_color(space(mid_color[0], mid_color[1], mid_color[2],
+#                                   observer=self.low_msh.observer,
+#                                   illuminant=self.low_msh.illuminant),
+#                             sRGBColor)
+#
+#         if ((rgb.rgb_r < -0.0019) or (rgb.rgb_r > 1.0019) or
+#                 (rgb.rgb_g < -0.0019) or (rgb.rgb_g > 1.0019) or
+#                 (rgb.rgb_b < -0.0019) or (rgb.rgb_b > 1.0019)):
+#             print('WARNING: Value at scalar %1.4f is out of range' % scalar,
+#                   rgb.get_value_tuple())
+#
+#         # Just in case the color leaves the color gammut, clamp to valid values.
+#         return sRGBColor(rgb.clamped_rgb_r,
+#                          rgb.clamped_rgb_g,
+#                          rgb.clamped_rgb_b)
+#
+#     def map_scalar_array(self, scalar_array, space=MshColor):
+#         '''
+#         Given an array of scalar values between 0 and 1, map them to colors.
+#         The color is returned as a sRGBColor object.
+#
+#         :param float scalar_array: Array of values to map to colors.
+#         :param color_object space: The colormath color object to do interpolation in.
+#         '''
+#         f = numpy.vectorize(lambda x: self.map_scalar(x, space))
+#         return f(scalar_array)
