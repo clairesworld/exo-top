@@ -156,6 +156,7 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
 
     # preload data
     df = pro.pickleio(case=case, load=True, suffix='_T', postprocess_functions=None, data_path=data_path)
+    print(df.head())
     if i_ts is None:
         n = df.sol.to_numpy()
         ts = df.index.to_numpy()
@@ -173,7 +174,7 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
         rms_plot = [h_rms[i_ts]] * len(x)
 
     else:
-        ts = df.index.to_numpy()[i_ts]
+        ts = i_ts  # df.ts.to_numpy()[i_ts]
         x, h = pro.read_topo_stats(case, ts, data_path=data_path)
         h_norm = pro.trapznorm(h)  # normalize to 0 mean
         peak, rms = pro.peak_and_rms(h_norm)
@@ -195,7 +196,7 @@ def static_h(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksiz
 
 
 def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, legsize=20, dark=False,
-                  return_artists=False, c='k', alpha=0.9, save=True, i_n=0, avg=False, fig=None, ax=None, leg=True,
+                  return_artists=False, c='k', c_bl='xkcd:tangerine', alpha=0.9, save=True, i_n=0, avg=False, fig=None, ax=None, leg=True,
                   xlabel='', ylabel='', showminmax=False, xlabelpad=20, **kwargs):
 
     if dark:
@@ -248,7 +249,7 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
         D_l_n = np.array(df_n['y_L'])
 
     line, = ax.plot(T_f, y_f, c=foreground, lw=3)
-    ax.fill_between(T_f, [D_l_n - delta_rh_n] * len(T_f), [D_l_n] * len(T_f), fc='xkcd:tangerine', alpha=alpha,
+    ax.fill_between(T_f, [D_l_n - delta_rh_n] * len(T_f), [D_l_n] * len(T_f), fc=c_bl, alpha=alpha,
                     label='Thermal bdy layer')
     #                 label='Thermal bdy layer\n' + r'$\delta$ = ' + '{:04.3f}'.format(delta_rh_n))
     if leg:
@@ -268,9 +269,10 @@ def static_T_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, ti
 
 
 def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
-                   legsize=12, legtext='', t1=None,
+                   legsize=12, legtext='', t1=None, vmax=1, vmin=0,
                    shading='nearest', return_artists=False, save=True, i_n=-1, avg=False, c='k', cbar=True, dark=False,
-                   title='Nondimensional temperature', fig=None, ax=None, col_vis=20, ticklabels=True, ylabelpad=20):
+                   title='Nondimensional temperature', fig=None, ax=None, col_vis=20, ticklabels=True, ylabelpad=20,
+                   **kwargs):
 
     if dark:
         foreground = 'xkcd:off white'
@@ -315,7 +317,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     if ax is None and fig is None:
         fig, ax = plt.subplots(figsize=(20, 10))
 
-    im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading)
+    im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading, vmin=vmin, vmax=vmax)
 
     if cbar:
         divider = make_axes_locatable(ax)
@@ -415,27 +417,27 @@ def static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
 
 def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
-                 save=True, c='k', wspace=0.1, hspace=0.1, c_h='k', legtext='', legsize=12, hlim=(-5e-2, 5e-2),
-                 **kwargs):
+                 save=True, c='k', nc=24, nr=5, w=24, h=5, wspace=0.1, hspace=0.1, c_h='k', legtext='', legsize=12, hlim=(-5e-2, 5e-2),
+                 i_n=-1, i_ts=-1, avg_prof=True, leg_x=0.1, **kwargs):
     from useful_and_bespoke import cornertext
     # not animated
 
-    fig = plt.figure(figsize=(24, 5))
-    gs = fig.add_gridspec(5, 24, wspace=wspace, hspace=hspace)
+    fig = plt.figure(figsize=(w, h))
+    gs = fig.add_gridspec(nr, nc, wspace=wspace, hspace=hspace)
 
-    ax0 = fig.add_subplot(gs[1, :-1])
+    ax0 = fig.add_subplot(gs[0:2, :-2])
     fig, ax0 = static_h(case, data_path=data_path, save=False, fig=fig, ax=ax0, c_line=c_h, labelsize=labelsize,
-                        ticksize=ticksize, i_ts=-1, ylabel='$h^\prime$', ylabelpad=7, ylim=hlim, **kwargs)
+                        ticksize=ticksize, i_ts=i_ts, ylabel='$h^\prime$', ylabelpad=7, ylim=hlim, **kwargs)
 
-    ax1 = fig.add_subplot(gs[2:,:-1])
+    ax1 = fig.add_subplot(gs[2:, :-2])
     fig, ax1 = static_T_field(case, data_path=data_path, avg=False, save=False, fig=fig, ax=ax1, c=c, cmap=cmap,
-                              title='', labelsize=labelsize, ticksize=ticksize, i_n=-1, cbar=False, ticklabels=False,
+                              title='', labelsize=labelsize, ticksize=ticksize, i_n=i_n, cbar=False, ticklabels=False,
                               ylabelpad=25, **kwargs)
     # e.g. case label
-    ax1 = cornertext(ax1, legtext, pos='bottom left', size=legsize, x=0.12, ha='right')
+    ax1 = cornertext(ax1, legtext, pos='bottom left', size=legsize, x=leg_x, ha='right')
 
-    ax2 = fig.add_subplot(gs[2:,-1])
-    fig, ax2 = static_T_prof(case, data_path=data_path, avg=True, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
+    ax2 = fig.add_subplot(gs[2:, -2:])
+    fig, ax2 = static_T_prof(case, data_path=data_path, avg=avg_prof, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,
                              ticksize=ticksize, leg=False, xlabel='$T^\prime$', xlabelpad=5, **kwargs)
     ax2.set_xticks([0, 1])
 

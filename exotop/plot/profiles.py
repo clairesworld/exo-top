@@ -36,6 +36,7 @@ hlim = (-3e-2, 3e-2)
 #                                labelsize=labelsize, ticksize=ticksize, legsize=legsize, wspace=wspace, hspace=hspace,
 #                                legtext=r'Ra = $1 \times 10^8$' + '\n' + r'$\Delta \eta = 1 \times 10^8$',
 #                                cmap='gist_heat', save=True, c='k', c_h=c_h, hlim=hlim)
+
 fig, axes = anims.T_h_gridspec(case='Ra3e8-eta1e8-wide-ascii', data_path=data_path, fig_path=fig_path,
                                labelsize=labelsize, ticksize=ticksize, legsize=legsize, wspace=wspace, hspace=hspace,
                                legtext=r'Ra = $3 \times 10^8$' + '\n' + r'$\Delta \eta = 1 \times 10^8$',
