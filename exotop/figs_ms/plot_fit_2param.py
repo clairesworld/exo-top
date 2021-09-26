@@ -19,7 +19,7 @@ ticksize = 16
 
 df = pd.read_csv('/home/claire/Works/aspect/runs/figs/aspect-output.csv')
 print(df.head())
-Ra = df.Ra_i_eff.to_numpy()
+# Ra = df.Ra_i_eff.to_numpy()
 Ra1 = df.Ra_1.to_numpy()
 h = df.h_rms.to_numpy()
 eta = df.delta_eta.to_numpy()
@@ -206,8 +206,10 @@ leg = ax.legend(handles=handles, frameon=False, fontsize=legsize)
 ax.add_artist(leg)
 
 # colourbar(vector=lneta_unique, ax=ax, label='$b = \ln(\Delta \eta)$', labelsize=labelsize, labelpad=30)
-ax = colourised_legend(clist=c, ax=ax, cleglabels=[int(e) for e in lneta_unique],
-                       title='$\ln(\Delta \eta)$', legsize=ticksize, titlesize=legsize, markersize=5)
+leglabels = [r'$10^6$', r'$10^7$', r'$10^8$', r'$10^9$']  # [int(np.round(e)) for e in lneta_unique]
+legtitle = '$\Delta \eta$'  # '$\ln(\Delta \eta)$'
+ax = colourised_legend(clist=c, ax=ax, cleglabels=leglabels,
+                       title=legtitle, legsize=ticksize, titlesize=legsize, markersize=5)
 ax.set_xlim(xlim)
 # ax.set_ylim(-2.25, -1.95)
 # ax.set_ylim(-3.5, -1)

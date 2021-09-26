@@ -172,3 +172,62 @@ def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_m=
     return h_rms
 
 # def no_h_scaling(pl):
+
+
+def plot_map(pl, at_age=4.5, phi0=None, name_rms='dyn_top_aspect_prime', spectrum_fname='base_spectrum_l1.pkl',
+             spectrum_fpath='/home/claire/Works/exo-top/exotop/top_spectra/', rho_w=1000, verbose=False,
+             fig_path='/home/claire/Works/exo-top/exotop/figs_scratch/', cbar=True, clabel='Dynamic topography (m)',
+             cmap='gist_earth', labelsize=16, clabelpad=20, save=True):
+    import matplotlib.pyplot as plt
+    from matplotlib import rc
+    from matplotlib.pyplot import rcParams
+    rc('text', usetex=True)  # turn off for running over ssh
+    rcParams['font.family'] = 'serif'
+    rcParams['font.serif'] = 'CMU Serif'
+
+    water_load_ratio = pl.rho_m / (pl.rho_m - rho_w)
+    print('including water loading')
+
+    if phi0 is None:
+        degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
+
+    h_rms1 = eval('pl.' + name_rms)
+    if verbose:
+        h_rms1_dim = eval('pl.' + 'dyn_top_rms')
+        print('nondimensional h rms', h_rms1[-1])
+        print('dimensional h rms', h_rms1_dim[-1])
+
+    l = np.arange(len(phi0))
+    k = sh.l_to_k(l, R=2)  # original model spectrum uses R = 2d = 2
+    h_rms0 = sh.parseval_rms(phi0, k)
+    if np.isnan(h_rms0):
+        print('phi0', phi0)
+        print('k', k)
+        raise Exception('rms of model spectrum is nan!')
+
+    ii = age_index(pl.t, at_age, parameters.sec2Gyr)  # get time index nearest to desired snap given in Gyr
+
+    h_rms = h_rms1[ii]
+    h_ratio = h_rms / h_rms0
+    clm = sh.random_harms_from_psd(phi0, l, R=2, h_ratio=h_ratio, plot=False, verbose=verbose)
+    data = sh.coeffs_to_grid(clm, R=2, plot_grid=False, plot_spectrum=False, verbose=verbose)
+    lmax = clm.lmax
+    print('lmax', lmax)
+    lats = data.lats()
+    lons = data.lons()
+    grid_dim = dimensionalise(data.data, pl, i=ii) * water_load_ratio
+    fig, ax = plt.subplots(1, 1)
+    mappable = ax.imshow(grid_dim, extent=(0, 360, -90, 90), cmap=cmap, interpolation='gaussian')
+    ax.set(yticks=np.arange(-90, 120, 30), xticks=np.arange(0, 390, 30))
+    ax.set_xlabel('Latitude', fontsize=labelsize)
+    ax.set_ylabel('Longitude', fontsize=labelsize)
+    if cbar:
+        cb = plt.colorbar(mappable, orientation='horizontal', location='top', fraction=0.07)
+        cb.set_label(label=clabel, fontsize=labelsize, labelpad=clabelpad)
+    if save:
+        plt.savefig(fig_path + 'topo_grid.png', bbox_inches='tight')
+    return fig, ax
+
+
+
+

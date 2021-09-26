@@ -5,13 +5,22 @@ from postaspect.setup_postprocessing import Ra_ls, eta_ls, t1_grid, end_grid, da
     fig_fmt, regime_grid_td, load_grid, p_Earth, postprocess_kwargs, benchmark_path, data_path_bullard, fig_path_bullard
 from useful_and_bespoke import dark_background, colourised_legend, colorize
 import matplotlib.pyplot as plt
+from matplotlib import rc
+from matplotlib.pyplot import rcParams
 
-data_path = data_path_bullard
-fig_path = fig_path_bullard
+rc('text', usetex=True)  # turn off for running over ssh
+rcParams['font.family'] = 'serif'
+rcParams['font.serif'] = 'CMU Serif'
+
+data_path = data_path_home
+fig_path = fig_path_home
+psd_path = '/home/claire/Works/exo-top/exotop/top_spectra/'
 labelsize = 18
 ticksize = 14
 legsize = 14
-cmap = 'rainbow'
+cmap = 'gray'  #'rainbow'
+norm = 'rms'  # 'rms'
+ylabel = 'Normalised 1D power spectral density'  # \n' + '(% relative to total)',
 
 """ set dimensionalisation factors """
 R_p = 6371  # Earth
@@ -22,13 +31,10 @@ R_p = 6371  # Earth
 d, dT, alpha = 1, 1, 1
 
 fig, axes = plt.subplots(2, 1, figsize=(7, 10))
-# regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 'not ready', 'sluggish'],  # eta 1e5
-#                            ['steady', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e6
-#                            ['no convection', 'steady', 'steady', 'trans.', 'test', 'chaotic', 'test'],  # eta 1e7
-#                            ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],
-#                            # eta 1e8
-#                            ['not ran', 'not ran', 'not ran', 'not ran', 'chaotic', 'not ran', 'chaotic']  # eta 1e9???
-#                            ])  # exclude some bad points??
+xlim = (6e-1, 6e1)
+ylim0 = (1e-6, 1e1)
+ylim1 = (3e-4, 1e1)
+model_c = 'xkcd:bordeaux'  # (0.02156863, 0.68274886, 0.93022931)
 regimes_use = ['chaotic']
 
 """ manu - all norm spectra with fit and Venus (and Hoggard?) """
@@ -38,52 +44,51 @@ fig, *axs = plat.plot_norm_spectra(Ra_ls, eta_ls, end_grid=end_grid, regime_grid
                                    figsize=(8, 5), z_name='case', cbar=False,
                                    show_beta_guide=False, clabelpad=30, fig=fig, ax=axes[0],
                                    labelsize=labelsize, ticksize=ticksize, marker=None, lw=1, alpha=0.4, labelpad=16,
-                                   xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
+                                   xlim=xlim, ylim=ylim0,
                                    max_dscale=2, bl_fudge=5, legsize=legsize,  # c_guide='xkcd:off white',
-                                   xlabel='', ylabel='Power spectral density\n' + '(% relative to total)',
+                                   xlabel='', ylabel='',
                                    x2label='Spherical harmonic degree', clabel='Case',
                                    # clabel=r'log(Ra$_{i, {\rm eff}})$',
-                                   norm='rel_power', whole=False, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
+                                   norm=norm, whole=False, dim=False, d=d, dT=dT, alpha_m=alpha, R_p=2 * d,
                                    # xlim_l=(0.3, 130),
                                    x1_name='wavenumber', show_degrees=False, legend=True,
-                                   # vmin=6, vmax=7.2
+                                   # vmin=1, vmax=11,
                                    )
-cases = np.arange(1, 11 + 1)
-ax = colourised_legend(axes[0], clist=colorize(cases, cmap=cmap)[0],
-                       cleglabels=cases, lw=1, ls='-', marker=None,
-                       markersize=0,
-                       legsize=legsize, ncol=1, title='Case')
-model_c = (0.02156863, 0.68274886, 0.93022931)
+# cases = np.arange(1, 11 + 1)
+# ax = colourised_legend(axes[0], clist=colorize(cases, cmap=cmap)[0],
+#                        cleglabels=cases, lw=1, ls='-', marker=None,
+#                        markersize=0,
+#                        legsize=legsize, ncol=1, title='Case')
 
-ylim = (1e-3, 8e1)
-fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
+
+fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path, psd_path=psd_path,
                            R=2, lmin=1, c=model_c ,  # 'xkcd:bordeaux',
-                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=(1e-5, 1e2),
+                           x_name='wavenumber', ticksize=ticksize, xlim=xlim, ylim=ylim0,
                            save=False, labelsize=labelsize, legend=True, label='Model dynamic topography',
-                           show_degrees=True, x2label='Spherical harmonic degree', marker='^',
-                           ylabel='Power spectral density\n' + '(% relative to total)',
-                           legsize=legsize, fig=fig, ax=axes[0])
+                           show_degrees=True, x2label='Spherical harmonic degree, $l$', marker='^',
+                           ylabel='',
+                           norm=norm, legsize=legsize, fig=fig, ax=axes[0])
 
-fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
+fig, ax = sh.plot_norm_psd(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path, psd_path=psd_path,
                            R=2, lmin=1, c=model_c ,  # 'xkcd:bordeaux',
-                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=ylim,
+                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=ylim1,
                            show_degrees=False, save=False, labelsize=labelsize, legend=False,
                            label='Model dynamic topography', marker='^', lmax=53,
-                           legsize=legsize, fig=fig, ax=axes[1])
+                           norm=norm, legsize=legsize, fig=fig, ax=axes[1])
 
-fig, ax = sh.plot_norm_psd(baseline_fname='Venus', fig_path=fig_path, data_path=data_path,
+fig, ax = sh.plot_norm_psd(baseline_fname='Venus', fig_path=fig_path, data_path=data_path, psd_path=psd_path,
                            R=2, lmin=1, c='xkcd:squash', lmax=53,
-                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=ylim,
+                           x_name='wavenumber', ticksize=ticksize, xlim=xlim, ylim=ylim1,
                            show_degrees=True, save=False, labelsize=labelsize, legend=False,
                            label='Venus (Wieczorek 2015)', marker='v',
-                           legsize=legsize, fig=fig, ax=axes[1])
+                           norm=norm, legsize=legsize, fig=fig, ax=axes[1])
 
-fig, ax = sh.plot_norm_psd(baseline_fname='spectrum_-2.pkl', fig_path=fig_path, data_path=data_path,
+fig, ax = sh.plot_norm_psd(baseline_fname='spectrum_-2.pkl', fig_path=fig_path, data_path=data_path, psd_path=psd_path,
                            R=2, lmin=1, c='xkcd:reddish orange', lmax=53,
-                           x_name='wavenumber', ticksize=ticksize, xlim=(6e-1, 6e1), ylim=ylim,
+                           x_name='wavenumber', ticksize=ticksize, xlim=xlim, ylim=ylim1,
                            show_degrees=True, save=False, labelsize=labelsize, legend=True,
-                           label=r'$k^{-2}$', marker='o', ylabel='Power spectral density\n' + '(% relative to total)',
-                           legsize=legsize, fig=fig, ax=axes[1])
+                           label=r'Red noise, $k^{-2}$', marker='o', ylabel='',
+                           norm=norm, legsize=legsize, fig=fig, ax=axes[1])
 
 # _, _, fig, _ = sh.Venus_correction(baseline_fname='base_spectrum_l1.pkl', fig_path=fig_path, data_path=data_path,
 #                                     R_base=2, lmin=1, set_axlabels=False, c_fit='xkcd:bordeaux', c_Ve='xkcd:squash',#'xkcd:dark',
@@ -98,13 +103,29 @@ fig, ax = sh.plot_norm_psd(baseline_fname='spectrum_-2.pkl', fig_path=fig_path, 
 #                                     save=False, plot=True, units='m3', scale_to=1.0, alpha=0.9, labelsize=labelsize,
 #                                     fig=fig, ax=axes[1])  # axs[0] if no secondary ax; this plots degrees
 
-axes[1].set_xlabel('Nondimensional wavenumber', fontsize=labelsize)
-
+axes[1].set_xlabel('Nondimensional wavenumber, $k/d$', fontsize=labelsize)
+fig.supylabel(ylabel, fontsize=labelsize)
 
 
 # plt.show()
 fig.savefig(fig_path + 'psd_stacked_k.png', bbox_inches='tight')
 #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 """ plot normalised spectra relative power on single axis - full spectrum norm rms"""
 
@@ -180,21 +201,3 @@ fig.savefig(fig_path + 'psd_stacked_k.png', bbox_inches='tight')
 #                                  max_dscale=1, bl_fudge=5,)
 
 
-""" get all time-averaged spectra and store """
-
-# for ii, eta in enumerate(eta_ls):  # across eta_ls
-#     cases_ii = ['Ra' + Ra + '-eta' + eta + e for Ra, e in zip(Ra_ls, end_grid[ii])]
-#     labels_ii = ['Ra=' + Ra for Ra in Ra_ls]
-#     for jj, Ra in enumerate(Ra_ls):
-#         if regime_grid_td[ii, jj] in regimes_use:
-#             case = cases_ii[jj]
-#             t1 = t1_grid[ii, jj]
-#             print('Calculating spectrum for', case)
-#             fig, ax = sh.dct_spectrum_avg(case, L_x=8,
-#                                           dim=False, R_p=d, d=d, dT=dT, alpha=alpha,
-#                                           t0=t1, x_res=1, t_res=1,
-#                                           test=False, data_path=data_path, fig_path=fig_path,
-#                                           check_norm=False,
-#                                           plot=True, load=False, dump=True, save=True, y0_guide=1e0,
-#                                           )
-#             print('    ...finished!')

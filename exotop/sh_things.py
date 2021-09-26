@@ -862,10 +862,12 @@ def get_pysh_constants(body, name):
     return eval('pyshtools.constants.' + body + '.' + name + '.value')
 
 
-def plot_norm_psd(baseline_fname='base_spectrum.pkl', fig_path='', lmin=1, lmax=None, x_name='degrees',
+def plot_norm_psd(baseline_fname='base_spectrum.pkl', fig_path='', psd_path=None, lmin=1, lmax=None, x_name='degrees',
                   norm='rel_power', c='xkcd:sea', marker='o', label='', dims='1D', R=2, xlim=None, ylim=None,
                   fig=None, ax=None, labelsize=16, legsize=12, ticksize=12, save=True, labelpad=12, x2label='',
                   xlabel=None, ylabel=None, fname='norm_psd', legend=True, show_degrees=False, **kwargs):
+    if psd_path is None:
+        psd_path = fig_path
     print('\n')
     # generic plotting a spectrum
     if R == 'Venus':
@@ -877,7 +879,7 @@ def plot_norm_psd(baseline_fname='base_spectrum.pkl', fig_path='', lmin=1, lmax=
         phi = k * phi_iso
     else:
         # get PSDs - model spectra are 1D and at fixed degrees
-        l, phi = load_model_spectrum_pkl(fname=baseline_fname, path=fig_path, **kwargs)
+        l, phi = load_model_spectrum_pkl(fname=baseline_fname, path=psd_path, **kwargs)
         # print('loaded l', l)
         k = l_to_k(l, R)
         phi_iso = 1 / k * phi

@@ -33,10 +33,16 @@ run_kwargs = {
 
 names = ['Ea', 'eta_pre',
                    ]
-mini = [300e3, 1.6e11,
-                   ]
-maxi = [300e3, 1.6e11,
-                   ]
+mini_mc = [200e3, 2.63e10, #240e3, 1.6e10
+           # 0.3
+           ]
+maxi_mc = [300e3, 5.32e13, #340e3, 2.6e12,
+           # 3
+           ]
+# mini = [300e3, 1.6e11,
+#                    ]
+# maxi = [300e3, 1.6e11,
+#                    ]
 
 # how h varies across key input parameters
 x_vars = ['t',
@@ -55,12 +61,12 @@ xlabels = ['Age\n(Gyr)',
            'Planet mass\n' + r'($M_{\oplus}$)', 'Core Mass Fraction',
            'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-dist_res = 2
-x_res = 4
+dist_res = 500
+x_res = 16
 n_sigma = 1
 
 fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_res=x_res, n_sigma=n_sigma,
-                                                           names=names, mini=mini, maxi=maxi,
+                                                           names=names, mini=mini_mc, maxi=maxi_mc,
                                                            defaults='baseline', age=4.5,
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
                                                            legend=True, lw=4, ylabel=r'RMS topography (m)',

@@ -71,11 +71,11 @@ else:
     cmap.set_under(hex_list[0])
     cmap.set_over(hex_list[-1])
 
-maxi_mc = [340e3, 2.6e12,
-           # 3
-           ]
-mini_mc = [240e3, 1.6e10,
+mini_mc = [200e3, 2.63e10, #240e3, 1.6e10
            # 0.3
+           ]
+maxi_mc = [300e3, 5.32e13, #340e3, 2.6e12,
+           # 3
            ]
 names_mc = ['Ea', 'eta_pre',
             # 'x_Eu'
@@ -88,9 +88,9 @@ run_kwargs = {
     # 'rms_type': 'Ra_i_eff'
 }
 
-nplanets = 7
+nplanets = 16
 n_stats = 100
-dist_res = 10
+dist_res = 500
 n_sigma = 1
 
 

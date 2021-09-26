@@ -25,10 +25,10 @@ linec = 'xkcd:pale turquoise'  # 'xkcd:british racing green'  # '#d88868'
 names_mc = ['Ea', 'eta_pre',
             # 'x_Eu'
             ]
-mini_mc = [240e3, 1.6e10, #4.8e10, #1.6e10, #4.8e10,
+mini_mc = [200e3, 2.63e10, #240e3, 1.6e10
            # 0.3
            ]
-maxi_mc = [340e3, 2.6e12, #2.6e13, #2.6e12, #2.6e13,
+maxi_mc = [300e3, 5.32e13, #340e3, 2.6e12,
            # 3
            ]
 
@@ -56,12 +56,12 @@ ylabels = [r'$T_m$ (K)',
            # r'$h_{\rm rms}$ (m)' + '\n' + r'$f$(Ra$_{i, {\rm eff}}$)',
            # 'Ur'
            ]
-ylims = [(1600, 3000),
+ylims = [(1600, 3500),
          # None,
          (1e17, 1e20),
-         (8, 20),
+         (8, 16),
          (1e7, 1e13),
-         (1e-1, 5e0),
+         (1e-1, 4e0),
          (1e0, 1e3),
          # (1e2, 1e3),
          # None
