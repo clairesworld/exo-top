@@ -1332,7 +1332,7 @@ def check_convergence(case, window=50, t1=0, fig_path='', plot=True, **kwargs):
     _, q_bot = read_evol(case, 'heatflux_bottom', **kwargs)
     _, vel = read_evol(case, 'rms_velocity', **kwargs)
 
-    q_diff = q_bot - q_top
+    q_diff = -q_bot - q_top
     # q_diff_smooth = savitzky_golay(q_diff, 10, 2)
 
     # smooth using moving avgs
