@@ -1355,10 +1355,12 @@ def check_convergence(case, window=50, t1=0, fig_path='', plot=True, **kwargs):
         import matplotlib.pyplot as plt
 
         fig, axes = plt.subplots(2, 1)
-        axes[0].plot(df['t'], df['vel_change'])
-        axes[1].plot(df['t'], df['qdiff_rolling'])
-        axes[0].set_xlabel('time')
-        axes[1].set_xlabel('time')
+        for ax in axes:
+            ax.set_xlabel('time')
+            ax.axvline(x=t1, lw=0, c='k')
+        axes[0].plot(df['t'], df['vel_change'], lw=0.5)
+        axes[1].plot(df['t'], df['qdiff_rolling'], lw=0.5)
+
         axes[0].set_ylabel('percent change rms velocity')
         axes[1].set_ylabel('q bottom - q top')
         fig.savefig(fig_path + 'converge_test_'+case+'.png', bbox_inches='tight')
