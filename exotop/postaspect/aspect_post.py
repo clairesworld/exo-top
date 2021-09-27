@@ -1254,7 +1254,7 @@ def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, fit_linear=True, **kwargs):
     return const, expon, const_err, expon_err, chisqr, MSE
 
 
-def check_convergence(case, window=10, **kwargs):
+def check_convergence(case, window=10, t1=0, **kwargs):
     def savitzky_golay(y, window_size, order, deriv=0, rate=1):
         r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
         The Savitzky-Golay filter removes high frequency noise from data.
@@ -1336,14 +1336,17 @@ def check_convergence(case, window=10, **kwargs):
     # q_diff_smooth = savitzky_golay(q_diff, 10, 2)
 
     # smooth using moving avgs
-    df = pd.DataFrame({'vel':vel, 'qdiff':q_diff})
+    df = pd.DataFrame({'t': t, 'vel':vel, 'qdiff':q_diff})
+    # df.set_index('t', inplace=True)
     df['vel_rolling'] = df['vel'].rolling(window).mean()
     df['qdiff_rolling'] = df['qdiff'].rolling(window).mean()
     df.dropna()
 
     # for rms velocity, want to check percent difference and see where it is small and stable
+    # note for q diff, just want to see where this gets to near 0
     df['vel_change'] = df['vel_rolling'].pct_change(periods=1)
 
-    # for q diff, just want to see where this gets to near 0
+    df.drop(df[df.t < t1].index, inplace=True)
 
     print(df.head())
+    print(df.tail())
