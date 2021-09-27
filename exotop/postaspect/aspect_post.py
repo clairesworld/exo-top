@@ -1346,9 +1346,9 @@ def check_convergence(case, window=50, t1=0, fig_path='', plot=True, **kwargs):
     # note for q diff, just want to see where this gets to near 0
     df['vel_change'] = df['vel_rolling'].pct_change(periods=1)
 
-    df.drop(df[df.t < t1].index, inplace=True)
+    # df.drop(df[df.t < t1].index, inplace=True)
 
-    print(df.head())
+    # print(df.head())
     print(df.tail())
 
     if plot:
