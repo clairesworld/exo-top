@@ -205,7 +205,7 @@ axes[-1] = cornertext(axes[-1], 'LAND\nPLANETS', pos='bottom right', size=labels
 #            ]
 handles = []
 for jj, rad in enumerate(rad_vals):
-    handles.append(mlines.Line2D([], [], color='k', ls=ls_rad[jj], lw=3, label=str(rad) + r'$\%$'))
+    handles.append(mlines.Line2D([], [], color='k', ls=ls_rad[jj], lw=3, label=str(rad*100) + r'$\%$'))
 axes[0].legend(handles=handles, bbox_to_anchor=(0, 1.05, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize,
                title=r'\textbf{U, Th budget relative to solar}', title_fontsize=legsize, ncol=3)
 
