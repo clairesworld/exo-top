@@ -1340,7 +1340,10 @@ def check_convergence(case, window=100, t1=0, fig_path='', plot=True, **kwargs):
     # q_diff_smooth = savitzky_golay(q_diff, 10, 2)
 
     # smooth using moving avgs
-    df = pd.DataFrame({'t': t, 'vel':vel, 'qdiff':q_diff})
+    try:
+        df = pd.DataFrame({'t': t, 'vel':vel, 'qdiff':q_diff})
+    except ValueError:
+        print('t', np.shape(t), 'vel', np.shape(vel), 'q', np.shape(q_diff))
     # df.set_index('t', inplace=True)
     df['vel_rolling'] = df['vel'].rolling(window).mean()
     df['qdiff_rolling'] = df['qdiff'].rolling(window).mean()
