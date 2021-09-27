@@ -1361,7 +1361,7 @@ def check_convergence(case, window=100, t1=0, fig_path='', plot=True, **kwargs):
         fig, axes = plt.subplots(2, 1)
         for ax in axes:
             ax.set_xlabel('time')
-            ax.axvline(x=t1, lw=0, c='k')
+            ax.axvline(x=t1, lw=1, c='k')
         axes[0].plot(df['t'], df['vel_change'], lw=0.5)
         axes[1].plot(df['t'], df['qdiff_rolling'], lw=0.5)
 
