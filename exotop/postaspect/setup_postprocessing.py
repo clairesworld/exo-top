@@ -40,7 +40,7 @@ regime_grid_td = np.array([['steady', 'steady', 'steady', 'trans.', 'sluggish', 
                            ['steady', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e6
                            ['no convection', 'steady', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e7
                            ['no convection', 'no convection', 'steady', 'trans.', 'chaotic', 'chaotic', 'chaotic'],  # eta 1e8
-                           ['not ran', 'not ran', 'not ran', 'not ran', 'chaotic', 'not rdy', 'chaotic']  # eta 1e9???
+                           ['not ran', 'not ran', 'not ran', 'not ran', 'chaotic', 'chaotic', 'chaotic']  # eta 1e9???
                            ])  # exclude some bad points??
 
 regime_names_td = ['steady', 'trans.', 'chaotic', 'not ready']
