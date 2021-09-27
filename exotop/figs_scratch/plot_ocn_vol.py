@@ -88,7 +88,7 @@ run_kwargs = {
     # 'rms_type': 'Ra_i_eff'
 }
 
-nplanets = 16
+nplanets = 9
 n_stats = 100
 dist_res = 500
 n_sigma = 1

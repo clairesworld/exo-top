@@ -895,6 +895,11 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
         ts_df = None
         if os.path.exists(data_path + 'output-' + case) and not (regime_grid[ii] == 'no convection') and not (
                 regime_grid[ii] == 'sluggish'):
+
+            print('checking convergence for', case)
+            pro.check_convergence(case, window=10, **kwargs)
+
+
             print('Plotting summary for', case, 'using t1 =', t1[ii])
             t1_ii = t1[ii]
             if iterable_not_string(load):
