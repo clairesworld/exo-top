@@ -1354,7 +1354,7 @@ def check_convergence(case, window=50, t1=0, fig_path='', plot=True, **kwargs):
     if plot:
         import matplotlib.pyplot as plt
 
-        fig, axes = plt.subplots(1, 2)
+        fig, axes = plt.subplots(2, 1)
         axes[0].plot(df['t'], df['vel_change'])
         axes[1].plot(df['t'], df['qdiff_rolling'])
         axes[0].set_xlabel('time')
