@@ -1254,7 +1254,7 @@ def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, fit_linear=True, **kwargs):
     return const, expon, const_err, expon_err, chisqr, MSE
 
 
-def check_convergence(case, window=50, t1=0, fig_path='', plot=True, **kwargs):
+def check_convergence(case, window=100, t1=0, fig_path='', plot=True, **kwargs):
     def savitzky_golay(y, window_size, order, deriv=0, rate=1):
         r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
         The Savitzky-Golay filter removes high frequency noise from data.
@@ -1332,7 +1332,11 @@ def check_convergence(case, window=50, t1=0, fig_path='', plot=True, **kwargs):
     _, q_bot = read_evol(case, 'heatflux_bottom', **kwargs)
     _, vel = read_evol(case, 'rms_velocity', **kwargs)
 
-    q_diff = -q_bot - q_top
+    try:
+        q_diff = (-q_bot - q_top)/q_top
+    except ValueError:
+        q_top = np.insert(q_top, 0, 0)
+        q_diff = (-q_bot - q_top) / q_top
     # q_diff_smooth = savitzky_golay(q_diff, 10, 2)
 
     # smooth using moving avgs

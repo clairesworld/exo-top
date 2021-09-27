@@ -89,6 +89,7 @@ def fit_ODR(y, x1, x2=None, beta0=None, func=None, err_x=None, err_y=None, ci=0.
     expected = func(output.beta, x)
     chisqr = output.sum_square  # np.sum(((y - expected) ** 2) / expected)
     chisqr_nu = output.res_var
+    dof = chisqr / chisqr_nu
 
     # covariance matrix
     cov_beta = output.cov_beta * output.res_var
@@ -100,6 +101,7 @@ def fit_ODR(y, x1, x2=None, beta0=None, func=None, err_x=None, err_y=None, ci=0.
         print('         -> beta', ii, ':', val, '+/-', output.sd_beta[ii], '    CI:', conf[ii][0], conf[ii][1])
     print('         -> sum of squares error:', chisqr)
     print('         -> reduced chi sqr:', chisqr_nu)
+    print('         -> dof:', dof)
     print('         -> covariance matrix:\n')
     print(cov_beta)
     # print('         -> eps', output.eps, len(output.eps), len(y))
