@@ -1254,7 +1254,7 @@ def fit_wrapper(x, h, yerr=1, xerr=1, n_fitted=2, fit_linear=True, **kwargs):
     return const, expon, const_err, expon_err, chisqr, MSE
 
 
-def check_convergence(case, window=10, t1=0, **kwargs):
+def check_convergence(case, window=50, t1=0, fig_path='', plot=True, **kwargs):
     def savitzky_golay(y, window_size, order, deriv=0, rate=1):
         r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
         The Savitzky-Golay filter removes high frequency noise from data.
@@ -1329,7 +1329,7 @@ def check_convergence(case, window=10, t1=0, **kwargs):
 
 
     t, q_top = read_evol(case, 'heatflux_top', **kwargs)
-    _, q_bot = read_evol(case, 'heatflux_top', **kwargs)
+    _, q_bot = read_evol(case, 'heatflux_bottom', **kwargs)
     _, vel = read_evol(case, 'rms_velocity', **kwargs)
 
     q_diff = q_bot - q_top
@@ -1350,3 +1350,16 @@ def check_convergence(case, window=10, t1=0, **kwargs):
 
     print(df.head())
     print(df.tail())
+
+    if plot:
+        import matplotlib.pyplot as plt
+
+        fig, axes = plt.subplots(1, 2)
+        axes[0].plot(df['t'], df['vel_change'])
+        axes[1].plot(df['t'], df['qdiff_rolling'])
+        axes[0].set_xlabel('time')
+        axes[1].set_xlabel('time')
+        axes[0].set_ylabel('percent change rms velocity')
+        axes[1].set_ylabel('q bottom - q top')
+        fig.savefig(fig_path + 'converge_test.png', bbox_inches='tight')
+    return None

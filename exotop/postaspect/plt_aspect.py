@@ -897,7 +897,7 @@ def subplots_cases(cases, labels=None, labelsize=16, labelpad=5, t1=None, save=T
                 regime_grid[ii] == 'sluggish'):
 
             print('checking convergence for', case)
-            pro.check_convergence(case, window=10, t1=t1[ii], **kwargs)
+            pro.check_convergence(case, t1=t1[ii], fig_path=fig_path, **kwargs)
 
 
             print('Plotting summary for', case, 'using t1 =', t1[ii])
