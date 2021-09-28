@@ -14,7 +14,7 @@ from datetime import date
 
 today = date.today().strftime("%b-%d-%Y")
 fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
-# fig_path = '/home/cmg76/Works/exo-top/exotop/figs_ms/'
+fig_path = '/home/cmg76/Works/exo-top/exotop/figs_ms/'
 data_path = '/home/cmg76/Works/aspect/runs/model-output/'
 case = 'Ra1e8-eta1e7-wide'
 # d, dT, alpha = 1, 1, 1
@@ -42,7 +42,7 @@ d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph dim factors
 
 """ money plot """
 spec_path = '/home/claire/Works/exo-top/exotop/top_spectra/'
-# spec_path = '/home/cmg76/Works/exo-top/exotop/top_spectra/'
+spec_path = '/home/cmg76/Works/exo-top/exotop/top_spectra/'
 cmap_path = '/plot/cmaps/'
 # cmap_name = 'c3t3a'
 # cmap = cmap_from_ascii(cmap_name, path=cmap_path, end='.txt').reversed()
