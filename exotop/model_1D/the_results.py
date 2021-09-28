@@ -477,10 +477,11 @@ def benchmark_thermal_plots(ident, show_qsfc_error=False, show_Tavg=False, names
 def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100, update_kwargs=None, run_kwargs=None,
                                    yscale=1, age=4.5, x_res=8, minx=None, maxx=None, verbose=False,
                                    names=vars_mc_default, mini=vmin_mc_default, maxi=vmax_mc_default, t_eval=None,
-                                   n_sigma=1, log=False, **kwargs):
+                                   n_sigma=1, log=False, return_planets=False, **kwargs):
     """generate ensemble of planets depending on x independent variable over some random variations of other
      parameters -- do this for """
-    print('n sigma', n_sigma)
+    if verbose:
+        print('n sigma', n_sigma)
 
     if default is not None:
         pl_kwargs_base = eval('inputs.' + default + '_in').copy()
@@ -500,6 +501,7 @@ def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100,
         x_vec = np.linspace(minx, maxx, x_res)
     planets_x = []
     for ii, x in enumerate(x_vec):
+        print('   ', xvar, x)
         # reset
         pl_kwargs = pl_kwargs_base.copy()
         pl_kwargs.update({xvar: x})
@@ -528,6 +530,8 @@ def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100,
     y_upper = y_av + y_std * n_sigma  # todo for log scape
     y_lower = y_av - y_std * n_sigma
 
+    if return_planets:
+        return x_vec, y_av, y_upper, y_lower, planets_x
     return x_vec, y_av, y_upper, y_lower
 
 
@@ -1120,7 +1124,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                            dist_res=10, ylim=None, leg_loc='upper left',
                                            xlabels=None, log=None, x_range=None, xscales=None, units=None, x_res=8,
                                            fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
-                                           yscale=1, alpha=0.2,
+                                           yscale=1, alpha=0.2, return_planets=False,
                                            linec='k', ls='-', labelsize=16, lw=3, ticksize=12,
                                            update_kwargs={}, run_kwargs={}, verbose=False, **kwargs):
     if x_vars is None:
@@ -1140,30 +1144,34 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
     if log is None:
         log = [False] * len(x_vars)
 
-    if picklefrom is not None:
-        yscale, x_vec, y_av, y_upper, y_lower = pkl.load(open(picklefrom, "rb"))
-    else:
-        if relative and (relval is None):
-            pl_baseline = evol.build_planet_from_id(ident=defaults,
-                                                    run_kwargs=run_kwargs, update_kwargs=update_kwargs,
-                                                    postprocessors=['topography'], t_eval=None)
-            try:
-                it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
-                model_baseline = eval('pl_baseline.' + model_param[0])[it]
-            except IndexError:
-                # scalar
-                model_baseline = eval('pl_baseline.' + model_param[0])
-            except AttributeError:
-                # steady state?
-                model_baseline = eval('pl_baseline.' + model_param[0])
-            yscale = model_baseline ** -1
-        elif relative:
-            yscale = relval ** -1
+    if relative and (relval is None):
+        pl_baseline = evol.build_planet_from_id(ident=defaults,
+                                                run_kwargs=run_kwargs, update_kwargs=update_kwargs,
+                                                postprocessors=['topography'], t_eval=None)
+        try:
+            it = age_index(pl_baseline.t, age, parameters.sec2Gyr)
+            model_baseline = eval('pl_baseline.' + model_param[0])[it]
+        except IndexError:
+            # scalar
+            model_baseline = eval('pl_baseline.' + model_param[0])
+        except AttributeError:
+            # steady state?
+            model_baseline = eval('pl_baseline.' + model_param[0])
+        yscale = model_baseline ** -1
+    elif relative:
+        yscale = relval ** -1
 
-        planets_axes = []
-        for i_ax, x_var in enumerate(x_vars):
-            print('axis', i_ax + 1, '/', len(axes))
-            xmin, xmax = x_range[i_ax]
+    planets_axes = []
+    for i_ax, x_var in enumerate(x_vars):
+        print('axis', i_ax + 1, '/', len(axes))
+        xmin, xmax = x_range[i_ax]
+
+        if picklefrom is not None:
+            x_vec, y_av, y_upper, y_lower = pkl.load(open(picklefrom + '_ax' + str(i_ax) + '.pkl', "rb"))
+            print('xvec', x_vec)
+            print('y_av', y_av)
+        else:
+
             if x_var == 't':
                 # time/age variation - plot single planet evol
                 x_vec, y_av, y_upper, y_lower = ensemble_time_distribution(yvar=model_param, xvar=x_var,
@@ -1176,58 +1184,64 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
             else:
                 if verbose:
                     print('generating planets across', x_var, '...')
-                x_vec, y_av, y_upper, y_lower = ensemble_marginal_distribution(yvar=model_param, xvar=x_var,
+                x_vec, y_av, y_upper, y_lower, planets_x = ensemble_marginal_distribution(yvar=model_param, xvar=x_var,
                                                                                default=defaults, dist_res=dist_res,
                                                                                update_kwargs=update_kwargs,
                                                                                run_kwargs=run_kwargs,
                                                                                yscale=yscale, age=age,
                                                                                x_res=x_res, minx=xmin, maxx=xmax,
                                                                                log=log[i_ax], verbose=verbose,
+                                                                                                 return_planets=True,
                                                                                **kwargs)
-                # planets_axes.append(planets_x)
+                x_vec = x_vec * xscales[i_ax]
+                planets_axes.append(planets_x)
 
-    if pickleto is not None:
-        pkl.dump(yscale, x_vec, y_av, y_upper, y_lower, open(pickleto, "wb"))
-    print('      range:', y_av[0], '-', y_av[-1], '| % diff:', abs(y_av[-1] - y_av[0]) / y_av[0])
-    x_vec = x_vec * xscales[i_ax]
-    axes[i_ax].plot(x_vec, y_av, c=linec, lw=lw, ls=ls)
-    axes[i_ax].fill_between(x_vec, y_lower, y_upper, color=linec, alpha=alpha)
-    axes[i_ax].set_xlabel(xlabels[i_ax], fontsize=labelsize)
-    axes[i_ax].tick_params(axis='both', labelsize=ticksize)
-    if log[i_ax]:
-        axes[i_ax].set_xscale('log')
-    if ylim is not None:
-        axes[i_ax].set_ylim(ylim)
-    if legend:
-        string = ''
-        if 't' not in x_vars:
-            string = string + '{:.3g}'.format(age) + ' Gyr' + '\n'
-        for jj, u in enumerate(units):
-            if jj != i_ax:
-                if x_vars[jj] == 't':
-                    string = string + '{:.3g}'.format(age) + u + '\n'
-                else:
-                    string = string + '{:.3g}'.format(
-                        eval('inputs.' + defaults + '_in')[x_vars[jj]] * xscales[jj]) + u + '\n'
-        string = string[:-1]  # remove last \n
-        if leg_loc == 'upper left':
-            axes[i_ax].text(0.06, 0.96, string,
-                            fontsize=legsize, c=textc,
-                            horizontalalignment='left',
-                            verticalalignment='top',
-                            transform=axes[i_ax].transAxes)
-        elif leg_loc == 'upper right':
-            axes[i_ax].text(0.96, 0.96, string,
-                            fontsize=legsize, c=textc,
-                            horizontalalignment='right',
-                            verticalalignment='top',
-                            transform=axes[i_ax].transAxes)
+        print('      range:', y_av[0], '-', y_av[-1], '| % diff:', abs(y_av[-1] - y_av[0]) / y_av[0])
+
+        axes[i_ax].plot(x_vec, y_av, c=linec, lw=lw, ls=ls)
+        axes[i_ax].fill_between(x_vec, y_lower, y_upper, color=linec, alpha=alpha)
+        axes[i_ax].set_xlabel(xlabels[i_ax], fontsize=labelsize)
+        axes[i_ax].tick_params(axis='both', labelsize=ticksize)
+        if log[i_ax]:
+            axes[i_ax].set_xscale('log')
+        if ylim is not None:
+            axes[i_ax].set_ylim(ylim)
+        if legend:
+            string = ''
+            if 't' not in x_vars:
+                string = string + '{:.3g}'.format(age) + ' Gyr' + '\n'
+            for jj, u in enumerate(units):
+                if jj != i_ax:
+                    if x_vars[jj] == 't':
+                        string = string + '{:.3g}'.format(age) + u + '\n'
+                    else:
+                        string = string + '{:.3g}'.format(
+                            eval('inputs.' + defaults + '_in')[x_vars[jj]] * xscales[jj]) + u + '\n'
+            string = string[:-1]  # remove last \n
+            if leg_loc == 'upper left':
+                axes[i_ax].text(0.06, 0.96, string,
+                                fontsize=legsize, c=textc,
+                                horizontalalignment='left',
+                                verticalalignment='top',
+                                transform=axes[i_ax].transAxes)
+            elif leg_loc == 'upper right':
+                axes[i_ax].text(0.96, 0.96, string,
+                                fontsize=legsize, c=textc,
+                                horizontalalignment='right',
+                                verticalalignment='top',
+                                transform=axes[i_ax].transAxes)
+
+        if pickleto is not None:
+            pkl.dump((x_vec, y_av, y_upper, y_lower), open(pickleto + '_ax' + str(i_ax) + '.pkl', "wb"))
+
     axes[0].set_ylabel(ylabel, fontsize=labelsize)
 
     for ax in axes:
         ax.xaxis.set_tick_params(width=tickwidth)
         ax.yaxis.set_tick_params(width=tickwidth)
     # plt.subplots_adjust(wspace=wspace)
+    if return_planets:
+        return fig, axes, planets_axes
     return fig, axes
 
 
@@ -1404,7 +1418,6 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
     # h_rms0 = harm.powerspectrum_RMS(power_lm=phi0, degree=degree)
     degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
 
-    print('\n...........\nfname', spectrum_fname, 'phi0', phi0[:5])
     pl0 = evol.bulk_planets(n=1, name='M_p', mini=M0 * parameters.M_E, maxi=M0 * parameters.M_E, like=defaults,
                             # verbose=True,
                             t_eval=None, random=False, phi0=phi0, postprocessors=['topography'],
@@ -1430,8 +1443,9 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
         model_param = 'max_ocean'
 
     if ensemble:
-        fig, axes = plot_change_with_observeables_ensemble(defaults=defaults, relative=relative,
+        fig, axes, planets_axes = plot_change_with_observeables_ensemble(defaults=defaults, relative=relative,
                                                                          textc=textc, linec=c,
+                                                           return_planets=True,
                                                            age=age, alpha=alpha_dist,
                                                            ylabel=ylabel,  log=[log],
                                                            x_range=x_range, fig=fig, axes=axes,
@@ -1467,8 +1481,8 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
                     vol_w = vol_w / vol_0
                 # print('relative water budget change', vol_w)
                 ax.plot(masses, vol_w, alpha=alpha_w, lw=0, zorder=0, c=colours[ii], marker='o', markersize=10)
-            print('cocn f waterbounds', np.min(f_water), np.max(f_water))
-            print('ocn f water vmin', vmin, 'vmax', vmax)
+            # print('cocn f waterbounds', np.min(f_water), np.max(f_water))
+            # print('ocn f water vmin', vmin, 'vmax', vmax)
         elif version == 1:
             # contourfill with some individual lines
             f_water = np.logspace(np.log10(mass_frac_sfcwater[0]), np.log10(mass_frac_sfcwater[-1]), num=100)
@@ -1539,6 +1553,8 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
     if save:
         plot_save(fig, fname, **kwargs)
 
+    # if ensemble:
+    #     return fig, axes, planets_axes[0]
     return fig, axes
 
 

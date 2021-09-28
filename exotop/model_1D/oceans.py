@@ -31,11 +31,40 @@ def simple_vol_scaling(pl, verbose=False, at_age=None, it=None, **kwargs):
     return pl
 
 
+def max_ocean_fast(pl, peak_ratio=3.5, at_age=None, name_rms='dyn_top_aspect_prime', rho_w=1000, verbose=False, **kwargs):
+    water_load_ratio = pl.rho_m / (pl.rho_m - rho_w)
+    if verbose:
+        print('including water loading |', 'peak ratio', peak_ratio)
+
+    h_rms_prime = eval('pl.' + name_rms)
+
+    if at_age is not None:
+        it = age_index(pl.t, at_age, parameters.sec2Gyr)  # get time index nearest to desired snap given in Gyr
+        it = range(it, it + 1)
+    else:  # all times
+        it = range(len(pl.t))
+        pl.max_ocean = np.zeros_like(it, dtype=np.float64)
+        pl.h_peak_spectral = np.zeros_like(it, dtype=np.float64)
+    for ii in it:
+        h_rms_ii = dimensionalise(h_rms_prime, pl, i=ii) * water_load_ratio
+        h_peak_ii = h_rms_ii * peak_ratio
+        V_cap_ii = 4 * np.pi * pl.R_p**2 * h_peak_ii
+
+        if at_age is None:
+            pl.max_ocean[ii] = V_cap_ii
+            pl.h_peak_spectral[ii] = h_peak_ii
+        else:
+            pl.max_ocean = V_cap_ii
+            pl.h_peak_spectral = h_peak_ii
+    return pl
+
+
 def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0=None, plot=False, verbose=False,
               spectrum_fname='base_spectrum_l1.pkl', spectrum_fpath='/home/claire/Works/exo-top/exotop/top_spectra/',
               rho_w=1000, **kwargs):
     water_load_ratio = pl.rho_m / (pl.rho_m - rho_w)
-    print('including water loading')
+    if verbose:
+        print('including water loading')
 
     if phi0 is None:
         degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)

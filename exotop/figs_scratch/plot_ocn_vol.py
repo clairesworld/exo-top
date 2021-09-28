@@ -14,7 +14,7 @@ from datetime import date
 
 today = date.today().strftime("%b-%d-%Y")
 fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
-fig_path = '/home/cmg76/Works/exo-top/exotop/figs_ms/'
+# fig_path = '/home/cmg76/Works/exo-top/exotop/figs_ms/'
 data_path = '/home/cmg76/Works/aspect/runs/model-output/'
 case = 'Ra1e8-eta1e7-wide'
 # d, dT, alpha = 1, 1, 1
@@ -41,8 +41,8 @@ d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph dim factors
 
 
 """ money plot """
-# spec_path = '/home/claire/Works/exo-top/exotop/top_spectra/'
-spec_path = '/home/cmg76/Works/exo-top/exotop/top_spectra/'
+spec_path = '/home/claire/Works/exo-top/exotop/top_spectra/'
+# spec_path = '/home/cmg76/Works/exo-top/exotop/top_spectra/'
 cmap_path = '/plot/cmaps/'
 # cmap_name = 'c3t3a'
 # cmap = cmap_from_ascii(cmap_name, path=cmap_path, end='.txt').reversed()
@@ -93,13 +93,14 @@ run_kwargs = {
 }
 
 nplanets = 32
-n_stats = 500
+n_stats = 2  # 500
 dist_res = 1000
 n_sigma = 1
 
 
 fig, axes = plt.subplots(1, 3, figsize=(30, 10))
 rad_vals = [0.3, 1, 3]
+peak_ratios = [3.5, 3.5, 3.9]
 # c_spec = [c_dt, 'xkcd:squash', 'xkcd:reddish orange']
 c_spec = [c_dt, 'xkcd:squash', 'xkcd:reddish orange']
 ls_rad = ['--', '-', '-.']
@@ -113,8 +114,9 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spe
         else:
             show_cbar = False
         planet_kwargs.update({'x_Eu': rad})
-        picklefile = 'ocnplot' + str(ii) + '-' + str(jj) + '.pkl'
-        fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1, pickleto=picklefile,
+        picklefile = 'pickle/ocnplot' + str(ii) + '-' + str(jj)
+        fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1, picklefrom=picklefile,
+                                              peak_ratio=peak_ratios[ii],
                                               mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=60), #vmin=1e-6, vmax=1e-2,
                                               textc=textc, titlesize=32,
                                               save=False, spectrum_fname=spec, c=c_spec[ii], ls=ls_rad[jj],
@@ -228,5 +230,5 @@ if slides:
     fig, *axes = dark_background(fig, axes)
 
 plt.subplots_adjust(wspace=0.1)
-fig.savefig(fig_path + 'ocn_vol_ensemble_soft_' + today + '.pdf', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_ensemble_fast_' + today + '.pdf', bbox_inches='tight')
 plt.show()
