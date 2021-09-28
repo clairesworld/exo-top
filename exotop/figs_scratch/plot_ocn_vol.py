@@ -115,7 +115,7 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spe
             show_cbar = False
         planet_kwargs.update({'x_Eu': rad})
         picklefile = 'pickle/ocnplot' + str(ii) + '-' + str(jj)
-        fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1, picklefrom=picklefile,
+        fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1, pickleto=picklefile,
                                               peak_ratio=peak_ratios[ii],
                                               mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=60), #vmin=1e-6, vmax=1e-2,
                                               textc=textc, titlesize=32,
