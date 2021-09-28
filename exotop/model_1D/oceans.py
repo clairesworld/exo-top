@@ -109,16 +109,17 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         else:
             pl.max_ocean = basin_capacity
             pl.h_peak_spectral = np.mean(peaks)
-            print('\n')
-            print('scaled h_rms', name_rms, '=', dimensionalise(h_rms1[-1], pl=pl, i=-1), 'm without water loading')
-            print('      water load ratio', water_load_ratio)
-            print("%.2f" % (pl.M_p / parameters.M_E), 'M_E |', "%.2f" % (pl.R_p * 1e-3), 'km radius | ocean vol:',
-                  "%.2f" % (basin_capacity / 1.4e18), 'EO | V_shell =',
-                  "%.2f" % (4 / 3 * np.pi * ((pl.R_p + np.mean(peaks)) ** 3 - pl.R_p ** 3) / 1.4e18), 'EO | h_peak =',
-                  "%.2f" % (np.mean(peaks) * 1e-3), 'km | h_rms =', "%.2f" % (np.mean(rms_dims) * 1e-3), 'km')
-            print('h_rms_prime =', "%.5f" % np.mean(rms_nondims), '| b =', "%.2f" % pl.b[-1], '| log Ra_i =',
-                  "%.2f" % np.log10(pl.Ra_i[-1]), '| d =', "%.2f" % (pl.d * 1e-3), '| dT =', "%.2f" % pl.delta_T[-1],
-                  '| alpha_m =', "%.2f" % pl.alpha_m)
+            if verbose:
+                print('\n')
+                print('      scaled h_rms', name_rms, '=', dimensionalise(h_rms1[-1], pl=pl, i=-1), 'm without water loading')
+                print('      water load ratio', water_load_ratio)
+                print("%.2f" % (pl.M_p / parameters.M_E), 'M_E |', "%.2f" % (pl.R_p * 1e-3), 'km radius | ocean vol:',
+                      "%.2f" % (basin_capacity / 1.4e18), 'EO | V_shell =',
+                      "%.2f" % (4 / 3 * np.pi * ((pl.R_p + np.mean(peaks)) ** 3 - pl.R_p ** 3) / 1.4e18), 'EO | h_peak =',
+                      "%.2f" % (np.mean(peaks) * 1e-3), 'km | h_rms =', "%.2f" % (np.mean(rms_dims) * 1e-3), 'km')
+                print('h_rms_prime =', "%.5f" % np.mean(rms_nondims), '| b =', "%.2f" % pl.b[-1], '| log Ra_i =',
+                      "%.2f" % np.log10(pl.Ra_i[-1]), '| d =', "%.2f" % (pl.d * 1e-3), '| dT =', "%.2f" % pl.delta_T[-1],
+                      '| alpha_m =', "%.2f" % pl.alpha_m)
 
         # print('t', ii, 'R_p:', pl.R_p * 1e-3, 'km, h_rms', h_rms1[ii]*1e-3, 'km, h_peak', h_spectrum_max * 1e-3, 'km, ocn vol:', basin_capacity / parameters.TO, 'TO')
     # print('final h_ratio', h_ratio)

@@ -105,13 +105,16 @@ c_spec = [c_dt, 'xkcd:squash', 'xkcd:reddish orange']
 ls_rad = ['--', '-', '-.']
 labels_spec = ['Pure dynamic topography', 'Spectrally Venus-like topography', 'Red noise topography']
 for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spectrum_-2.pkl']):
+    print('spectrum', ii+1, '/ 3')
     for jj, rad in enumerate(rad_vals):
+        print('   rad budget', jj + 1, '/ 3')
         if jj == 2 and ii == 2:
             show_cbar = True
         else:
             show_cbar = False
         planet_kwargs.update({'x_Eu': rad})
-        fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1, pickleto='ocnplot.pkl',
+        picklefile = 'ocnplot' + str(ii) + '-' + str(jj) + '.pkl'
+        fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1, pickleto=picklefile,
                                               mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=60), #vmin=1e-6, vmax=1e-2,
                                               textc=textc, titlesize=32,
                                               save=False, spectrum_fname=spec, c=c_spec[ii], ls=ls_rad[jj],
