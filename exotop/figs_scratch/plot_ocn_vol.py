@@ -92,9 +92,9 @@ run_kwargs = {
     # 'rms_type': 'Ra_i_eff'
 }
 
-nplanets = 32
+nplanets = 6  # 32
 n_stats = 2  # 500
-dist_res = 1000
+dist_res = 500 # 1000
 n_sigma = 1
 
 
@@ -114,7 +114,7 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spe
         else:
             show_cbar = False
         planet_kwargs.update({'x_Eu': rad})
-        picklefile = 'pickle/ocnplot' + str(ii) + '-' + str(jj)
+        picklefile = 'pickle/ocnplot-n6-' + str(ii) + '-' + str(jj)
         fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1, pickleto=picklefile,
                                               peak_ratio=peak_ratios[ii],
                                               mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=60), #vmin=1e-6, vmax=1e-2,

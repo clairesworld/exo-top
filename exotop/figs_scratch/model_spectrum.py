@@ -18,10 +18,13 @@ data_path = '/home/claire/Works/aspect/runs/model-output/'
 # d, dT, alpha = 1, 1, 1
 d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph dim factors
 
-case = 'Ra1e8-eta1e7-wide'
-sh.make_model_spectrum(case, R=2, data_path=data_path, fig_path='', newfname='base_spectrum',
-                       bl_fudge=2 * np.pi, max_dscale=1, plot=False, verbose=False)
-l, S = sh.load_model_spectrum_pkl(path='')
+
+l, S = sh.make_any_reference(slope=-1, l_rolloff=None, newfname='spectrum', fig_path='', lmin=1, lmax=100,
+                             plot=False, R=2, S0=1, max_dscale=2, d=1)
+# case = 'Ra1e8-eta1e7-wide'
+# sh.make_model_spectrum(case, R=2, data_path=data_path, fig_path='', newfname='base_spectrum',
+#                        bl_fudge=2 * np.pi, max_dscale=1, plot=False, verbose=False)
+l, S = sh.load_model_spectrum_pkl(path='', fname='spectrum_-1.pkl')
 
 # original
 h_ratio = 1
