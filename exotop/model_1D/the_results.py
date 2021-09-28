@@ -530,8 +530,8 @@ def ensemble_marginal_distribution(yvar, xvar, default='baseline', dist_res=100,
     y_upper = y_av + y_std * n_sigma  # todo for log scape
     y_lower = y_av - y_std * n_sigma
 
-    # if return_planets:
-    #     return x_vec, y_av, y_upper, y_lower, planets_x
+    if return_planets:
+        return x_vec, y_av, y_upper, y_lower, planets_x
     return x_vec, y_av, y_upper, y_lower
 
 
@@ -1553,8 +1553,8 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
     if save:
         plot_save(fig, fname, **kwargs)
 
-    if ensemble:
-        return fig, axes, planets_axes[0]
+    # if ensemble:
+    #     return fig, axes, planets_axes[0]
     return fig, axes
 
 
