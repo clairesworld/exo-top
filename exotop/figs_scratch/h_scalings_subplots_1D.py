@@ -14,7 +14,7 @@ today = date.today().strftime("%b-%d-%Y")
 
 # set paths
 fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
-fig_format = '.png'
+fig_format = '.pdf'  # '.png'
 benchmark_path = '../benchmarks/'
 planet_icon_path = '/home/claire/Pictures/science-graphics/planet_png/'
 labelsize = 30
@@ -61,8 +61,8 @@ xlabels = ['Age\n(Gyr)',
            'Planet mass\n' + r'($M_{\oplus}$)', 'Core Mass Fraction',
            'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-dist_res = 500
-x_res = 16
+dist_res = 1000
+x_res = 32
 n_sigma = 1
 
 fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_res=x_res, n_sigma=n_sigma,

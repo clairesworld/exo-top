@@ -49,7 +49,7 @@ def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, random=False,
 
 
 def bulk_planets_mc(n=100, names=None, mini=None, maxi=None, pl_kwargs={}, model_kwargs={}, t_eval=None, log=False,
-                    T_m0_options=None, propagate_fit_err=True, verbose=False, beta_h=p.beta_h, cov_beta_h=p.cov_beta_h,
+                    T_m0_options=None, propagate_fit_err=False, verbose=False, beta_h=p.beta_h, cov_beta_h=p.cov_beta_h,
                     **kwargs):
     """varying multiple parameters in 'names' between mini and maxi, use default values otherwise.
     update_kwargs can include any TerrestrialPlanet attribute

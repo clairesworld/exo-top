@@ -156,5 +156,5 @@ for ii, mass in enumerate(masses):
 fig.supxlabel(xlabel, fontsize=labelsize, y=0.02)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.1)
-plt.savefig(fig_path + 'evol_dist' + today + '.png', bbox_inches='tight')
+plt.savefig(fig_path + 'evol_dist' + today + '.pdf', bbox_inches='tight')
 plt.show()

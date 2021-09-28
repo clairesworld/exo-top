@@ -228,5 +228,5 @@ ax2.tick_params(axis='x', labelsize=ticksize)
 ax2.tick_params(axis='y', labelsize=ticksize)
 ax2.loglog()
 
-fig.savefig(fig_path + 'hfit_' + today + '.png', bbox_inches='tight')
+fig.savefig(fig_path + 'hfit_' + today + '.pdf', bbox_inches='tight')
 # plt.show()

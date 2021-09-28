@@ -17,7 +17,7 @@ from postaspect.setup_postprocessing import data_path_bullard, fig_path_bullard,
 from useful_and_bespoke import colorize, iterable_not_string, cmap_from_list, not_iterable, \
     colourbar, cmap_from_ascii, not_string, minmaxnorm, mahalanobis, colourised_legend, find_nearest_idx
 
-def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.png', bbox_inches='tight', tight_layout=True, **kwargs):
+def plot_save(fig, fname, fig_path=fig_path_bullard, fig_fmt='.pdf', bbox_inches='tight', tight_layout=True, **kwargs):
     path = fig_path + fname + fig_fmt
     directory = os.path.dirname(path)
     os.makedirs(directory, exist_ok=True)

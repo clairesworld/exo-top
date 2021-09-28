@@ -1369,6 +1369,6 @@ def check_convergence(case, window=100, t1=0, fig_path='', plot=True, **kwargs):
         axes[1].plot(df['t'], df['qdiff_rolling'], lw=0.5)
 
         axes[0].set_ylabel('percent change rms velocity')
-        axes[1].set_ylabel('q bottom - q top')
+        axes[1].set_ylabel('(q bottom - q top) / q top')
         fig.savefig(fig_path + 'converge_test_'+case+'.png', bbox_inches='tight')
     return None

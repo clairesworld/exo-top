@@ -177,7 +177,7 @@ def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_m=
 def plot_map(pl, at_age=4.5, phi0=None, name_rms='dyn_top_aspect_prime', spectrum_fname='base_spectrum_l1.pkl',
              spectrum_fpath='/home/claire/Works/exo-top/exotop/top_spectra/', rho_w=1000, verbose=False,
              fig_path='/home/claire/Works/exo-top/exotop/figs_scratch/', cbar=True, clabel='Dynamic topography (m)',
-             cmap='gist_earth', labelsize=16, clabelpad=20, save=True):
+             cmap='gist_earth', labelsize=16, clabelpad=20, fig_fmt='.pdf', save=True):
     import matplotlib.pyplot as plt
     from matplotlib import rc
     from matplotlib.pyplot import rcParams
@@ -225,7 +225,7 @@ def plot_map(pl, at_age=4.5, phi0=None, name_rms='dyn_top_aspect_prime', spectru
         cb = plt.colorbar(mappable, orientation='horizontal', location='top', fraction=0.07)
         cb.set_label(label=clabel, fontsize=labelsize, labelpad=clabelpad)
     if save:
-        plt.savefig(fig_path + 'topo_grid.png', bbox_inches='tight')
+        plt.savefig(fig_path + 'topo_grid' + fig_fmt, bbox_inches='tight')
     return fig, ax
 
 

@@ -20,7 +20,7 @@ ticksize = 14
 legsize = 14
 cmap = 'gray'  #'rainbow'
 norm = 'rms'  # 'rms'
-ylabel = 'Normalised 1D power spectral density'  # \n' + '(% relative to total)',
+ylabel = 'Normalised power spectral density (m$^3$)'  # \n' + '(% relative to total)',
 
 """ set dimensionalisation factors """
 R_p = 6371  # Earth
@@ -103,12 +103,12 @@ fig, ax = sh.plot_norm_psd(baseline_fname='spectrum_-2.pkl', fig_path=fig_path, 
 #                                     save=False, plot=True, units='m3', scale_to=1.0, alpha=0.9, labelsize=labelsize,
 #                                     fig=fig, ax=axes[1])  # axs[0] if no secondary ax; this plots degrees
 
-axes[1].set_xlabel('Nondimensional wavenumber, $k/d$', fontsize=labelsize)
+axes[1].set_xlabel('Nondimensional wavenumber, $kd$', fontsize=labelsize)
 fig.supylabel(ylabel, fontsize=labelsize)
 
 
 # plt.show()
-fig.savefig(fig_path + 'psd_stacked_k.png', bbox_inches='tight')
+fig.savefig(fig_path + 'psd_stacked_k.pdf', bbox_inches='tight')
 #
 
 

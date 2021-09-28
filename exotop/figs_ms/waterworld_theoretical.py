@@ -194,7 +194,7 @@ ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 ax.tick_params(axis='x', labelsize=ticksize)
 ax.tick_params(axis='y', labelsize=ticksize)
 
-plt.savefig(fig_path + 'ww_lim.png', bbox_inches='tight',
+plt.savefig(fig_path + 'ww_lim.pdf', bbox_inches='tight',
             # transparent=True
             )
 # plt.show()

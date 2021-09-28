@@ -44,9 +44,11 @@ spec_path = '/home/claire/Works/exo-top/exotop/top_spectra/'
 cmap_path = '/plot/cmaps/'
 # cmap_name = 'c3t3a'
 # cmap = cmap_from_ascii(cmap_name, path=cmap_path, end='.txt').reversed()
-hex_list = ['#ffd8e2', '#dce5e9', '#d6fcdd', '#bbfde1', '#a4fde1', '#49fffc', '#4cd5e8', '#56c3e0', '#72b2d3',
+# hex_list = ['#ffd8e2', '#dce5e9', '#d6fcdd', '#bbfde1', '#a4fde1', '#49fffc', '#4cd5e8', '#56c3e0', '#72b2d3',
+#             '#3b5e71']
+hex_list = ['#ffd8e2', '#dce5e9', '#d6fcdd', '#bbfde1', '#a4fde1', '#49fffc', '#4cd5e8', '#56c3e0',
             '#3b5e71']
-float_list = [1e-5, 5e-5, 6e-5, 8e-5, 1e-4, 1.1e-4, 1.3e-4, 2e-4, 2.3e-4, 3e-4]
+float_list = [1e-5, 5e-5, 6e-5, 8e-5, 1e-4, 2e-4, 2.3e-4, 3e-4]
 fln = None  # minmaxnorm(float_list, a=0, b=1)
 
 slides = False
@@ -67,7 +69,7 @@ else:
     c_dt = 'xkcd:bordeaux'
     alpha_w = 0.3
     alpha_dist = 0.15
-    cmap = get_continuous_cmap(hex_list, N=12, float_list=fln)
+    cmap = get_continuous_cmap(hex_list, N=14, float_list=fln)
     cmap.set_under(hex_list[0])
     cmap.set_over(hex_list[-1])
 
@@ -88,9 +90,9 @@ run_kwargs = {
     # 'rms_type': 'Ra_i_eff'
 }
 
-nplanets = 9
-n_stats = 100
-dist_res = 500
+nplanets = 32
+n_stats = 500
+dist_res = 1000
 n_sigma = 1
 
 
@@ -107,8 +109,8 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spe
         else:
             show_cbar = False
         planet_kwargs.update({'x_Eu': rad})
-        fig, ax, planets_l = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1,
-                                              mass_frac_sfcwater=np.logspace(-6, -3, num=60), #vmin=1e-6, vmax=1e-2,
+        fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1, pickleto='ocnplot.pkl',
+                                              mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=60), #vmin=1e-6, vmax=1e-2,
                                               textc=textc, titlesize=32,
                                               save=False, spectrum_fname=spec, c=c_spec[ii], ls=ls_rad[jj],
                                               spectrum_fpath=spec_path,
@@ -118,7 +120,7 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spe
                                               x_range=[(0.1 * p.M_E, 5 * p.M_E)], nplanets=nplanets, dist_res=dist_res,
                                               cmap=cmap, version=0, alpha_w=alpha_w, alpha_dist=alpha_dist, alpha=1,
                                               names_mc=names_mc, mini_mc=mini_mc, maxi_mc=maxi_mc, defaults=baseline,
-                                              show_contours=None, ensemble=True, n_stats=n_stats, verbose=True,
+                                              show_contours=None, ensemble=True, n_stats=n_stats, verbose=False,
                                               update_kwargs=planet_kwargs, run_kwargs=run_kwargs, wspace=0.15,
                                               legend=False, lw=4, labelpad=10, show_cbar=show_cbar,
                                               x_vars=['M_p'], units=['$M_E$'], xscales=[p.M_E ** -1],
@@ -204,8 +206,9 @@ axes[-1] = cornertext(axes[-1], 'LAND\nPLANETS', pos='bottom right', size=labels
 #            #               label='Simple scaling')
 #            ]
 handles = []
+names = ['30\%', '100\%', '300\%']  # str(rad*100) + r'$\%$')
 for jj, rad in enumerate(rad_vals):
-    handles.append(mlines.Line2D([], [], color='k', ls=ls_rad[jj], lw=3, label=str(rad*100) + r'$\%$'))
+    handles.append(mlines.Line2D([], [], color='k', ls=ls_rad[jj], lw=3, label=names[jj]))
 axes[0].legend(handles=handles, bbox_to_anchor=(0, 1.05, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize,
                title=r'\textbf{U, Th budget relative to solar}', title_fontsize=legsize, ncol=3)
 
@@ -220,5 +223,5 @@ if slides:
     fig, *axes = dark_background(fig, axes)
 
 plt.subplots_adjust(wspace=0.1)
-fig.savefig(fig_path + 'ocn_vol_ensemble_soft_' + today + '.png', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_ensemble_soft_' + today + '.pdf', bbox_inches='tight')
 plt.show()
