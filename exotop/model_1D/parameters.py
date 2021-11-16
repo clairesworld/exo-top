@@ -3,6 +3,7 @@ M_E = 5.972e24  # earth mass in kg
 R_E = 6371e3  # earth radius in m
 TO = 1.35e9 * 1000 ** 3  # earth ocean volume
 L_sun = 3.9e26  # solar luminosity in W
+G = 6.67408e-11
 years2sec = 31557600
 sec2Gyr = 1e-9 / years2sec
 AU2m = 1.5e11

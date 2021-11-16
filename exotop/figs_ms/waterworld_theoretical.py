@@ -9,8 +9,8 @@ from datetime import date
 today = date.today().strftime("%b-%d-%Y")
 fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
 rc('text', usetex=True)  # turn off for running over ssh
-rcParams['font.family'] = 'serif'
-rcParams['font.serif'] = 'CMU Serif'
+# rcParams['font.family'] = 'serif'
+# rcParams['font.serif'] = 'CMU Serif'
 rho_c = 2700
 rho_w = 1000
 M_E = 5.972e24  # earth mass in kg
@@ -36,10 +36,12 @@ w_Trg = [0.72e-2, 3.5e-2, 6.4e-2]
 e_Trg = [[[0], [1.3e-2]], [[1.3e-2], [1.6e-2]], [[1.6e-2], [2e-2]]]
 M_Trg = 1.321
 
-err_c = ['0.1', '0.35', '0.6']
+# err_c = ['0.1', '0.35', '0.6']  # ms
+err_c = ['0.4', '0.65', '0.9']  # slides
 err_m = ['o', '^', 's']
 err_kwargs = {'elinewidth': 1, 'capsize': 5, 'ms': 7, 'lw': 0}
-labels = ['CMF = 18\%', 'CMF = 25\%', 'CMF = 33\%']
+# labels = ['CMF = 18\%', 'CMF = 25\%', 'CMF = 33\%']  # ms
+labels = ['18\% iron', '25\% iron', '33\% iron']  # slides
 annosize = legsize  # - 5
 limkwargs = err_kwargs.copy()
 limkwargs.update({'marker': '_'})
@@ -47,7 +49,8 @@ off = [0, 0.02, 0.04]  # offset
 
 for i_cmf in range(3):
     c = err_c[i_cmf]
-    anno_c = 'k'
+    # anno_c = 'k'  # ms
+    anno_c = 'w'  # slides
     err_kwargs.update({'mec': c, 'mfc': c, 'ecolor': c, 'marker': err_m[i_cmf]})
     limkwargs.update({'mec': c, 'mfc': c, 'ecolor': c, 'marker': err_m[i_cmf]})
 
@@ -168,14 +171,12 @@ print('dt hot:', pd)
 # print(wmfs)
 
 c = '#b13c02ff'
-plt.plot(masses, wmfs_rock, c='xkcd:sunshine yellow', lw=lw, label='Crustal strength capacity', zorder=0)
+plt.plot(masses, wmfs_rock, c='xkcd:sunshine yellow', lw=lw, label='Rock strength capacity', zorder=0)
 plt.plot(masses, wmfs_dt_cold, c='xkcd:grey green', lw=lw, label='Dynamic topography capacity, cold', zorder=0)
 plt.plot(masses, wmfs_dt_hot, c='xkcd:grey green', lw=1, label='Dynamic topography capacity, hot', zorder=0)
 plt.xlabel(r'Planet mass ($M_{\oplus}$)', fontsize=labelsize, labelpad=20)
 plt.ylabel(r'Surface water mass fraction', fontsize=labelsize, labelpad=20)
 plt.loglog()
-
-# fig, ax = dark_background(fig, ax)
 
 handles, labels = ax.get_legend_handles_labels()
 # sort both labels and handles by labels
@@ -194,7 +195,10 @@ ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 ax.tick_params(axis='x', labelsize=ticksize)
 ax.tick_params(axis='y', labelsize=ticksize)
 
-plt.savefig(fig_path + 'ww_lim.pdf', bbox_inches='tight',
-            # transparent=True
+fig, ax = dark_background(fig, ax)
+
+plt.savefig(fig_path + 'ww_lim_dark.png', bbox_inches='tight',
+            # transparent=True,
+facecolor=fig.get_facecolor()
             )
 # plt.show()

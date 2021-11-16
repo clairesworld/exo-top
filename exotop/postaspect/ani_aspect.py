@@ -272,7 +272,7 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
                    legsize=12, legtext='', t1=None, vmax=1, vmin=0,
                    shading='nearest', return_artists=False, save=True, i_n=-1, avg=False, c='k', cbar=True, dark=False,
                    title='Nondimensional temperature', fig=None, ax=None, col_vis=20, ticklabels=True, ylabelpad=20,
-                   **kwargs):
+                   rasterized=False, **kwargs):
 
     if dark:
         foreground = 'xkcd:off white'
@@ -317,7 +317,8 @@ def static_T_field(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
     if ax is None and fig is None:
         fig, ax = plt.subplots(figsize=(20, 10))
 
-    im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading, vmin=vmin, vmax=vmax)
+    im = ax.pcolormesh(x, y, ap.reduce_dims(T_im), cmap=cmap, shading=shading, vmin=vmin, vmax=vmax,
+                       rasterized=rasterized)
 
     if cbar:
         divider = make_axes_locatable(ax)

@@ -6,6 +6,7 @@ from . import thermal as th
 from . import rheology as rh
 from . import topography
 from . import oceans
+from . import core
 from scipy import integrate
 import random as rand
 from scipy.stats import loguniform
@@ -130,7 +131,8 @@ def postprocess_planet(pl, postprocessors=None, nondimensional=False, **kwargs):
     if 'topography' in postprocessors:
         pl = topography.topography(pl, **kwargs)
     if 'ocean_capacity' in postprocessors:
-        pl = oceans.max_ocean_fast(pl, **kwargs)
+        # pl = oceans.max_ocean_fast(pl, **kwargs)
+        pl = oceans.max_ocean(pl, **kwargs)
         pl = oceans.simple_vol_scaling(pl, **kwargs)
     if nondimensional:
         pl.nondimensionalise()
@@ -184,7 +186,7 @@ def solve(pl, run_kwargs={}, t0=0, t_eval=None, t0_buffer=5, verbose=False, atol
     return pl
 
 
-def LHS(t, y, pl=None, **kwargs):
+def LHS(t, y, pl=None, use_core=False, **kwargs):
     """ ODE equation to solve, LHS = 0 """
 
     # print('t', t*p.sec2Gyr, 'Gyr, T_m', y[0])
@@ -194,7 +196,10 @@ def LHS(t, y, pl=None, **kwargs):
     pl.D_l = y[2]
     pl = recalculate(t, pl, **kwargs)
 
-    dTdt_c = th.dTdt(-pl.Q_core, pl.M_c, pl.c_c)
+    if not use_core:
+        dTdt_c = th.dTdt(-pl.Q_core, pl.M_c, pl.c_c)
+    else:
+        dTdt_c = core.LHS(t, y, c=pl.core, **kwargs)
     dTdt_m = th.dTdt(-pl.Q_ubl + pl.H_rad_m + pl.Q_core - pl.Q_melt, pl.M_conv, pl.c_m)
     dDdt = th.lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l, rho_m=pl.rho_m,
                          T_s=pl.T_s,

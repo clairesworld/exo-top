@@ -1,6 +1,6 @@
 from . import parameters
 import numpy as np
-from useful_and_bespoke import age_index
+from useful_and_bespoke import age_index, dark_background
 import sh_things as sh
 from model_1D.topography import dimensionalise, dyn_topo_peak_prime_aspect
 
@@ -207,13 +207,15 @@ def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_m=
 def plot_map(pl, at_age=4.5, phi0=None, name_rms='dyn_top_aspect_prime', spectrum_fname='base_spectrum_l1.pkl',
              spectrum_fpath='/home/claire/Works/exo-top/exotop/top_spectra/', rho_w=1000, verbose=False,
              fig_path='/home/claire/Works/exo-top/exotop/figs_scratch/', cbar=True, clabel='Dynamic topography (m)',
-             cmap='gist_earth', labelsize=16, clabelpad=20, fig_fmt='.pdf', save=True):
+             cmap='gist_earth', labelsize=16, ticksize=14, clabelpad=20, fig_fmt='.pdf', dark=False, save=True,
+             axlabels=True, bg_colour='k', fg_colour='xkcd:off white', fname='topo_grid', texfont=True):
     import matplotlib.pyplot as plt
     from matplotlib import rc
     from matplotlib.pyplot import rcParams
     rc('text', usetex=True)  # turn off for running over ssh
-    rcParams['font.family'] = 'serif'
-    rcParams['font.serif'] = 'CMU Serif'
+    if texfont:
+        rcParams['font.family'] = 'serif'
+        rcParams['font.serif'] = 'CMU Serif'
 
     water_load_ratio = pl.rho_m / (pl.rho_m - rho_w)
     print('including water loading')
@@ -249,13 +251,31 @@ def plot_map(pl, at_age=4.5, phi0=None, name_rms='dyn_top_aspect_prime', spectru
     fig, ax = plt.subplots(1, 1)
     mappable = ax.imshow(grid_dim, extent=(0, 360, -90, 90), cmap=cmap, interpolation='gaussian')
     ax.set(yticks=np.arange(-90, 120, 30), xticks=np.arange(0, 390, 30))
-    ax.set_xlabel('Latitude', fontsize=labelsize)
-    ax.set_ylabel('Longitude', fontsize=labelsize)
+    ax.tick_params(axis='both', labelsize=0)
+    if axlabels:
+        ax.set_xlabel('Latitude', fontsize=labelsize)
+        ax.set_ylabel('Longitude', fontsize=labelsize)
     if cbar:
         cb = plt.colorbar(mappable, orientation='horizontal', location='top', fraction=0.07)
-        cb.set_label(label=clabel, fontsize=labelsize, labelpad=clabelpad)
+        cb.ax.tick_params(axis='x', labelsize=ticksize)
+        if dark:
+            textc = fg_colour
+            # set colorbar tick color
+            cb.ax.xaxis.set_tick_params(color=textc)
+
+            # set colorbar edgecolor
+            cb.outline.set_edgecolor(textc)
+
+            # set colorbar ticklabels
+            plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=textc)
+        else:
+            textc = 'k'
+        cb.set_label(label=clabel, fontsize=labelsize, labelpad=clabelpad, c=textc)
+    if dark:
+        fig, ax = dark_background(fig, ax, bgc=bg_colour,  fgc=fg_colour)
     if save:
-        plt.savefig(fig_path + 'topo_grid' + fig_fmt, bbox_inches='tight')
+        plt.savefig(fig_path + fname + fig_fmt, bbox_inches='tight',
+                    facecolor=fig.get_facecolor())
     return fig, ax
 
 

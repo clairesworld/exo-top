@@ -20,25 +20,6 @@ case = 'Ra1e8-eta1e7-wide'
 # d, dT, alpha = 1, 1, 1
 d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph dim factors
 
-""" test single planet """
-# from model_1D import evolve as evol
-# from model_1D import oceans
-# from model_1D import parameters
-# pl0 = \
-# evol.bulk_planets(n=1, name='M_p', mini=parameters.M_E, maxi=parameters.M_E, like='Venusbaseline',  # verbose=True,
-#                   t_eval=None, random=False, postprocessors=['topography'],)[0]
-#
-# spectrum_fname='base_spectrum.pkl'
-# spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/'
-# degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
-# print('rms of original phi0', sh.parseval_rms(phi0, sh.l_to_k(degree, 2)))
-# print('rms from aspect model', pl0.dyn_top_aspect_prime[-1])
-# print('dimensional rms', pl0.dyn_top_rms[-1])
-#
-# pl0 = oceans.max_ocean(pl0, at_age=4.5, name_rms='dyn_top_aspect_prime', phi0=phi0, n_stats=1)
-# vol_0 = pl0.max_ocean
-# print('basin capacity in M_E', vol_0*1000/parameters.M_E)
-
 
 """ money plot """
 spec_path = '/home/claire/Works/exo-top/exotop/top_spectra/'
@@ -53,11 +34,8 @@ hex_list = ['#ffd8e2', '#dce5e9', '#d6fcdd', '#bbfde1', '#a4fde1', '#49fffc', '#
 float_list = [1e-5, 5e-5, 6e-5, 8e-5, 1e-4, 2e-4, 2.3e-4, 3e-4]
 fln = None  # minmaxnorm(float_list, a=0, b=1)
 
-slides = False
+slides = True
 xlabel = 'Planet mass ' + r'($M_{\oplus}$)'
-labelsize = 30  # 33.5  # 30
-legsize = 22
-ticksize = 26  # 20
 clabelpad = 50
 
 if slides:
@@ -65,15 +43,21 @@ if slides:
     c_dt = 'xkcd:orange red'
     alpha_w = 0.8  # 0.6
     alpha_dist = 0.25
-    cmap = 'gist_earth_r'
+    # cmap = 'gist_earth_r'
+    labelsize = 35  # 33.5  # 30
+    legsize = 35
+    ticksize = 30  # 20
 else:
     textc = 'k'
     c_dt = 'xkcd:bordeaux'
     alpha_w = 0.3
     alpha_dist = 0.15
-    cmap = get_continuous_cmap(hex_list, N=14, float_list=fln)
-    cmap.set_under(hex_list[0])
-    cmap.set_over(hex_list[-1])
+    labelsize = 30  # 33.5  # 30
+    legsize = 22
+    ticksize = 26  # 20
+cmap = get_continuous_cmap(hex_list, N=14, float_list=fln)
+cmap.set_under(hex_list[0])
+cmap.set_over(hex_list[-1])
 
 mini_mc = [200e3, 2.63e10, #240e3, 1.6e10
            # 0.3
@@ -99,29 +83,23 @@ n_sigma = 1
 
 pickledir = '/home/claire/Works/exo-top/exotop/figs_scratch/pickle/'
 
-fig, axes = plt.subplots(1, 3, figsize=(30, 10))
-rad_vals = [0.3, 1, 3]
-peak_ratios = [3.5, 3.5, 3.9]
-# c_spec = [c_dt, 'xkcd:squash', 'xkcd:reddish orange']
+fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+axes = [ax]
+rad_vals = [1]
+peak_ratios = [3.5]
 c_spec = [c_dt, 'xkcd:squash', 'xkcd:reddish orange']
-ls_rad = ['--', '-', '-.']
-labels_spec = ['Pure dynamic topography', 'Spectrally Venus-like topography', 'Red noise topography']
-for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spectrum_-2.pkl']):
-    print('spectrum', ii+1, '/ 3')
+labels_spec = ['Spectrally Venus-like topography']
+for ii, spec in enumerate(['Venus_spectrum_l1.pkl']):
     for jj, rad in enumerate(rad_vals):
-        print('   rad budget', jj + 1, '/ 3')
-        if jj == 2 and ii == 2:
-            show_cbar = True
-        else:
-            show_cbar = False
+        show_cbar = True
         planet_kwargs.update({'x_Eu': rad})
 
-        picklefile = pickledir + 'ocnplot-n6-' + str(ii) + '-' + str(jj)
-        fig, ax = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1, picklefrom=picklefile,
+        picklefile = pickledir + 'ocnplot-small-' + str(ii) + '-' + str(jj)
+        fig, ax = results.plot_ocean_capacity(fig=fig, axes=ax, M0=1, pickleto=picklefile,
                                               peak_ratio=peak_ratios[ii],
                                               mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=60), #vmin=1e-6, vmax=1e-2,
                                               textc=textc, titlesize=32,
-                                              save=False, spectrum_fname=spec, c=c_spec[ii], ls=ls_rad[jj],
+                                              save=False, spectrum_fname=spec, c=c_spec[ii], ls='-',
                                               spectrum_fpath=spec_path,
                                               ticksize=ticksize, labelsize=labelsize, clabelpad=clabelpad,
                                               relative=True,
@@ -136,37 +114,6 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spe
                                               xlabels=[xlabel], n_sigma=n_sigma, legsize=legsize,
                                               )
 
-        # hacky but will run faster - need to rearrange order of rad loop and spec loop
-        # planets = planets_l[0]  # because it's a list over axes
-        # degree, phi0 = sh.load_model_spectrum_pkl(fname=spec, path=spec_path)
-        # for pl in planets:
-        #     # recalculate ocn
-        #     pl = evol.postprocess_planet(pl, postprocessors=['ocean_capacity'], phi0=phi0, n_stats=n_stats)
-
-        # show single test case
-        # fig, axes = results.plot_ocean_capacity_relative(fig=fig, axes=axes, n_stats=n_stats, relative=True, nplanets=nplanets, version=0,
-        #                                                  update_kwargs=planet_kwargs, run_kwargs=run_kwargs,
-        #                                                  legsize=legsize, ticksize=ticksize, labelsize=labelsize, wspace=0.15,
-        #                                                  titlesize=32, fig_path=fig_path, save=False, log=True, alpha_w=alpha_w,
-        #                                                  vol_0='Earth', simple_scaling=False, M0=1, legend=False,
-        #                                                  defaults=baseline, textc=textc,
-        #                                                  # title='Water volume to submerge land',
-        #                                                  spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/',
-        #                                                  # benchmark_path+'wei_Venus/',
-        #                                                  spectrum_fname='base_spectrum_l1.pkl',
-        #                                                  #                                                  c='#81f79f',
-        #                                                  c=c_dt, cmap=cmap,
-        #                                                  alpha=1, lw=4, ymin=0.3, ymax=1.8, labelpad=10,
-        #                                                  set_ylim=True, x_vars=['M_p'], units=['$M_E$'],
-        #                                                  x_range=[(0.1 * p.M_E, 5 * p.M_E)], xscales=[p.M_E ** -1],
-        #                                                  xlabels=[xlabel],
-        #                                                  leg_bbox=(0, 1.01), clabelpad=clabelpad,
-        #                                                  fname='ocean-vol', ytitle=1.05,  # vmax=3e-3,
-        #                                                  mass_frac_sfcwater=np.logspace(-5, -3, num=30),
-        #                                                  ensemble=False,
-        #                                                  # [1e-5, 3e-5, 1e-4, 3e-4, 1e-3]
-        #                                                  show_contours=None  # [3e-5, 1e-4, 3e-4]
-        #                                                  )
 
 # format
 for iax, ax in enumerate(axes):
@@ -214,23 +161,13 @@ axes[-1] = cornertext(axes[-1], 'LAND\nPLANETS', pos='bottom right', size=labels
 #            # mlines.Line2D([], [], color='g', ls='--', lw=3,
 #            #               label='Simple scaling')
 #            ]
-handles = []
-names = ['30\%', '100\%', '300\%']  # str(rad*100) + r'$\%$')
-for jj, rad in enumerate(rad_vals):
-    handles.append(mlines.Line2D([], [], color='k', ls=ls_rad[jj], lw=3, label=names[jj]))
-axes[0].legend(handles=handles, bbox_to_anchor=(0, 1.05, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize,
-               title=r'\textbf{U, Th budget relative to solar}', title_fontsize=legsize, ncol=3)
 
-# ax = axes[1]
-# ax.set_xlabel('U and Th abundance\n($\%$ relative to solar)', fontsize=labelsize, c=textc,
-#               labelpad=20)
-# ax.set_xlim((30, 300))
-# ax.set_xticks([30, 100, 200, 300])
 
 
 if slides:
     fig, *axes = dark_background(fig, axes)
 
 plt.subplots_adjust(wspace=0.1)
-fig.savefig(fig_path + 'ocn_vol_ensemble_fast_' + today + '.pdf', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol_ensemble_fast_' + today + '.png', bbox_inches='tight',
+            facecolor=fig.get_facecolor())
 plt.show()
