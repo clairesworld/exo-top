@@ -4,22 +4,27 @@ import model_1D.parameters as p
 class InteriorStructure():
     # noack 2021 valid to 2 M_E - check
 
-    def __init__(self, **kwargs):
-
+    def __init__(self, verbose=False, **kwargs):
+        if verbose:
+            print('getting interior structure')
         # define default attributes
-        default_attr = {
-            # constants
-            'M_p': 1 * p.M_E,
-            'X_Fe': 0.35815,  # weight iron fraction of planet from 0.15 to 0.8
-            'num_Fe_m': 0.063632,  # iron number in mantle (Mg/Fe ratio in olivine)
-        }
+        # default_attr = {
+        #     # constants
+        #     'M_p': 1 * p.M_E,
+        #     'X_Fe': 0.35815,  # weight iron fraction of planet from 0.15 to 0.8
+        #     'num_Fe_m': 0.063632,  # iron number in mantle (Mg/Fe ratio in olivine)
+        # }
+        #
+        # # add input parameters, use default if not given
+        # default_attr.update(kwargs)
+        # self.__dict__.update((k, v) for k, v in default_attr.items())
 
-        # add input parameters, use default if not given
-        default_attr.update(kwargs)
-        self.__dict__.update((k, v) for k, v in default_attr.items())
 
-
-    def init_structure(self, which='hot', CMF=None, m_Fe=55.845e-3, m_Mg=24.305e-3, m_Si=28.0855e-3, m_O=15.999e-3, **kwargs):
+    def init_structure(self, M_p=p.M_E, X_Fe=0.35815, num_Fe_m=0.063632, which='hot', CMF=None, T_cmb0=None,
+                       m_Fe=55.845e-3, m_Mg=24.305e-3, m_Si=28.0855e-3, m_O=15.999e-3, **kwargs):
+        self.M_p = M_p
+        self.X_Fe = X_Fe
+        self.num_Fe_m = num_Fe_m
         self.R_p = (7030 - 1840 * self.X_Fe) * 1e3 * (self.M_p/p.M_E)**0.282  # planet radius in km
         self.X_Fe_m = 2 * self.num_Fe_m * m_Fe / ((2 * (1 - self.num_Fe_m) * m_Mg + self.num_Fe_m * m_Fe) + m_Si + 4 * m_O)  # iron mass fraction in mantle
 
@@ -44,10 +49,16 @@ class InteriorStructure():
 
         self.p_cmb = self.g_m_av * self.rho_m_av * (self.R_p - self.R_c)  # CMB pressure in Pa - avg error 3%
 
+        # initial temperatures
+        if T_cmb0 is None:
+            if which == 'hot':
+                self.T_cmb = 5400*(self.p_cmb/140e9)**0.48/(1 - np.log(1 - self.num_Fe_m))
+            print('T_cmb0 derived', self.T_cmb)
+        else:
+            self.T_cmb = T_cmb0
+            print('using input T_cmb0 =', T_cmb0)
 
-    def derive(self, which='hot', **kwargs):
-        if which == 'hot':
-            self.T_cmb = 5400*(self.p_cmb/140e9)**0.48/(1 - np.log(1 - self.num_Fe_m))
+
 
 
 # test = InteriorStructure()

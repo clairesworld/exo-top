@@ -199,7 +199,7 @@ def LHS(t, y, pl=None, use_core=False, **kwargs):
     if not use_core:
         dTdt_c = th.dTdt(-pl.Q_core, pl.M_c, pl.c_c)
     else:
-        dTdt_c = core.LHS(t, y, c=pl.core, **kwargs)
+        dTdt_c = core.temperature_LHS(t, y, c=pl.core, **kwargs)
     dTdt_m = th.dTdt(-pl.Q_ubl + pl.H_rad_m + pl.Q_core - pl.Q_melt, pl.M_conv, pl.c_m)
     dDdt = th.lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l, rho_m=pl.rho_m,
                          T_s=pl.T_s,
