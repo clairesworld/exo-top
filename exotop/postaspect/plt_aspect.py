@@ -2316,9 +2316,9 @@ def plot_norm_spectra(Ra_ls, eta_ls, cmap='rainbow', end_grid=None, regime_grid=
         # secax = ax.twiny()
         # if xlim_l is None:
         #     xlim_k = ax.get_xlim()
-        #     xlim_l = sh.k_to_l(np.array(xlim_k), R)
+        #     xlim_l = sh.k_to_l(np.array(xlim_k), R_b)
         # else:
-        #     xlim_k = sh.l_to_k(np.array(xlim_l), R)
+        #     xlim_k = sh.l_to_k(np.array(xlim_l), R_b)
 
         # secax.set_xlim(xlim_l)
         # ax.set_xlim(xlim_k)

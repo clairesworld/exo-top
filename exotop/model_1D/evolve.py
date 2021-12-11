@@ -6,11 +6,12 @@ from . import thermal as th
 from . import rheology as rh
 from . import topography
 from . import oceans
-from . import core
+from . import core as tcore
 from scipy import integrate
 import random as rand
 from scipy.stats import loguniform
 from pprint import pprint
+import sys
 
 
 def bulk_planets(n=1, name=None, mini=None, maxi=None, like=None, random=False,
@@ -108,18 +109,35 @@ def build_planet_from_id(ident='Earthbaseline', run_kwargs=None, update_kwargs=N
     return pl
 
 
-def build_planet(planet_kwargs, run_kwargs, solve_ODE=True, steady=False, **kwargs):
+def build_planet(planet_kwargs, run_kwargs, solve_ODE=True, steady=False, use_core=False, core_params={}, **kwargs):
     if run_kwargs is None:
         run_kwargs = {}
     if planet_kwargs is None:
         planet_kwargs = {}
     pl = tp.TerrestrialPlanet(**planet_kwargs)
+    if use_core:
+        core_params.update({'M_p': pl.M_p, 'R_p': pl.R_p})
+        pl.core = tcore.TerrestrialCore(**core_params)
+        run_kwargs['T_c0'] = pl.core.T_cmb  # update
+        run_kwargs['T_m0'] = pl.core.T_cmb - 500  # start mantle at core temp as in Nimmo
+        # print('using initial T_cmb', run_kwargs['T_c0'], 'K', 'T_m', run_kwargs['T_m0'], 'K')
+
+        # set planet structure to accord with (better) core structure
+        pl.reinitialise(R_c=pl.core.R_c, CMF=pl.core.CMF, R_p=pl.core.R_p)
+
+        # check
+        for k, v in pl.core.__dict__.items():
+            if hasattr(pl, k):
+                if eval('pl.' + k) != v:
+                    print('!value mismatch between', k, ': planet has', eval('pl.' + k), 'core has',
+                          eval('pl.core.' + k))
+
     if steady:
         age = run_kwargs['tf'] / p.sec2Gyr
         pl = steadystate(pl, age=age, **run_kwargs, **planet_kwargs, **kwargs)
         pl = postprocess_planet(pl, **kwargs)
     elif solve_ODE:
-        pl = solve(pl, run_kwargs=run_kwargs, **kwargs)  # T_m, T_c, D_l
+        pl = solve(pl, run_kwargs=run_kwargs, use_core=use_core, **kwargs)  # T_m, T_c, D_l
         pl = postprocess_planet(pl, **kwargs, **run_kwargs)
     return pl
 
@@ -139,7 +157,8 @@ def postprocess_planet(pl, postprocessors=None, nondimensional=False, **kwargs):
     return pl
 
 
-def solve(pl, run_kwargs={}, t0=0, t_eval=None, t0_buffer=5, verbose=False, atol=(1e-6, 1e-6, 1e-6), **kwargs):
+def solve(pl, run_kwargs={}, t0=0, t_eval=None, t0_buffer=5, verbose=False, use_core=False, use_lid=True, atol=(1e-6, 1e-6, 1e-6),
+          **kwargs):
     """ call ODE solver """
 
     tf = run_kwargs['tf']
@@ -152,13 +171,14 @@ def solve(pl, run_kwargs={}, t0=0, t_eval=None, t0_buffer=5, verbose=False, atol
         t0i = t0 - t0_buffer
         if verbose:
             print('getting initial conditions with', t0_buffer, 'Gyr buffer')
-        pre_f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(pl=pl, **run_kwargs, **kwargs)),
-                                    t_span=(t0i * 1e9 * p.years2sec, t0 * 1e9 * p.years2sec), y0=[T_m0, T_c0, D_l0],
-                                    t_eval=None,
-                                    max_step=100e6 * p.years2sec,
-                                    method='BDF',  # 'RK45',
-                                    # atol=atol,
-                                    )
+        pre_f = integrate.solve_ivp(
+            fun=lambda t, y: LHS(t, y, **dict(pl=pl, use_core=use_core, use_lid=use_lid, **run_kwargs, **kwargs)),
+            t_span=(t0i * 1e9 * p.years2sec, t0 * 1e9 * p.years2sec), y0=[T_m0, T_c0, D_l0],
+            t_eval=None,
+            max_step=100e6 * p.years2sec,
+            method='BDF',  # 'RK45',
+            # atol=atol,
+        )
         T_m0, T_c0, D_l0 = pre_f.y[:, -1]
 
     if T_m0 > 10000 or D_l0 < 0:
@@ -168,55 +188,78 @@ def solve(pl, run_kwargs={}, t0=0, t_eval=None, t0_buffer=5, verbose=False, atol
         print('Solving 1D thermal history with T_m0 =', T_m0, 'K, T_c0 =', T_c0, 'K, D_l0 =', D_l0, 'm, tf =', tf,
               'Gyr')
 
-    f = integrate.solve_ivp(fun=lambda t, y: LHS(t, y, **dict(pl=pl, verbose=verbose, **run_kwargs, **kwargs)),
-                            t_span=(t0 * 1e9 * p.years2sec, tf * 1e9 * p.years2sec), y0=[T_m0, T_c0, D_l0],
-                            t_eval=t_eval,
-                            max_step=100e6 * p.years2sec,
-                            method='RK45',
-                            # atol=atol
-                            )
+    f = integrate.solve_ivp(
+        fun=lambda t, y: LHS(t, y, **dict(pl=pl, use_core=use_core, verbose=verbose, **run_kwargs, **kwargs)),
+        t_span=(t0 * 1e9 * p.years2sec, tf * 1e9 * p.years2sec), y0=[T_m0, T_c0, D_l0],
+        t_eval=t_eval,
+        max_step=100e6 * p.years2sec,
+        method='RK45',
+        # atol=atol
+    )
 
     # initial postprocessing to get values of derived parameters across time
     pl.T_m = f.y[0]
     pl.T_c = f.y[1]
     pl.D_l = f.y[2]
     pl.t = f.t
-    pl = recalculate(pl.t, pl, verbose=verbose, **run_kwargs, **kwargs)
+    pl = recalculate(pl.t, pl, verbose=verbose, use_core=use_core, **run_kwargs, **kwargs)
+    if use_core:
+        pl.core.T_cmb = pl.T_c
+        pl.core.Q_cmb = pl.Q_core
+        pl.core.evolve_profiles(t=pl.t)
+        pl.core.core_gradient(t=pl.t)
 
     return pl
 
 
-def LHS(t, y, pl=None, use_core=False, **kwargs):
+def LHS(t, y, pl=None, use_core=False, use_lid=True, **kwargs):
     """ ODE equation to solve, LHS = 0 """
 
     # print('t', t*p.sec2Gyr, 'Gyr, T_m', y[0])
 
     pl.T_m = y[0]
     pl.T_c = y[1]
-    pl.D_l = y[2]
-    pl = recalculate(t, pl, **kwargs)
+    if use_lid:
+        pl.D_l = y[2]
+    else:
+        pl.D_l = 0
+    # print('  LHS in planet: t =', t*p.sec2Gyr, 'Gyr', 'T_cmb', pl.T_c, 'K', 'T_m', pl.T_m, 'K')
+    if np.isnan(pl.T_c):
+        print('pl.T_c', pl.T_c, 'K')
+        sys.exit()
+    pl = recalculate(t, pl, use_core=use_core, use_lid=use_lid, **kwargs)
 
     if not use_core:
+        print('not using core dTdc')
         dTdt_c = th.dTdt(-pl.Q_core, pl.M_c, pl.c_c)
     else:
-        dTdt_c = core.temperature_LHS(t, y, c=pl.core, **kwargs)
+        pl.core.Q_cmb = pl.Q_core
+        # dTdt_c, dR_idt = tcore.temperature_LHS(t, y=[pl.T_c, pl.core.R_ic], c=pl.core, **kwargs)
+        dTdt_c = tcore.temperature_LHS(t, y=pl.T_c, c=pl.core, **kwargs)
+
+    # print('    dTdt_c in planet', dTdt_c)
     dTdt_m = th.dTdt(-pl.Q_ubl + pl.H_rad_m + pl.Q_core - pl.Q_melt, pl.M_conv, pl.c_m)
-    dDdt = th.lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l, rho_m=pl.rho_m,
-                         T_s=pl.T_s,
-                         c_m=pl.c_m, k_m=pl.k_m, **kwargs)
+    # print('    dTdt_m in planet', dTdt_m)
+    if use_lid:
+        dDdt = th.lid_growth(T_m=pl.T_m, q_ubl=pl.q_ubl, h0=pl.h_rad_m, R_p=pl.R_p, R_l=pl.R_l, T_l=pl.T_l,
+                             rho_m=pl.rho_m,
+                             T_s=pl.T_s,
+                             c_m=pl.c_m, k_m=pl.k_m, **kwargs)
+    else:
+        dDdt = 0
     # print('t =', t*p.sec2Gyr, 'Gyr, T_m =', pl.T_m, 'dD/dt =', dDdt*1e-3/p.sec2Gyr, 'km/Gyr', 'h =', pl.h_rad_m*1e12, 'pW/kg')
 
     return [dTdt_m, dTdt_c, dDdt]
 
 
-def recalculate(t, pl, verbose=False, rad_type=None, q_type='Ra_crit', lid_heating=True, **kwargs):
+def recalculate(t, pl, verbose=False, rad_type=None, q_type='Ra_crit', lid_heating=True, use_core=False, use_lid=True, **kwargs):
     """ calcualte all the thermal convection parameters (single time step or postprocess all timesteps"""
 
     # if verbose:
     #     print('\nrecalculate kwargs:\n', kwargs)
     #     print('\nplanet:')
     #     for attr in dir(pl):
-    #         print("pl.%s = %r" % (attr, getattr(pl, attr)))
+    #         print("pl.%s = %r" % (attr, getattr(pl, attr))
 
     # check if there are any weird issues
     try:
@@ -236,6 +279,12 @@ def recalculate(t, pl, verbose=False, rad_type=None, q_type='Ra_crit', lid_heati
     pl.M_lid = V_lid * pl.rho_m  # not considering density change in lid due to melting/differentiation
     pl.M_conv = pl.M_m - pl.M_lid  # mass of convecting region
 
+    Tp = th.potential_temperature(T=pl.T_m, z=pl.R_p - pl.R_c, g=pl.g_sfc, Cp=pl.c_m,
+                                  alpha=pl.alpha_m)  # halfway depth or CMB?
+    pl.Tp = Tp
+    # print('think lid thickness is', pl.D_l*1e-3, 'km', 'mantle depth', pl.d_m*1e-3, 'km', 'depth available', (pl.R_p - pl.R_c)*1e-3, 'km')
+
+
     # radiogenic heating
     # pl.h_rad_m = th.h_rad(t, H_0=pl.H_0, H_f=pl.H_f, c_n=pl.c_n, p_n=pl.p_n, lambda_n=pl.lambda_n, verbose=verbose, **kwargs)  # W kg^-1
     if rad_type == 'H0':
@@ -253,9 +302,18 @@ def recalculate(t, pl, verbose=False, rad_type=None, q_type='Ra_crit', lid_heati
     pl.H_rad_lid = th.H_rad(h=pl.h_rad_m, M=pl.M_lid, **kwargs)  # lid radiogenic heating in W
 
     # temperature update
-    pl.dT_visc = p.R_b * pl.T_m ** 2 / pl.Ea
+
+    if use_core:
+        pl.dT_visc = p.R_b * Tp ** 2 / pl.Ea
+    else:
+        pl.dT_visc = p.R_b * pl.T_m ** 2 / pl.Ea
     pl.dT_rh = pl.a_rh * pl.dT_visc
-    pl.T_l = th.T_lid(T_m=pl.T_m, a_rh=pl.a_rh, dT_visc=pl.dT_visc)
+    if not use_lid:
+        pl.T_l = pl.T_s
+    elif use_core:
+        pl.T_l = th.T_lid(T_m=Tp, a_rh=pl.a_rh, dT_visc=pl.dT_visc)
+    else:
+        pl.T_l = th.T_lid(T_m=pl.T_m, a_rh=pl.a_rh, dT_visc=pl.dT_visc)
     pl.dT_m = pl.T_c - pl.T_l
     pl.delta_T = pl.T_c - pl.T_s
     pl.b = rh.visc_factor(pl, **kwargs)
@@ -268,10 +326,18 @@ def recalculate(t, pl, verbose=False, rad_type=None, q_type='Ra_crit', lid_heati
         print('{:.2f} M_E: SERIOUS WARNING: -ve T_m at {:.2f} Gyr'.format(pl.M_p / p.M_E, t * p.sec2Gyr))
 
     # viscosity update
-    pl.eta_s = rh.dynamic_viscosity(T=pl.T_s, pl=pl, **kwargs)  # viscosity at surface temperature
-    pl.eta_l = rh.dynamic_viscosity(T=pl.T_l, pl=pl, **kwargs)  # viscosity at lid base temperature
-    pl.eta_m = rh.dynamic_viscosity(T=pl.T_m, pl=pl, **kwargs)  # viscosity at interior mantle temperature
-    pl.eta_cmb = rh.dynamic_viscosity(T=(pl.T_c + pl.T_m) / 2, pl=pl, **kwargs)  # viscosity at cmb
+    # pl.eta_s = rh.dynamic_viscosity(T=pl.T_s, pl=pl, **kwargs)  # viscosity at surface temperature
+    # pl.eta_l = rh.dynamic_viscosity(T=pl.T_l, pl=pl, **kwargs)  # viscosity at lid base temperature
+    if use_core:
+        pl.eta_m = rh.dynamic_viscosity(T=pl.Tp, T_ref=1573,
+                                        **kwargs)  # viscosity at interior mantle temperature
+        pl.eta_cmb = 10 * rh.dynamic_viscosity(T=(pl.T_c + pl.T_m) / 2, T_ref=3400,
+                                               **kwargs)  # viscosity at cmb - T_ref may not be used
+    else:
+        pl.eta_m = rh.dynamic_viscosity(T=pl.T_m, pl=pl, T_ref=None,
+                                        **kwargs)  # viscosity at interior mantle temperature
+        pl.eta_cmb = rh.dynamic_viscosity(T=(pl.T_c + pl.T_m) / 2, pl=pl, T_ref=None, **kwargs)  # viscosity at cmb
+
     # pl.delta_eta = pl.eta_s / rh.dynamic_viscosity(T=(pl.T_c - pl.T_s), pl=pl, **kwargs)  # total viscosity contrast
 
     # equivalent to effective Ra_i in 2D models with d and dT decreased by lid thickness and temp drop
@@ -279,7 +345,11 @@ def recalculate(t, pl, verbose=False, rad_type=None, q_type='Ra_crit', lid_heati
                         alpha=pl.alpha_m)
 
     # for calculating the upper tbl thickness
-    pl.Ra_rh_u = th.Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, deltaT=pl.T_m - pl.T_l, l=pl.d_m, kappa=pl.kappa_m,
+    if use_core:
+        deltaT = pl.Tp - pl.T_l
+    else:
+        deltaT = pl.T_m - pl.T_l
+    pl.Ra_rh_u = th.Ra(eta=pl.eta_m, rho=pl.rho_m, g=pl.g_sfc, deltaT=deltaT, l=pl.d_m, kappa=pl.kappa_m,
                        alpha=pl.alpha_m)
 
     # the 'overall' interior Ra covering the whole domain from cmb to surface
@@ -289,18 +359,33 @@ def recalculate(t, pl, verbose=False, rad_type=None, q_type='Ra_crit', lid_heati
     pl.theta_FK = rh.theta_FK(Ea=pl.Ea, T_i=pl.T_m, T_s=pl.T_s)
 
     pl.delta_rh = th.bdy_thickness(d_m=pl.d_m, Ra_crit=pl.Ra_crit_u, beta=pl.beta_u, Ra_rh=pl.Ra_rh_u, **kwargs)
+    # if use_core:
+    #     delta_rh = (600 * pl.kappa_m * pl.eta_m / (pl.rho_m * pl.g_sfc * pl.alpha_m * (pl.Tp - pl.T_s)))**(1/3)
+        # print('calculated delta_rh',pl.delta_rh*1e-3, 'should be', delta_rh*1e-3)
+
+
     if q_type == 'theta':  # i.e. like Foley & Smye
         pl.q_ubl = th.q_theta_scaling(theta_FK=pl.theta_FK, Ra_i=pl.Ra_i, T_m=pl.T_m, T_s=pl.T_s, d=pl.d, k=pl.k_m,
                                       c1=0.5)
+    elif use_core:
+        pl.q_ubl = th.q_bl(deltaT=Tp - pl.T_l, k=pl.k_m, d_bl=pl.delta_rh, beta=pl.beta_u, **kwargs)
     else:
         pl.q_ubl = th.q_bl(deltaT=pl.T_m - pl.T_l, k=pl.k_m, d_bl=pl.delta_rh, beta=pl.beta_u, **kwargs)
     pl.Q_ubl = th.Q_bl(q=pl.q_ubl, R=pl.R_l)
 
     # core
-    pl.Ra_crit_c = 0.28 * pl.Ra_i ** 0.21  # Thiriet eqn 16, Deschamps & Sotin (2001)
+    if not hasattr(pl, 'Ra_crit_c0'):
+        pl.Ra_crit_c = 0.28 * pl.Ra_i ** 0.21  # Thiriet eqn 16, Deschamps & Sotin (2001)
+    else:
+        pl.Ra_crit_c = pl.Ra_crit_c0
     pl.Ra_rh_c = th.Ra(eta=pl.eta_cmb, rho=pl.rho_m, g=pl.g_cmb, deltaT=abs(pl.T_c - pl.T_m), l=pl.d_m,
                        kappa=pl.kappa_m, alpha=pl.alpha_m)
     pl.TBL_c = th.bdy_thickness(d_m=pl.d_m, Ra_crit=pl.Ra_crit_c, Ra_rh=pl.Ra_rh_c, beta=pl.beta_c, **kwargs)
+
+    # if use_core:
+    #     delta_c = (600 * pl.kappa_lm * pl.eta_cmb / (pl.rho_m * pl.g_sfc * pl.alpha_m * pl.T_c - pl.T_m))**(1/3)
+    #     print('calculated delta_b', pl.TBL_c * 1e-3, 'should be', delta_c * 1e-3)
+
     pl.dT_cmb = pl.T_c - pl.T_m
     pl.q_core = th.q_bl(deltaT=pl.dT_cmb, k=pl.k_lm, d_bl=pl.TBL_c, beta=pl.beta_c, **kwargs)
     pl.Q_core = th.Q_bl(q=pl.q_core, R=pl.R_c)
@@ -435,9 +520,9 @@ def steadystate(pl, age=4.5 / p.sec2Gyr, T_m0=2000, tol=1e-1, verbose=False, **k
 #
 #         delta_rh = th.bdy_thickness(d_m=d_m, Ra_crit=pl.Ra_crit_u, beta=1/3, Ra_rh=Ra_i_eff, **kwargs)
 #         q_ubl = th.q_bl(deltaT=dT_m, k=pl.k_m, d_bl=delta_rh, beta=1/3, **kwargs)
-#         Q_ubl = th.Q_bl(q=q_ubl, R=R_l)
+#         Q_ubl = th.Q_bl(q=q_ubl, R_b=R_l)
 #         q_sfc = th.sph_flux(pl.R_p, a0=pl.a0, T_l=T_l, R_l=R_l, k_m=pl.k_m, T_s=pl.T_s, R_p=pl.R_p, **kwargs)
 #
-#         Q_sfc = th.Q_bl(q=q_sfc, R=pl.R_p)  # W
+#         Q_sfc = th.Q_bl(q=q_sfc, R_b=pl.R_p)  # W
 #
 #     # TODO: sympy?

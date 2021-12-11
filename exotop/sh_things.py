@@ -116,7 +116,7 @@ def scale_spectrum(h_rms, h_rms0=None, phi0=None, degree=None, pl=None, pl0=None
     # ratio = ratio[it]
     if h_rms0 is None:
         h_rms0 = powerspectrum_RMS(power_lm=phi0,
-                                   degree=degree)  # I hope this is a power spectrum, but this probably needs to be multipled by R or something
+                                   degree=degree)  # I hope this is a power spectrum, but this probably needs to be multipled by R_b or something
     ratio = h_rms / h_rms0
     sqrtphi = np.sqrt(phi0) * ratio
     return sqrtphi ** 2
@@ -275,7 +275,7 @@ def dct_spectrum_jfr(case=None, test=False, plot_test=False, L_x=8, x_res=1, dat
 
 
 # def dct_spectrum_old(case, ts0=None, t0=0.5, x_res=1, norm='ortho', data_path='', plot=False,
-#                  L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, R=6050, test=False, **kwargs):
+#                  L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, R_b=6050, test=False, **kwargs):
 #     from scipy.fftpack import dct
 #
 #     if ts0 is None:
@@ -295,7 +295,7 @@ def dct_spectrum_jfr(case=None, test=False, plot_test=False, L_x=8, x_res=1, dat
 #     k = np.pi/D_x * p
 #     wl = 1/k
 #     psd = 2* D_x * f**2
-#     # psd_scale = 4*np.pi*R**2 * psd / (2*sh.to_wn(k, R=R) + 1)
+#     # psd_scale = 4*np.pi*R_b**2 * psd / (2*sh.to_wn(k, R_b=R_b) + 1)
 #
 #     if test:
 #         rms_parseval = parseval_rms(psd, k)
@@ -362,7 +362,7 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
 
     def to_wn(l):
         return (l + 0.5) / (2 * np.pi * R)
-        # return (l + 0.5) / (np.pi * R)  # denominator is planet radius
+        # return (l + 0.5) / (np.pi * R_b)  # denominator is planet radius
 
     if k[0] == 0:  # only wavenumbers greater than 0
         k = k[1:]
@@ -586,7 +586,7 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
 
     # somehow get exact degrees? must do fit...
     l, Sl = interpolate_degrees(S, k, R=R, lmin=lmin, kmin_fit=k_min, kmax_fit=k_max, kmax_interp=kmax_interp)
-    # l_1, Sl_1 = interpolate_degrees(S, k, R=R, lmin=1, kmin_fit=k_min, kmax_fit=k_max)
+    # l_1, Sl_1 = interpolate_degrees(S, k, R_b=R_b, lmin=1, kmin_fit=k_min, kmax_fit=k_max)
 
     if plot:
         ax2 = ax.twiny()
@@ -594,7 +594,7 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
         ax2.loglog(l, Sl, 'b.', lw=0, ls='--', label='l=2 Fit')
         ax2.loglog(k_to_l(k[1:], R), S[1:], 'b--', lw=3, label='original PSD',
                    alpha=0.2)  # original k includes 0, fucks up l
-        # plt.scatter(l_to_k(l, R=R), S, marker='o', c='g', alpha=0.3, label='fit points')
+        # plt.scatter(l_to_k(l, R_b=R_b), S, marker='o', c='g', alpha=0.3, label='fit points')
         ax2.set_xlabel("Degree, $l$")
         ax2.legend()
         ax.legend()
@@ -609,7 +609,7 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
         # print('x1lim, k=', xlim)
         print('\nRMS of model 1D psd l =', lmin, ':', parseval_rms(Sl, l_to_k(l, R)), 'for k:', np.min(l_to_k(l, R)),
               np.max(l_to_k(l, R)))
-        # print('\nRMS of model 1D psd l=1', parseval_rms(Sl_1, l_to_k(l_1, R)), 'for k:', np.min(l_to_k(l_1, R)), np.max(l_to_k(l_1, R)))
+        # print('\nRMS of model 1D psd l=1', parseval_rms(Sl_1, l_to_k(l_1, R_b)), 'for k:', np.min(l_to_k(l_1, R_b)), np.max(l_to_k(l_1, R_b)))
         print('l = 1 corresponds to k=', l_to_k(1, R))
 
     pkl.dump((l, Sl), open(fig_path + newfname + fend, "wb"))
@@ -708,7 +708,7 @@ def coeffs_to_grid(clm, R=2, lmax=None, scale_to_1D=False, plot_grid=True, plot_
     if plot_spectrum:
         plt.figure(figsize=figsize)
         plt.loglog(l[2:], 4.0 * np.pi * R * R * spectrum[2:], c=cline, lw=lw)
-        #         plt.xlim(-0.5+2.0*np.pi*R/5000.0, -0.5+2.0*np.pi*R/200.0)
+        #         plt.xlim(-0.5+2.0*np.pi*R_b/5000.0, -0.5+2.0*np.pi*R_b/200.0)
         #         plt.ylim(1e1,1e6)
         plt.xlabel("Spherical harmonic degree", fontsize=labelsize)
         plt.ylabel("Power (km$^2$ km$^2$)", fontsize=labelsize)
@@ -811,7 +811,7 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
         if verbose:
             print('RMS of random 2D psd', parseval_rms_2D(psd_2D, k))
             print('RMS of random pseudo-1D psd', parseval_rms(psd_pseudo, k))
-            # print('RMS of 2D psd if it were 1D', parseval_rms(4.0*np.pi*R*R*power_per_lm*k, k), 'km')
+            # print('RMS of 2D psd if it were 1D', parseval_rms(4.0*np.pi*R_b*R_b*power_per_lm*k, k), 'km')
 
         if plot:
             # plt.loglog(degrees[2:], psd_pseudo[2:], label=r'$S_{l}^{\rm rand}$')
@@ -926,7 +926,7 @@ def plot_norm_psd(baseline_fname='base_spectrum.pkl', fig_path='', psd_path=None
         # secax.plot(l, phi_norm, marker='v', ls='--', lw=1, c='k', alpha=0.5, label='degrees test')
 
     # print('xlim k ', ax.get_xlim())
-    # print('xlim l should be', k_to_l(np.array(ax.get_xlim()), R))
+    # print('xlim l should be', k_to_l(np.array(ax.get_xlim()), R_b))
     return fig, ax
 
 
@@ -1058,7 +1058,7 @@ def make_Venus_reference(newfname='Venus_spectrum.pkl', baseline_fname='base_spe
     import pickle as pkl
 
     # want to 'nondimensionalise' observed Venus spectrum by scaling it such that it has same rms as baseline and
-    # corresponds to R=2
+    # corresponds to R_b=2
     l, Sl = Venus_correction(baseline_fname=baseline_fname, fig_path=fig_path, R_base=2,
                              save=False, plot=plot, lmin=lmin, units='km3', scale_to='base')
 

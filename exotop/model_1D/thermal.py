@@ -34,6 +34,11 @@ def adiabat(T_0, R=None, g=None, R_p=None, h=None, c_v=None, alpha_m=None, f_d=0
     return u * T_0
 
 
+def potential_temperature(T=None, z=None, g=None, Cp=None, alpha=None):
+    Tp = T * np.exp(-alpha*g*z/Cp)
+    return Tp
+
+
 def sph_conduction(r, k_m=None, T_l=None, T_s=None, R_p=None, R_l=None,
                    a0=None, **kwargs):
     """ calculate temperature at r based on conduction in spherical geometry with total radius R_p, a0: internal heating rate """

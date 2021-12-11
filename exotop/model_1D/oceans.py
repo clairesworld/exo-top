@@ -76,7 +76,7 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         print('dimensional h rms', h_rms1_dim[-1])
 
     l = np.arange(len(phi0))
-    k = sh.l_to_k(l, R=2)  # original model spectrum uses R = 2d = 2
+    k = sh.l_to_k(l, R=2)  # original model spectrum uses R_b = 2d = 2
     h_rms0 = sh.parseval_rms(phi0, k)
     if np.isnan(h_rms0):
         print('phi0', phi0)
@@ -100,12 +100,12 @@ def max_ocean(pl, n_stats=10, at_age=None, name_rms='dyn_top_aspect_prime', phi0
         rms_nondims = []
         while nn < n_stats:
             clm = sh.random_harms_from_psd(phi0, l, R=2, h_ratio=h_ratio, plot=plot, verbose=verbose)
-            # shgrid = sh.coeffs_to_grid(clm, R=2, plot_grid=False, plot_spectrum=False, verbose=verbose,)
+            # shgrid = sh.coeffs_to_grid(clm, R_b=2, plot_grid=False, plot_spectrum=False, verbose=verbose,)
             # lmax = shgrid.lmax
             # data = shgrid.data
             # lats = shgrid.lats()
             # lons = shgrid.lons()
-            # vol = sh.integrate_to_peak(grid_dim, lats, lons, R=pl.R_p, lmax=shgrid.lmax, verbose=verbose)
+            # vol = sh.integrate_to_peak(grid_dim, lats, lons, R_b=pl.R_p, lmax=shgrid.lmax, verbose=verbose)
             data = clm.expand(grid='GLQ', extend=False).to_array()
             lmax = clm.lmax
             rms_nondim = np.sqrt(np.mean(data ** 2))
@@ -170,7 +170,7 @@ def min_topo(x_h2o, R_p, M_p, n_stats=50, rms_1=1000, tol=0.5, phi0=None, rho_m=
         degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
 
     l = np.arange(len(phi0))
-    k = sh.l_to_k(l, R=2)  # original model spectrum uses R = 2d = 2
+    k = sh.l_to_k(l, R=2)  # original model spectrum uses R_b = 2d = 2
     h_rms0 = sh.parseval_rms(phi0, k)
     M_w = M_p * parameters.M_E * x_h2o  # mass of sfc water in kg
     vol_w = M_w / rho_w  # corresponding volume
@@ -230,7 +230,7 @@ def plot_map(pl, at_age=4.5, phi0=None, name_rms='dyn_top_aspect_prime', spectru
         print('dimensional h rms', h_rms1_dim[-1])
 
     l = np.arange(len(phi0))
-    k = sh.l_to_k(l, R=2)  # original model spectrum uses R = 2d = 2
+    k = sh.l_to_k(l, R=2)  # original model spectrum uses R_b = 2d = 2
     h_rms0 = sh.parseval_rms(phi0, k)
     if np.isnan(h_rms0):
         print('phi0', phi0)

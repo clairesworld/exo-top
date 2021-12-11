@@ -17,6 +17,8 @@ def dynamic_viscosity(T=None, pl=None, visc_type=None, **kwargs):  # note kwargs
         return eta_Thi(T, pl=pl, **kwargs)
     elif visc_type == 'FK':
         return eta_FK(T, T_i=T, pl=pl, **kwargs)
+    elif visc_type == 'Nim':
+        return eta_Nim(T, eta_0=1e21, zeta=1e-2, T_ref=kwargs['T_ref'])
     else:
         print('missing viscosity method')
 
@@ -73,6 +75,10 @@ def eta_Thi(T, pl=None, eta_0=1e21, T_ref=1600, Ea=300e3, **kwargs):  # diffusio
         eta_0 = pl.eta_0
         T_ref = pl.T_ref
     return eta_0 * np.exp(Ea / p.R_b * (T ** -1 - T_ref ** -1))
+
+
+def eta_Nim(T, eta_0=1e21, zeta=1e-2, T_ref=1573):  # Nimmo+ 2003 like FK
+    return eta_0 * np.exp(-zeta*(T - T_ref))
 
 
 def eta_FK(T, pl=None, T_s=None, eta_s=None, T_i=None, Ea=300e3, P=0, V_rh=6e-6, **kwargs):

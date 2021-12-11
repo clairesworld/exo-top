@@ -197,7 +197,7 @@ fig.savefig(fig_path + 'psd_stacked_k.pdf', bbox_inches='tight')
 """ what does a cartesian projection look like? """
 
 # base_case = 'Ra1e8-eta1e7-wide'
-# l, S = sh.make_baseline_spectrum(base_case, R=1, data_path=data_path, fig_path=fig_path, newfname='base_spectrum',
+# l, S = sh.make_baseline_spectrum(base_case, R_b=1, data_path=data_path, fig_path=fig_path, newfname='base_spectrum',
 #                                  max_dscale=1, bl_fudge=5,)
 
 
