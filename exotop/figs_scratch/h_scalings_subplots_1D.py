@@ -61,8 +61,8 @@ xlabels = ['Age\n(Gyr)',
            'Planet mass\n' + r'($M_{\oplus}$)', 'Core Mass Fraction',
            'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-dist_res = 5 # 1000
-x_res = 4  #32
+dist_res = 3 # 1000
+x_res = 3  #32
 n_sigma = 1
 
 fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_res=x_res, n_sigma=n_sigma,
@@ -79,6 +79,7 @@ fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_
                                                            linec=linec, leg_loc='upper right',
                                                            textc='k',  # 'xkcd:off white',
                                                            alpha=alpha, legsize=legsize, xlabelpad=xlabelpad,
+                                                           # verbose=True
                                                            )
 
 # # add second scaling relationship
@@ -101,10 +102,10 @@ for i, ax in enumerate(axes):
     ax.set_xlim([x * xscales[i] for x in x_range[i]])
     ax.set_xticks(xticks[i])
     ax.set_yscale('log')
-    ax.set_ylim((10, 30000))
+    # ax.set_ylim((10, 30000))
     # ax.set_yticks((200, 800, 1000))
-    # ax.set_ylim((10, 800))
-    # ax.set_yticks((10, 100, 800))
+    ax.set_ylim((10, 800))
+    ax.set_yticks((10, 100, 800))
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))

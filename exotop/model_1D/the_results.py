@@ -1174,6 +1174,8 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
 
             if x_var == 't':
                 # time/age variation - plot single planet evol
+                if verbose:
+                    print('generating single planet time distribution')
                 x_vec, y_av, y_upper, y_lower = ensemble_time_distribution(yvar=model_param, xvar=x_var,
                                                                            default=defaults, dist_res=dist_res,
                                                                            update_kwargs=update_kwargs,
@@ -1181,6 +1183,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                                                            yscale=yscale,
                                                                            min_t=xmin, max_t=xmax, verbose=verbose,
                                                                            **kwargs)
+                x_vec = x_vec * xscales[i_ax]
             else:
                 if verbose:
                     print('generating planets across', x_var, '...')
@@ -1198,6 +1201,11 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
 
         print('      range:', y_av[0], '-', y_av[-1], '| % diff:', abs(y_av[-1] - y_av[0]) / y_av[0])
 
+        if i_ax == 0:
+            print('\nx_vec', x_vec)
+            print('y_av', y_av)
+            print('y_upper', y_upper)
+            print('y_lower', y_lower, '\n')
         axes[i_ax].plot(x_vec, y_av, c=linec, lw=lw, ls=ls)
         axes[i_ax].fill_between(x_vec, y_lower, y_upper, color=linec, alpha=alpha)
         axes[i_ax].set_xlabel(xlabels[i_ax], fontsize=labelsize)
