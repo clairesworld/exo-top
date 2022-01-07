@@ -61,8 +61,8 @@ xlabels = ['Age\n(Gyr)',
            'Planet mass\n' + r'($M_{\oplus}$)', 'Core Mass Fraction',
            'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-dist_res = 1000
-x_res = 32
+dist_res = 5 # 1000
+x_res = 4  #32
 n_sigma = 1
 
 fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_res=x_res, n_sigma=n_sigma,
@@ -101,10 +101,10 @@ for i, ax in enumerate(axes):
     ax.set_xlim([x * xscales[i] for x in x_range[i]])
     ax.set_xticks(xticks[i])
     ax.set_yscale('log')
-    # ax.set_ylim((200, 1000))
+    ax.set_ylim((10, 30000))
     # ax.set_yticks((200, 800, 1000))
-    ax.set_ylim((10, 800))
-    ax.set_yticks((10, 100, 800))
+    # ax.set_ylim((10, 800))
+    # ax.set_yticks((10, 100, 800))
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
 axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
@@ -146,10 +146,24 @@ handles = [
 #                         borderaxespad=0,
 #                         loc='lower left', bbox_to_anchor=(0.0, 1.01), ncol=3, )
 
+
+# rock strength scaling
+def h_peak_rock(M=None, Y=100e6, rho_c=2700, C=1 / 2, **kwargs):
+    # C is 1/3 to 1/2 - min stress difference supported elastically underneath load (Jeffreys' theorem)
+    R = radius_zeng(M, CMF=0.3)  # in km
+    g = grav(M, R)
+    return (C ** -1 * Y) / (rho_c * g)
+
+m = np.linspace(0.1, 5, 10)
+h_max = h_peak_rock(m*p.M_E)
+axes[1].plot(m, h_max, c='k', alpha=0.6)
+print('rock strength', h_max, 'm')
+
+
 # fig, *axes = dark_background(fig, axes)
 plt.subplots_adjust(wspace=0.2)
 # plt.tight_layout()
 
 # plt.suptitle(r'Ra$_{i, {\rm eff}}$ scaling')
-fig.savefig(fig_path + 'h_parameterstest' + today + fig_format, bbox_inches='tight')
+fig.savefig(fig_path + 'h_parameters' + today + fig_format, bbox_inches='tight')
 plt.show()

@@ -10,6 +10,12 @@ AU2m = 1.5e11
 R_b = 8.3144598  # universal gas constant in J mol −1 K −1
 sb = 5.67e-8  # Stefan Boltzmann constant in W m^-2 K^-4
 
+# other solar system
+M_Mars = 6.39e23
+R_Mars = 3389.5e3
+M_Venus = 4.867e24
+R_Venus = 6051.8e3
+
 # radioisotope data from Treatise on Geophys, Dye (2012)
 # order: [238U, 235U, 232Th, 40K]
 lambda_n = [a * 1e-9 / years2sec for a in [0.15541417, 0.98458406, 0.04951051, 0.55011681]]  # decay constant in s^-1

@@ -87,7 +87,7 @@ yscales = [1,
            # 1
            ]
 
-num_dist = 500
+num_dist = 50
 masses = np.array([0.1, 1, 5]) * p.M_E
 verbose = False
 
@@ -106,7 +106,9 @@ verbose = False
 # verbose = True
 # labelsize = 12
 
-planet_kwargs = {}
+planet_kwargs = {
+    'beta_u': 0.333
+}
 run_kwargs = {
     # 'rms_type': 'Ra_i_eff'
 }

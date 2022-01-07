@@ -84,10 +84,13 @@ def mod_loaded_spectrum(k, S, is_wl=False, is_2D=False, is_amplitude=False, norm
     return k, S
 
 
-def scale_psd_to_rms(phi0=None, k=None, rms1=1, R=2, **kwargs):
+def scale_psd_to_rms(phi0=None, k=None, rms1=1, R=2, l=None, **kwargs):
     # given psd in 1D (units m2 m), scale to new rms1
+    if k is None:
+        k = l_to_k(l, R)
     phi_iso0 = 1 / k * phi0  # Jacobs eqn 5 but pi changed to 1 in numerator says JFR
-    l = k_to_l(k, R)
+    if l is None:
+        l = k_to_l(k, R)
     rms0 = parseval_rms(phi0, k)
     rms_ratio = rms1 / rms0
 
@@ -616,10 +619,16 @@ def make_model_spectrum(case, R=2, data_path='', fig_path='', newfname='base_spe
     return l, Sl
 
 
-def integrate_to_peak(grid, lats, lons, R=2, lmax=120, fudge_to_rms=None, verbose=False, type='GLQ'):
+def integrate_to_peak(grid, lats, lons, R=2, lmax=120, normalise=True, fudge_to_rms=None, verbose=False):
     if fudge_to_rms is not None:
         rms_grid = np.sqrt(np.mean(grid ** 2))
         grid = grid * fudge_to_rms / rms_grid
+
+    if normalise:
+        mean = np.mean(grid)
+        print('mean', mean*1e-3, 'km')
+        grid = grid - mean
+        print('new mean', np.mean(grid)*1e-3, 'km\n')
 
     h_peak = np.max(grid)
     h_peak_abs = np.max(abs(grid))
@@ -628,12 +637,6 @@ def integrate_to_peak(grid, lats, lons, R=2, lmax=120, fudge_to_rms=None, verbos
     annulus_vol = 4 / 3 * np.pi * ((R + h_peak_abs) ** 3 - R ** 3)
 
     # integrate cellwise
-    if type == 'GLQ':
-        # calculate Gauss-Legendre weights for quadrature rule
-        nodes, lat_weights = pyshtools.expand.SHGLQ(lmax)  # gives weights for latitude
-        lon_weights = 2.0 * np.pi / (2 * lmax + 1)  # weights for longitude are uniform
-        w = lon_weights * np.tile(lat_weights, (2 * lmax + 1, 1)).T  # 2d grid of lat-lon weights for quadrature
-
     vol_rock = 0
     vol_ocn = 0
     area = 0
@@ -641,27 +644,23 @@ def integrate_to_peak(grid, lats, lons, R=2, lmax=120, fudge_to_rms=None, verbos
     nlat = len(lats)
     for jj in range(1, nlat - 1):  # don't count poles (??)
         for ii in range(nlon - 1):  # shgrid contains redundant column for 360 E
-            if type == 'GLQ':
-                # quadrature integration
-                dA = w[jj, ii]
-            else:
-                # regular lat lon grid?
-                dlon = lons[1] - lons[0]  # width of one cell in degrees, constant
-                dy = np.pi * R / nlat  # height of cell in m, constant for a sphere (pole-to-pole distance over n cells)
-                lat = lats[jj]  # latitude at cell edge
-                d_1lon = np.pi / 180 * R * np.cos(np.pi / 180 * lat)  # width of 1 deg lon depends on radius at jj
-                dx = dlon * d_1lon
-                dA = dx * dy
+            # regular lat lon grid?
+            dlon = lons[1] - lons[0]  # width of one cell in degrees, constant
+            dy = np.pi * R / nlat  # height of cell in m, constant for a sphere (pole-to-pole distance over n cells)
+            lat = lats[jj]  # latitude at cell edge
+            d_1lon = np.pi / 180 * R * np.cos(np.pi / 180 * lat)  # width of 1 deg lon depends on radius at jj
+            dx = dlon * d_1lon
+            dA = dx * dy
             vol_rock = vol_rock + abs(grid[jj, ii]) * dA
             vol_ocn = vol_ocn + (h_peak - grid[jj, ii]) * dA
             area = area + dA
 
     if verbose:
         vol_EO = 1.4e21 / 1000
-        print('h peak from grid', h_peak, 'm')
+        print('h peak from grid', h_peak*1e-3, 'km')
         print('spherical annulus vol:', annulus_vol, 'm^3 -->', annulus_vol / vol_EO, 'EO')
         print('integrated vol:', vol_ocn, 'm^3 -->', vol_ocn / vol_EO, 'EO')
-        print('mean h', np.mean(grid), 'min h', np.min(grid), 'max h', np.max(grid))
+        print('mean h', np.mean(grid)*1e-3, 'km | min h', np.min(grid)*1e-3, 'km | max h', np.max(grid)*1e-3, 'km')
         print('area/4piR^2', area / (4 * np.pi * R ** 2))
 
     return vol_ocn
@@ -833,6 +832,7 @@ def get_psd_Venus(lmax=719, unit='per_lm', to_km=True, to_1D=False, verbose=Fals
     power = hlm_norm.spectrum(unit=unit)  # 2D psd
     l = hlm_norm.degrees()
     R = pyshtools.constants.Venus.r.value
+    print('R', R, 'm')
     k = l_to_k(l, R)
 
     if unit == 'per_lm':

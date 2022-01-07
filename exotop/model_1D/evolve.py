@@ -230,7 +230,7 @@ def LHS(t, y, pl=None, use_core=False, use_lid=True, **kwargs):
     pl = recalculate(t, pl, use_core=use_core, use_lid=use_lid, **kwargs)
 
     if not use_core:
-        print('not using core dTdc')
+        # print('not using core dTdc')
         dTdt_c = th.dTdt(-pl.Q_core, pl.M_c, pl.c_c)
     else:
         pl.core.Q_cmb = pl.Q_core
