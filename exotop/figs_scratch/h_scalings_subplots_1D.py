@@ -61,8 +61,8 @@ xlabels = ['Age\n(Gyr)',
            'Planet mass\n' + r'($M_{\oplus}$)', 'Core Mass Fraction',
            'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-dist_res = 3 # 1000
-x_res = 3  #32
+dist_res = 10000
+x_res = 7
 n_sigma = 1
 
 fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_res=x_res, n_sigma=n_sigma,

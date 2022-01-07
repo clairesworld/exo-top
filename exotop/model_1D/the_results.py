@@ -1201,11 +1201,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
 
         print('      range:', y_av[0], '-', y_av[-1], '| % diff:', abs(y_av[-1] - y_av[0]) / y_av[0])
 
-        if i_ax == 0:
-            print('\nx_vec', x_vec)
-            print('y_av', y_av)
-            print('y_upper', y_upper)
-            print('y_lower', y_lower, '\n')
+
         axes[i_ax].plot(x_vec, y_av, c=linec, lw=lw, ls=ls)
         axes[i_ax].fill_between(x_vec, y_lower, y_upper, color=linec, alpha=alpha)
         axes[i_ax].set_xlabel(xlabels[i_ax], fontsize=labelsize)
