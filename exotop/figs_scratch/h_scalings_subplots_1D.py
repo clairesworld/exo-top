@@ -65,7 +65,7 @@ xlabels = ['Age\n(Gyr)',
            'Planet mass\n' + r'($M_{\oplus}$)', 'Core Mass Fraction',
            'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-dist_res = 5
+dist_res = 10000
 x_res = 7
 n_sigma = 1
 
