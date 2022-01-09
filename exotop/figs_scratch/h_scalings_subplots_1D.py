@@ -9,6 +9,7 @@ from useful_and_bespoke import dark_background, imscatter
 import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
 from datetime import date
+import pickle as pkl
 
 today = date.today().strftime("%b-%d-%Y")
 
@@ -61,7 +62,7 @@ xlabels = ['Age\n(Gyr)',
            'Planet mass\n' + r'($M_{\oplus}$)', 'Core Mass Fraction',
            'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-dist_res = 10000
+dist_res = 5
 x_res = 7
 n_sigma = 1
 
@@ -155,16 +156,19 @@ def h_peak_rock(M=None, Y=100e6, rho_c=2700, C=1 / 2, **kwargs):
     g = grav(M, R)
     return (C ** -1 * Y) / (rho_c * g)
 
-m = np.linspace(0.1, 5, 10)
-h_max = h_peak_rock(m*p.M_E)
-axes[1].plot(m, h_max, c='k', alpha=0.6)
-print('rock strength', h_max, 'm')
+# m = np.linspace(0.1, 5, 10)
+# h_max = h_peak_rock(m*p.M_E)
+# axes[1].plot(m, h_max, c='k', alpha=0.6)
+# print('rock strength', h_max, 'm')
 
 
 # fig, *axes = dark_background(fig, axes)
 plt.subplots_adjust(wspace=0.2)
 # plt.tight_layout()
 
+with open(fig_path + r"h_parameters_fig.pkl", "wb") as f:
+    pkl.dump(fig, f)
+
 # plt.suptitle(r'Ra$_{i, {\rm eff}}$ scaling')
 fig.savefig(fig_path + 'h_parameters' + today + fig_format, bbox_inches='tight')
-plt.show()
+# plt.show()

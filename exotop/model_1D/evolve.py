@@ -226,7 +226,7 @@ def LHS(t, y, pl=None, use_core=False, use_lid=True, **kwargs):
     # print('  LHS in planet: t =', t*p.sec2Gyr, 'Gyr', 'T_cmb', pl.T_c, 'K', 'T_m', pl.T_m, 'K')
     if np.isnan(pl.T_c):
         print('pl.T_c', pl.T_c, 'K')
-        sys.exit()
+        # sys.exit()
     pl = recalculate(t, pl, use_core=use_core, use_lid=use_lid, **kwargs)
 
     if not use_core:
