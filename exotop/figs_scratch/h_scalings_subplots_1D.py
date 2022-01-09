@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
 from model_1D import the_results as plottop
 from model_1D import inputs as ins
 from model_1D import parameters as p
@@ -11,7 +10,9 @@ import matplotlib.lines as mlines
 from datetime import date
 import pickle as pkl
 from matplotlib import rc
+from matplotlib import use as mpluse
 
+mpluse('Qt5Agg')
 rc('text', usetex=False)  # turn off for running over ssh
 today = date.today().strftime("%b-%d-%Y")
 
