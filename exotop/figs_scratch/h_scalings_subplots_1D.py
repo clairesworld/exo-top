@@ -10,7 +10,9 @@ import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
 from datetime import date
 import pickle as pkl
+from matplotlib import rc
 
+rc('text', usetex=False)  # turn off for running over ssh
 today = date.today().strftime("%b-%d-%Y")
 
 # set paths
