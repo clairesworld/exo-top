@@ -12,7 +12,7 @@ import pickle as pkl
 from matplotlib import rc
 from matplotlib import use as mpluse
 
-mpluse('Qt5Agg')
+mpluse('Agg')
 rc('text', usetex=False)  # turn off for running over ssh
 today = date.today().strftime("%b-%d-%Y")
 
