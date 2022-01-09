@@ -14,7 +14,7 @@ import pickle as pkl
 today = date.today().strftime("%b-%d-%Y")
 
 # set paths
-fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
+fig_path = '/home/cmg76/Works/exo-top/exotop/figs_ms/'
 fig_format = '.pdf'  # '.png'
 benchmark_path = '../benchmarks/'
 planet_icon_path = '/home/claire/Pictures/science-graphics/planet_png/'
