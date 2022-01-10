@@ -135,7 +135,7 @@ def draw_random_yhat(u=None, beta=None, cov_beta=None, func=None):
 
 """ setup """
 fig, ax = plt.subplots(figsize=(5,5))
-fig2, ax2 = plt.subplots(figsize=(5,5))
+# fig2, ax2 = plt.subplots(figsize=(5,5))
 x1 = np.log10(Ra_i)
 x2 = ln_eta
 xlim = (7.5, 8.1)
@@ -196,6 +196,14 @@ for n, b in enumerate(lneta_unique):
     # ax2.fill_between(10**x1_hat, yn_lower, yn_upper, fc=c[idx[n]], alpha=0.15)
 
 
+
+
+# colourbar(vector=lneta_unique, ax=ax, label='$b = \ln(\Delta \eta)$', labelsize=labelsize, labelpad=30)
+leglabels = [r'$10^6$', r'$10^7$', r'$10^8$', r'$10^9$']  # [int(np.round(e)) for e in lneta_unique]
+legtitle = '$\Delta \eta$'  # '$\ln(\Delta \eta)$'
+ax, leg2 = colourised_legend(clist=c, ax=ax, cleglabels=leglabels, return_leg=True,
+                       title=legtitle, legsize=ticksize, titlesize=legsize, markersize=5)
+
 handles = []
 lw = [0, 0.7]
 label = ['Data', 'Model']
@@ -204,14 +212,9 @@ marker = ['o', None]
 ls = ['--', '--']
 for jj in range(2):
     handles.append(mlines.Line2D([], [], color=ch[jj], lw=lw[jj], label=label[jj], marker=marker[jj], ls=ls[jj]))
-leg = ax.legend(handles=handles, frameon=False, fontsize=legsize)
-ax.add_artist(leg)
+leg1 = ax.legend(handles=handles, frameon=False, fontsize=legsize)
+# ax.add_artist(leg1)
 
-# colourbar(vector=lneta_unique, ax=ax, label='$b = \ln(\Delta \eta)$', labelsize=labelsize, labelpad=30)
-leglabels = [r'$10^6$', r'$10^7$', r'$10^8$', r'$10^9$']  # [int(np.round(e)) for e in lneta_unique]
-legtitle = '$\Delta \eta$'  # '$\ln(\Delta \eta)$'
-ax = colourised_legend(clist=c, ax=ax, cleglabels=leglabels,
-                       title=legtitle, legsize=ticksize, titlesize=legsize, markersize=5)
 ax.set_xlim(xlim)
 # ax.set_ylim(-2.25, -1.95)
 # ax.set_ylim(-3.5, -1)
@@ -222,11 +225,15 @@ ax.set_ylabel(r'log(h$^\prime_{\rm rms}$)', fontsize=labelsize)
 ax.tick_params(axis='x', labelsize=ticksize)
 ax.tick_params(axis='y', labelsize=ticksize)
 
-ax2.set_xlabel(r'Ra$_i$', fontsize=labelsize)
-ax2.set_ylabel(r'h$_{\rm rms}$ (m)', fontsize=labelsize)
-ax2.tick_params(axis='x', labelsize=ticksize)
-ax2.tick_params(axis='y', labelsize=ticksize)
-ax2.loglog()
+# ax2.set_xlabel(r'Ra$_i$', fontsize=labelsize)
+# ax2.set_ylabel(r'h$_{\rm rms}$ (m)', fontsize=labelsize)
+# ax2.tick_params(axis='x', labelsize=ticksize)
+# ax2.tick_params(axis='y', labelsize=ticksize)
+# ax2.loglog()
 
-fig.savefig(fig_path + 'hfit_' + today + '.pdf', bbox_inches='tight')
+# fig.tight_layout()
+# fig.subplots_adjust(right=1.1)  # to get legend
+fig.savefig(fig_path + 'hfit_' + today + '.png', bbox_inches='tight', dpi=600,
+            bbox_extra_artists=(leg1, leg2,),
+            )
 plt.show()

@@ -200,7 +200,8 @@ def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='
     return cbar
 
 
-def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersize=20, alpha=1, legsize=25, titlesize=None, ncol=1, title=None, **kwargs):
+def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersize=20, alpha=1, legsize=25,
+                      titlesize=None, ncol=1, title=None, return_leg=False, **kwargs):
     import matplotlib.lines as mlines
     handles = []
     for jj, label in enumerate(cleglabels):
@@ -212,6 +213,8 @@ def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersi
             titlesize = legsize
         leg.get_title().set_fontsize(titlesize)  # legend 'Title' fontsize
     ax.add_artist(leg)
+    if return_leg:
+        return ax, leg
     return ax
 
 
