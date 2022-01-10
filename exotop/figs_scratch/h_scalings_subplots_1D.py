@@ -169,7 +169,7 @@ def h_peak_rock(M=None, Y=100e6, rho_c=2700, C=1 / 2, **kwargs):
 plt.subplots_adjust(wspace=0.2)
 # plt.tight_layout()
 
-with open(fig_path + r"h_parameters_fig.pkl", "wb") as f:
+with open(fig_path + r"h_parameters_fig_" + today + ".pkl", "wb") as f:
     pkl.dump(fig, f)
 
 # plt.suptitle(r'Ra$_{i, {\rm eff}}$ scaling')

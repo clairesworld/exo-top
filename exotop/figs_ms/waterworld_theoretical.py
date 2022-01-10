@@ -61,7 +61,7 @@ def plot_trappist_wmf():
 
     err_c = ['0.1', '0.35', '0.6']  # ms
     # err_c = ['0.4', '0.65', '0.9']  # slides
-    err_m = ['o', '^', 's']
+    err_m = ['o', 'D', 's']
     err_kwargs = {'elinewidth': 1, 'capsize': 5, 'ms': 7, 'lw': 0}
     labels = ['CMF = 18\%', 'CMF = 25\%', 'CMF = 33\%']  # ms
     # labels = ['18\% iron', '25\% iron', '33\% iron']  # slides
