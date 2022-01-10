@@ -12,15 +12,15 @@ import pickle as pkl
 from matplotlib import rc
 from matplotlib import use as mpluse
 
-mpluse('Agg')
-rc('text', usetex=False)  # turn off for running over ssh
+# mpluse('Agg')
+rc('text', usetex=True)  # turn off for running over ssh
 today = date.today().strftime("%b-%d-%Y")
 
 # set paths
 fig_path = '/home/cmg76/Works/exo-top/exotop/figs_ms/'
 fig_format = '.pdf'  # '.png'
 benchmark_path = '../benchmarks/'
-planet_icon_path = '/home/claire/Pictures/science-graphics/planet_png/'
+# planet_icon_path = '/home/claire/Pictures/science-graphics/planet_png/'
 labelsize = 30
 legsize = 22  # 30
 xlabelpad = 50
@@ -65,8 +65,8 @@ xlabels = ['Age\n(Gyr)',
            'Planet mass\n' + r'($M_{\oplus}$)', 'Core Mass Fraction',
            'U and Th budget\n($\%$ relative to solar)']  # 'Radiogenic heating\n(pW kg$^{-1}$)'
 
-dist_res = 10000
-x_res = 7
+dist_res = 10000  # works with 10000 - production run
+x_res = 7  # works with 7 - production run
 n_sigma = 1
 
 fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_res=x_res, n_sigma=n_sigma,
@@ -84,6 +84,7 @@ fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_
                                                            textc='k',  # 'xkcd:off white',
                                                            alpha=alpha, legsize=legsize, xlabelpad=xlabelpad,
                                                            # verbose=True
+                                                           pickleto=fig_path + 'h_parameters_data_large.pkl',
                                                            )
 
 # # add second scaling relationship
@@ -173,5 +174,5 @@ with open(fig_path + r"h_parameters_fig_" + today + ".pkl", "wb") as f:
     pkl.dump(fig, f)
 
 # plt.suptitle(r'Ra$_{i, {\rm eff}}$ scaling')
-fig.savefig(fig_path + 'h_parameters' + today + fig_format, bbox_inches='tight')
+fig.savefig(fig_path + 'h_parameters_large' + today + fig_format, bbox_inches='tight')
 # plt.show()

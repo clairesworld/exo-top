@@ -1162,14 +1162,19 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
         yscale = relval ** -1
 
     planets_axes = []
+
+    if picklefrom is not None:
+        picklelist = pkl.load(open(picklefrom, "rb"))
+        # print('xvec', x_vec)
+        # print('y_av', y_av)
+    else:
+        picklelist = []
     for i_ax, x_var in enumerate(x_vars):
         print('axis', i_ax + 1, '/', len(axes))
         xmin, xmax = x_range[i_ax]
 
         if picklefrom is not None:
-            x_vec, y_av, y_upper, y_lower = pkl.load(open(picklefrom + '_ax' + str(i_ax) + '.pkl', "rb"))
-            print('xvec', x_vec)
-            print('y_av', y_av)
+            x_vec, y_av, y_upper, y_lower = picklelist[i_ax]
         else:
 
             if x_var == 't':
@@ -1197,7 +1202,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                                                                                  return_planets=True,
                                                                                **kwargs)
                 x_vec = x_vec * xscales[i_ax]
-                planets_axes.append(planets_x)
+                # planets_axes.append(planets_x)
 
         print('      range:', y_av[0], '-', y_av[-1], '| % diff:', abs(y_av[-1] - y_av[0]) / y_av[0])
 
@@ -1234,9 +1239,10 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                 horizontalalignment='right',
                                 verticalalignment='top',
                                 transform=axes[i_ax].transAxes)
+        picklelist.append((x_vec, y_av, y_upper, y_lower))
 
-        if pickleto is not None:
-            pkl.dump((x_vec, y_av, y_upper, y_lower), open(pickleto + '_ax' + str(i_ax) + '.pkl', "wb"))
+    if pickleto is not None:
+        pkl.dump(picklelist, open(pickleto, "wb"))
 
     axes[0].set_ylabel(ylabel, fontsize=labelsize)
 
