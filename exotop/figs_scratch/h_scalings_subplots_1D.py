@@ -12,8 +12,8 @@ import pickle as pkl
 from matplotlib import rc
 from matplotlib import use as mpluse
 
-# mpluse('Agg')
-rc('text', usetex=True)  # turn off for running over ssh
+mpluse('Agg')
+rc('text', usetex=False)  # turn off for running over ssh
 today = date.today().strftime("%b-%d-%Y")
 
 # set paths
