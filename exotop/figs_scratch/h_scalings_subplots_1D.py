@@ -10,10 +10,13 @@ import matplotlib.lines as mlines
 from datetime import date
 import pickle as pkl
 from matplotlib import rc
+from matplotlib.pyplot import rcParams
 from matplotlib import use as mpluse
 
 mpluse('Agg')
 rc('text', usetex=False)  # turn off for running over ssh
+rcParams['font.family'] = 'serif'
+rcParams['font.serif'] = 'CMU Serif'
 today = date.today().strftime("%b-%d-%Y")
 
 # set paths

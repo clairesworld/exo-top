@@ -38,10 +38,10 @@ def radius_otegi(M_p):
     return np.exp(1/3.45*np.log(M_p/0.9))
 
 
-def radius_zeng(M_p, CMF=None):
+def radius_zeng(M_p, CMF=None, test_inflation=1):
     # applicable to M_E <= 8 and CMF <= 0.4
 #     print('using Zeng radius model')
-    return (1.07 - 0.21*CMF)*(M_p/p.M_E)**(1/3.7)
+    return (1.07 - 0.21*CMF)*(M_p/p.M_E)**(1/3.7)*test_inflation
 
 
 def grav(M, R):

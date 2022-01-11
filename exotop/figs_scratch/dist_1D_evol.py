@@ -9,8 +9,12 @@ from useful_and_bespoke import dark_background, imscatter
 import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
 from datetime import date
+from matplotlib import rc
 
+rc('text', usetex=True)  # turn off for running over ssh
 today = date.today().strftime("%b-%d-%Y")
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.serif'] = 'CMU Serif'
 
 # set paths
 fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
@@ -87,7 +91,8 @@ yscales = [1,
            # 1
            ]
 
-num_dist = 50
+num_dist = 100
+line_alpha = 0.11
 masses = np.array([0.1, 1, 5]) * p.M_E
 verbose = False
 
@@ -126,11 +131,11 @@ for ii, mass in enumerate(masses):
         legtext = str(int(mass / p.M_E)) + r' $M_{\oplus}$'
     else:
         legtext = str(mass / p.M_E) + r' $M_{\oplus}$'
-    fig, ax_col = plottop.plot_distribution(yvars, default='baseline', tf=4.5, propagate_fit_err=False,
+    fig, ax_col = plottop.plot_distribution(yvars, default='baseline', tf=4.5, propagate_fit_err=True,
                                             update_kwargs=planet_kwargs, run_kwargs=run_kwargs,
                                             num=num_dist, names=names_mc, mini=mini_mc, maxi=maxi_mc,
                                             xlabelpad=None, ylabelpad=10, n_sigma=1, ylims=ylims, tickpad=5,
-                                            fig=fig, axes=axes[:, ii], c='k', lw=0.5, alpha=0.05, c_mean=linec,
+                                            fig=fig, axes=axes[:, ii], c='k', lw=0.5, alpha=line_alpha, c_mean=linec,
                                             xticks=None, yticks=yticks, log=log,
                                             xlabel='', ylabels=ylabels, yscales=yscales, labelsize=labelsize,
                                             ticksize=ticksize, legsize=legsize, save=False,
@@ -159,4 +164,4 @@ fig.supxlabel(xlabel, fontsize=labelsize, y=0.02)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.1)
 plt.savefig(fig_path + 'evol_dist' + today + '.pdf', bbox_inches='tight')
-plt.show()
+# plt.show()

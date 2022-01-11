@@ -49,6 +49,7 @@ def max_ocean_fast(pl, peak_ratio=3.5, at_age=None, name_rms='dyn_top_aspect_pri
         h_rms_ii = dimensionalise(h_rms_prime, pl, i=ii) * water_load_ratio
         h_peak_ii = h_rms_ii * peak_ratio
         V_cap_ii = 4 * np.pi * pl.R_p**2 * h_peak_ii
+        # print('V_cap_ii', V_cap_ii, 'R_p', pl.R_p, 'h_peak_ii', h_peak_ii)
 
         if at_age is None:
             pl.max_ocean[ii] = V_cap_ii

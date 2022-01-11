@@ -1125,7 +1125,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                            xlabels=None, log=None, x_range=None, xscales=None, units=None, x_res=8,
                                            fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
                                            yscale=1, alpha=0.2, return_planets=False,
-                                           linec='k', ls='-', labelsize=16, lw=3, ticksize=12,
+                                           linec='k', ls='-', labelsize=16, lw=3, ticksize=12, extra_def=False,
                                            update_kwargs={}, run_kwargs={}, verbose=False, **kwargs):
     if x_vars is None:
         x_vars = ['t', 'M_p', 'CMF', 'H_0']
@@ -1202,13 +1202,16 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                                                                                  return_planets=True,
                                                                                **kwargs)
                 x_vec = x_vec * xscales[i_ax]
-                # planets_axes.append(planets_x)
+                planets_axes.append(planets_x)
 
         print('      range:', y_av[0], '-', y_av[-1], '| % diff:', abs(y_av[-1] - y_av[0]) / y_av[0])
 
 
         axes[i_ax].plot(x_vec, y_av, c=linec, lw=lw, ls=ls)
         axes[i_ax].fill_between(x_vec, y_lower, y_upper, color=linec, alpha=alpha)
+        if extra_def:
+            axes[i_ax].plot(x_vec, y_lower, c=linec, alpha=1, lw=0.5, ls='-')
+            axes[i_ax].plot(x_vec, y_upper, c=linec, alpha=1, lw=0.5, ls='-')
         axes[i_ax].set_xlabel(xlabels[i_ax], fontsize=labelsize)
         axes[i_ax].tick_params(axis='both', labelsize=ticksize)
         if log[i_ax]:
@@ -1478,19 +1481,25 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
     if mass_frac_sfcwater is not None:
         # how does actual vol scale assuming constant mass fraction of surface water (bad assumption)?
         ax = axes[mass_iax]
-        masses = np.logspace(np.log10(0.1), np.log10(6), num=60)  # mass in M_E
+        masses = np.logspace(np.log10(0.1), np.log10(5), num=60)  # mass in M_E
 
         if version == 0:
             # f_water = np.logspace(np.log10(mass_frac_sfcwater[0]), np.log10(mass_frac_sfcwater[-1]), num=25)
             f_water = mass_frac_sfcwater
             colours = colorize([np.log10(m) for m in f_water], cmap=cmap)[0]
+            vol_w_last = 10*np.ones_like(masses)
             for ii, X in enumerate(f_water):
                 M_w = masses * parameters.M_E * X  # mass of sfc water in kg
                 vol_w = M_w / rho_w  # corresponding volume
+                # ax.fill_between(masses, y1=vol_w, y2=vol_w_last, color=colours[ii], alpha=0.05)
+                vol_w_last = vol_w
                 if relative:
                     vol_w = vol_w / vol_0
                 # print('relative water budget change', vol_w)
-                ax.plot(masses, vol_w, alpha=alpha_w, lw=0, zorder=0, c=colours[ii], marker='o', markersize=10)
+                # ax.plot(masses, vol_w, alpha=alpha_w, lw=0, zorder=0, c=colours[ii], marker='o', markersize=10)
+                # " less distracting"
+                ax.plot(masses, vol_w, alpha=alpha_w, lw=1, zorder=0, c=colours[ii], marker=None, markersize=10)
+
             # print('cocn f waterbounds', np.min(f_water), np.max(f_water))
             # print('ocn f water vmin', vmin, 'vmax', vmax)
         elif version == 1:
@@ -1563,8 +1572,9 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
     if save:
         plot_save(fig, fname, **kwargs)
 
-    # if ensemble:
-    #     return fig, axes, planets_axes[0]
+    if ensemble:
+        # print('planets_axes', np.shape(planets_axes))
+        return fig, axes, planets_axes
     return fig, axes
 
 

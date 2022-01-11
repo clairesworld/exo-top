@@ -52,7 +52,7 @@ if slides:
 else:
     textc = 'k'
     c_dt = 'xkcd:bordeaux'
-    alpha_w = 0.3
+    alpha_w = 0.5 #0.3
     alpha_dist = 0.15
     cmap = get_continuous_cmap(hex_list, N=14, float_list=fln)
     cmap.set_under(hex_list[0])
@@ -75,39 +75,41 @@ run_kwargs = {
     # 'rms_type': 'Ra_i_eff'
 }
 
-nplanets = 6  # 32
+nplanets = 7  # 32
 n_stats = 2  # 500
-dist_res = 5  #500 # 1000
+dist_res = 1000  #500 # 1000
 n_sigma = 1
 
 pickledir = '/home/claire/Works/exo-top/exotop/figs_scratch/pickle/'
 
 fig, axes = plt.subplots(1, 3, figsize=(30, 10))
 rad_vals = [0.3, 1, 3]
-peak_ratios = [3.5, 3.5, 3.9]
+peak_ratios = [3.5,  3.9]
 # c_spec = [c_dt, 'xkcd:squash', 'xkcd:reddish orange']
-c_spec = [c_dt, 'xkcd:squash', 'xkcd:reddish orange']
+c_spec = [c_dt, 'xkcd:reddish orange']
 ls_rad = ['--', '-', '-.']
-labels_spec = ['Pure dynamic topography', 'Spectrally Venus-like topography', 'Red noise topography']
-for ii, spec in enumerate(['base_spectrum_l1.pkl', 'Venus_spectrum_l1.pkl', 'spectrum_-2.pkl']):
+ls_spec = ['--', ':']
+labels_spec = ['Pure dynamic topography',  'Red noise topography']
+labels_cols = ['Low U and Th, cold', 'Solar U and Th', 'High U and Th, hot']
+for ii, spec in enumerate(['base_spectrum_l1.pkl',  'spectrum_-2.pkl']):
     print('spectrum', ii+1, '/ 3')
     for jj, rad in enumerate(rad_vals):
         print('   rad budget', jj + 1, '/ 3')
-        if jj == 2 and ii == 2:
+        if jj == len(rad_vals) - 1 and (ii == len(c_spec) - 1):
             show_cbar = True
         else:
             show_cbar = False
         planet_kwargs.update({'x_Eu': rad})
 
-        picklefile = pickledir + 'ocnplot-n6-' + str(ii) + '-' + str(jj)
-        fig, ax, planets_axes = results.plot_ocean_capacity(fig=fig, axes=axes[ii], M0=1,
-                                              # picklefrom=picklefile,
+        picklefile = pickledir + 'ocnplot-' + str(ii) + '-' + str(jj)
+        fig, ax, planets_axes = results.plot_ocean_capacity(fig=fig, axes=axes[jj], M0=1,
+                                              pickleto=picklefile,
                                               peak_ratio=peak_ratios[ii],
-                                              mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=30),
+                                              mass_frac_sfcwater=np.logspace(-6, np.log10(3e-3), num=120),
                                               # mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=60), #vmin=1e-6, vmax=1e-2,
                                               textc=textc, titlesize=32,
-                                              save=False, spectrum_fname=spec, c=c_spec[ii], ls=ls_rad[jj],
-                                              spectrum_fpath=spec_path,
+                                              save=False, spectrum_fname=spec, c=c_spec[ii], ls=ls_spec[ii],
+                                              spectrum_fpath=spec_path, extra_def=True,
                                               ticksize=ticksize, labelsize=labelsize, clabelpad=clabelpad,
                                               relative=True,
                                               vol_0='Earth', simple_scaling=False, leg_bbox=(0, 1.01), log=True,
@@ -148,15 +150,11 @@ for iax, ax in enumerate(axes):
                       labelpad=20)
     else:
         ax.set_ylabel('')
-    ax.set_title(labels_spec[iax], fontsize=labelsize, c=textc)
+    ax.set_title(labels_cols[iax], fontsize=labelsize, c=textc)
 
 axes[0] = cornertext(axes[0], 'WATER\nPLANETS', pos='top left', size=labelsize, pad=0.03)
 axes[-1] = cornertext(axes[-1], 'LAND\nPLANETS', pos='bottom right', size=labelsize, pad=0.03)
 
-# ax.text(0.03, 0.97, '4.5 Gyr\n300 kJ mol$^{-1}$\n0.3 CMF\n4.6 pW kg$^{-1}$', fontsize=legsize,
-#         horizontalalignment='left', c=textc,
-#         verticalalignment='top',
-#         transform=ax.transAxes)
 
 # handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,
 #                          label='Pure dynamic topography'),
@@ -168,11 +166,11 @@ axes[-1] = cornertext(axes[-1], 'LAND\nPLANETS', pos='bottom right', size=labels
 #            #               label='Simple scaling')
 #            ]
 handles = []
-names = ['30\%', '100\%', '300\%']  # str(rad*100) + r'$\%$')
-for jj, rad in enumerate(rad_vals):
-    handles.append(mlines.Line2D([], [], color='k', ls=ls_rad[jj], lw=3, label=names[jj]))
+names = ['Pure dynamic topography', 'Red noise']  # str(rad*100) + r'$\%$')
+for jj, n in enumerate(names):
+    handles.append(mlines.Line2D([], [], color=c_spec[jj], ls=ls_spec[jj], lw=3, label=n))
 axes[0].legend(handles=handles, bbox_to_anchor=(0, 1.05, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize,
-               title=r'\textbf{U, Th budget relative to solar}', title_fontsize=legsize, ncol=3)
+               title=r'\textbf{Topography spectral model}', title_fontsize=legsize, ncol=3)
 
 # ax = axes[1]
 # ax.set_xlabel('U and Th abundance\n($\%$ relative to solar)', fontsize=labelsize, c=textc,
@@ -185,29 +183,8 @@ if slides:
     fig, *axes = dark_background(fig, axes)
 
 plt.subplots_adjust(wspace=0.1)
-fig.savefig(fig_path + 'ocn_vol_ensemble_fast_' + today + '.pdf', bbox_inches='tight')
+fig.savefig(fig_path + 'ocn_vol2_fast_1000_' + today + '.pdf', bbox_inches='tight')
 # plt.show()
 
 
 
-
-
-
-""" test single planet """
-# from model_1D import evolve as evol
-# from model_1D import oceans
-# from model_1D import parameters
-# pl0 = \
-# evol.bulk_planets(n=1, name='M_p', mini=parameters.M_E, maxi=parameters.M_E, like='Venusbaseline',  # verbose=True,
-#                   t_eval=None, random=False, postprocessors=['topography'],)[0]
-#
-# spectrum_fname='base_spectrum.pkl'
-# spectrum_fpath='/home/claire/Works/exo-top/exotop/figs_scratch/'
-# degree, phi0 = sh.load_model_spectrum_pkl(fname=spectrum_fname, path=spectrum_fpath)
-# print('rms of original phi0', sh.parseval_rms(phi0, sh.l_to_k(degree, 2)))
-# print('rms from aspect model', pl0.dyn_top_aspect_prime[-1])
-# print('dimensional rms', pl0.dyn_top_rms[-1])
-#
-# pl0 = oceans.max_ocean(pl0, at_age=4.5, name_rms='dyn_top_aspect_prime', phi0=phi0, n_stats=1)
-# vol_0 = pl0.max_ocean
-# print('basin capacity in M_E', vol_0*1000/parameters.M_E)

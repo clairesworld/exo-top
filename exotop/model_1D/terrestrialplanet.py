@@ -104,7 +104,9 @@ class TerrestrialPlanet():
             except KeyError:
                 self.ident = '%.2f' % (self.M_p / parameters.M_E) + ' M$_E$'  # run id
         if self.R_p0 is None:
-            self.R_p = ast.radius_zeng(self.M_p, self.CMF) * parameters.R_E  # in m
+            self.R_p = ast.radius_zeng(self.M_p, self.CMF,
+                                       # test_inflation=kwargs['test_inflation']
+                                       ) * parameters.R_E  # in m
         else:
             self.R_p = self.R_p0
 
