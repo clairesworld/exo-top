@@ -177,5 +177,5 @@ with open(fig_path + r"h_parameters_fig_" + today + ".pkl", "wb") as f:
     pkl.dump(fig, f)
 
 # plt.suptitle(r'Ra$_{i, {\rm eff}}$ scaling')
-fig.savefig(fig_path + 'h_parameters_large' + today + fig_format, bbox_inches='tight')
+fig.savefig(fig_path + 'h_parameters' + today + fig_format, bbox_inches='tight')
 # plt.show()
