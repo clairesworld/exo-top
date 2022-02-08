@@ -23,9 +23,9 @@ cmap_name = 'pm3d20'
 # cmap = cmap_from_ascii('smooth-cool-warm', path=cmap_path, end='.csv', delimiter=',')
 cmap = 'coolwarm'
 
-labelsize = 30
-ticksize = 20
-legsize = 30  #20
+labelsize = 35  # 30
+ticksize = 30
+legsize = 35  #20
 wspace = 0.3
 hspace = 0.3
 c_h = 'xkcd:silver' # 'xkcd:light purple'  #'xkcd:dark pastel green'  # 'xkcd:tealish green'
@@ -35,6 +35,6 @@ fig, axes = anims.T_h_gridspec(case='Ra1e8-eta1e8-wide-ascii', data_path=data_pa
                                labelsize=labelsize, ticksize=ticksize, legsize=legsize, wspace=wspace, hspace=hspace,
                                legtext=r'Ra = $1 \times 10^8$' + '\n' + r'$\Delta \eta = 1 \times 10^8$',
                                cmap=cmap, save=True, c='k', c_h=c_h, hlim=hlim, avg_prof=False,
-                               rasterized=True,
-                               w=30, h=5.4, nr=6, nc=30, leg_x=0.12, c_bl='xkcd:silver', vmin=0, vmax=1.1,
+                               rasterized=True, c_text='w',
+                               w=30, h=5.4, nr=6, nc=30, leg_x=0.13, c_bl='xkcd:silver', vmin=0, vmax=1.1,
                                i_n=209, i_ts=183795, t1=0.09, fig_fmt='.pdf')

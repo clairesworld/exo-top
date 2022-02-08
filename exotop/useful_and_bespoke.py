@@ -2,7 +2,7 @@
 
 import numpy as np
 
-def colorize(vector,cmap='plasma', vmin=None, vmax=None):
+def colorize(vector,cmap='rainbow', vmin=None, vmax=None):
     """Convert a vector to RGBA colors. @author: jlustigy
 
     Parameters

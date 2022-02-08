@@ -16,6 +16,8 @@ fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
 labelsize = 22
 legsize = 20
 ticksize = 16
+xlabelpad=8
+ylabelpad=10
 
 df = pd.read_csv('/home/claire/Works/aspect/runs/figs/aspect-output.csv')
 print(df.head())
@@ -219,8 +221,8 @@ ax.set_xlim(xlim)
 # ax.set_ylim(-2.25, -1.95)
 # ax.set_ylim(-3.5, -1)
 
-ax.set_xlabel(r'log(Ra$_i$)', fontsize=labelsize)
-ax.set_ylabel(r'log(h$^\prime_{\rm rms}$)', fontsize=labelsize)
+ax.set_xlabel(r'log(Ra$_i$)', fontsize=labelsize, labelpad=xlabelpad)
+ax.set_ylabel(r'log(h$^\prime_{\rm rms}$)', fontsize=labelsize, labelpad=ylabelpad)
 # ax.set_ylabel(r'Dynamic topography, log(h$^\prime_{\rm rms}$)', fontsize=labelsize)
 ax.tick_params(axis='x', labelsize=ticksize)
 ax.tick_params(axis='y', labelsize=ticksize)

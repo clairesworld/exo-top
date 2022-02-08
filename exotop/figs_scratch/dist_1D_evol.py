@@ -24,7 +24,7 @@ labelsize = 14
 legsize = 14
 xlabelpad = 20
 ticksize = 12
-linec = 'xkcd:pale turquoise'  # 'xkcd:british racing green'  # '#d88868'
+linec = 'xkcd:greyish green' # 'xkcd:pale turquoise'  # 'xkcd:british racing green'  # '#d88868'
 
 names_mc = ['Ea', 'eta_pre',
             # 'x_Eu'
@@ -92,7 +92,7 @@ yscales = [1,
            ]
 
 num_dist = 100
-line_alpha = 0.11
+line_alpha = 0.08 #0.11
 masses = np.array([0.1, 1, 5]) * p.M_E
 verbose = False
 
@@ -131,7 +131,7 @@ for ii, mass in enumerate(masses):
         legtext = str(int(mass / p.M_E)) + r' $M_{\oplus}$'
     else:
         legtext = str(mass / p.M_E) + r' $M_{\oplus}$'
-    fig, ax_col = plottop.plot_distribution(yvars, default='baseline', tf=4.5, propagate_fit_err=True,
+    fig, ax_col = plottop.plot_distribution(yvars, default='baseline', tf=4.5, propagate_fit_err=False,
                                             update_kwargs=planet_kwargs, run_kwargs=run_kwargs,
                                             num=num_dist, names=names_mc, mini=mini_mc, maxi=maxi_mc,
                                             xlabelpad=None, ylabelpad=10, n_sigma=1, ylims=ylims, tickpad=5,

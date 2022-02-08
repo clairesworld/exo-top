@@ -13,23 +13,26 @@ from matplotlib import rc
 from matplotlib.pyplot import rcParams
 from matplotlib import use as mpluse
 
-mpluse('Agg')
-rc('text', usetex=False)  # turn off for running over ssh
-rcParams['font.family'] = 'serif'
-rcParams['font.serif'] = 'CMU Serif'
+# mpluse('Agg')
+rc('text', usetex=True)  # turn off for running over ssh
+# rcParams['font.family'] = 'serif'
+# rcParams['font.serif'] = 'CMU Serif'
 today = date.today().strftime("%b-%d-%Y")
 
 # set paths
-fig_path = '/home/cmg76/Works/exo-top/exotop/figs_ms/'
+fig_path = '/home/claire/Works/exo-top/exotop/figs_ms/'
 fig_format = '.pdf'  # '.png'
 benchmark_path = '../benchmarks/'
 # planet_icon_path = '/home/claire/Pictures/science-graphics/planet_png/'
-labelsize = 30
-legsize = 22  # 30
-xlabelpad = 50
-ticksize = 25
-linec = 'xkcd:ocean green'  # 'xkcd:british racing green'  # '#d88868'
+labelsize = 26 #30
+legsize = 26  # 30
+xlabelpad = 10
+ylabelpad = 10
+ticksize = 22
+linec = 'xkcd:greyish green'  #'xkcd:ocean green'  # 'xkcd:british racing green'  # '#d88868'
+linec2 = None  #'xkcd:pale turquoise'
 alpha = 0.3  # 0.3
+lw = 3  # 4
 
 planet_kwargs = {
     # 'visc_type': 'KW'
@@ -76,18 +79,20 @@ fig, axes = plottop.plot_change_with_observeables_ensemble(dist_res=dist_res, x_
                                                            names=names, mini=mini_mc, maxi=maxi_mc,
                                                            defaults='baseline', age=4.5,
                                                            ticksize=ticksize, labelsize=labelsize, fig_height=6,
-                                                           legend=True, lw=4, ylabel=r'RMS topography (m)',
+                                                           legend=True, lw=lw, ylabel=r'RMS topography (m)',
                                                            labelpad=20, legendtop=True, tickwidth=1,
                                                            save=False,
                                                            update_kwargs=planet_kwargs, run_kwargs=run_kwargs,
                                                            model_param='dyn_top_rms', labels=[''],
                                                            x_vars=x_vars, units=units, log=log, x_range=x_range,
                                                            xscales=xscales, xlabels=xlabels,
-                                                           linec=linec, leg_loc='upper right',
+                                                           linec=linec, linec2=linec2, leg_loc='upper right',
                                                            textc='k',  # 'xkcd:off white',
                                                            alpha=alpha, legsize=legsize, xlabelpad=xlabelpad,
+                                                           ylabelpad=ylabelpad,
+                                                           extra_def=True,
                                                            # verbose=True
-                                                           pickleto=fig_path + 'h_parameters_data_large.pkl',
+                                                           picklefrom=fig_path + 'h_parameters_data_large.pkl',
                                                            )
 
 # # add second scaling relationship
@@ -169,13 +174,13 @@ def h_peak_rock(M=None, Y=100e6, rho_c=2700, C=1 / 2, **kwargs):
 # print('rock strength', h_max, 'm')
 
 
-# fig, *axes = dark_background(fig, axes)
-plt.subplots_adjust(wspace=0.2)
+fig, *axes = dark_background(fig, axes)
+plt.subplots_adjust(wspace=0.1)
 # plt.tight_layout()
 
 with open(fig_path + r"h_parameters_fig_" + today + ".pkl", "wb") as f:
     pkl.dump(fig, f)
 
 # plt.suptitle(r'Ra$_{i, {\rm eff}}$ scaling')
-fig.savefig(fig_path + 'h_parameters' + today + fig_format, bbox_inches='tight')
+fig.savefig(fig_path + 'h_parameters' + today + fig_format, bbox_inches='tight', )
 # plt.show()

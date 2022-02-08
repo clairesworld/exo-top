@@ -418,7 +418,7 @@ def static_uv_prof(case, data_path=data_path, fig_path=fig_path, labelsize=30, t
 
 
 def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, ticksize=16, cmap='gist_heat',
-                 save=True, c='k', nc=24, nr=5, w=24, h=5, wspace=0.1, hspace=0.1, c_h='k', legtext='', legsize=12, hlim=(-5e-2, 5e-2),
+                 save=True, c='k', c_text='k', nc=24, nr=5, w=24, h=5, wspace=0.1, hspace=0.1, c_h='k', legtext='', legsize=12, hlim=(-5e-2, 5e-2),
                  i_n=-1, i_ts=-1, avg_prof=True, leg_x=0.1, **kwargs):
     from useful_and_bespoke import cornertext
     # not animated
@@ -435,7 +435,7 @@ def T_h_gridspec(case, data_path=data_path, fig_path=fig_path, labelsize=30, tic
                               title='', labelsize=labelsize, ticksize=ticksize, i_n=i_n, cbar=False, ticklabels=False,
                               ylabelpad=25, **kwargs)
     # e.g. case label
-    ax1 = cornertext(ax1, legtext, pos='bottom left', size=legsize, x=leg_x, ha='right')
+    ax1 = cornertext(ax1, legtext, pos='bottom left', size=legsize, x=leg_x, ha='right', c=c_text)
 
     ax2 = fig.add_subplot(gs[2:, -2:])
     fig, ax2 = static_T_prof(case, data_path=data_path, avg=avg_prof, save=False, fig=fig, ax=ax2, c=c, labelsize=labelsize,

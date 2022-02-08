@@ -38,9 +38,9 @@ fln = None  # minmaxnorm(float_list, a=0, b=1)
 
 slides = False
 xlabel = 'Planet mass ' + r'($M_{\oplus}$)'
-labelsize = 30  # 33.5  # 30
-legsize = 22
-ticksize = 26  # 20
+labelsize = 35 #30  # 33.5  # 30
+legsize = 35 # 28 # 28
+ticksize = 28 # 26  # 20
 clabelpad = 50
 
 if slides:
@@ -90,7 +90,7 @@ c_spec = [c_dt, 'xkcd:reddish orange']
 ls_rad = ['--', '-', '-.']
 ls_spec = ['--', ':']
 labels_spec = ['Pure dynamic topography',  'Red noise topography']
-labels_cols = ['Low U and Th, cold', 'Solar U and Th', 'High U and Th, hot']
+labels_cols = ['Low internal heating', 'Solar system-like internal heating', 'High internal heating']
 for ii, spec in enumerate(['base_spectrum_l1.pkl',  'spectrum_-2.pkl']):
     print('spectrum', ii+1, '/ 3')
     for jj, rad in enumerate(rad_vals):
@@ -103,9 +103,10 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl',  'spectrum_-2.pkl']):
 
         picklefile = pickledir + 'ocnplot-' + str(ii) + '-' + str(jj)
         fig, ax, planets_axes = results.plot_ocean_capacity(fig=fig, axes=axes[jj], M0=1,
-                                              pickleto=picklefile,
+                                              picklefrom=picklefile,
                                               peak_ratio=peak_ratios[ii],
-                                              mass_frac_sfcwater=np.logspace(-6, np.log10(3e-3), num=120),
+                                              mass_frac_sfcwater=np.logspace(np.log10(3e-7), np.log10(3e-3), num=120),
+                                                            vmin=1e-6,
                                               # mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=60), #vmin=1e-6, vmax=1e-2,
                                               textc=textc, titlesize=32,
                                               save=False, spectrum_fname=spec, c=c_spec[ii], ls=ls_spec[ii],
@@ -116,7 +117,8 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl',  'spectrum_-2.pkl']):
                                               x_range=[(0.1 * p.M_E, 5 * p.M_E)], nplanets=nplanets, dist_res=dist_res,
                                               cmap=cmap, version=0, alpha_w=alpha_w, alpha_dist=alpha_dist, alpha=1,
                                               names_mc=names_mc, mini_mc=mini_mc, maxi_mc=maxi_mc, defaults=baseline,
-                                              show_contours=None, ensemble=True, n_stats=n_stats, verbose=False,
+                                              show_contours=[3e-4, 1e-4, 3e-5, 1e-5, 3e-6, 1e-6],
+                                                            ensemble=True, n_stats=n_stats, verbose=False,
                                               update_kwargs=planet_kwargs, run_kwargs=run_kwargs, wspace=0.15,
                                               legend=False, lw=4, labelpad=10, show_cbar=show_cbar,
                                               x_vars=['M_p'], units=['$M_E$'], xscales=[p.M_E ** -1],
@@ -133,9 +135,7 @@ for iax, ax in enumerate(axes):
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.yaxis.set_minor_formatter(ticker.NullFormatter())
-    # ax.set_ylim((2e-1, 1.8))  # old Ra i eff scaling
-    ax.set_ylim((0.02, 1))  # low b scaling
-    # ax.set_yticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1, 1.4])  # old Ra i eff scaling
+    ax.set_ylim((0.01, 1.01))  # low b scaling  # (0.02, 1))
     # ax.set_yticks([0.01, 0.1, 0.2])  # low b scaling
     ax.set_yscale('log')  # ensure
     if iax > 0:  # remove tick labels but keep ticks
@@ -152,8 +152,8 @@ for iax, ax in enumerate(axes):
         ax.set_ylabel('')
     ax.set_title(labels_cols[iax], fontsize=labelsize, c=textc)
 
-axes[0] = cornertext(axes[0], 'WATER\nPLANETS', pos='top left', size=labelsize, pad=0.03)
-axes[-1] = cornertext(axes[-1], 'LAND\nPLANETS', pos='bottom right', size=labelsize, pad=0.03)
+axes[1] = cornertext(axes[1], 'WATER\nPLANETS', pos='top left', size=labelsize, pad=0.03)  ## , x=0.2
+axes[1] = cornertext(axes[1], 'LAND\nPLANETS', pos='bottom right', size=labelsize, pad=0.03) # , x=0.8
 
 
 # handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,

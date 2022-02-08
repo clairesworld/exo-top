@@ -1120,11 +1120,11 @@ def plot_vs_x(scplanets=None, lplanets=None, xname=None, ynames=None, planets2=N
 
 def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1, tickwidth=1, textc='k',
                                            relative=False, relval=None, picklefrom=None, pickleto=None,
-                                           age=4.5, x_vars=None, ylabel='', fig_height=4,
+                                           age=4.5, x_vars=None, ylabel='', ylabelpad=10, xlabelpad=10, fig_height=4,
                                            dist_res=10, ylim=None, leg_loc='upper left',
                                            xlabels=None, log=None, x_range=None, xscales=None, units=None, x_res=8,
                                            fig=None, axes=None, model_param='dyn_top_rms', legend=False, legsize=12,
-                                           yscale=1, alpha=0.2, return_planets=False,
+                                           yscale=1, alpha=0.2, return_planets=False, linec2=None,
                                            linec='k', ls='-', labelsize=16, lw=3, ticksize=12, extra_def=False,
                                            update_kwargs={}, run_kwargs={}, verbose=False, **kwargs):
     if x_vars is None:
@@ -1207,12 +1207,14 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
         print('      range:', y_av[0], '-', y_av[-1], '| % diff:', abs(y_av[-1] - y_av[0]) / y_av[0])
 
 
-        axes[i_ax].plot(x_vec, y_av, c=linec, lw=lw, ls=ls)
+        if linec2 is None:
+            linec2 = linec
+        axes[i_ax].plot(x_vec, y_av, c=linec2, lw=lw, ls=ls)
         axes[i_ax].fill_between(x_vec, y_lower, y_upper, color=linec, alpha=alpha)
         if extra_def:
             axes[i_ax].plot(x_vec, y_lower, c=linec, alpha=1, lw=0.5, ls='-')
             axes[i_ax].plot(x_vec, y_upper, c=linec, alpha=1, lw=0.5, ls='-')
-        axes[i_ax].set_xlabel(xlabels[i_ax], fontsize=labelsize)
+        axes[i_ax].set_xlabel(xlabels[i_ax], fontsize=labelsize, labelpad=xlabelpad)
         axes[i_ax].tick_params(axis='both', labelsize=ticksize)
         if log[i_ax]:
             axes[i_ax].set_xscale('log')
@@ -1247,7 +1249,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
     if pickleto is not None:
         pkl.dump(picklelist, open(pickleto, "wb"))
 
-    axes[0].set_ylabel(ylabel, fontsize=labelsize)
+    axes[0].set_ylabel(ylabel, fontsize=labelsize, labelpad=ylabelpad)
 
     for ax in axes:
         ax.xaxis.set_tick_params(width=tickwidth)
@@ -1486,7 +1488,11 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
         if version == 0:
             # f_water = np.logspace(np.log10(mass_frac_sfcwater[0]), np.log10(mass_frac_sfcwater[-1]), num=25)
             f_water = mass_frac_sfcwater
-            colours = colorize([np.log10(m) for m in f_water], cmap=cmap)[0]
+            if vmin is None:
+                vmin = np.min(mass_frac_sfcwater)
+            if vmax is None:
+                vmax = np.max(mass_frac_sfcwater)
+            colours = colorize([np.log10(m) for m in f_water], cmap=cmap, vmin=np.log10(vmin), vmax=np.log10(vmax))[0]
             vol_w_last = 10*np.ones_like(masses)
             for ii, X in enumerate(f_water):
                 M_w = masses * parameters.M_E * X  # mass of sfc water in kg
@@ -1521,33 +1527,30 @@ def plot_ocean_capacity(age=4.5, legsize=16, fname='ocean_vol', mass_frac_sfcwat
             for ii, X in enumerate(show_contours):
                 M_w = masses * parameters.M_E * X  # mass of sfc water in kg
                 vol_w = M_w / rho_w  # corresponding volume
+                # print('vol_w', vol_w)
                 if relative:
                     vol_w = vol_w / vol_0
                 x = masses
                 y = vol_w
-                l, = ax.plot(x, y, alpha=1, lw=0.5, zorder=1, c='k')
+                l, = ax.plot(x, y, lw=0.5, zorder=0, c='0.5', alpha=0.2)
+                rot = np.degrees(np.arctan(y/x)[-1])
+                pos = (x[6], y[6])
                 # labels
-                fY = interpolate.interp1d(x, y)
-                fX = interpolate.interp1d(y, x)
-                if log:
-                    pos = [10 ** ((np.log10(x[0]) + np.log10(fX(y[-1]))) / 2.),
-                           10 ** ((np.log10(fY(x[0])) + np.log10(y[-1])) / 2.)]
-
-                # transform data points to screen space
-                xscreen = ax.transData.transform(np.array((x[-2::], y[-2::])))
-                rot = np.rad2deg(np.arctan2(*np.abs(np.gradient(xscreen)[0][0][::-1])))
-                # if (x0[0] < pos[0] < x0[1]) and (y0[0] < pos[1] < y0[1]):
-                sX = format(X, ".0e")
-                s = num2tex(sX, display_singleton=False)
-                print('s[0]', s[0])
-                if s[0] == '\\':  # if singleton
-                    s = s[7:]
-                    print('removing times')
-                # s = '$' + str(num2tex(X))[7:] + '$'
-                print('s', s)
-                ltex = ax.text(pos[0], pos[1], '$' + s + '$', size=legsize, rotation=rot,
+                # sX = format(X, ".0e")
+                # s = num2tex(sX, display_singleton=False)
+                # print('s[0]', s[0])
+                # if s[0] == '\\' or s[0] == '1':  # if singleton
+                #     s = s[7:]
+                #     # print('removing times')
+                # # s = '$' + str(num2tex(X))[7:] + '$'
+                s = mathtextsci(X, fmt="%1.0e")
+                print('s =', s)
+                ltex = ax.text(pos[0], pos[1], '$' + s + '$', size=18, rotation=rot,
                                color=l.get_color(),
-                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec='w', fc='w'))
+                               ha="center", va="center", bbox=dict(boxstyle='square,pad=-0.0', ec='w', fc='w'),
+                               rotation_mode='anchor',
+                               transform_rotates_text=True
+                               )
 
         if vmin is None:
             vmin = np.min(mass_frac_sfcwater)
@@ -1585,3 +1588,21 @@ def read_JFR(fname='', path='/home/claire/Works/exo-top/benchmarks/JFR/'):
     h_rms = np.array(df.RMS_topo)
     Nu = np.array(df.Nu)
     return Ra, h_peak, h_rms, Nu
+
+
+import matplotlib.ticker as mticker
+def mathtextsci(x, fmt="%1.2e", pos=None):
+        s = fmt % x
+        decimal_point = '.'
+        positive_sign = '+'
+        tup = s.split('e')
+        significand = tup[0].rstrip(decimal_point)
+        sign = tup[1][0].replace(positive_sign, '')
+        exponent = tup[1][1:].lstrip('0')
+        if exponent:
+            exponent = '10^{%s%s}' % (sign, exponent)
+        if significand and exponent:
+            s =  r'%s{\times}%s' % (significand, exponent)
+        else:
+            s =  r'%s%s' % (significand, exponent)
+        return "${}$".format(s)
