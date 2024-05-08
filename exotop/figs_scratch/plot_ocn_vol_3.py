@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 from useful_and_bespoke import dark_background, cmap_from_ascii, get_continuous_cmap, minmaxnorm, cornertext
 import model_1D.the_results as results
-# import model_1D.evolve as evol
+import model_1D.evolve as evol
 import model_1D.parameters as p
 import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
@@ -75,7 +75,12 @@ run_kwargs = {
 }
 
 nplanets = 7  # 32
-n_stats = 2  # 500
+n_stats = 2  # 500# Get the images on an axis
+im = ax.images
+
+# Assume colorbar was plotted last one plotted last
+cb = im[-1].colorbar
+
 dist_res = 1000  #500 # 1000
 n_sigma = 1
 
@@ -85,9 +90,9 @@ fig, axes = plt.subplots(1, 3, figsize=(30, 10))
 rad_vals = [0.3, 1, 3]
 peak_ratios = [3.5,  3.9]
 # c_spec = [c_dt, 'xkcd:squash', 'xkcd:reddish orange']
-c_spec = [c_dt, 'xkcd:reddish orange']
+c_spec = [c_dt, 'w']
 ls_rad = ['--', '-', '-.']
-ls_spec = ['--', ':']
+ls_spec = ['--','']
 labels_spec = ['Pure dynamic topography',  'Red noise topography']
 labels_cols = ['Low internal heating', 'Solar system-like internal heating', 'High internal heating']
 for ii, spec in enumerate(['base_spectrum_l1.pkl',  'spectrum_-2.pkl']):
@@ -104,9 +109,8 @@ for ii, spec in enumerate(['base_spectrum_l1.pkl',  'spectrum_-2.pkl']):
         fig, ax, planets_axes = results.plot_ocean_capacity(fig=fig, axes=axes[jj], M0=1,
                                               picklefrom=picklefile,
                                               peak_ratio=peak_ratios[ii],
-                                              # mass_frac_sfcwater=np.logspace(np.log10(3e-7), np.log10(3e-3), num=120),
+                                              mass_frac_sfcwater=np.logspace(np.log10(3e-7), np.log10(1e-2), num=120),
                                                             vmin=1e-6,
-                                              # mass_frac_sfcwater=np.logspace(-6, np.log10(2e-3), num=60), #vmin=1e-6, vmax=1e-2,
                                               textc=textc, titlesize=32,
                                               save=False, spectrum_fname=spec, c=c_spec[ii], ls=ls_spec[ii],
                                               spectrum_fpath=spec_path, extra_def=True,
@@ -134,8 +138,7 @@ for iax, ax in enumerate(axes):
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%g'))
     ax.yaxis.set_minor_formatter(ticker.NullFormatter())
-    ax.set_ylim((0.01, 1.01))  # low b scaling  # (0.02, 1))
-    # ax.set_yticks([0.01, 0.1, 0.2])  # low b scaling
+    ax.set_ylim((0.01, 5))
     ax.set_yscale('log')  # ensure
     if iax > 0:  # remove tick labels but keep ticks
         tk = [item.get_text() for item in ax.get_yticklabels()]
@@ -155,54 +158,40 @@ axes[1] = cornertext(axes[1], 'WATER\nPLANETS', pos='top left', size=labelsize, 
 axes[1] = cornertext(axes[1], 'LAND\nPLANETS', pos='bottom right', size=labelsize, pad=0.03) # , x=0.8
 
 
-# handles = [mlines.Line2D([], [], color=c_dt, ls='-', lw=3,
-#                          label='Pure dynamic topography'),
-#            mlines.Line2D([], [], color='xkcd:squash', ls='--', lw=3,
-#                          label='Venus-like topography'),
-#            mlines.Line2D([], [], color='xkcd:reddish orange', ls='-.', lw=3,
-#                          label='Red noise topography'),
-#            # mlines.Line2D([], [], color='g', ls='--', lw=3,
-#            #               label='Simple scaling')
-#            ]
-
-
-# ax = axes[1]
-# ax.set_xlabel('U and Th abundance\n($\%$ relative to solar)', fontsize=labelsize, c=textc,
-#               labelpad=20)
-# ax.set_xlim((30, 300))
-# ax.set_xticks([30, 100, 200, 300])
-
 
 # if slides:
 # fig, *axes = dark_background(fig, axes)
 # for ax in axes:
 #     ax.set_facecolor('w')
 
-# # add water budget from mantle capacity
-# for mass, wm in zip([0.1, 0.644, 1.1888, 1.73333, 2.2777, 2.8222, 3.3666, 3.9111, 4.45555, 5],
-#                      [0.22423470268081988, 0.30710920286531945, 0.29808890486546075,
-#                       0.41634988905851456, 0.39417319187173433, 0.47329591937758037, 0.5083128218512414,
-#                       0.5589056273868939, 0.6347661498420221, 0.699645538747869]):
-#     v_TO = (1.4e21 / 1000)
-#     axes[1].scatter(mass, wm, marker='*', c='k', s=180, alpha=0.8)
-#
-# # add crustal peak scaling
-# for mass, vmax in zip([0.1, 0.644, 1.1888, 1.73333, 2.2777, 2.8222, 3.3666, 3.9111, 4.45555, 5],
-#                       [1.8375475383320783, 2.0428494361481584, 2.1964335705508247, 2.4319830149075927,
-#                        2.5608063910043857, 2.7396306300156517, 2.90286118173904, 3.0774926147219857, 3.093650080815854,
-#                        3.1324688159845504]):
-#     axes[1].plot(mass, vmax, c='xkcd:true blue', lw=3)
+# add water budget from mantle capacity
+for ax in axes:
+    ax.scatter([0.1, 0.15444521049463789, 0.23853323044733007, 0.36840314986403866, 0.5689810202763907,
+                     0.8787639344404102, 1.3572088082974532, 2.096144000826768, 3.2373940143476263, 5.000000000000001],
+               [0.22423470268081988, 0.30710920286531945, 0.29808890486546075,
+                0.41634988905851456, 0.39417319187173433, 0.47329591937758037, 0.5083128218512414,
+                0.5589056273868939, 0.6347661498420221, 0.699645538747869],
+               marker='*', c='k', s=250, alpha=0.8)
+
+    # add crustal peak scaling
+    ax.plot([0.1, 0.15444521049463789, 0.23853323044733007, 0.36840314986403866, 0.5689810202763907,
+                   0.8787639344404102, 1.3572088082974532, 2.096144000826768, 3.2373940143476263, 5.000000000000001],
+            [1.8375475383320783, 2.0428494361481584, 2.1964335705508247, 2.4319830149075927,
+             2.5608063910043857, 2.7396306300156517, 2.90286118173904, 3.0774926147219857, 3.093650080815854,
+             3.1324688159845504], c='xkcd:vivid blue', lw=5, ls='-', alpha=0.5)
+
 
 
 handles = []
-names = ['Pure dynamic topography', 'Red noise']  # str(rad*100) + r'$\%$')
+names = ['Dynamic topography']  # str(rad*100) + r'$\%$')
 for jj, n in enumerate(names):
     handles.append(mlines.Line2D([], [], color=c_spec[jj], ls=ls_spec[jj], lw=3, label=n))
-handles.append(mlines.Line2D([], [], color='xkcd:true blue', ls='-', lw=3, label='Max strength'))
+handles.append(mlines.Line2D([], [], color='xkcd:vivid blue', ls='-', lw=5, label='Max strength, 100 MPa'))
+handles.append(mlines.Line2D([], [], color='k', marker='*', markersize=15, lw=0, label='Primordial mantle water capacity, 1900 K'))
 axes[0].legend(handles=handles, bbox_to_anchor=(0, 1.05, 1, 0.2), loc="lower left", frameon=False, fontsize=legsize,
-               title=r'\textbf{Topography spectral model}', title_fontsize=legsize, ncol=3)
+               # title=r'\textbf{Topography spectral model}', title_fontsize=legsize,
+               ncol=3)
 
-# axes[1].set_ylim((0.01, 4))  # if including different peak scalings beyond dynamic topo
 
 plt.subplots_adjust(wspace=0.1)
 fig.savefig(fig_path + 'ocn_vol2_fast_1000_' + today + '.png', bbox_inches='tight', dpi=400,

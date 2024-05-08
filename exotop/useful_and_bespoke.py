@@ -48,10 +48,11 @@ def cmap_from_list(clist, n_bin=None, cmap_name=''):
     return cm
 
 
-def cmap_from_ascii(name, path='', end='.txt', **kwargs):
+def cmap_from_ascii(name, path='', end='.txt', usecols=(1, 2, 3), **kwargs):
     from matplotlib.colors import ListedColormap
+    # .gpf gnuplot files are in format (idx, r, g, b)
     file = path + name + end
-    carray = np.genfromtxt(file, comments='#', **kwargs)
+    carray = np.genfromtxt(file, comments='#', usecols=usecols, **kwargs)
     cmap = ListedColormap(carray, name=name)
     return cmap
 
@@ -141,7 +142,7 @@ def printe(name, obj, showall=False):
         pass
 
 
-def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='', labelsize=16, ticksize=14,
+def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='', labelsize=14, ticksize=14,
               ticks=None, ticklabels=None, labelpad=17, loc='right',
               rot=None, discrete=False, cmap='rainbow', tickformatter=None, c='k', pad=0.05, log=False):
     from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -164,11 +165,14 @@ def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='
                 vmax = np.max(vector)
         except TypeError as e:
             print(e)
-            raise Exception('colourbar: if mappable is None, must provide vector')
+            raise Exception('colourbar: if mappable is None, must provide numerical vector')
         dum = np.linspace(np.min(vector), np.max(vector), n)
         print('colourmap bounds', np.min(vector), np.max(vector))
         print('colourmax vmin', vmin, 'vmax', vmax)
-        mappable = ax.scatter(dum, dum, c=dum, cmap=cmap, s=0, norm=norm, vmin=vmin, vmax=vmax)
+        if norm is None:
+            mappable = ax.scatter(dum, dum, c=dum, cmap=cmap, s=0, vmin=vmin, vmax=vmax)
+        else:
+            mappable = ax.scatter(dum, dum, c=dum, cmap=cmap, s=0, norm=norm)
 
     fig = ax.figure
     divider = make_axes_locatable(ax)
@@ -201,13 +205,13 @@ def colourbar(mappable=None, vector=None, ax=None, vmin=None, vmax=None, label='
 
 
 def colourised_legend(ax, clist, cleglabels, lw=0, ls='--', marker='o', markersize=20, alpha=1, legsize=25,
-                      titlesize=None, ncol=1, title=None, return_leg=False, **kwargs):
+                      titlesize=None, ncol=1, title=None, return_leg=False, bbox_to_anchor=(1.01, 1), **kwargs):
     import matplotlib.lines as mlines
     handles = []
     for jj, label in enumerate(cleglabels):
         handles.append(mlines.Line2D([], [], color=clist[jj], marker=marker, ls=ls, alpha=alpha,
                                      markersize=markersize, lw=lw, label=str(label)))
-    leg = ax.legend(handles=handles, frameon=False, fontsize=legsize, ncol=ncol, bbox_to_anchor=(1.01, 1), loc='upper left', title=title, **kwargs)
+    leg = ax.legend(handles=handles, frameon=False, fontsize=legsize, ncol=ncol, bbox_to_anchor=bbox_to_anchor, loc='upper left', title=title, **kwargs)
     if title is not None:
         if titlesize is None:
             titlesize = legsize
@@ -400,6 +404,24 @@ def get_continuous_cmap(hex_list, float_list=None, N=256):
     cmp = mcolors.LinearSegmentedColormap('my_cmp', segmentdata=cdict, N=N)
     return cmp
 
+
+def imscatter(x, y, image, ax=None, zoom=1):
+    if ax is None:
+        ax = plt.gca()
+    try:
+        image = plt.imread(image)
+    except TypeError:
+        # Likely already an array...
+        pass
+    im = OffsetImage(image, zoom=zoom)
+    x, y = np.atleast_1d(x, y)
+    artists = []
+    for x0, y0 in zip(x, y):
+        ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=False)
+        artists.append(ax.add_artist(ab))
+    ax.update_datalim(np.column_stack([x, y]))
+    ax.autoscale()
+    return artists
 
 
 # from colormath.color_objects import *
@@ -615,3 +637,4 @@ def get_continuous_cmap(hex_list, float_list=None, N=256):
 #         '''
 #         f = numpy.vectorize(lambda x: self.map_scalar(x, space))
 #         return f(scalar_array)
+

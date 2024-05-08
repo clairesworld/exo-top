@@ -20,7 +20,6 @@ from useful_and_bespoke import age_index, dark_background, not_iterable, coloriz
 from model_1D.parameters import M_E
 import matplotlib.ticker as ticker
 import matplotlib.lines as mlines
-from num2tex import num2tex
 import pickle as pkl
 
 vars_mc_default = ['Ea', 'eta_pre',
@@ -1174,7 +1173,9 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
         xmin, xmax = x_range[i_ax]
 
         if picklefrom is not None:
+            print('unpickled', picklelist, np.shape(picklelist))
             x_vec, y_av, y_upper, y_lower = picklelist[i_ax]
+            print('y_av', y_av)
         else:
 
             if x_var == 't':
@@ -1203,6 +1204,8 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                                                                **kwargs)
                 x_vec = x_vec * xscales[i_ax]
                 planets_axes.append(planets_x)
+                print('x', x_vec)
+                print('y', y_av)
 
         print('      range:', y_av[0], '-', y_av[-1], '| % diff:', abs(y_av[-1] - y_av[0]) / y_av[0])
 
@@ -1244,6 +1247,7 @@ def plot_change_with_observeables_ensemble(defaults='Earthbaseline', wspace=0.1,
                                 horizontalalignment='right',
                                 verticalalignment='top',
                                 transform=axes[i_ax].transAxes)
+        print('xlim', axes[i_ax].get_xlim())
         picklelist.append((x_vec, y_av, y_upper, y_lower))
 
     if pickleto is not None:

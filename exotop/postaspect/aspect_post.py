@@ -8,9 +8,8 @@ from scipy import stats
 from scipy import odr
 import os
 import matplotlib.pyplot as plt
-from sklearn import linear_model
 from scipy.interpolate import interp1d
-from scipy.spatial import distance
+# from scipy.spatial import distance
 # import statsmodels.api as sm
 from postaspect import aspectdata as ad
 from postaspect.setup_postprocessing import data_path_bullard

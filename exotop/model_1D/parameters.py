@@ -9,6 +9,8 @@ sec2Gyr = 1e-9 / years2sec
 AU2m = 1.5e11
 R_b = 8.3144598  # universal gas constant in J mol −1 K −1
 sb = 5.67e-8  # Stefan Boltzmann constant in W m^-2 K^-4
+w_Earth_ppm = 1.426e21/M_E * 1e6
+print(w_Earth_ppm)
 
 # other solar system
 M_Mars = 6.39e23

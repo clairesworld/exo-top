@@ -1,14 +1,12 @@
-import pyshtools
-import cartopy.crs as ccrs
+
+# import cartopy.crs as ccrs
 import numpy as np
 import pandas as pd
-from postaspect import aspect_post as ap
-from postaspect import aspectdata as post
-from postaspect.plt_aspect import plot_save
 import matplotlib.pyplot as plt
 
 
 def hpeak_from_spectrum(power, norm='4pi', lmax=40, n=10, **kwargs):
+    import pyshtools
     ii = 0
     h_peak = []
     while ii < n:
@@ -64,7 +62,7 @@ def norm_spectrum(k, S, norm='min_l', k_min=None, verbose=False, **kwargs):
     elif norm == 'rel_power':  # S must be density
         S_norm = 100 * S / np.sum(S)
     else:
-        print('no PSD normalisation scheme recognised')
+        print('no PSD normalisation scheme recognised - not normalising')
         S_norm = S
 
     if verbose:
@@ -221,6 +219,7 @@ def get_dct_test():
 
 def dct_spectrum_jfr(case=None, test=False, plot_test=False, L_x=8, x_res=1, data_path='', ts0=None, t0=0.5, dim=False,
                      d=600, dT=442, alpha=4e-5, check_norm=False, **kwargs):
+    from postaspect import aspect_post as ap
     # 1D power spectral density estimate for Claire
     from scipy.fftpack import dct
 
@@ -315,6 +314,7 @@ def dct_spectrum_avg(case, ts0=None, tsf=None, t0=None, x_res=1, t_res=100, data
                      plot=False, L_x=8, dim=False, d=2700, dT=3000, alpha=2e-5, load=False, dump=True, **kwargs):
     import os
     import pickle as pkl
+    from postaspect import aspect_post as ap
 
     file = data_path + 'output-' + case + '/pickle/' + case + '_sph' + fend
     if load and os.path.exists(file):
@@ -420,6 +420,7 @@ def plot_fit_psd(psd, k, dim=True, case='', show_nat_scales=True, save=True, fig
     fig = plt.gcf()
     plt.tight_layout()
     if save:
+        from postaspect.plt_aspect import plot_save
         plot_save(fig, fname='DCT_' + case, fig_path=fig_path, **kwargs)
     elif show:
         plt.show()
@@ -472,6 +473,7 @@ def show_beta_guide(ax, x0, y0, x1, m=-2, c='xkcd:slate', lw=1, legsize=12, log=
 
 def nat_scales(case, ax=None, t1=0, d=2700, alpha=2e-3, c='xkcd:grey', lw=0.5, data_path='', dim=False,
                min_type='delta_rh', lid=False, max_dscale=2, bl_fudge=1, plot=True, show_orig_scales=False, **kwargs):
+    from postaspect import aspect_post as ap
     if not dim:
         d = 1
     df = ap.pickleio(case, suffix='_T', t1=t1, load=True, data_path=data_path, **kwargs)
@@ -667,6 +669,7 @@ def integrate_to_peak(grid, lats, lons, R=2, lmax=120, normalise=True, fudge_to_
 
 
 def integrate_to_peak_GLQ(grid, R=2, lmax=120, verbose=False):
+    import pyshtools
     h_peak = np.max(grid)
     h_peak_abs = np.max(abs(grid))
 
@@ -694,9 +697,9 @@ def integrate_to_peak_GLQ(grid, R=2, lmax=120, verbose=False):
 
 
 def coeffs_to_grid(clm, R=2, lmax=None, scale_to_1D=False, plot_grid=True, plot_spectrum=True, cbar=False,
-                   clabel='Dynamic topography (km)',
-                   cmap='terrain', labelsize=14, verbose=False, fig_path='', cline='k', lw=3,
-                   save=False, figsize=(5, 3), ticksize=16):
+                   clabel='Dynamic topography (km)', zscale=1, flood=None,
+                   cmap='terrain', labelsize=14, verbose=False, fig_path='', cline='k', lw=3, vmin=None, vmax=None,
+                   save=False, figsize=(5, 3), ticksize=16, fig=None, ax=None):
     if lmax is None:
         lmax = clm.lmax
     spectrum = clm.spectrum(unit='per_lm')  # 2D power spectral density
@@ -743,21 +746,31 @@ def coeffs_to_grid(clm, R=2, lmax=None, scale_to_1D=False, plot_grid=True, plot_
         # v = v.reshape((v.shape[0], 1))
         # data = np.hstack([data, v])
 
-        fig, ax = plt.subplots(1, 1)
-        mappable = ax.imshow(data, extent=(0, 360, -90, 90), cmap=cmap)
+        if ax is None:
+            fig, ax = plt.subplots(1, 1)
+        if vmin is None:
+            vmin = np.min(data*zscale)
+        if vmax is None:
+            vmax = np.max(data*zscale)
+        data = data * zscale
+        if flood is not None:
+            data = np.ma.masked_where(data <= flood, data, copy=True)
+        mappable = ax.imshow(data, extent=(0, 360, -90, 90), cmap=cmap, vmin=vmin, vmax=vmax)
         ax.set(yticks=np.arange(-90, 120, 30), xticks=np.arange(0, 390, 30))
-        ax.set_xlabel('Latitude', fontsize=labelsize)
-        ax.set_ylabel('Longitude', fontsize=labelsize)
+        ax.set_xlabel('Longitude', fontsize=labelsize)
+        ax.set_ylabel('Latitude', fontsize=labelsize)
         if cbar:
-            plt.colorbar(mappable, orientation='horizontal', label=clabel,
-                         fraction=0.07)
+            colourbar = plt.colorbar(mappable, orientation='horizontal', fraction=0.07)
+            colourbar.set_label(clabel, fontsize=labelsize)
         if save:
             plt.savefig(fig_path + 'topo_grid.png', bbox_inches='tight')
+        return topo, fig, ax
 
     return topo
 
 
 def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
+    import pyshtools
     # psd and l are already model, l must be integers starting at 0
 
     #     d, dT, alpha = 2890, 3000, 3e-5  # Hoggard AGU Monograph
@@ -824,6 +837,7 @@ def random_harms_from_psd(psd, l, R=2, h_ratio=1, plot=True, verbose=True):
 
 
 def get_psd_Venus(lmax=719, unit='per_lm', to_km=True, to_1D=False, verbose=False, norm='ortho'):
+    import pyshtools
     hlm = pyshtools.datasets.Venus.VenusTopo719(
         lmax=lmax)  # 719 degree and order spherical harmonic model of the shape of the planet Venus (Wieczorek 2015).
     hlm_norm = hlm.convert(normalization=norm)
@@ -911,6 +925,7 @@ def plot_norm_psd(baseline_fname='base_spectrum.pkl', fig_path='', psd_path=None
     if legend:
         ax.legend(frameon=False, fontsize=legsize)
     if save:
+        from postaspect.plt_aspect import plot_save
         plot_save(fig, fname=fname, fig_path=fig_path)
 
     if show_degrees and x_name == 'wavenumber':
@@ -1042,6 +1057,7 @@ def Venus_correction(baseline_fname='base_spectrum.pkl', fig_path='', R_base=2, 
         if xlim is not None:
             ax.set_xlim(xlim)
         if save:
+            from postaspect.plt_aspect import plot_save
             plot_save(fig, fname='Venus_correction', fig_path=fig_path)
 
     if lmin > 0:

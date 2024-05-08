@@ -223,6 +223,8 @@ def LHS(t, y, pl=None, use_core=False, use_lid=True, **kwargs):
         pl.D_l = y[2]
     else:
         pl.D_l = 0
+    # pl.D_l = 0
+    # print('lid = 0')
     # print('  LHS in planet: t =', t*p.sec2Gyr, 'Gyr', 'T_cmb', pl.T_c, 'K', 'T_m', pl.T_m, 'K')
     if np.isnan(pl.T_c):
         print('pl.T_c', pl.T_c, 'K')
@@ -247,6 +249,7 @@ def LHS(t, y, pl=None, use_core=False, use_lid=True, **kwargs):
                              c_m=pl.c_m, k_m=pl.k_m, **kwargs)
     else:
         dDdt = 0
+    # dDdt = 0
     # print('t =', t*p.sec2Gyr, 'Gyr, T_m =', pl.T_m, 'dD/dt =', dDdt*1e-3/p.sec2Gyr, 'km/Gyr', 'h =', pl.h_rad_m*1e12, 'pW/kg')
 
     return [dTdt_m, dTdt_c, dDdt]

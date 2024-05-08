@@ -2,7 +2,7 @@
 
 import numpy as np
 from scipy.special import erf
-from mpmath import nsum, exp, inf, sinh
+# from mpmath import nsum, exp, inf, sinh
 from model_1D import parameters as p
 from model_1D import thermal as th
 from model_1D import parameterised_interior as intr

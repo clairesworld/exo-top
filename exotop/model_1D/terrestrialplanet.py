@@ -95,6 +95,7 @@ class TerrestrialPlanet():
         self.T_c = None
         self.D_l = None
         self.t = None
+        self.urey = None
 
     def init_derived(self, bug_Rc=False, verbose=False, **kwargs):
         """ Parameters derived from input parameters """
@@ -204,7 +205,7 @@ class TerrestrialPlanet():
 
         self.eta_m_prime = 1 / self.Ra_i * np.exp(-self.b * self.T_m_prime)
         self.dyn_top_rms_prime = self.dyn_top_rms / (self.alpha_m * T0 * L)
-        self.heuristic_h_prime = self.heuristic_h / (self.alpha_m * T0 * L)
+        # self.heuristic_h_prime = self.heuristic_h / (self.alpha_m * T0 * L)
 
         self.T_scale = T
         self.L_scale = L

@@ -1,8 +1,8 @@
 from . import parameters
 import numpy as np
 from useful_and_bespoke import age_index, dark_background
-import sh_things as sh
 from model_1D.topography import dimensionalise, dyn_topo_peak_prime_aspect
+import sh_things as sh
 
 
 def simple_vol_scaling(pl, verbose=False, at_age=None, it=None, **kwargs):

@@ -11,6 +11,7 @@ import matplotlib.lines as mlines
 from datetime import date
 from matplotlib import rc
 
+
 rc('text', usetex=True)  # turn off for running over ssh
 today = date.today().strftime("%b-%d-%Y")
 plt.rcParams['font.family'] = 'serif'
